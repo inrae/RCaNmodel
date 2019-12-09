@@ -167,7 +167,7 @@ build_CaNmod<-function(file){
   
   ####add refuge biomasses
   attach(symbolic_enviro)
-  A<-rbind(A,do.call(rbind,lapply(components_param$Component[components_param$Component %in%species & !is.na(components_param$RefugeBiomass)],function(sp) treat_constraint(paste(sp,"<=",components_param$RefugeBiomass[components_param$Component==sp])))))
+  A<-rbind(A,do.call(rbind,lapply(components_param$Component[components_param$Component %in%species & !is.na(components_param$RefugeBiomass)],function(sp) treat_constraint(paste(sp,">=",components_param$RefugeBiomass[components_param$Component==sp])))))
   
   ####add satiation
   species_flow_to<-unique(as.character(fluxes_def$To[fluxes_def$To%in%species & is_trophic_flux]))
