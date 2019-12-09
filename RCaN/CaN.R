@@ -170,16 +170,27 @@ build_CaNmod<-function(file){
   A<-rbind(A,do.call(rbind,lapply(components_param$Component[components_param$Component %in%species & !is.na(components_param$RefugeBiomass)],function(sp) treat_constraint(paste(sp,"<=",components_param$RefugeBiomass[components_param$Component==sp])))))
   
   ####add satiation
-  species_flow_to<-unique(as.character(fluxes_def$To[fluxes_def$To%in%species]))
+  species_flow_to<-unique(as.character(fluxes_def$To[fluxes_def$To%in%species & is_trophic_flux]))
   A<-rbind(A,do.call(rbind,lapply(species_flow_to[!is.na(components_param$Satiation[match(species_flow_to,components_param$Component)])],
-                            function(sp) treat_constraint(paste(paste(fluxes_def$Flux[fluxes_def$To==sp],collapse="+"),"<=",components_param$Satiation[components_param$Component==sp],"*",sp)))))
-  ####add inertia
+                                  function(sp) treat_constraint(paste(paste(fluxes_def$Flux[fluxes_def$To==sp & is_trophic_flux],collapse="+"),"<=",components_param$Satiation[components_param$Component==sp],"*",sp)))))
+  ####add inertia 
+  ####to be corrected, we should only take into account tropic flows, i.e. remove non trophic flows
   A<-rbind(A,do.call(rbind,lapply(components_param$Component[components_param$Component %in%species & !is.na(components_param$Inertia)],
-                                  function(sp) treat_constraint(paste(sp,"[-1] >=",sp,"[1:(length(",sp,")-1)]*exp(-",components_param$Inertia[components_param$Component==sp],")",sep="")))))
+                                  function(sp) { #increase
+                                    emigrants <- as.character(fluxes_def$Flux)[as.character(fluxes_def$From)==sp & !fluxes_def$Trophic]
+                                    treat_constraint(paste(sp,"[-1] >=",sp,"[1:(ntstep-1)]*exp(-",components_param$Inertia[components_param$Component==sp],")",
+                                                           ifelse(length(emigrants)>0,paste("+",paste(emigrants,collapse="+","[1:(ntstep-1)]",sep=""),sep=""),""), #we do not take into account emigrants
+                                                           sep=""))
+                                  })))
   A<-rbind(A,do.call(rbind,lapply(components_param$Component[components_param$Component %in%species & !is.na(components_param$Inertia)],
-                                  function(sp) treat_constraint(paste(sp,"[-1] <=",sp,"[1:(length(",sp,")-1)]*exp(",components_param$Inertia[components_param$Component==sp],")",sep="")))))
+                                  function(sp) { #decrease
+                                    immigrants <- as.character(fluxes_def$Flux)[as.character(fluxes_def$To)==sp & !fluxes_def$Trophic]
+                                    treat_constraint(paste(sp,"[-1] <=",sp,"[1:(ntstep-1)]*exp(",components_param$Inertia[components_param$Component==sp],")",
+                                                           ifelse(length(immigrants)>0,paste("-",paste(immigrants,collapse="-","[1:(ntstep-1)]",sep=""),sep=""),""), #we do not take into account imemigrants
+                                                           sep=""))
+                                  })))
   
-
+  
   ####add constraint provided by user
   if (length(lessthan)+length(greaterthan)>0){
     A<-rbind(A,do.call(rbind,mapply(function(c,yr) treat_constraint(c,yr),
