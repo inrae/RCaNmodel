@@ -166,6 +166,7 @@ build_CaNmod<-function(file){
   A<-rbind(A,cbind(rep(0,nbparam-1),diag(-1,nbparam-1,nbparam-1)))
   
   ####add refuge biomasses/biomass positiveness
+  attach(symbolic_enviro)
   A<-rbind(A,do.call(rbind,lapply(components_param$Component[components_param$Component %in%species],function(sp) treat_constraint(paste(sp,">=",ifelse(is.na(components_param$RefugeBiomass[components_param$Component==sp]),0,components_param$RefugeBiomass[components_param$Component==sp]))))))
   
   ####add satiation
