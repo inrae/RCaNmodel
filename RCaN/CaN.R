@@ -48,7 +48,7 @@ treat_constraint<-function(myconstraint,yr=NULL,years=NULL){
     yr<-years %in% as.character(eval(parse(text=yr)))
   }
   
-  mat[years %in%yr,]
+  mat[yr,]
 }
 
 
