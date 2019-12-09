@@ -197,7 +197,7 @@ build_CaNmod<-function(file){
     C<-rbind(C,do.call(rbind,lapply(as.character(constraints$Constraint[equality]),
                                     function(c) treat_constraint(c))))
   }
-  v<- C[,1]
+  v<- -C[,1]
   C <- C[,-1]
   detach(symbolic_enviro)
   
