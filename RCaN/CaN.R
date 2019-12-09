@@ -1,11 +1,11 @@
-setwd("~/Documents/Bordeaux/equipe estuaire/CaN/can/RCaN//")
+setwd("~/Documents/Bordeaux/equipe estuaire/CaN/can/RCaN/")
 
 library(Matrix) #to build sparse matrices and vector
 library(symengine) #https://github.com/symengine/symengine.R
 rm(list=ls())
 library(xlsx)
-libray(cgpsR)
-
+library(cgpsR)
+library(lsei)
 
 file="CaN_input_template.xlsx"
 
@@ -16,7 +16,13 @@ mean.VecBasic<-function(x,...){
 
 
 #function that convert a less than constraint into a linear equation a%*%x=0
-treat_constraint<-function(myconstraint){
+treat_constraint<-function(myconstraint,yr=NULL){
+  years<-as.character(series$Year)
+  if (is.null(yr)){
+    yr<-years
+  } else{
+    yr<-as.character(eval(parse(text=yr)))
+  }
   sign<-ifelse (length(grep("<=",myconstraint))>0,"<=",ifelse (length(grep(">=",myconstraint))>0,">=","="))
   tmp<-strsplit(myconstraint,sign)[[1]]
   if(sign=="<=" | sign=="="){
@@ -26,9 +32,23 @@ treat_constraint<-function(myconstraint){
     left<-tmp[2]
     right<-tmp[1]
   }
-  symbolic_constraint<-symengine::expand(eval(parse(text=left))-eval(parse(text=right)))
+  ###check for division
+  left_numerator<-left
+  left_denominator<-1
+  right_numerator<-right
+  right_denominator<-1
+  if(length(grep("/",left))>0){
+    left_numerator<-strsplit(left,"/")[[1]][1]
+    left_denominator<-strsplit(left,"/")[[1]][2]
+  }
+  if(length(grep("/",right))>0){
+    right_numerator<-strsplit(right,"/")[[1]][1]
+    right_denominator<-strsplit(right,"/")[[1]][2]
+  }
+  
+  symbolic_constraint<-symengine::expand(eval(parse(text=left_numerator))*eval(parse(text=right_denominator))-eval(parse(text=right_numerator))*eval(parse(text=left_denominator)))
   mat<-do.call(rbind,lapply(as.vector(symbolic_constraint),build_vector_constraint))
-  mat
+  mat[years %in%yr,]
 }
 
 
@@ -110,6 +130,7 @@ build_CaNmod<-function(file){
   nbfluxes<-nrow(fluxes_def)
   fluxes_from<-match(fluxes_def$From,species)
   fluxes_to<-match(fluxes_def$To,species)
+  is_trophic_flux <- fluxes_def$Trophic==1
   
   #read Times series
   series<-read.xlsx(file,sheetName="Input time-series")
@@ -128,7 +149,7 @@ build_CaNmod<-function(file){
   H<-diag(1-exp(-components_param$OtherLosses[index_species]))
   N<-matrix(0,nbspecies,nbfluxes)
   N[cbind(fluxes_from,1:nbfluxes)]<- -1 #this is an outgoing flow
-  N[na.omit(cbind(fluxes_to,1:nbfluxes))]<-na.omit(N[cbind(fluxes_to,1:nbfluxes)]+components_param$AssimilationE[match(fluxes_def$To,components)]*components_param$Digestibility[match(fluxes_def$From,components)])
+  N[na.omit(cbind(fluxes_to,1:nbfluxes))]<-ifelse(is_trophic_flux[!is.na(fluxes_to)],na.omit(N[cbind(fluxes_to,1:nbfluxes)]+components_param$AssimilationE[match(fluxes_def$To,components)]*components_param$Digestibility[match(fluxes_def$From,components)]),1) #if it is not a trophic flow, we do not take into account assimilation and digestibility
   N<-sweep(N,1,STATS=diag(H)/(components_param$OtherLosses[index_species]),"*")
   
   
@@ -146,22 +167,23 @@ build_CaNmod<-function(file){
   
   ####add refuge biomasses
   attach(symbolic_enviro)
-  A<-rbind(A,do.call(rbind,lapply(species,function(sp) treat_constraint(paste(sp,"<=",components_param$RefugeBiomass[components_param$Component==sp])))))
+  A<-rbind(A,do.call(rbind,lapply(components_param$Component[components_param$Component %in%species & !is.na(components_param$RefugeBiomass)],function(sp) treat_constraint(paste(sp,"<=",components_param$RefugeBiomass[components_param$Component==sp])))))
   
   ####add satiation
-  A<-rbind(A,do.call(rbind,lapply(unique(as.character(fluxes_def$To[fluxes_def$To%in%species])),
+  species_flow_to<-unique(as.character(fluxes_def$To[fluxes_def$To%in%species]))
+  A<-rbind(A,do.call(rbind,lapply(species_flow_to[!is.na(components_param$Satiation[match(species_flow_to,components_param$Component)])],
                             function(sp) treat_constraint(paste(paste(fluxes_def$Flux[fluxes_def$To==sp],collapse="+"),"<=",components_param$Satiation[components_param$Component==sp],"*",sp)))))
   ####add inertia
-  A<-rbind(A,do.call(rbind,lapply(species,
+  A<-rbind(A,do.call(rbind,lapply(components_param$Component[components_param$Component %in%species & !is.na(components_param$Inertia)],
                                   function(sp) treat_constraint(paste(sp,"[-1] >=",sp,"[1:(length(",sp,")-1)]*exp(-",components_param$Inertia[components_param$Component==sp],")",sep="")))))
-  A<-rbind(A,do.call(rbind,lapply(species,
+  A<-rbind(A,do.call(rbind,lapply(components_param$Component[components_param$Component %in%species & !is.na(components_param$Inertia)],
                                   function(sp) treat_constraint(paste(sp,"[-1] <=",sp,"[1:(length(",sp,")-1)]*exp(",components_param$Inertia[components_param$Component==sp],")",sep="")))))
   
 
   ####add constraint provided by user
   if (length(lessthan)+length(greaterthan)>0){
-    A<-rbind(A,do.call(rbind,lapply(as.character(constraints$Constraint[c(lessthan,greaterthan)]),
-                                    function(c) treat_constraint(c))))
+    A<-rbind(A,do.call(rbind,mapply(function(c,yr) treat_constraint(c,yr),
+                                    as.character(constraints$Constraint[c(lessthan,greaterthan)]),as.character(constraints$Time.range[c(lessthan,greaterthan)]))))
     
   }
   b<- -A[,1]
@@ -195,7 +217,11 @@ build_CaNmod<-function(file){
                b=b,symbolic_enviro=symbolic_enviro))
 }
 
-
+getBoundsParam<-function(myCaNmod,i=1){
+  a<-matrix(rep(0,ncol(myCaNmod$A)),1)
+  a[1,i]<-1
+  lsei(a,0,as.matrix(myCaNmod$C),myCaNmod$v,-as.matrix(myCaNmod$A),-myCaNmod$b)
+}
 
 
 myCaNmod=build_CaNmod(file)
