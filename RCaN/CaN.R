@@ -178,14 +178,14 @@ build_CaNmod<-function(file){
                                   function(sp) { #increase
                                     emigrants <- as.character(fluxes_def$Flux)[as.character(fluxes_def$From)==sp & !fluxes_def$Trophic]
                                     treat_constraint(paste(sp,"[-1] >=",sp,"[1:(length(",sp,")-1)]*exp(-",components_param$Inertia[components_param$Component==sp],")",
-                                                           ifelse(length(emigrants)>0,paste("+",paste(emigrants,collapse="+","[1:(length(",sp,")-1)]",sep=""),sep=""),""), #we do not take into account emigrants
+                                                           ifelse(length(emigrants)>0,paste("-",paste(emigrants,collapse="-","[1:(length(",sp,")-1)]",sep=""),sep=""),""), #we do not take into account emigrants
                                                            sep=""))
                                   })))
   A<-rbind(A,do.call(rbind,lapply(components_param$Component[components_param$Component %in%species & !is.na(components_param$Inertia)],
                                   function(sp) { #decrease
                                     immigrants <- as.character(fluxes_def$Flux)[as.character(fluxes_def$To)==sp & !fluxes_def$Trophic]
                                     treat_constraint(paste(sp,"[-1] <=",sp,"[1:(length(",sp,")-1)]*exp(",components_param$Inertia[components_param$Component==sp],")",
-                                                           ifelse(length(immigrants)>0,paste("-",paste(immigrants,collapse="-","[1:(length(",sp,")-1)]",sep=""),sep=""),""), #we do not take into account imemigrants
+                                                           ifelse(length(immigrants)>0,paste("+",paste(immigrants,collapse="+","[1:(length(",sp,")-1)]",sep=""),sep=""),""), #we do not take into account imemigrants
                                                            sep=""))
                                   })))
   
