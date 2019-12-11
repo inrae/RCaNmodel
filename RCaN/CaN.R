@@ -112,7 +112,7 @@ generate_symbolic_objects <- function (flow,species,ntstep,H,N,B0,series){
   for (s in names(series)[-1]){
     assign(s,series[,s])
   }
-  rm(list=c("H","N","flow","species","ntstep","series","B0"))
+  rm(list=c("H","N","flow","species","ntstep","series","B0","f","s","t","is"))
   return(environment())
 }
 
