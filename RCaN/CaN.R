@@ -167,6 +167,7 @@ build_CaNmod<-function(file){
   
   ####add flow positiveness
   A<-rbind(A,cbind(rep(0,nbparam-1),diag(-1,nbparam-1,nbparam-1)))
+  rownames(A)<-paste(colnames(A)[-1],">=0")
   
   ####add refuge biomasses/biomass positiveness
   attach(symbolic_enviro)
