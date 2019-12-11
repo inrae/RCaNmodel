@@ -239,7 +239,35 @@ inertia=937:1111
 inertia2=1112:1286
 user=1287:1702
 
-getBoundsParam<-function(myCaNmod,i=1){
+lines=c(positiveness,refuge,satiation)
+
+getBoundsParam<-function(myCaNmod){
+  nbparam<-ncol(myCaNmod$A)
+  pb <- txtProgressBar(min = 0, max = nbparam, style = 3)
+  bounds<-sapply(1:nbparam,function(p){
+    setTxtProgressBar(pb,p)
+    lp_model<-make.lp(nrow(myCaNmod$A[lines,]),ncol(myCaNmod$A))
+    set.bounds(lp_model,rep(0,ncol(myCaNmod$A)))
+    lp.control(lp_model,"presolve"=c("rows","lindep","cols"),"verbose"="neutral")
+    for(i in lines){
+      add.constraint(lp_model, myCaNmod$A[i,], "<=", myCaNmod$b[i])
+    }
+    for(i in 1:nrow(myCaNmod$C)){
+      add.constraint(lp_model, myCaNmod$C[i,], "=", myCaNmod$v[i])
+    }
+    ncontr<-length(get.constr.value(lp_model))
+    
+    set.objfn(lp_model,1,p)
+    lp.control(lp_model,sense="max")
+    solve.lpExtPtr(lp_model)
+    upbound<-(get.primal.solution(lp_model,orig=TRUE)[(ncontr+1):(ncontr+nbparam)])[p]
+    lp.control(lp_model,sense="min")
+    solve.lpExtPtr(lp_model)
+    lowbound<-get.primal.solution(lp_model,orig=TRUE)[(ncontr+1):(ncontr+nbparam)][p]
+    c(lowbound,upbound)
+  })
+  data.frame(param=colnames(myCaNmod$A),lowerbound=bounds[1,],upperbound=bounds[2,])
+}
   a<-matrix(rep(0,ncol(myCaNmod$A)),1)
   a[1,i]<-1
   lsei(a,0,as.matrix(myCaNmod$C),myCaNmod$v,-as.matrix(myCaNmod$A)[c(positiveness,refuge,satiation,inertia,inertia2,user),],-myCaNmod$b[c(positiveness,refuge,satiation,inertia,inertia2,user)])
