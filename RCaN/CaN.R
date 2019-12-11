@@ -5,7 +5,8 @@ library(symengine) #https://github.com/symengine/symengine.R
 rm(list=ls())
 library(xlsx)
 library(cgpsR)
-library(lsei)
+library(lpSolveAPI)
+library(utils)
 
 file="CaN_input_template3.xlsx"
 
