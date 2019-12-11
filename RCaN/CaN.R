@@ -178,7 +178,6 @@ build_CaNmod<-function(file){
   A<-rbind(A,do.call(rbind,lapply(species_flow_to[!is.na(components_param$Satiation[match(species_flow_to,components_param$Component)])],
                                   function(sp) treat_constraint(paste(paste(fluxes_def$Flux[fluxes_def$To==sp & is_trophic_flux],collapse="+"),"<=",components_param$Satiation[components_param$Component==sp],"*",sp)))))
   ####add inertia 
-  ####to be corrected, we should only take into account tropic flows, i.e. remove non trophic flows
   A<-rbind(A,do.call(rbind,lapply(components_param$Component[components_param$Component %in%species & !is.na(components_param$Inertia)],
                                   function(sp) { #increase
                                     emigrants <- as.character(fluxes_def$Flux)[as.character(fluxes_def$From)==sp & !fluxes_def$Trophic]
