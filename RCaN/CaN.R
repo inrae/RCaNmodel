@@ -49,7 +49,9 @@ treat_constraint<-function(myconstraint,yr=NULL,years=NULL){
     yr<-years %in% as.character(eval(parse(text=yr)))
   }
   
-  mat[yr,]
+  mat<-mat[yr,]
+  rownames(mat)<-paste(yr,myconstraint,sep=" : ")
+  mat
 }
 
 
