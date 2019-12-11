@@ -162,7 +162,7 @@ build_CaNmod<-function(file){
   
   #build A matrix and b corresponding to constraints A.x<=b
   nbparam<-length(symbolic_enviro$param)
-  A<-Matrix::Matrix(0,0,length(symbolic_enviro$param),sparse=TRUE)
+  A<-Matrix::Matrix(0,0,length(symbolic_enviro$param),sparse=TRUE) #first column stores -b
   colnames(A)<-as.character(symbolic_enviro$param)
   
   ####add flow positiveness
