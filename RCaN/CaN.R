@@ -152,7 +152,7 @@ build_CaNmod<-function(file){
   H<-diag(1-exp(-components_param$OtherLosses[index_species]))
   N<-matrix(0,nbspecies,nbfluxes)
   N[cbind(fluxes_from,1:nbfluxes)]<- -1 #this is an outgoing flow
-  N[na.omit(cbind(fluxes_to,1:nbfluxes))]<-ifelse(is_trophic_flux[!is.na(fluxes_to)],na.omit(N[cbind(fluxes_to,1:nbfluxes)]+components_param$AssimilationE[match(fluxes_def$To,components)]*components_param$Digestibility[match(fluxes_def$From,components)]),1) #if it is not a trophic flow, we do not take into account assimilation and digestibility
+  N[na.omit(cbind(fluxes_to,1:nbfluxes))]<-na.omit(N[cbind(fluxes_to,1:nbfluxes)]+ifelse(is_trophic_flux,components_param$AssimilationE[match(fluxes_def$To,components)]*components_param$Digestibility[match(fluxes_def$From,components)],1)) #if it is not a trophic flow, we do not take into account assimilation and digestibility
   N<-sweep(N,1,STATS=diag(H)/(components_param$OtherLosses[index_species]),"*")
   
   
