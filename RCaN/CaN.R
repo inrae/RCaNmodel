@@ -254,6 +254,40 @@ user=1287:1702
 lines=c(positiveness,refuge,satiation)
 
 
+
+checkPolytopeStatus<-function(myCanMod){
+  nbparam<-ncol(myCaNmod$A)
+  lp_model<-make.lp(nrow(myCaNmod$A[lines,]),nbparam)
+  set.bounds(lp_model,rep(0,ncol(myCaNmod$A)))
+  lp.control(lp_model,"presolve"=c("rows","lindep","cols"),"verbose"="neutral")
+  for(i in lines){
+    add.constraint(lp_model, myCaNmod$A[i,], "<=", myCaNmod$b[i])
+  }
+  for(i in 1:nrow(myCaNmod$C)){
+    add.constraint(lp_model, myCaNmod$C[i,], "=", myCaNmod$v[i])
+  }
+  ncontr<-length(get.constr.value(lp_model))
+  
+  set.objfn(lp_model,rep(1,nbparam))
+  res<-solve.lpExtPtr(lp_model)
+  if (res==0) {
+    print("polytope ok")
+  } else if (res==2){
+    print("empty polytope")
+  } else if (res==3){
+    print("polytope not bounded")
+  } else if (res==9){
+    print("unique solution")
+  } else if (res==5){
+    print("numerical error")
+  }else {
+    print ("potential problem")
+  }
+}
+
+
+
+
 getBoundParam<-function(myCanMod,p,additional_constraint=list()){
   nbparam<-ncol(myCaNmod$A)
   lp_model<-make.lp(nrow(myCaNmod$A[lines,]),nbparam)
