@@ -9,6 +9,7 @@ library(lpSolveAPI)
 library(utils)
 library(ggplot2)
 
+
 file="CaN_input_template3.xlsx"
 
 #this function can be useful to use relative abundance indices
@@ -27,6 +28,8 @@ treat_constraint<-function(myconstraint,yr=NULL,years=NULL){
   } else if(sign==">="){
     left<-tmp[2]
     right<-tmp[1]
+  } else{
+    stop(paste("unrecognized sign in constraint:",myconnstraint))
   }
   ###check for division
   left_numerator<-left
@@ -123,6 +126,7 @@ generate_symbolic_objects <- function (flow,species,ntstep,H,N,B0,series){
 build_CaNmod<-function(file){
   #Components & input parameter
   components_param<-read.xlsx(file,sheetName="Components & input parameter",de)
+  if (length(which(!(components_param$in_out %in% c('In','Out'))))>0) paste("compontents in_out should be either 'Out' or 'In'")
   index_species<-which(components_param$in_out=="In")
   components<-components_param$Component
   species<-as.character(components_param$Component[index_species])
@@ -132,8 +136,12 @@ build_CaNmod<-function(file){
   fluxes_def<-read.xlsx(file,sheetName="Fluxes")
   flow<-as.character(fluxes_def$Flux)
   nbfluxes<-nrow(fluxes_def)
+  if (length(which(! (fluxes_def$From %in%components)))>0) stop(paste("In sheet fluxes, column From, not recognized:",fluxes_def$From[!(fluxes_def$From %in% components)]))
+  if (length(which(! (fluxes_def$To %in%components)))>0) stop(paste("In sheet fluxes, column To, not recognized:",fluxes_def$To[!(fluxes_def$To %in% components)]))
   fluxes_from<-match(fluxes_def$From,species)
   fluxes_to<-match(fluxes_def$To,species)
+  
+  if(length(which(fluxes_def$Trophic !=0 & fluxes_def$Trophic !=1))>0) stop("In sheet fluxes, Trophic should be 1 or 0")
   is_trophic_flux <- fluxes_def$Trophic==1
   
   #read Times series
@@ -148,6 +156,9 @@ build_CaNmod<-function(file){
   greaterthan <- grep(">",constraints$Constraint)
   equality <- grep("^[^<>]+$",constraints$Constraint)
   
+  constraints_word<-unlist(sapply(as.character(constraints$Constraint),function(x) strsplit(x,split="\\+|=|<|\\*|>|\\-|\\)|\\(|[[:space:]]")))
+  not_recognized<-which(!constraints_word %in% c(as.character(components),flow,data_series_name,"mean","sum","") & suppressWarnings(is.na(as.numeric(constraints_word))))
+  if(length(not_recognized)>0) stop(paste("words not recognized in constraints:",constraints_word[not_recognized]))
   
   #build matrices H and N
   H<-diag(1-exp(-components_param$OtherLosses[index_species]))
