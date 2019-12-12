@@ -7,6 +7,7 @@ library(xlsx)
 library(cgpsR)
 library(lpSolveAPI)
 library(utils)
+library(ggplot2)
 
 file="CaN_input_template3.xlsx"
 
@@ -94,11 +95,11 @@ generate_symbolic_objects <- function (flow,species,ntstep,H,N,B0,series){
     assign(paste("B",t,sep="_"),(IE_H%*%eval(parse(text=paste("B",t-1,sep="_"))))[,1]+(n%*%eval(parse(text=paste("F",t-1,sep="_"))))[,1]) # biomass at time t+1 is B_t+1=(Ie-H)%*%B_t+N%*%F_t
     list_F=c(list_F,eval(parse(text=paste("F",t,sep="_"))))
     list_B=c(list_B,eval(parse(text=paste("B",t,sep="_"))))
-  } 
+  }
   
   assign("Fmat",do.call('cbind',list_F))
   assign("param",do.call('c',list_F)) #vector of flows on which we will have to sample
-  assign("Bmat",do.call('cbind',list_B)) 
+  assign("Bmat",do.call('cbind',list_B))
   param<-c(V(1),param) #we add an intercept
   
   for(is in 1:nbspec){
@@ -177,7 +178,7 @@ build_CaNmod<-function(file){
   species_flow_to<-unique(as.character(fluxes_def$To[fluxes_def$To%in%species & is_trophic_flux]))
   A<-rbind(A,do.call(rbind,lapply(species_flow_to[!is.na(components_param$Satiation[match(species_flow_to,components_param$Component)])],
                                   function(sp) treat_constraint(paste(paste(fluxes_def$Flux[fluxes_def$To==sp & is_trophic_flux],collapse="+"),"<=",components_param$Satiation[components_param$Component==sp],"*",sp)))))
-  ####add inertia 
+  ####add inertia
   A<-rbind(A,do.call(rbind,lapply(components_param$Component[components_param$Component %in%species & !is.na(components_param$Inertia)],
                                   function(sp) { #increase
                                     emigrants <- as.character(fluxes_def$Flux)[as.character(fluxes_def$From)==sp & !fluxes_def$Trophic]
@@ -241,48 +242,78 @@ user=1287:1702
 
 lines=c(positiveness,refuge,satiation)
 
-getBoundsParam<-function(myCaNmod){
+
+getBoundParam<-function(myCanMod,p,additional_constraint=list()){
+  nbparam<-ncol(myCaNmod$A)
+  lp_model<-make.lp(nrow(myCaNmod$A[lines,]),nbparam)
+  set.bounds(lp_model,rep(0,ncol(myCaNmod$A)))
+  lp.control(lp_model,"presolve"=c("rows","lindep","cols"),"verbose"="neutral")
+  for(i in lines){
+    add.constraint(lp_model, myCaNmod$A[i,], "<=", myCaNmod$b[i])
+  }
+  for(i in 1:nrow(myCaNmod$C)){
+    add.constraint(lp_model, myCaNmod$C[i,], "=", myCaNmod$v[i])
+  }
+  if (length(additional_constraint)>0){
+    for(i in 1:nrow(additional_constraint$aC)){
+      add.constraint(lp_model, additional_constraint$aC[i,], "=", additional_constraint$av[i])
+    }
+  }
+  ncontr<-length(get.constr.value(lp_model))
+  
+  set.objfn(lp_model,1,p)
+  lp.control(lp_model,sense="max")
+  solve.lpExtPtr(lp_model)
+  upbound<-(get.primal.solution(lp_model,orig=TRUE)[(ncontr+1):(ncontr+nbparam)])[p]
+  lp.control(lp_model,sense="min")
+  solve.lpExtPtr(lp_model)
+  lowbound<-get.primal.solution(lp_model,orig=TRUE)[(ncontr+1):(ncontr+nbparam)][p]
+  c(lowbound,upbound)
+}
+
+getAllBoundsParam<-function(myCaNmod){
   nbparam<-ncol(myCaNmod$A)
   pb <- txtProgressBar(min = 0, max = nbparam, style = 3)
-  bounds<-sapply(1:nbparam,function(p){
+  bounds<-sapply(1:nbparam,function(p) {
     setTxtProgressBar(pb,p)
-    lp_model<-make.lp(nrow(myCaNmod$A[lines,]),ncol(myCaNmod$A))
-    set.bounds(lp_model,rep(0,ncol(myCaNmod$A)))
-    lp.control(lp_model,"presolve"=c("rows","lindep","cols"),"verbose"="neutral")
-    for(i in lines){
-      add.constraint(lp_model, myCaNmod$A[i,], "<=", myCaNmod$b[i])
-    }
-    for(i in 1:nrow(myCaNmod$C)){
-      add.constraint(lp_model, myCaNmod$C[i,], "=", myCaNmod$v[i])
-    }
-    ncontr<-length(get.constr.value(lp_model))
-    
-    set.objfn(lp_model,1,p)
-    lp.control(lp_model,sense="max")
-    solve.lpExtPtr(lp_model)
-    upbound<-(get.primal.solution(lp_model,orig=TRUE)[(ncontr+1):(ncontr+nbparam)])[p]
-    lp.control(lp_model,sense="min")
-    solve.lpExtPtr(lp_model)
-    lowbound<-get.primal.solution(lp_model,orig=TRUE)[(ncontr+1):(ncontr+nbparam)][p]
-    c(lowbound,upbound)
+    getBoundParam(myCaNmod,p)
   })
   data.frame(param=colnames(myCaNmod$A),lowerbound=bounds[1,],upperbound=bounds[2,])
 }
-  a<-matrix(rep(0,ncol(myCaNmod$A)),1)
-  a[1,i]<-1
-  lsei(a,0,as.matrix(myCaNmod$C),myCaNmod$v,-as.matrix(myCaNmod$A)[c(positiveness,refuge,satiation,inertia,inertia2,user),],-myCaNmod$b[c(positiveness,refuge,satiation,inertia,inertia2,user)])
+
+
+plotPolytope2D<-function(myCaNmod,params=c(1,2)){
+  nbparam<-ncol(myCaNmod$A)
+  if (length(params)!=2) stop("only works for two params")
+  if (class(params)=="character"){
+    old_params<-params
+    params<-match(params,colnames(myCaNmod$A))
+    if (length(which(is.na(params)))>0) stop(paste("params",which(old_params[is.na(params)]),"not recognized"))
+  }
+  bounds_param1<-getBoundParam(myCaNmod,params[1])
+  seqx1<-seq(bounds_param1[1],bounds_param1[2],length.out=50)
+  pb <- txtProgressBar(min = 0, max = 50, style = 3)
+  polygon<-lapply(seqx1,function(x) {
+    setTxtProgressBar(pb,which(seqx1==x))
+    cbind(rep(x,2),getBoundParam(myCanMod,
+                  params[2],
+                  additional_constraint=list(aC=matrix(ifelse((1:nbparam)==params[1],1,0),1),av=x)))
+  })
+  polygon<-as.data.frame(rbind(do.call('rbind',lapply(polygon, function(x) x[1,])),do.call('rbind',lapply(rev(polygon), function(x) x[2,]))))
+  names(polygon)<-colnames(myCaNmod$A)[params]
+  ggplot(polygon,aes_string(x=colnames(myCaNmod$A)[params[1]],y=colnames(myCaNmod$A)[params[2]]))+geom_polygon()
+  
 }
 
-a<-matrix(rep(0,ncol(myCaNmod$A)),1)
-a[1,i]<-1
-nbc=122
-lsei(a,0,e=-as.matrix(myCaNmod$A),f=myCaNmod$b)
+
+
+
+
+
 
 
 myCaNmod=build_CaNmod(file)
 
 
-
-
-
-
+getAllBoundsParam(myCaNmod)
+plotPolytope2D(myCaNmod,params=c("F01_1","F01_2"))
