@@ -371,6 +371,7 @@ plotPolytope2D<-function(myCaNmod,params=c(1,2)){
 
 myCaNmod=build_CaNmod(file)
 
+checkPolytopeStatus(myCaNmod)
 
 getAllBoundsParam(myCaNmod)
 plotPolytope2D(myCaNmod,params=c("F01_1","F01_2"))
