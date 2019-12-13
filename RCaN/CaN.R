@@ -4,13 +4,13 @@ library(Matrix) #to build sparse matrices and vector
 library(symengine) #https://github.com/symengine/symengine.R
 rm(list=ls())
 library(xlsx)
-library(cgpsR)
+library(cpgsR)
 library(lpSolveAPI)
 library(utils)
 library(ggplot2)
 
 
-file="CaN_input_template3.xlsx"
+file="CaN_template_mini.xlsx"
 
 #this function can be useful to use relative abundance indices
 mean.VecBasic<-function(x,...){
@@ -19,7 +19,8 @@ mean.VecBasic<-function(x,...){
 
 
 #function that convert a less than constraint into a linear equation a%*%x=0
-treat_constraint<-function(myconstraint,yr=NULL,years=NULL){
+treat_constraint<-function(myconstraint,yr=NULL){
+  years<-as.character(colnames(Fmat))
   sign<-ifelse (length(grep("<=",myconstraint))>0,"<=",ifelse (length(grep(">=",myconstraint))>0,">=","="))
   tmp<-strsplit(myconstraint,sign)[[1]]
   if(sign=="<=" | sign=="="){
@@ -50,11 +51,10 @@ treat_constraint<-function(myconstraint,yr=NULL,years=NULL){
   if (is.null(yr)){
     yr<-1:nrow(mat)
   } else{
-    yr<-years %in% as.character(eval(parse(text=yr)))
+    yr<- years %in% as.character(eval(parse(text=yr)))
   }
-  
   mat<-mat[yr,]
-  rownames(mat)<-paste(yr,myconstraint,sep=" : ")
+  rownames(mat)<-paste(years[yr],myconstraint,sep=" : ")
   mat
 }
 
@@ -101,8 +101,10 @@ generate_symbolic_objects <- function (flow,species,ntstep,H,N,B0,series){
   }
   
   assign("Fmat",do.call('cbind',list_F))
+  colnames(Fmat)<-series$Year
   assign("param",do.call('c',list_F)) #vector of flows on which we will have to sample
   assign("Bmat",do.call('cbind',list_B))
+  colnames(Bmat)<-series$Year
   param<-c(V(1),param) #we add an intercept
   
   for(is in 1:nbspec){
@@ -208,7 +210,7 @@ build_CaNmod<-function(file){
   
   ####add constraint provided by user
   if (length(lessthan)+length(greaterthan)>0){
-    A<-rbind(A,do.call(rbind,mapply(function(c,yr) treat_constraint(c,yr,as.character(series$Year)),
+    A<-rbind(A,do.call(rbind,mapply(function(c,yr) treat_constraint(c,yr),
                                     as.character(constraints$Constraint[c(lessthan,greaterthan)]),as.character(constraints$Time.range[c(lessthan,greaterthan)]))))
     
   }
