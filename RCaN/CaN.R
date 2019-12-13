@@ -225,6 +225,16 @@ build_CaNmod<-function(file){
   }
   v<- -C[,1]
   C <- C[,-1]
+  
+  ####build matrix L and M of B=L.F+M
+  L<-Matrix::Matrix(0,0,length(symbolic_enviro$param),sparse=TRUE) #first column stores -b
+  L<-rbind(L,do.call('rbind',do.call('rbind',lapply(species,function(sp) lapply(as.vector(expand(eval(parse(text=sp)))),build_vector_constraint)))))
+  M<-L[,1]
+  L<-L[,-1]
+  colnames(L)<-colnames(A)
+  tmp<-expand.grid(series$Year,species)
+  rownames(L)<-paste(tmp[,2],"[",tmp[,1],"]",sep="")
+  
   detach(symbolic_enviro)
   
   return (list(components_param=components_param,
@@ -280,7 +290,7 @@ checkPolytopeStatus<-function(myCanMod){
     print("unique solution")
   } else if (res==5){
     print("numerical error")
-  }else {
+  } else {
     print ("potential problem")
   }
 }
