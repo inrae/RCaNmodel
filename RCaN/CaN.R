@@ -250,6 +250,8 @@ build_CaNmod<-function(file){
                A=A,
                C=C,
                v=v,
+               L=L,
+               M=M,
                b=b,symbolic_enviro=symbolic_enviro))
 }
 
