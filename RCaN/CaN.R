@@ -11,6 +11,7 @@ library(ggplot2)
 
 
 file="CaN_template_mini.xlsx"
+file="CaN_input_template3.xlsx"
 
 #this function can be useful to use relative abundance indices
 mean.VecBasic<-function(x,...){
@@ -19,7 +20,7 @@ mean.VecBasic<-function(x,...){
 
 
 #function that convert a less than constraint into a linear equation a%*%x=0
-treat_constraint<-function(myconstraint,yr=NULL){
+treat_constraint<-function(myconstraint,yr=NULL,name_constr=NULL){
   years<-as.character(colnames(Fmat))
   sign<-ifelse (length(grep("<=",myconstraint))>0,"<=",ifelse (length(grep(">=",myconstraint))>0,">=","="))
   tmp<-strsplit(myconstraint,sign)[[1]]
@@ -54,7 +55,7 @@ treat_constraint<-function(myconstraint,yr=NULL){
     yr<- years %in% as.character(eval(parse(text=yr)))
   }
   mat<-mat[yr,]
-  rownames(mat)<-paste(years[yr],myconstraint,sep=" : ")
+  rownames(mat)<-paste(years[yr],name_constr,sep=" : ")
   mat
 }
 
@@ -187,33 +188,35 @@ build_CaNmod<-function(file){
   
   ####add refuge biomasses/biomass positiveness
   attach(symbolic_enviro)
-  A<-rbind(A,do.call(rbind,lapply(components_param$Component[components_param$Component %in%species],function(sp) treat_constraint(paste(sp,">=",ifelse(is.na(components_param$RefugeBiomass[components_param$Component==sp]),0,components_param$RefugeBiomass[components_param$Component==sp]))))))
+  A<-rbind(A,do.call(rbind,lapply(components_param$Component[components_param$Component %in%species],function(sp) treat_constraint(paste(sp,">=",ifelse(is.na(components_param$RefugeBiomass[components_param$Component==sp]),0,components_param$RefugeBiomass[components_param$Component==sp])),name_constr=paste("Biomass positiveness_refuge",sp,sep="_")))))
   
   ####add satiation
   species_flow_to<-unique(as.character(fluxes_def$To[fluxes_def$To%in%species & is_trophic_flux]))
   A<-rbind(A,do.call(rbind,lapply(species_flow_to[!is.na(components_param$Satiation[match(species_flow_to,components_param$Component)])],
-                                  function(sp) treat_constraint(paste(paste(fluxes_def$Flux[fluxes_def$To==sp & is_trophic_flux],collapse="+"),"<=",components_param$Satiation[components_param$Component==sp],"*",sp)))))
+                                  function(sp) treat_constraint(paste(paste(fluxes_def$Flux[fluxes_def$To==sp & is_trophic_flux],collapse="+"),"<=",components_param$Satiation[components_param$Component==sp],"*",sp),name_constr=paste("satiation",sp,sep="_")))))
   ####add inertia
   A<-rbind(A,do.call(rbind,lapply(components_param$Component[components_param$Component %in%species & !is.na(components_param$Inertia)],
                                   function(sp) { #increase
                                     emigrants <- as.character(fluxes_def$Flux)[as.character(fluxes_def$From)==sp & !fluxes_def$Trophic]
                                     treat_constraint(paste(sp,"[-1] >=",sp,"[1:(length(",sp,")-1)]*exp(-",components_param$Inertia[components_param$Component==sp],")",
                                                            ifelse(length(emigrants)>0,paste("-",paste(emigrants,collapse="-","[1:(length(",sp,")-1)]",sep=""),sep=""),""), #we do not take into account emigrants
-                                                           sep=""))
+                                                           sep=""),name_constr=paste("inertia_sup",sp,paste="_"))
                                   })))
   A<-rbind(A,do.call(rbind,lapply(components_param$Component[components_param$Component %in%species & !is.na(components_param$Inertia)],
                                   function(sp) { #decrease
                                     immigrants <- as.character(fluxes_def$Flux)[as.character(fluxes_def$To)==sp & !fluxes_def$Trophic]
                                     treat_constraint(paste(sp,"[-1] <=",sp,"[1:(length(",sp,")-1)]*exp(",components_param$Inertia[components_param$Component==sp],")",
                                                            ifelse(length(immigrants)>0,paste("+",paste(immigrants,collapse="+","[1:(length(",sp,")-1)]",sep=""),sep=""),""), #we do not take into account imemigrants
-                                                           sep=""))
+                                                           sep=""),name_constr=paste("inertia_inf",sp,paste="_"))
                                   })))
   
   
   ####add constraint provided by user
   if (length(lessthan)+length(greaterthan)>0){
-    A<-rbind(A,do.call(rbind,mapply(function(c,yr) treat_constraint(c,yr),
-                                    as.character(constraints$Constraint[c(lessthan,greaterthan)]),as.character(constraints$Time.range[c(lessthan,greaterthan)]))))
+    A<-rbind(A,do.call(rbind,mapply(function(c,yr,id) treat_constraint(c,yr,id),
+                                    as.character(constraints$Constraint[c(lessthan,greaterthan)]),
+                                    as.character(constraints$Time.range[c(lessthan,greaterthan)]),
+                                    as.character(constraints$Id[c(lessthan,greaterthan)]))))
     
   }
   b<- -A[,1]
@@ -224,8 +227,10 @@ build_CaNmod<-function(file){
   C<-Matrix::Matrix(0,0,length(symbolic_enviro$param),sparse=TRUE)
   colnames(C)<-as.character(symbolic_enviro$param)
   if (length(equality)>0){
-    C<-rbind(C,do.call(rbind,lapply(as.character(constraints$Constraint[equality]),
-                                    function(c) treat_constraint(c))))
+    C<-rbind(C,do.call(rbind,mapply(function(c,yr,id) treat_constraint(c,yr,id),
+                       as.character(constraints$Constraint[equality]),
+                       as.character(constraints$Time.range[equality]),
+                       as.character(constraints$Id[equality]))))
   }
   v<- -C[,1]
   C <- C[,-1]
@@ -421,13 +426,24 @@ plotPolytope2D<-function(myCaNmod,params=c(1,2)){
 
 
 
-
-
-
-
 myCaNmod=build_CaNmod(file)
 
 checkPolytopeStatus(myCaNmod)
+findingIncompatibleConstraints(myCaNmod)
+
 
 getAllBoundsParam(myCaNmod)
 plotPolytope2D(myCaNmod,params=c("F01_1","F01_2"))
+
+gets
+
+
+write.table(myCaNmod$N,"/tmp/N.csv",sep=";")
+write.table(myCaNmod$H,"/tmp/H.csv",sep=";")
+write.table(as.matrix(myCaNmod$A),"/tmp/A.csv",sep=";")
+write.table(as.matrix(myCaNmod$C),"/tmp/C.csv",sep=";")
+write.table(myCaNmod$b,"/tmp/b.csv",sep=";")
+write.table(myCaNmod$v,"/tmp/v.csv",sep=";")
+write.table(as.matrix(myCaNmod$L),"/tmp/L.csv",sep=";")
+write.table(myCaNmod$M,"/tmp/M.csv",sep=";")
+
