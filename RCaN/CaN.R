@@ -274,15 +274,7 @@ lines=c(positiveness,refuge,satiation)
 
 checkPolytopeStatus<-function(myCanMod){
   nbparam<-ncol(myCaNmod$A)
-  lp_model<-make.lp(nrow(myCaNmod$A[lines,]),nbparam)
-  set.bounds(lp_model,rep(0,ncol(myCaNmod$A)))
-  lp.control(lp_model,"presolve"=c("rows","lindep","cols"),"verbose"="neutral")
-  for(i in lines){
-    add.constraint(lp_model, myCaNmod$A[i,], "<=", myCaNmod$b[i])
-  }
-  for(i in 1:nrow(myCaNmod$C)){
-    add.constraint(lp_model, myCaNmod$C[i,], "=", myCaNmod$v[i])
-  }
+  lp_model<-defineLPMod(myCanMod)
   ncontr<-length(get.constr.value(lp_model))
   
   set.objfn(lp_model,rep(1,nbparam))
@@ -303,24 +295,28 @@ checkPolytopeStatus<-function(myCanMod){
 }
 
 
+defineLPMod<-function(myCaNmod){
+  nbparam<-ncol(myCaNmod$A)
+  lp_model<-make.lp(nrow(myCaNmod$A)+nrow(myCaNmod$C),nbparam)
+  set.bounds(lp_model,rep(0,ncol(myCaNmod$A)))
+  lp.control(lp_model,"presolve"=c("rows","lindep","cols"),"verbose"="neutral")
+  for (p in 1:nbparam){
+    set.column(lp_model,p,c(myCaNmod$A[,p],myCaNmod$C[,p]))
+  }
+  set.rhs(lp_model,c(myCaNmod$b,myCaNmod$v))
+  set.constr.type(lp_model,c(rep("<=",nrow(myCaNmod$A)),rep("=",nrow(myCaNmod$C))))
+  dimnames(lp_model)<-list(c(rownames(myCaNmod$A),rownames(myCaNmod$C)),colnames(myCaNmod$A))
+  lp_model
+}
+
+
+
+
 
 
 getBoundParam<-function(myCanMod,p,additional_constraint=list()){
   nbparam<-ncol(myCaNmod$A)
-  lp_model<-make.lp(nrow(myCaNmod$A[lines,]),nbparam)
-  set.bounds(lp_model,rep(0,ncol(myCaNmod$A)))
-  lp.control(lp_model,"presolve"=c("rows","lindep","cols"),"verbose"="neutral")
-  for(i in lines){
-    add.constraint(lp_model, myCaNmod$A[i,], "<=", myCaNmod$b[i])
-  }
-  for(i in 1:nrow(myCaNmod$C)){
-    add.constraint(lp_model, myCaNmod$C[i,], "=", myCaNmod$v[i])
-  }
-  if (length(additional_constraint)>0){
-    for(i in 1:nrow(additional_constraint$aC)){
-      add.constraint(lp_model, additional_constraint$aC[i,], "=", additional_constraint$av[i])
-    }
-  }
+  lp_model<-defineLPMod(myCanMod)
   ncontr<-length(get.constr.value(lp_model))
   
   set.objfn(lp_model,1,p)
