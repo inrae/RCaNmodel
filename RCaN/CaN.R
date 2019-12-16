@@ -340,6 +340,61 @@ getAllBoundsParam<-function(myCaNmod){
 }
 
 
+findingIncompatibleConstraints<-function(myCaNmod){
+  nbparam<-ncol(myCaNmod$A)
+  lp_model<-defineLPMod(myCaNmod)
+  nbineq<-nrow(myCaNmod$A)
+  nbeq<-nrow(myCaNmod$C)
+  ####add slack variable for inequality constraint
+  for (s in 1:nrow(myCaNmod$A)){
+    slack<-rep(0,nbineq+nbeq)
+    slack[s] <- -1
+    add.column(lp_model,slack)
+    dimnames(lp_model)[[2]][nbparam+s]<-paste("slack",rownames(myCaNmod$A)[s])
+  }
+  for (s in 1:nrow(myCaNmod$C)){
+    slack<-rep(0,nbineq+nbeq)
+    slack[nbineq+s] <- -1
+    add.column(lp_model,slack)
+    add.column(lp_model,-slack)
+    dimnames(lp_model)[[2]][nbparam+nbineq+2*(s-1)+1]<-paste("slack",rownames(myCaNmod$C)[s])
+    dimnames(lp_model)[[2]][nbparam+nbineq+2*(s-1)+2]<-paste("slackbis",rownames(myCaNmod$C)[s])
+  }
+  contr_name<-dimnames(lp_model)[[1]]
+  param_name<-dimnames(lp_model)[[2]]
+  set.objfn(lp_model,c(rep(1,nbparam),rep(1000,nbineq+2*nbeq)))
+  res<-solve.lpExtPtr(lp_model)
+  solutions<-get.primal.solution(lp_model,orig=TRUE)[-(1:(nbeq+nbineq))]
+  problematic<-param_name[which(solutions>0 & (1:length(solutions))>(nbparam))]
+  lapply(1:length(problematic),function(p){
+    lp_model<-defineLPMod(myCaNmod)
+    for (s in 1:nrow(myCaNmod$A)){
+      if (paste("slack",rownames(myCaNmod$A)[s])!=problematic[p]){
+        slack<-rep(0,nbineq+nbeq)
+        slack[s] <- -1
+        add.column(lp_model,slack)
+        dimnames(lp_model)[[2]][length(dimnames(lp_model)[[2]])]<-paste("slack",rownames(myCaNmod$A)[s])
+      }
+    }
+    for (s in 1:nrow(myCaNmod$C)){
+      if(paste("slack",rownames(myCaNmod$C)[s])!=problematic[p] & paste("slackbis",rownames(myCaNmod$C)[s])!=problematic[p]){
+        slack<-rep(0,nbineq+nbeq)
+        slack[nbineq+s] <- -1
+        add.column(lp_model,slack)
+        add.column(lp_model,-slack)
+        dimnames(lp_model)[[2]][length(dimnames(lp_model)[[2]])-1]<-paste("slack",rownames(myCaNmod$C)[s])
+        dimnames(lp_model)[[2]][length(dimnames(lp_model)[[2]])]<-paste("slackbis",rownames(myCaNmod$C)[s])
+      }
+    }
+    contr_name<-dimnames(lp_model)[[1]]
+    param_name<-dimnames(lp_model)[[2]]
+    set.objfn(lp_model,c(rep(1,nbparam),rep(1000,dim(lp_model)[2]-nbparam)))
+    res<-solve.lpExtPtr(lp_model)
+    solutions<-get.primal.solution(lp_model,orig=TRUE)[-(1:(nbeq+nbineq))]
+    c(problematic[p],param_name[which(solutions>0 & (1:length(solutions))>(nbparam))])
+  })
+}
+
 plotPolytope2D<-function(myCaNmod,params=c(1,2)){
   nbparam<-ncol(myCaNmod$A)
   if (length(params)!=2) stop("only works for two params")
