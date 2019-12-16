@@ -168,7 +168,9 @@ build_CaNmod<-function(file){
   N[cbind(fluxes_from,1:nbfluxes)]<- -1 #this is an outgoing flow
   N[na.omit(cbind(fluxes_to,1:nbfluxes))]<-na.omit(N[cbind(fluxes_to,1:nbfluxes)]+ifelse(is_trophic_flux,components_param$AssimilationE[match(fluxes_def$To,components)]*components_param$Digestibility[match(fluxes_def$From,components)],1)) #if it is not a trophic flow, we do not take into account assimilation and digestibility
   N<-sweep(N,1,STATS=diag(H)/(components_param$OtherLosses[index_species]),"*")
-  
+  rownames(N)<-species
+  colnames(N)<-flow
+  colnames(H)<-rownames(H)<-species
   
   #build symbolic objects in a specific environment
   symbolic_enviro <- generate_symbolic_objects(flow,species,ntstep,H,N,components_param$InitialBiomass[index_species],series)
@@ -231,11 +233,12 @@ build_CaNmod<-function(file){
   ####build matrix L and M of B=L.F+M
   L<-Matrix::Matrix(0,0,length(symbolic_enviro$param),sparse=TRUE) #first column stores -b
   L<-rbind(L,do.call('rbind',do.call('rbind',lapply(species,function(sp) lapply(as.vector(expand(eval(parse(text=sp)))),build_vector_constraint)))))
+  tmp<-expand.grid(series$Year,species)
+  rownames(L)<-paste(tmp[,2],"[",tmp[,1],"]",sep="")
   M<-L[,1]
   L<-L[,-1]
   colnames(L)<-colnames(A)
-  tmp<-expand.grid(series$Year,species)
-  rownames(L)<-paste(tmp[,2],"[",tmp[,1],"]",sep="")
+  
   
   detach(symbolic_enviro)
   
