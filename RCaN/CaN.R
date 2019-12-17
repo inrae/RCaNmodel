@@ -415,7 +415,7 @@ plotPolytope2D<-function(myCaNmod,params=c(1,2)){
   pb <- txtProgressBar(min = 0, max = 50, style = 3)
   polygon<-lapply(seqx1,function(x) {
     setTxtProgressBar(pb,which(seqx1==x))
-    cbind(rep(x,2),getBoundParam(myCaNMod,
+    cbind(rep(x,2),getBoundParam(myCaNmod,
                   params[2],
                   additional_constraint=list(aC=matrix(ifelse((1:nbparam)==params[1],1,0),1),av=x)))
   })
