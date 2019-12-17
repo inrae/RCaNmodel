@@ -11,7 +11,7 @@ library(ggplot2)
 
 
 file="CaN_template_mini.xlsx"
-file="CaN_input_template3.xlsx"
+#file="CaN_input_template3.xlsx"
 
 #this function can be useful to use relative abundance indices
 mean.VecBasic<-function(x,...){
@@ -200,14 +200,14 @@ build_CaNmod<-function(file){
                                     emigrants <- as.character(fluxes_def$Flux)[as.character(fluxes_def$From)==sp & !fluxes_def$Trophic]
                                     treat_constraint(paste(sp,"[-1] >=",sp,"[1:(length(",sp,")-1)]*exp(-",components_param$Inertia[components_param$Component==sp],")",
                                                            ifelse(length(emigrants)>0,paste("-",paste(emigrants,collapse="-","[1:(length(",sp,")-1)]",sep=""),sep=""),""), #we do not take into account emigrants
-                                                           sep=""),name_constr=paste("inertia_sup",sp,paste="_"))
+                                                           sep=""),name_constr=paste("inertia_sup",sp,sep="_"))
                                   })))
   A<-rbind(A,do.call(rbind,lapply(components_param$Component[components_param$Component %in%species & !is.na(components_param$Inertia)],
                                   function(sp) { #decrease
                                     immigrants <- as.character(fluxes_def$Flux)[as.character(fluxes_def$To)==sp & !fluxes_def$Trophic]
                                     treat_constraint(paste(sp,"[-1] <=",sp,"[1:(length(",sp,")-1)]*exp(",components_param$Inertia[components_param$Component==sp],")",
                                                            ifelse(length(immigrants)>0,paste("+",paste(immigrants,collapse="+","[1:(length(",sp,")-1)]",sep=""),sep=""),""), #we do not take into account imemigrants
-                                                           sep=""),name_constr=paste("inertia_inf",sp,paste="_"))
+                                                           sep=""),name_constr=paste("inertia_inf",sp,sep="_"))
                                   })))
   
   
@@ -277,9 +277,9 @@ lines=c(positiveness,refuge,satiation)
 
 
 
-checkPolytopeStatus<-function(myCanMod){
+checkPolytopeStatus<-function(myCaNmod){
   nbparam<-ncol(myCaNmod$A)
-  lp_model<-defineLPMod(myCanMod)
+  lp_model<-defineLPMod(myCaNmod)
   ncontr<-length(get.constr.value(lp_model))
   
   set.objfn(lp_model,rep(1,nbparam))
@@ -319,9 +319,9 @@ defineLPMod<-function(myCaNmod){
 
 
 
-getBoundParam<-function(myCanMod,p,additional_constraint=list()){
+getBoundParam<-function(myCaNMod,p,additional_constraint=list()){
   nbparam<-ncol(myCaNmod$A)
-  lp_model<-defineLPMod(myCanMod)
+  lp_model<-defineLPMod(myCaNMod)
   ncontr<-length(get.constr.value(lp_model))
   
   set.objfn(lp_model,1,p)
@@ -371,7 +371,8 @@ findingIncompatibleConstraints<-function(myCaNmod){
   res<-solve.lpExtPtr(lp_model)
   solutions<-get.primal.solution(lp_model,orig=TRUE)[-(1:(nbeq+nbineq))]
   problematic<-param_name[which(solutions>0 & (1:length(solutions))>(nbparam))]
-  lapply(1:length(problematic),function(p){
+  if(length(problematic)>0){
+    return(lapply(1:length(problematic),function(p){
     lp_model<-defineLPMod(myCaNmod)
     for (s in 1:nrow(myCaNmod$A)){
       if (paste("slack",rownames(myCaNmod$A)[s])!=problematic[p]){
@@ -397,7 +398,8 @@ findingIncompatibleConstraints<-function(myCaNmod){
     res<-solve.lpExtPtr(lp_model)
     solutions<-get.primal.solution(lp_model,orig=TRUE)[-(1:(nbeq+nbineq))]
     c(problematic[p],param_name[which(solutions>0 & (1:length(solutions))>(nbparam))])
-  })
+  }))
+  }else{return("no problem detected")}
 }
 
 plotPolytope2D<-function(myCaNmod,params=c(1,2)){
@@ -413,7 +415,7 @@ plotPolytope2D<-function(myCaNmod,params=c(1,2)){
   pb <- txtProgressBar(min = 0, max = 50, style = 3)
   polygon<-lapply(seqx1,function(x) {
     setTxtProgressBar(pb,which(seqx1==x))
-    cbind(rep(x,2),getBoundParam(myCanMod,
+    cbind(rep(x,2),getBoundParam(myCaNMod,
                   params[2],
                   additional_constraint=list(aC=matrix(ifelse((1:nbparam)==params[1],1,0),1),av=x)))
   })
