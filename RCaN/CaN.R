@@ -72,7 +72,7 @@ build_vector_constraint<-function(eq_constraint){
   if (length(myelem)>length(param_used)){ #there is an intercept
     param_used=c("1",param_used)
   }
-  coeff_const[,param_used]<-mapply(function(expr,par) eval(parse(text=gsub(paste("\\*?",par,"$",sep=""),"",expr))),myelem,param_used)
+  coeff_const[,param_used]<-mapply(function(expr,par) eval(parse(text=gsub(paste("\\*?",par,"$",sep=""),"",expr))),myelem,ifelse(param_used!="1",param_used,""))
   coeff_const
 }
 
