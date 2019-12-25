@@ -266,15 +266,6 @@ build_CaNmod<-function(file){
 }
 
 
-positiveness=1:572
-refuge=573:754
-satiation=755:936
-inertia=937:1111
-inertia2=1112:1286
-user=1287:1702
-
-lines=c(positiveness,refuge,satiation)
-
 
 
 checkPolytopeStatus<-function(myCaNmod){
@@ -300,11 +291,11 @@ checkPolytopeStatus<-function(myCaNmod){
 }
 
 
-defineLPMod<-function(myCaNmod){
+defineLPMod<-function(myCaNmod,presolve=c("rows","lindep","cols")){
   nbparam<-ncol(myCaNmod$A)
   lp_model<-make.lp(nrow(myCaNmod$A)+nrow(myCaNmod$C),nbparam)
   set.bounds(lp_model,rep(0,ncol(myCaNmod$A)))
-  lp.control(lp_model,"presolve"=c("rows","lindep","cols"),"verbose"="neutral")
+  lp.control(lp_model,"presolve"=presolve,"verbose"="neutral")
   for (p in 1:nbparam){
     set.column(lp_model,p,c(myCaNmod$A[,p],myCaNmod$C[,p]))
   }
@@ -397,6 +388,7 @@ findingIncompatibleConstraints<-function(myCaNmod){
     set.objfn(lp_model,c(rep(1,nbparam),rep(1000,dim(lp_model)[2]-nbparam)))
     res<-solve.lpExtPtr(lp_model)
     solutions<-get.primal.solution(lp_model,orig=TRUE)[-(1:(nbeq+nbineq))]
+    print(paste("polytope is valid when relaxing can be fitted if "))
     c(problematic[p],param_name[which(solutions>0 & (1:length(solutions))>(nbparam))])
   }))
   }else{return("no problem detected")}
@@ -423,6 +415,17 @@ plotPolytope2D<-function(myCaNmod,params=c(1,2)){
   names(polygon)<-colnames(myCaNmod$A)[params]
   ggplot(polygon,aes_string(x=colnames(myCaNmod$A)[params[1]],y=colnames(myCaNmod$A)[params[2]]))+geom_polygon()
   
+}
+
+
+fitCaN<-function(myCaNmod){
+  nbparam<-ncol(myCaNmod$A)
+  nbcontr<-nrow(myCaNmod$C)+nrow(myCaNmod$A)
+  lp_model<-defineLPMod(myCaNmod)
+  ncontr<-length(get.constr.value(lp_model))
+  set.objfn(lp_model,rep(1,nbparam))
+  res<-solve.lpExtPtr(lp_model)
+  x0<-(get.primal.solution(lp_model,orig=TRUE)[(ncontr+1):(ncontr+nbparam)])
 }
 
 
