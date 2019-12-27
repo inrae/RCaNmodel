@@ -1,11 +1,26 @@
 Package: RCaN
 Type: Package
-Title: What the Package Does in One 'Title Case' Line
+Title: a package to fit Chance and Necessity model
 Version: 1.0
 Date: 2019-12-25
-Author: Your Name
-Maintainer: Your Name <your@email.com>
+Authors@R: c(person("Hilaire","Drouineau",email="hilaire.drouineau@irstea.fr",role=c("aut","cre")),
+    person("Benjamin","Planque",role=c("aut")),
+    person("Christian","Mullon",role=c("aut")),
+    person("INRAE - Norvegian Institute of Marine Research - IRD",role=("cph")))
 Description: One paragraph description of what the package does as one or more full sentences.
-License: GPL (>= 2)
-Imports: Rcpp (>= 1.0.3)
-LinkingTo: Rcpp
+License: BSD_3_clause + file LICENSE
+Imports: 
+    Rcpp (>= 1.0.3),
+    RcppEigen,
+    ggplot2,
+    lpSolveAPI,
+    symengine,
+    Matrix,
+    xlsx,
+    cpgsR
+LinkingTo: Rcpp, cpgsR, RcppEigen
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+RoxygenNote: 6.1.1
