@@ -261,6 +261,9 @@ build_CaNmod <- function(file) {
   b <- -A[, 1]
   A <- A [, -1]
 
+  tmp <- expand.grid(flow, series$Year)
+  colnames(A) <- paste(tmp[, 1], "[", tmp[, 2], "]", sep = "")
+
 
   ####build matrix for equality constraint  C x = v and fill it
   C <- Matrix::Matrix(0, 0, length(symbolic_enviro$param), sparse = TRUE)
@@ -319,6 +322,7 @@ build_CaNmod <- function(file) {
     symbolic_enviro = symbolic_enviro
   )
   class(myCaNmod)<-"CaNmod"
+
 
   return (
     myCaNmod

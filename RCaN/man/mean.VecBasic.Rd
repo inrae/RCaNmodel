@@ -5,10 +5,12 @@
 \title{mean.VecBasic
 this function is for internal use}
 \usage{
-\method{mean}{VecBasic}(x)
+\method{mean}{VecBasic}(x, ...)
 }
 \arguments{
 \item{x}{a VecBasic}
+
+\item{...}{Additional arguments}
 }
 \value{
 the symbolic expression corresponding to the mean of x

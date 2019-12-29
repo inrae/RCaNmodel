@@ -28,7 +28,7 @@ List fitCaN(const int N,const Eigen::MatrixXd &A ,const Eigen::VectorXd &b,const
     F=cpgsR::cpgs(N,A,b,x0);
   }
   for (int i=0;i<N;++i){
-    B.row(i)=L*F.row(i)+M;
+    B.row(i)=L*F.row(i).transpose()+M;
   }
   return(List::create(F,B));
 }
