@@ -1,6 +1,7 @@
 #' treat_constraint
 #' This is an internal function used to convert a string constraint into a symbolic expression
 #' @param myconstraint a string corresponding to a constraint
+#' @param symbolic_enviro an environment that stores all symbolic computation
 #' @param yr the year ranges in which the constraint apply
 #' @param name_constr a string naming the constraint
 #'
@@ -9,9 +10,10 @@
 
 
 treat_constraint <- function(myconstraint,
+                             symbolic_enviro,
                              yr = NULL,
                              name_constr = NULL) {
-  years <- as.character(colnames(Fmat))
+  years <- as.character(colnames(symbolic_enviro$Fmat))
   sign <-
     ifelse (length(grep("<=", myconstraint)) > 0, "<=", ifelse (length(grep(
       ">=", myconstraint
@@ -41,11 +43,11 @@ treat_constraint <- function(myconstraint,
   }
 
   symbolic_constraint <-
-    symengine::expand(eval(parse(text = left_numerator)) * eval(parse(text =
-                                                                        right_denominator)) - eval(parse(text = right_numerator)) * eval(parse(text =
-                                                                                                                                                 left_denominator)))
+    symengine::expand(eval(parse(text = left_numerator),symbolic_enviro) * eval(parse(text =
+                                                                        right_denominator),symbolic_enviro) - eval(parse(text = right_numerator),symbolic_enviro) * eval(parse(text =
+                                                                                                                                                 left_denominator),symbolic_enviro))
   mat <-
-    do.call(rbind, lapply(as.vector(symbolic_constraint), build_vector_constraint))
+    do.call(rbind, lapply(as.vector(symbolic_constraint), function(s) build_vector_constraint(s,symbolic_enviro)))
   if (is.null(yr)) {
     yr <- 1:nrow(mat)
   } else{

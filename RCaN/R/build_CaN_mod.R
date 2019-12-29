@@ -130,7 +130,6 @@ build_CaNmod <- function(file) {
   rownames(A) <- paste(colnames(A)[-1], ">=0")
 
   ####add refuge biomasses/biomass positiveness
-  attach(symbolic_enviro)
   A <-
     rbind(A, do.call(
       rbind,
@@ -140,7 +139,7 @@ build_CaNmod <- function(file) {
             is.na(components_param$RefugeBiomass[components_param$Component == sp]),
             0,
             components_param$RefugeBiomass[components_param$Component == sp]
-          )),
+          )),symbolic_enviro,
           name_constr = paste("Biomass positiveness_refuge", sp, sep = "_")
         ))
     ))
@@ -163,6 +162,7 @@ build_CaNmod <- function(file) {
                    "*",
                    sp
                  ),
+                 symbolic_enviro,
                  name_constr = paste("satiation", sp, sep = "_")
                ))
     ))
@@ -201,6 +201,7 @@ build_CaNmod <- function(file) {
                                          #we do not take into account emigrants
                                          sep = ""
                                        ),
+                                       symbolic_enviro,
                                        name_constr = paste("inertia_sup", sp, sep = "_")
                                      )
                                    })))
@@ -238,6 +239,7 @@ build_CaNmod <- function(file) {
                                          #we do not take into account imemigrants
                                          sep = ""
                                        ),
+                                       symbolic_enviro,
                                        name_constr = paste("inertia_inf", sp, sep = "_")
                                      )
                                    })))
@@ -250,7 +252,7 @@ build_CaNmod <- function(file) {
         rbind,
         mapply(
           function(c, yr, id)
-            treat_constraint(c, yr, id),
+            treat_constraint(c,symbolic_enviro, yr, id),
           as.character(constraints$Constraint[c(lessthan, greaterthan)]),
           as.character(constraints$Time.range[c(lessthan, greaterthan)]),
           as.character(constraints$Id[c(lessthan, greaterthan)])
@@ -274,7 +276,7 @@ build_CaNmod <- function(file) {
         rbind,
         mapply(
           function(c, yr, id)
-            treat_constraint(c, yr, id),
+            treat_constraint(c,symbolic_enviro, yr, id),
           as.character(constraints$Constraint[equality]),
           as.character(constraints$Time.range[equality]),
           as.character(constraints$Id[equality])
@@ -291,8 +293,8 @@ build_CaNmod <- function(file) {
     rbind(L, do.call('rbind', do.call(
       'rbind', lapply(species, function(sp)
         lapply(as.vector(expand(eval(
-          parse(text = sp)
-        ))), build_vector_constraint))
+          parse(text = sp),symbolic_enviro
+        ))), function(s)build_vector_constraint(s,symbolic_enviro)))
     )))
   tmp <- expand.grid(series$Year, species)
   rownames(L) <- paste(tmp[, 2], "[", tmp[, 1], "]", sep = "")
@@ -301,7 +303,6 @@ build_CaNmod <- function(file) {
   colnames(L) <- colnames(A)
 
 
-  detach(symbolic_enviro)
   myCaNmod<-list(
     components_param = components_param,
     species = species,
