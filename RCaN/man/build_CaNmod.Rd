@@ -2,8 +2,7 @@
 % Please edit documentation in R/build_CaN_mod.R
 \name{build_CaNmod}
 \alias{build_CaNmod}
-\title{build_CaNmod
-function that reads the template and return build the complete model description, including all the underlying equations}
+\title{build_CaNmod}
 \usage{
 build_CaNmod(file)
 }
@@ -31,7 +30,6 @@ a CaNmod object with following elements
 }
 }
 \description{
-build_CaNmod
 function that reads the template and return build the complete model description, including all the underlying equations
 }
 \examples{

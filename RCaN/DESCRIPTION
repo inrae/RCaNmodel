@@ -22,10 +22,15 @@ Imports:
     tidyr,
     ggraph,
     RColorBrewer,
-    gridExtra
+    gridExtra,
+    coda,
+    doParallel,
+    doRNG,
+    foreach
 LinkingTo: Rcpp, cpgsR, RcppEigen
 Suggests: 
     knitr,
     rmarkdown
 VignetteBuilder: knitr
 RoxygenNote: 6.1.1
+Encoding: UTF-8

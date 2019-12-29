@@ -2,8 +2,7 @@
 % Please edit documentation in R/treat_constraint.R
 \name{treat_constraint}
 \alias{treat_constraint}
-\title{treat_constraint
-This is an internal function used to convert a string constraint into a symbolic expression}
+\title{treat_constraint}
 \usage{
 treat_constraint(myconstraint, symbolic_enviro, yr = NULL,
   name_constr = NULL)
@@ -21,6 +20,5 @@ treat_constraint(myconstraint, symbolic_enviro, yr = NULL,
 a matrix that correspond to the coefficient of the constraints, fist column corresponds to the -intercept and each line to a constraint (year)
 }
 \description{
-treat_constraint
 This is an internal function used to convert a string constraint into a symbolic expression
 }

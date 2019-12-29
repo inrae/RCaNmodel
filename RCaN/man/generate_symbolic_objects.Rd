@@ -2,8 +2,7 @@
 % Please edit documentation in R/generate_symbolic_objects.R
 \name{generate_symbolic_objects}
 \alias{generate_symbolic_objects}
-\title{generate_symbolic_objects
-This is an internal function that builds all the required symbolic objects required for the computation of the model}
+\title{generate_symbolic_objects}
 \usage{
 generate_symbolic_objects(flow, species, ntstep, H, N, B0, series)
 }
@@ -33,6 +32,5 @@ en environment storing all symbolic elements including among others
 }
 }
 \description{
-generate_symbolic_objects
 This is an internal function that builds all the required symbolic objects required for the computation of the model
 }
