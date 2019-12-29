@@ -22,17 +22,13 @@ fitmyCaNmod<-function(myCaNmod,N){
   lp_model<-defineLPMod(myCaNmod$A,myCaNmod$b,myCaNmod$C,myCaNmod$v)
   ncontr <- length(get.constr.value(lp_model))
   set.objfn(lp_model, rep(1,ncol(myCaNmod$A)))
-  lp.control(lp_model, sense = "max")
+  lp.control(lp_model, sense = "min")
   solve.lpExtPtr(lp_model)
   x0 <-
     get.primal.solution(lp_model, orig = TRUE)[(ncontr + 1):(ncontr + ncol(myCaNmod$A))]
   res <- fitCaN(N, as.matrix(myCaNmod$A), myCaNmod$b, as.matrix(myCaNmod$C), myCaNmod$v, as.matrix(myCaNmod$L), myCaNmod$M, x0)
   names(res)<-c("F","B")
-  print(dim(res$F))
-  print(dim(myCaNmod$A))
   colnames(res$F)<-colnames(myCaNmod$A)
-  print("there")
   colnames(res$B)<-rownames(myCaNmod$L)
-  print("nowhere")
-  res
+  cbind(res$F,res$B)
 }
