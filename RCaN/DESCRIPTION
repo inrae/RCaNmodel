@@ -17,7 +17,12 @@ Imports:
     symengine,
     Matrix,
     xlsx,
-    cpgsR
+    cpgsR,
+    igraph,
+    tidyr,
+    ggraph,
+    RColorBrewer,
+    gridExtra
 LinkingTo: Rcpp, cpgsR, RcppEigen
 Suggests: 
     knitr,
