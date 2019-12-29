@@ -5,10 +5,13 @@
 \title{treat_constraint
 This is an internal function used to convert a string constraint into a symbolic expression}
 \usage{
-treat_constraint(myconstraint, yr = NULL, name_constr = NULL)
+treat_constraint(myconstraint, symbolic_enviro, yr = NULL,
+  name_constr = NULL)
 }
 \arguments{
 \item{myconstraint}{a string corresponding to a constraint}
+
+\item{symbolic_enviro}{an environment that stores all symbolic computation}
 
 \item{yr}{the year ranges in which the constraint apply}
 

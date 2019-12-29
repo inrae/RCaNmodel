@@ -1,15 +1,15 @@
 #' build_vector_constraint
 #' internal function that convert a symbolic equation of constraint into a matrix storing the coefficients of the constraint
 #' @param eq_constraint a symbolic equation corresponding to a constraint
-#'
+#' @param symbolic_enviro the symbolic environment
 #' @return a sparse matrix storing the coefficient of the constraint (first column stands for -intercept)
 #' @importFrom Matrix Matrix
 #' @importFrom symengine free_symbols
 #' @importFrom symengine get_str
 
-build_vector_constraint <- function(eq_constraint) {
-  coeff_const <- Matrix::Matrix(0, 1, length(param), sparse = TRUE)
-  colnames(coeff_const) <- as.character(param)
+build_vector_constraint <- function(eq_constraint,symbolic_enviro) {
+  coeff_const <- Matrix::Matrix(0, 1, length(symbolic_enviro$param), sparse = TRUE)
+  colnames(coeff_const) <- as.character(symbolic_enviro$param)
   basic_constraint <- (eq_constraint)
   all_elements = get_str(basic_constraint)
   myelem = strsplit(gsub(" ", "", gsub(

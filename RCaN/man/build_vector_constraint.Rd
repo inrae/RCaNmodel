@@ -5,10 +5,12 @@
 \title{build_vector_constraint
 internal function that convert a symbolic equation of constraint into a matrix storing the coefficients of the constraint}
 \usage{
-build_vector_constraint(eq_constraint)
+build_vector_constraint(eq_constraint, symbolic_enviro)
 }
 \arguments{
 \item{eq_constraint}{a symbolic equation corresponding to a constraint}
+
+\item{symbolic_enviro}{the symbolic environment}
 }
 \value{
 a sparse matrix storing the coefficient of the constraint (first column stands for -intercept)
