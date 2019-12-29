@@ -1,10 +1,13 @@
 
 #' fitmyCaNmod
+#'
 #' fit the CaNmod model
 #' @param myCaNmod a CaNmod object with following elements
 #' @param N the number of samples required
+#' @param nchain the number of mcmc chains
+#' @param ncore number of cores to use
 #'
-#' @return a list with F and B the matrices of biomass and flows
+#' @return a \code{\link[coda]{mcmc.list}}
 #' @export
 #'
 #' @examples
@@ -17,18 +20,48 @@
 #' @importFrom lpSolveAPI solve.lpExtPtr
 #' @importFrom lpSolveAPI get.primal.solution
 #' @importFrom cpgsR defineLPMod
-#'
-fitmyCaNmod<-function(myCaNmod,N){
-  lp_model<-defineLPMod(myCaNmod$A,myCaNmod$b,myCaNmod$C,myCaNmod$v)
-  ncontr <- length(get.constr.value(lp_model))
-  set.objfn(lp_model, rep(1,ncol(myCaNmod$A)))
-  lp.control(lp_model, sense = "min")
-  solve.lpExtPtr(lp_model)
-  x0 <-
-    get.primal.solution(lp_model, orig = TRUE)[(ncontr + 1):(ncontr + ncol(myCaNmod$A))]
-  res <- fitCaN(N, as.matrix(myCaNmod$A), myCaNmod$b, as.matrix(myCaNmod$C), myCaNmod$v, as.matrix(myCaNmod$L), myCaNmod$M, x0)
-  names(res)<-c("F","B")
-  colnames(res$F)<-colnames(myCaNmod$A)
-  colnames(res$B)<-rownames(myCaNmod$L)
-  cbind(res$F,res$B)
+#' @importFrom parallel detectCores
+#' @importFrom parallel makeCluster
+#' @importFrom doParallel registerDoParallel
+#' @importFrom doParallel stopImplicitCluster
+#' @importFrom doRNG registerDoRNG
+#' @importFrom coda mcmc
+#' @importFrom coda mcmc.list
+#' @importFrom foreach foreach
+#' @importFrom foreach %dopar%
+#' @importFrom foreach %do%
+#' @importFrom foreach %do%
+fitmyCaNmod<-function(myCaNmod,N,nchain=1,ncore=1){
+  ncore <- min(min(detectCores() - 1,ncore),nchain)
+  `%myinfix%` <- `%do%`
+
+  if (ncore>1){
+    cl <- makeCluster(ncore)
+    clusterEvalQ(cl,{library(RCaN)})
+    clusterEvalQ(cl,{library(cpgsR)})
+    clusterExport(cl,c("myCaNmod","N"))
+    registerDoParallel(cl)
+    registerDoRNG(seed=123)
+    `%myinfix%` <- `%dopar%`
+  }
+  res<-foreach(i=1:nchain,.combine=mcmc.list) %myinfix%{
+    lp_model<-defineLPMod(myCaNmod$A,myCaNmod$b,myCaNmod$C,myCaNmod$v)
+    ncontr <- length(get.constr.value(lp_model))
+    set.objfn(lp_model, runif(ncol(myCaNmod$A)))
+    lp.control(lp_model, sense = "min")
+    solve.lpExtPtr(lp_model)
+    x0 <-
+      get.primal.solution(lp_model, orig = TRUE)[(ncontr + 1):(ncontr + ncol(myCaNmod$A))]
+    res <- fitCaN(N, as.matrix(myCaNmod$A), myCaNmod$b, as.matrix(myCaNmod$C), myCaNmod$v, as.matrix(myCaNmod$L), myCaNmod$M, x0)
+    names(res)<-c("F","B")
+    colnames(res$F)<-colnames(myCaNmod$A)
+    colnames(res$B)<-rownames(myCaNmod$L)
+    mcmc(cbind(res$F,res$B),1,nrow(res$F),1)
+  }
+
+  if (ncore>1){
+    stopCluster(cl)
+    stopImplicitCluster()
+  }
+  res
 }

@@ -1,4 +1,5 @@
 #' generate_symbolic_objects
+#'
 #' This is an internal function that builds all the required symbolic objects required for the computation of the model
 #' @param flow names of the flow
 #' @param species names of the species

@@ -1,4 +1,5 @@
 #' treat_constraint
+#'
 #' This is an internal function used to convert a string constraint into a symbolic expression
 #' @param myconstraint a string corresponding to a constraint
 #' @param symbolic_enviro an environment that stores all symbolic computation

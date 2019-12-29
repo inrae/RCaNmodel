@@ -2,21 +2,23 @@
 % Please edit documentation in R/fitmyCaNmod.R
 \name{fitmyCaNmod}
 \alias{fitmyCaNmod}
-\title{fitmyCaNmod
-fit the CaNmod model}
+\title{fitmyCaNmod}
 \usage{
-fitmyCaNmod(myCaNmod, N)
+fitmyCaNmod(myCaNmod, N, nchain = 1, ncore = 1)
 }
 \arguments{
 \item{myCaNmod}{a CaNmod object with following elements}
 
 \item{N}{the number of samples required}
+
+\item{nchain}{the number of mcmc chains}
+
+\item{ncore}{number of cores to use}
 }
 \value{
-a list with F and B the matrices of biomass and flows
+a \code{\link[coda]{mcmc.list}}
 }
 \description{
-fitmyCaNmod
 fit the CaNmod model
 }
 \examples{

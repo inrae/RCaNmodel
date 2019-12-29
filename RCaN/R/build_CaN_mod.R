@@ -1,4 +1,5 @@
 #' build_CaNmod
+#'
 #' function that reads the template and return build the complete model description, including all the underlying equations
 #' @param file the name of the file enclosing the model description
 #'
