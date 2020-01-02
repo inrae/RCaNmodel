@@ -4,7 +4,7 @@
 #' provide a ggplot of the fit
 #' @param mcmc_res result sent by \link{fitmyCaNmod}
 #' @param myCaNmod a CaNmod object
-#' @param colour the colour of the plot
+#' @param param the name (or a vector of name) of a parameter (either a flow or a biomass)
 #' @return a ggplot
 #' @details the line corresponds to median of the mcmc simulation, the ribbon corresponds to quantiles 2.5% and 97.5%
 #'
@@ -26,7 +26,7 @@
 
 #' @export
 #'
-ggResult <- function(mcmc_res, myCaNmod, param, colour = "blue") {
+ggResult <- function(mcmc_res, myCaNmod, param) {
   mat_res <- as.matrix(mcmc_res)
   quantiles<-do.call('rbind.data.frame',lapply(param,function(p){
     columns <- grep(paste(p, "\\[",sep=""),colnames(mat_res))
