@@ -11,8 +11,6 @@ ggResult(mcmc_res, myCaNmod, param, colour = "blue")
 
 \item{myCaNmod}{a CaNmod object}
 
-\item{param}{the name of a parameter (either a flow or a biomass)}
-
 \item{colour}{the colour of the plot}
 }
 \value{
