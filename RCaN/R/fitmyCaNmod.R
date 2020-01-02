@@ -22,6 +22,9 @@
 #' @importFrom cpgsR defineLPMod
 #' @importFrom parallel detectCores
 #' @importFrom parallel makeCluster
+#' @importFrom parallel clusterEvalQ
+#' @importFrom parallel clusterExport
+#' @importFrom parallel stopCluster
 #' @importFrom doParallel registerDoParallel
 #' @importFrom doParallel stopImplicitCluster
 #' @importFrom doRNG registerDoRNG
@@ -31,6 +34,8 @@
 #' @importFrom foreach %dopar%
 #' @importFrom foreach %do%
 #' @importFrom foreach %do%
+#' @importFrom doRNG "%dorng%"
+#' @importFrom stats runif
 fitmyCaNmod<-function(myCaNmod,N,nchain=1,ncore=1){
   ncore <- min(min(detectCores() - 1,ncore),nchain)
   `%myinfix%` <- `%do%`
@@ -39,12 +44,17 @@ fitmyCaNmod<-function(myCaNmod,N,nchain=1,ncore=1){
     cl <- makeCluster(ncore)
     clusterEvalQ(cl,{library(RCaN)})
     clusterEvalQ(cl,{library(cpgsR)})
-    clusterExport(cl,c("myCaNmod","N"))
+    clusterEvalQ(cl,{library(lpSolveAPI)})
+    clusterEvalQ(cl,{library(cpgsR)})
+    clusterEvalQ(cl,{library(coda)})
+    clusterEvalQ(cl,{library(doRNG)})
+    clusterEvalQ(cl,{library(stats)})
+    clusterExport(cl,c("myCaNmod","N"),envir=environment())
     registerDoParallel(cl)
     registerDoRNG(seed=123)
     `%myinfix%` <- `%dopar%`
   }
-  res<-foreach(i=1:nchain,.combine=mcmc.list) %myinfix%{
+  res<-foreach(i=1:nchain) %myinfix%{
     lp_model<-defineLPMod(myCaNmod$A,myCaNmod$b,myCaNmod$C,myCaNmod$v)
     ncontr <- length(get.constr.value(lp_model))
     set.objfn(lp_model, runif(ncol(myCaNmod$A)))
@@ -63,5 +73,5 @@ fitmyCaNmod<-function(myCaNmod,N,nchain=1,ncore=1){
     stopCluster(cl)
     stopImplicitCluster()
   }
-  res
+  mcmc.list(res)
 }
