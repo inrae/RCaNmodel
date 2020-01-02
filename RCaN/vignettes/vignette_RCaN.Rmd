@@ -1,10 +1,18 @@
 ---
-title: "vignette_RCaN"
-output: rmarkdown::html_vignette
+title: "Tutorial of RCaN"
+output:
+  pdf_document:
+    toc: yes
+  rmarkdown::html_vignette:
+     keep_md: yes
+author: 
+- "Hilaire Drouineau - INRAE Bordeaux, UR EABX"
+- "Benjamin Planque - IMR"
+- "Christian Mullon - IRD"
 vignette: >
   %\VignetteIndexEntry{vignette_RCaN}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
 ---
 
 ```{r, include = FALSE}
@@ -16,4 +24,144 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(RCaN)
+```
+
+This package aims at fitting a chance and necessity ecosystem model. A full description of this kind of model is provided in 
+
+Planque, B., & Mullon, C. (n.d.). Modelling chance and necessity in natural systems. ICES Journal of Marine Science. https://doi.org/10.1093/icesjms/fsz173
+
+
+# Data requirements
+Inputs should be provided in an xlxs data file. This file can be generated using an independent java graphical user interface, but it can be created independently. An artificial file is provided in the package as a template and as an example for this vignette. You can find the path to the file by entering
+
+```{r}
+system.file("extdata", "CaN_template_mini.xlsx", package = "RCaN")
+```
+
+```{r,echo=FALSE,include=FALSE}
+myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx", package = "RCaN"))
+```
+
+There are a few important things to remember:
+* the names of the sheets should match the names of the sheets in the template (i.e. "Components & input parameter", "Fluxes", "Input time-series", "Constraints")
+* the names of the columns in sheets "Components & input parameter", "Fluxes" and "Constraints" and there should be a column "Year" in the sheet "Input time-series"
+* it is worthwile giving as much information as possible in the "Info" sheet
+* you can add other sheets and other columns in your file is needed, as the minimal sets of sheets and columns are provided
+
+## Sheet "Components & input parameter"
+```{r,echo=FALSE,include=TRUE}
+myCaNmod$components_param
+```
+Components correspond to the boxes of the trophic food web. Most components are internal to the ecosystem (denoted "In"), but other can be external, for example to deal with fishery or migrations, and are denoted "Out". The definition of the parameters are provided in Planque and Mullon (in press). You can leave some cells empty:
+* if you do not want to use a specific constraint (for example, if you do not want to use a satiety constraint for a component, leave the cell empty)
+* for "Out" component, you can leave all cells empty since the dynamics of external components are not modelled, except digestibility of components that are eated by internal components (for example in the template, we have a digestibility for PhytoAndBacteria).
+
+## Sheet "Fluxes"
+```{r,echo=FALSE,include=TRUE}
+myCaNmod$fluxes_def
+```
+Column "Flux" aims at providing name to identify the differents fluxes. Then, "From" and "To" define the different (oriented) flow in the food web. The names in "From" and "To" should match the names in Components (case sensitive)
+
+
+## Sheet "Input time-series"
+```{r,echo=FALSE,include=TRUE}
+myCaNmod$series
+```
+Here you provide all the time series you have. The first column correspond to years and define the time range of the model. Then following time series correspond to the different time series (observations) that you will use to define constraints. 
+
+##sheet "Constraints"
+```{r,echo=FALSE,include=TRUE}
+myCaNmod$constraints
+```
+The "Id" correspond to identifiers of the constraints. Then, the constraint correspond to a mathematical linear equation of constraint. You can potentially use "sum" and "mean" to computes sum or means over the time range. Both inequality ("<=" or ">=") and equality ("=") constraints can be used. Time.Range defines the time range of the constraint, they can be denoted either either with "firstyear:lastyear" or as a vector of years "c(year1,year2...)"
+
+# Building the model
+The first step of the workflow is to build the model. The function build_CaNmod does this job. It reads the template file and provides a CaNmod object that includes all necessary data to fit the model.  You see here the different elements included in the object.
+
+```{r}
+myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx", package = "RCaN"))
+names(myCaNmod)
+```
+Everything should be all right if your template was well created. The function retrieves meaningful error message if a problem is detected. Two functions can be used to check that the model is correct. The function ggCaNmod draws a graph to show you the trophic food web
+
+```{r}
+g<-ggCaNmod(myCaNmod)
+print(g)
+```
+The function pdfCaNmod builds an even more detailed summary of the model as a pdffile
+
+```{r,eval=FALSE,echo=FALSE}
+pdfCaNmod(myCaNmod, output_file = "summaryCaNmod.pdf")
+```
+
+
+# Checking the model configuration
+The set of constraints define a convex polytope, i.e. a conspace subspace of a n-dimensional space (n corresponding to the number of the parameter) with flat sides. Each point inside the polytope is a possible solution of the model. The idea of Chance and Necessity model is to uniformly sample within those polytopes in order to explore the whole space of possible solutions. Nevertheless, the polytope should not be empty (otherwise, there is no solution) and preferentially should be bounded (otherwise a parameter can range to infinity). To check that the polytope is ok, you can use checkPolytopeStatusCaNmod which will tell you the status of your polytope.
+
+```{r}
+checkPolytopeStatusCaNmod(myCaNmod)
+```
+
+If your polytope is not bounded, you should probably add additional constraints on not bounded parameter. To see which parameter is not bounded, you can use the function getAllBoundsParamCaNmod. An Inf in the upperbound column would correspond to a non bounded parameter, otherwise you have lower and upperbounds of each parameter
+```{r}
+getAllBoundsParamCaNmod(myCaNmod)
+```
+Since this function can be time consuming, we provide a version that focus on a parameter of interest, here for example the first parameter:
+
+```{r}
+getBoundParamCaNmod(myCaNmod, p="F01[1988]")
+```
+
+If your polytope is empty, it means that there is no possible solutions and that some constraints should be relaxed. A function can help you to find which constraint raise problem: findingIncompatibleConstraintsCaNmod. For example, here we artificially add a constraint corresponding to a negative flow and look at the result:
+
+```{r}
+myCaNmod2 <- myCaNmod
+#we artificially add incompatible constraints (first flow is negative)
+myCaNmod2$A <- rbind(myCaNmod2$A,c(1,rep(0,ncol(myCaNmod2$A)-1)))
+rownames(myCaNmod2$A)[nrow(myCaNmod2$A)]<-"neg_flow"
+myCaNmod2$b <- c(myCaNmod2$b,-1)
+incomp<-findingIncompatibleConstraintsCaNmod(myCaNmod2)
+```
+
+Here the first line tells you that the algorithm successfully fit the model by relaxing 4 constraints: "neg_flow" is the one we added, two constraints of biomass positiveness and one constraint of inertia. Then the algorithm tell you that "1989 : Biomass positiveness_refuge_HerbZooplankton" appears to be incompatible with "neg_flow", "1990 : Biomass positiveness_refuge_HerbZooplankton" with both "1989 : Biomass positiveness_refuge_HerbZooplankton" and "neg_flow"... Since neg_flow is always listed in the incompabible list, and that neg_flow can not be subtituted by another constraint (neg_flow: ), it would be the first one to be removed.
+
+After this step, you should be able to fit the model.
+
+
+# Fitting the model
+The aim of this step is to achieve a uniform sampling within the convex poltyope. To do that, we use the package cpgsR available on github. Since the sampling is based on a mcmc algorithm, it can be a good idea to run several independent chains; the library allows you to run several chain in parallel using multicore facility provided by package parallel and doParallel. For example, here is the solution to run 2 chains in parrallel with 1000 samples in each chain:
+
+```{r}
+res <- fitmyCaNmod(myCaNmod, 1000,nchain=2,ncore=2)
+```
+
+The argument ncore allows to use several cores in parallel, however the library ensure that the computation leave one core unused and that the number of cores remain smaller than the number of chains
+
+Since the result is a mcmc.list object, we can use all the diagnostics tools provided in the package coda, such traceplot, summary or gelman and rubin tests or autocorrelograms.
+
+```{r}
+library(coda)
+nchain(res)
+summary(res)
+traceplot(res[,"F01[1988]"])
+gelman.diag(res[,"F01[1988]"])
+acfplot(res[,"F01[1988]"])
+```
+
+We can also do a posteriori thinning if required, for example if we chose to keep only one iteration on two:
+
+```{r}
+thin(res)
+thinned_res <- window(res,thin=2)
+thin(thinned_res)
+acfplot(thinned_res[,"F01[1988]"])
+```
+
+The package provides a function that draw a ggplot of time series of biomass or flux. For example, here we draw a combination of time trends of "HerbZooPlankton" and "F01":
+
+```{r}
+herbzoo<-ggResult(res,myCaNmod,"HerbZooplankton","blue")
+f01<-ggResult(res,myCaNmod,"F01","red")
+library(gridExtra)
+grid.arrange(f01,herbzoo,nrow=1)
 ```
