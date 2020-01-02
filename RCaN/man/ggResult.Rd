@@ -4,14 +4,14 @@
 \alias{ggResult}
 \title{ggResult}
 \usage{
-ggResult(mcmc_res, myCaNmod, param, colour = "blue")
+ggResult(mcmc_res, myCaNmod, param)
 }
 \arguments{
 \item{mcmc_res}{result sent by \link{fitmyCaNmod}}
 
 \item{myCaNmod}{a CaNmod object}
 
-\item{colour}{the colour of the plot}
+\item{param}{the name (or a vector of name) of a parameter (either a flow or a biomass)}
 }
 \value{
 a ggplot
@@ -25,6 +25,10 @@ the line corresponds to median of the mcmc simulation, the ribbon corresponds to
 \examples{
 myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx", package = "RCaN"))
 res <- fitmyCaNmod(myCaNmod, 100)
+#with one series
 ggResult(res,myCaNmod,"F01")
+
+#with 2 series
+ggResult(res,myCaNmod,c("F01","HerbZooplankton"))
 
 }
