@@ -5,6 +5,8 @@
 #' @return a ggraph
 #'
 #' @examples
+#' require(ggraph)
+#' require(ggplot2)
 #' myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx", package = "RCaN"))
 #' ggCaNmod(myCaNmod)
 #' @importFrom igraph graph_from_data_frame
@@ -14,6 +16,7 @@
 #' @importFrom ggraph geom_edge_arc2
 #' @importFrom ggplot2 arrow
 #' @importFrom ggplot2 aes
+#' @importFrom ggplot2 aes_string
 #' @importFrom ggplot2 theme
 #' @importFrom ggplot2 unit
 #' @importFrom ggraph geom_edge_loop
@@ -48,7 +51,7 @@ ggCaNmod <- function(myCaNmod) {
     size = 3,
     alpha = 1) +
     geom_edge_arc2(
-      aes(label = Flux, colour = Trophic),
+      aes_string(label = "Flux", colour = "Trophic"),
       strength = 0.1,
       alpha = 0.33,
       width = 1,
@@ -60,11 +63,11 @@ ggCaNmod <- function(myCaNmod) {
       )
     ) +
     geom_edge_loop(
-      aes(
+      aes_string(
         span = 90,
         direction = 90,
-        label = Flux,
-        colour = Trophic
+        label = "Flux",
+        colour = "Trophic"
       ),
       width = 1,
       alpha = 0.33

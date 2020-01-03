@@ -85,6 +85,8 @@ names(myCaNmod)
 Everything should be all right if your template was well created. The function retrieves meaningful error message if a problem is detected. Two functions can be used to check that the model is correct. The function ggCaNmod draws a graph to show you the trophic food web
 
 ```{r}
+require(ggplot2)
+require(ggraph)
 g<-ggCaNmod(myCaNmod)
 print(g)
 ```
