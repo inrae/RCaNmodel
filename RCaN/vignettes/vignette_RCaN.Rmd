@@ -60,7 +60,7 @@ Components correspond to the boxes of the trophic food web. Most components are 
 ```{r,echo=FALSE,include=TRUE}
 myCaNmod$fluxes_def
 ```
-Column "Flux" aims at providing name to identify the differents fluxes. Then, "From" and "To" define the different (oriented) flow in the food web. The names in "From" and "To" should match the names in Components (case sensitive)
+Column "Flux" aims at providing name to identify the differents fluxes. Then, "From" and "To" define the different (oriented) flow in the food web. The names in "From" and "To" should match the names in Components (case sensitive). Trophic is a boolean that indicates whether the flow corresponds to a trophic flow or to a non trophic flow (e.g. migration, fishery etc.). Contrary to non trophic flows, a trophic flow will be submitted to digestibility and assimilation.
 
 
 ## Sheet "Input time-series"
