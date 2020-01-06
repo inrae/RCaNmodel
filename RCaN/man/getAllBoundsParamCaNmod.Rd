@@ -11,13 +11,15 @@ getAllBoundsParamCaNmod(myCaNmod)
 \item{myCaNmod}{a CaNmod oject}
 }
 \value{
-a data frame with first column as names of params and 2 columns for bounds
+a data frame with first column as names of params and 2 columns for
+bounds
 }
 \description{
 getAllBoundsParamCaNmod
 compute bounds for all paramaters
 }
 \examples{
-myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx", package = "RCaN"))
+myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx",
+ package = "RCaN"))
 getAllBoundsParamCaNmod(myCaNmod)
 }

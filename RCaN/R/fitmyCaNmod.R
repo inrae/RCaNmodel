@@ -11,7 +11,8 @@
 #' @export
 #'
 #' @examples
-#' myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx", package = "RCaN"))
+#' myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx",
+#'  package = "RCaN"))
 #' res <- fitmyCaNmod(myCaNmod, 100)
 #'
 #' @importFrom lpSolveAPI get.constr.value
@@ -36,40 +37,68 @@
 #' @importFrom foreach %do%
 #' @importFrom doRNG "%dorng%"
 #' @importFrom stats runif
-fitmyCaNmod<-function(myCaNmod,N,nchain=1,ncore=1){
-  ncore <- min(min(detectCores() - 1,ncore),nchain)
+fitmyCaNmod <- function(myCaNmod,
+                        N,
+                        nchain = 1,
+                        ncore = 1) {
+  ncore <- min(min(detectCores() - 1, ncore), nchain)
   `%myinfix%` <- `%do%`
 
-  if (ncore>1){
+  if (ncore > 1) {
     cl <- makeCluster(ncore)
-    clusterEvalQ(cl,{library(RCaN)})
-    clusterEvalQ(cl,{library(cpgsR)})
-    clusterEvalQ(cl,{library(lpSolveAPI)})
-    clusterEvalQ(cl,{library(cpgsR)})
-    clusterEvalQ(cl,{library(coda)})
-    clusterEvalQ(cl,{library(doRNG)})
-    clusterEvalQ(cl,{library(stats)})
-    clusterExport(cl,c("myCaNmod","N"),envir=environment())
+    clusterEvalQ(cl, {
+      library(RCaN)
+    })
+    clusterEvalQ(cl, {
+      library(cpgsR)
+    })
+    clusterEvalQ(cl, {
+      library(lpSolveAPI)
+    })
+    clusterEvalQ(cl, {
+      library(cpgsR)
+    })
+    clusterEvalQ(cl, {
+      library(coda)
+    })
+    clusterEvalQ(cl, {
+      library(doRNG)
+    })
+    clusterEvalQ(cl, {
+      library(stats)
+    })
+    clusterExport(cl, c("myCaNmod", "N"), envir = environment())
     registerDoParallel(cl)
-    registerDoRNG(seed=123)
+    registerDoRNG(seed = 123)
     `%myinfix%` <- `%dopar%`
   }
-  res<-foreach(i=1:nchain) %myinfix%{
-    lp_model<-defineLPMod(myCaNmod$A,myCaNmod$b,myCaNmod$C,myCaNmod$v)
+  res <- foreach(i = 1:nchain) %myinfix% {
+    lp_model <- defineLPMod(myCaNmod$A, myCaNmod$b, myCaNmod$C, myCaNmod$v)
     ncontr <- length(get.constr.value(lp_model))
     set.objfn(lp_model, runif(ncol(myCaNmod$A)))
     lp.control(lp_model, sense = "min")
     solve.lpExtPtr(lp_model)
     x0 <-
-      get.primal.solution(lp_model, orig = TRUE)[(ncontr + 1):(ncontr + ncol(myCaNmod$A))]
-    res <- fitCaN(N, as.matrix(myCaNmod$A), myCaNmod$b, as.matrix(myCaNmod$C), myCaNmod$v, as.matrix(myCaNmod$L), myCaNmod$M, x0)
-    names(res)<-c("F","B")
-    colnames(res$F)<-colnames(myCaNmod$A)
-    colnames(res$B)<-rownames(myCaNmod$L)
-    mcmc(cbind(res$F,res$B),1,nrow(res$F),1)
+      get.primal.solution(lp_model,
+                          orig = TRUE)[(ncontr + 1):(ncontr + ncol(myCaNmod$A))]
+    res <-
+      fitCaN(
+        N,
+        as.matrix(myCaNmod$A),
+        myCaNmod$b,
+        as.matrix(myCaNmod$C),
+        myCaNmod$v,
+        as.matrix(myCaNmod$L),
+        myCaNmod$M,
+        x0
+      )
+    names(res) <- c("F", "B")
+    colnames(res$F) <- colnames(myCaNmod$A)
+    colnames(res$B) <- rownames(myCaNmod$L)
+    mcmc(cbind(res$F, res$B), 1, nrow(res$F), 1)
   }
 
-  if (ncore>1){
+  if (ncore > 1) {
     stopCluster(cl)
     stopImplicitCluster()
   }

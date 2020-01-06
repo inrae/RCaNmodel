@@ -1,13 +1,16 @@
 #' treat_constraint
 #'
-#' This is an internal function used to convert a string constraint into a symbolic expression
+#' This is an internal function used to convert a string constraint into a
+#' symbolic expression
 #' @param myconstraint a string corresponding to a constraint
 #' @param symbolic_enviro an environment that stores all symbolic computation
 #' @param yr the year ranges in which the constraint apply
 #' @param name_constr a string naming the constraint
 #'
-#' @return a matrix that correspond to the coefficient of the constraints, fist column corresponds to the -intercept and each line to a constraint (year)
+#' @return a matrix that correspond to the coefficient of the constraints, first
+#' column corresponds to the -intercept and each line to a constraint (year)
 #' @importFrom symengine expand
+
 
 
 treat_constraint <- function(myconstraint,
@@ -16,7 +19,7 @@ treat_constraint <- function(myconstraint,
                              name_constr = NULL) {
   years <- as.character(colnames(symbolic_enviro$Fmat))
   sign <-
-    ifelse (length(grep("<=", myconstraint)) > 0, "<=", ifelse (length(grep(
+    ifelse(length(grep("<=", myconstraint)) > 0, "<=", ifelse(length(grep(
       ">=", myconstraint
     )) > 0, ">=", "="))
   tmp <- strsplit(myconstraint, sign)[[1]]
@@ -44,13 +47,18 @@ treat_constraint <- function(myconstraint,
   }
 
   symbolic_constraint <-
-    symengine::expand(eval(parse(text = left_numerator),symbolic_enviro) * eval(parse(text =
-                                                                        right_denominator),symbolic_enviro) - eval(parse(text = right_numerator),symbolic_enviro) * eval(parse(text =
-                                                                                                                                                 left_denominator),symbolic_enviro))
+    symengine::expand(
+      eval(parse(text = left_numerator), symbolic_enviro) *
+        eval(parse(text = right_denominator), symbolic_enviro) -
+        eval(parse(text = right_numerator), symbolic_enviro) *
+        eval(parse(text = left_denominator), symbolic_enviro)
+    )
   mat <-
-    do.call(rbind, lapply(as.vector(symbolic_constraint), function(s) build_vector_constraint(s,symbolic_enviro)))
+    do.call(rbind,
+            lapply(as.vector(symbolic_constraint), function(s)
+              build_vector_constraint(s, symbolic_enviro)))
   if (is.null(yr)) {
-    yr <- 1:nrow(mat)
+    yr <- seq_len(nrow(mat))
   } else{
     yr <- years %in% as.character(eval(parse(text = yr)))
   }

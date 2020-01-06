@@ -1,6 +1,7 @@
 #' build_CaNmod
 #'
-#' function that reads the template and return build the complete model description, including all the underlying equations
+#' function that reads the template and return build the complete model
+#' description, including all the underlying equations
 #' @param file the name of the file enclosing the model description
 #'
 #' @return a CaNmod object with following elements
@@ -19,12 +20,14 @@
 #'  \item{"v"}{vector of constraints C.x=v}
 #'  \item{"L"}{matrix of B=L.F+M}
 #'  \item{"M"}{vector of B=L.F+M}
-#'  \item{"symbolic_enviro"}{an environment storing all symbolic objects required for the computation}
+#'  \item{"symbolic_enviro"}{an environment storing all symbolic objects
+#'  required for the computation}
 #' }
 #' @export
 #'
 #' @examples
-#' myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx", package = "RCaN"))
+#' myCaNmod <- build_CaNmod(system.file("extdata",
+#'  "CaN_template_mini.xlsx", package = "RCaN"))
 #'
 #' @importFrom xlsx read.xlsx
 #' @importFrom Matrix Matrix
@@ -34,7 +37,7 @@ build_CaNmod <- function(file) {
   components_param <-
     read.xlsx(file, sheetName = "Components & input parameter")
   if (length(which(!(
-    components_param$in_out %in% c('In', 'Out')
+    components_param$in_out %in% c("In", "Out")
   ))) > 0)
     paste("compontents in_out should be either 'Out' or 'In'")
   index_species <- which(components_param$in_out == "In")
@@ -52,7 +55,8 @@ build_CaNmod <- function(file) {
       fluxes_def$From[!(fluxes_def$From %in% components)]
     ))
   if (length(which(!(fluxes_def$To %in% components))) > 0)
-    stop(paste("In sheet fluxes, column To, not recognized:", fluxes_def$To[!(fluxes_def$To %in% components)]))
+    stop(paste("In sheet fluxes, column To, not recognized:",
+               fluxes_def$To[!(fluxes_def$To %in% components)]))
   fluxes_from <- match(fluxes_def$From, species)
   fluxes_to <- match(fluxes_def$To, species)
 
@@ -88,7 +92,8 @@ build_CaNmod <- function(file) {
       ) & suppressWarnings(is.na(as.numeric(constraints_word)))
     )
   if (length(not_recognized) > 0)
-    stop(paste("words not recognized in constraints:", constraints_word[not_recognized]))
+    stop(paste("words not recognized in constraints:",
+               constraints_word[not_recognized]))
 
   #build matrices H and N
   H <- diag(1 - exp(-components_param$OtherLosses[index_species]))
@@ -98,7 +103,8 @@ build_CaNmod <- function(file) {
     na.omit(
       N[cbind(fluxes_to, 1:nbfluxes)] + ifelse(
         is_trophic_flux,
-        components_param$AssimilationE[match(fluxes_def$To, components)] * components_param$Digestibility[match(fluxes_def$From, components)],
+        components_param$AssimilationE[match(fluxes_def$To, components)] *
+          components_param$Digestibility[match(fluxes_def$From, components)],
         1
       )
     ) #if it is not a trophic flow, we do not take into account assimilation and digestibility
@@ -266,7 +272,7 @@ build_CaNmod <- function(file) {
 
   }
   b <- -A[, 1]
-  A <- A [,-1]
+  A <- A [, -1]
 
   tmp <- expand.grid(flow, series$Year)
   colnames(A) <- paste(tmp[, 1], "[", tmp[, 2], "]", sep = "")
@@ -290,15 +296,18 @@ build_CaNmod <- function(file) {
       ))
   }
   v <- -C[, 1]
-  C <- C[,-1]
+  C <- C[, -1]
 
   ####build matrix L and M of B=L.F+M
   L <-
-    Matrix::Matrix(0, 0, length(symbolic_enviro$param), sparse = TRUE) #first column stores -b
+    Matrix::Matrix(0,
+                   0,
+                   length(symbolic_enviro$param),
+                   sparse = TRUE) #first column stores -b
   L <-
-    rbind(L, do.call('rbind',  lapply(species, function(sp)
+    rbind(L, do.call("rbind",  lapply(species, function(sp)
       do.call(
-        'rbind',
+        "rbind",
         lapply(as.vector(expand(eval(
           parse(text = sp), symbolic_enviro
         ))), function(s)
@@ -307,7 +316,7 @@ build_CaNmod <- function(file) {
   tmp <- expand.grid(series$Year, species)
   rownames(L) <- paste(tmp[, 2], "[", tmp[, 1], "]", sep = "")
   M <- L[, 1]
-  L <- L[,-1]
+  L <- L[, -1]
   colnames(L) <- colnames(A)
 
 
@@ -333,5 +342,5 @@ build_CaNmod <- function(file) {
   class(myCaNmod) <- "CaNmod"
 
 
-  return (myCaNmod)
+  return(myCaNmod)
 }

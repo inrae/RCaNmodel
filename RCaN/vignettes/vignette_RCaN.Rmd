@@ -127,7 +127,7 @@ myCaNmod2$b <- c(myCaNmod2$b,-1)
 With these lines, we added a constraint telling that F01[1998]<=0. Since by construction of the model, F01[1988]>=0, this imposes F01[1988]. Since it is the only incoming flow for HerbZooplankton, they are only submitted to predation and other mortality and consequently necessarily decrease.
 
 ```{r}
-incomp<-findingIncompatibleConstraintsCaNmod(myCaNmod2)
+incomp<-findingIncompatibleConstrCaNmod(myCaNmod2)
 ```
 
 Here the first line tells you that the algorithm successfully fit the model by relaxing 4 constraints: "neg_flow" is the one we added, two constraints of biomass positiveness and one constraint of inertia. This is logical: with no incoming flow, the HerbZooplankton biomass decreases below zero and the change of biomass during the first time step is too important. Then the algorithm tell you that "1989 : Biomass positiveness_refuge_HerbZooplankton" appears to be incompatible with "neg_flow", "1990 : Biomass positiveness_refuge_HerbZooplankton" with both "1989 : Biomass positiveness_refuge_HerbZooplankton" and "neg_flow"... Since neg_flow is always listed in the incompabible list, and that neg_flow can not be subtituted by another constraint (neg_flow: ), it would be the first one to be removed.

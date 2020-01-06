@@ -26,13 +26,16 @@ a CaNmod object with following elements
  \item{"v"}{vector of constraints C.x=v}
  \item{"L"}{matrix of B=L.F+M}
  \item{"M"}{vector of B=L.F+M}
- \item{"symbolic_enviro"}{an environment storing all symbolic objects required for the computation}
+ \item{"symbolic_enviro"}{an environment storing all symbolic objects
+ required for the computation}
 }
 }
 \description{
-function that reads the template and return build the complete model description, including all the underlying equations
+function that reads the template and return build the complete model
+description, including all the underlying equations
 }
 \examples{
-myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx", package = "RCaN"))
+myCaNmod <- build_CaNmod(system.file("extdata",
+ "CaN_template_mini.xlsx", package = "RCaN"))
 
 }
