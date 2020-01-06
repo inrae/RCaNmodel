@@ -26,14 +26,15 @@
 #' @export
 ggCaNmod <- function(myCaNmod) {
   # need to order the links table so that it matches the order of the components
-  edge_graph <- myCaNmod$fluxes_def[, c("From", "To", "Trophic", "Flux")]
+  edge_graph <-
+    myCaNmod$fluxes_def[, c("From", "To", "Trophic", "Flux")]
   edge_graph$Trophic <- as.factor(edge_graph$Trophic)
   names(edge_graph)[c(1:2)] <- c("from", "to")
-  edge_graph = rbind.data.frame(d = edge_graph, list("HerbZooplankton", "HerbZooplankton", 1, "F01"))
   vertices_graph <-
     myCaNmod$components_param[, c("Component", "in_out")]
 
-  g <- graph_from_data_frame(d = edge_graph, vertices = vertices_graph)
+  g <-
+    graph_from_data_frame(d = edge_graph, vertices = vertices_graph)
 
   gg_foodweb <- ggraph(g, 'circle') +
     geom_node_point(aes(
@@ -61,7 +62,9 @@ ggCaNmod <- function(myCaNmod) {
         ends = "last",
         type = "closed"
       )
-    ) +
+    )
+  if(sum(which_loop(g))>0){
+    gg_foodweb <- gg_foodweb +
     geom_edge_loop(
       aes_string(
         span = 90,
@@ -70,8 +73,17 @@ ggCaNmod <- function(myCaNmod) {
         colour = "Trophic"
       ),
       width = 1,
-      alpha = 0.33
-    ) +
+      end_cap = circle(0.1, 'inches'),
+      alpha = 0.33,
+      arrow = arrow(
+        angle = 30,
+        length = unit(0.1, "inches"),
+        ends = "last",
+        type = "closed"
+      )
+    )
+    }
+  gg_foodweb <-gg_foodweb +
     theme(aspect.ratio = 1)
-
+  gg_foodweb
 }
