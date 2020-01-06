@@ -17,8 +17,10 @@ treat_constraint(myconstraint, symbolic_enviro, yr = NULL,
 \item{name_constr}{a string naming the constraint}
 }
 \value{
-a matrix that correspond to the coefficient of the constraints, fist column corresponds to the -intercept and each line to a constraint (year)
+a matrix that correspond to the coefficient of the constraints, first
+column corresponds to the -intercept and each line to a constraint (year)
 }
 \description{
-This is an internal function used to convert a string constraint into a symbolic expression
+This is an internal function used to convert a string constraint into a
+symbolic expression
 }

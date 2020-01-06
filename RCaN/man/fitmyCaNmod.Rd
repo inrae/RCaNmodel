@@ -22,7 +22,8 @@ a \code{\link[coda]{mcmc.list}}
 fit the CaNmod model
 }
 \examples{
-myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx", package = "RCaN"))
+myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx",
+ package = "RCaN"))
 res <- fitmyCaNmod(myCaNmod, 100)
 
 }

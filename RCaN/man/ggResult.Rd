@@ -11,7 +11,8 @@ ggResult(mcmc_res, myCaNmod, param)
 
 \item{myCaNmod}{a CaNmod object}
 
-\item{param}{the name (or a vector of name) of a parameter (either a flow or a biomass)}
+\item{param}{the name (or a vector of name) of a parameter (either a flow or
+a biomass)}
 }
 \value{
 a ggplot
@@ -20,10 +21,12 @@ a ggplot
 provide a ggplot of the fit
 }
 \details{
-the line corresponds to median of the mcmc simulation, the ribbon corresponds to quantiles 2.5% and 97.5%
+the line corresponds to median of the mcmc simulation, the ribbon
+corresponds to quantiles 2.5% and 97.5%
 }
 \examples{
-myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx", package = "RCaN"))
+myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx",
+ package = "RCaN"))
 res <- fitmyCaNmod(myCaNmod, 100)
 #with one series
 ggResult(res,myCaNmod,"F01")

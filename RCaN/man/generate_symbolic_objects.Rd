@@ -32,5 +32,6 @@ en environment storing all symbolic elements including among others
 }
 }
 \description{
-This is an internal function that builds all the required symbolic objects required for the computation of the model
+This is an internal function that builds all the required symbolic objects
+required for the computation of the model
 }

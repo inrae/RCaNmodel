@@ -7,9 +7,11 @@
 #' @examples
 #' require(ggraph)
 #' require(ggplot2)
-#' myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx", package = "RCaN"))
+#' myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx",
+#'  package = "RCaN"))
 #' ggCaNmod(myCaNmod)
 #' @importFrom igraph graph_from_data_frame
+#' @importFrom igraph which_loop
 #' @importFrom ggraph ggraph
 #' @importFrom ggraph geom_edge_arc
 #' @importFrom ggraph geom_node_text
@@ -36,7 +38,7 @@ ggCaNmod <- function(myCaNmod) {
   g <-
     graph_from_data_frame(d = edge_graph, vertices = vertices_graph)
 
-  gg_foodweb <- ggraph(g, 'circle') +
+  gg_foodweb <- ggraph(g, "circle") +
     geom_node_point(aes(
       x = x * 1.05,
       y = y * 1.05,
@@ -63,27 +65,27 @@ ggCaNmod <- function(myCaNmod) {
         type = "closed"
       )
     )
-  if(sum(which_loop(g))>0){
+  if (sum(which_loop(g)) > 0) {
     gg_foodweb <- gg_foodweb +
-    geom_edge_loop(
-      aes_string(
-        span = 90,
-        direction = 90,
-        label = "Flux",
-        colour = "Trophic"
-      ),
-      width = 1,
-      end_cap = circle(0.1, 'inches'),
-      alpha = 0.33,
-      arrow = arrow(
-        angle = 30,
-        length = unit(0.1, "inches"),
-        ends = "last",
-        type = "closed"
+      geom_edge_loop(
+        aes_string(
+          span = 90,
+          direction = 90,
+          label = "Flux",
+          colour = "Trophic"
+        ),
+        width = 1,
+        end_cap = circle(0.1, "inches"),
+        alpha = 0.33,
+        arrow = arrow(
+          angle = 30,
+          length = unit(0.1, "inches"),
+          ends = "last",
+          type = "closed"
+        )
       )
-    )
-    }
-  gg_foodweb <-gg_foodweb +
+  }
+  gg_foodweb <- gg_foodweb +
     theme(aspect.ratio = 1)
   gg_foodweb
 }

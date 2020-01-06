@@ -8,6 +8,6 @@
 #' @export
 
 
-mean.VecBasic <- function(x,...) {
+mean.VecBasic <- function(x, ...) {
   sum(x) / length(x)
 }

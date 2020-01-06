@@ -3,7 +3,8 @@
 \name{build_vector_constraint}
 \alias{build_vector_constraint}
 \title{build_vector_constraint
-internal function that convert a symbolic equation of constraint into a matrix storing the coefficients of the constraint}
+internal function that convert a symbolic equation of constraint into a
+matrix storing the coefficients of the constraint}
 \usage{
 build_vector_constraint(eq_constraint, symbolic_enviro)
 }
@@ -13,9 +14,11 @@ build_vector_constraint(eq_constraint, symbolic_enviro)
 \item{symbolic_enviro}{the symbolic environment}
 }
 \value{
-a sparse matrix storing the coefficient of the constraint (first column stands for -intercept)
+a sparse matrix storing the coefficient of the constraint (first
+column stands for -intercept)
 }
 \description{
 build_vector_constraint
-internal function that convert a symbolic equation of constraint into a matrix storing the coefficients of the constraint
+internal function that convert a symbolic equation of constraint into a
+matrix storing the coefficients of the constraint
 }
