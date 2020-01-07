@@ -1,5 +1,5 @@
 
-#' findingIncompatibleConstraintsCaNmod
+#' findingIncompatibleConstrCaNmod
 #' compute bounds for all paramaters
 #' @param myCaNmod a CaNmod oject
 #'
