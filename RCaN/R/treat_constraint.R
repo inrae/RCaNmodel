@@ -56,7 +56,7 @@ treat_constraint <- function(myconstraint,
   mat <-
     do.call(rbind,
             lapply(as.vector(symbolic_constraint), function(s)
-              build_vector_constraint(s, symbolic_enviro)))
+              RCaN:::build_vector_constraint(s, symbolic_enviro)))
   if (is.null(yr)) {
     yr <- seq_len(nrow(mat))
   } else{
@@ -64,5 +64,6 @@ treat_constraint <- function(myconstraint,
   }
   mat <- mat[yr, ]
   rownames(mat) <- paste(years[yr], name_constr, sep = " : ")
+  mat <- mat[!is.na(rowSums(mat)), ]
   mat
 }
