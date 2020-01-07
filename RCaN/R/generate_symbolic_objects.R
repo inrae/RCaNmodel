@@ -24,21 +24,22 @@
 
 generate_symbolic_objects <-
   function(flow, species, ntstep, H, N, B0, series) {
+    years <- series$Year
     nbspec <- length(species)
     Ie <- diag(nbspec) #diagonal_matrix
     IE_H <- symengine::Matrix(Ie - H)
     n <- symengine::Matrix(N)
-    B_0 <- Vector(B0)
+    assign(paste("B_", years[1], sep = ""), Vector(B0))
     for (f in flow)
-      assign(paste(f, 0, sep = "_"),
-             S(paste(f, 0, sep = "_"))) #symbolic flow for time step 0
-    F_0 <-
+      assign(paste(f, years[1], sep = "_"),
+             S(paste(f, years[1], sep = "_"))) #symbolic flow for time step 0
+    assign(paste("F_", years[1], sep = ""),
       eval(parse(text = paste(
-        "Vector(", paste(flow, 0, sep = "_", collapse = ","), ")"
-      ))) #symbolic vector F_0 (all fluxes for time step 0)
-    list_F <- list(F_0)
-    list_B <- list(B_0)
-    for (t in 1:(ntstep - 1)) {
+        "Vector(", paste(flow, years[1], sep = "_", collapse = ","), ")"
+      )))) #symbolic vector F_0 (all fluxes for time step 0)
+    list_F <- list(eval(parse(text = paste("F", years[1], sep = "_"))))
+    list_B <- list(eval(parse(text = paste("B", years[1], sep = "_"))))
+    for (t in years[-1]) {
       for (f in flow) {
         assign(paste(f, t, sep = "_"),
                S(paste(f, t, sep = "_"))) #symbolic fluxes for time step t
@@ -57,11 +58,11 @@ generate_symbolic_objects <-
     }
 
     assign("Fmat", do.call("cbind", list_F))
-    colnames(Fmat) <- series$Year
+    colnames(Fmat) <- years
     assign("param",
            do.call("c", list_F)) #vector of flows on which we will sample
     assign("Bmat", do.call("cbind", list_B))
-    colnames(Bmat) <- series$Year
+    colnames(Bmat) <- years
     param <- c(V(1), param) #we add an intercept
 
     for (is in 1:nbspec) {
@@ -74,7 +75,7 @@ generate_symbolic_objects <-
 
     for (s in names(series)[-1]) {
       ser <- series[, s]
-      ser[is.na(ser)]<-NaN
+      ser[is.na(ser)] <- NaN
       assign(s, Vector(ser))
     }
     rm(list = c(
