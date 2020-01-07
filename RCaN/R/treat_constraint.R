@@ -64,6 +64,6 @@ treat_constraint <- function(myconstraint,
   }
   mat <- mat[yr, ]
   rownames(mat) <- paste(years[yr], name_constr, sep = " : ")
-  mat <- mat[!is.na(rowSums(mat)), ]
+  mat <- mat[!is.na(Matrix::rowSums(mat)), ]
   mat
 }

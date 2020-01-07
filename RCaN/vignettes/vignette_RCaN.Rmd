@@ -73,7 +73,7 @@ Here you provide all the time series you have. The first column correspond to ye
 ```{r,echo=FALSE,include=TRUE}
 myCaNmod$constraints
 ```
-The "Id" correspond to identifiers of the constraints. Then, the constraint correspond to a mathematical linear equation of constraint. You can potentially use "sum" and "mean" to computes sum or means over the time range. Both inequality ("<=" or ">=") and equality ("=") constraints can be used. Time.Range defines the time range of the constraint, they can be denoted either either with "firstyear:lastyear" or as a vector of years "c(year1,year2...)"
+The "Id" correspond to identifiers of the constraints. Then, the constraint correspond to a mathematical linear equation of constraint. You can potentially use "sum" and "mean" to computes sum or means over the time range. Both inequality ("<=" or ">=") and equality ("=") constraints can be used. Time.Range defines the time range of the constraint, they can be denoted either either with "firstyear:lastyear" or as a vector of years "c(year1,year2...)". It is also possible to make a reference to a specific year of a vector by indexing with "_year"; for example a constraint F01<=PrimaryProduction_1988 would mean that flux F01 should always be inferior to the 1988 PrimaryProduction.
 
 # Building the model
 The first step of the workflow is to build the model. The function build_CaNmod does this job. It reads the template file and provides a CaNmod object that includes all necessary data to fit the model.  You see here the different elements included in the object.
