@@ -73,7 +73,9 @@ generate_symbolic_objects <-
     }
 
     for (s in names(series)[-1]) {
-      assign(s, series[, s])
+      ser <- series[, s]
+      ser[is.na(ser)]<-NaN
+      assign(s, Vector(ser))
     }
     rm(list = c(
       "H",
