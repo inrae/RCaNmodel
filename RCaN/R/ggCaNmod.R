@@ -34,6 +34,8 @@ ggCaNmod <- function(myCaNmod) {
   names(edge_graph)[c(1:2)] <- c("from", "to")
   vertices_graph <-
     myCaNmod$components_param[, c("Component", "in_out")]
+  vertices_graph$in_out <- ifelse(vertices_graph$in_out == "In", "internal", "external")
+  names(vertices_graph)[2] <- "Status"
 
   g <-
     graph_from_data_frame(d = edge_graph, vertices = vertices_graph)
@@ -42,7 +44,7 @@ ggCaNmod <- function(myCaNmod) {
     geom_node_point(aes(
       x = x * 1.05,
       y = y * 1.05,
-      colour = in_out
+      colour = Status
     ),
     size = 5,
     alpha = 0.33) +
