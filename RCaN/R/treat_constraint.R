@@ -56,7 +56,7 @@ treat_constraint <- function(myconstraint,
   mat <-
     do.call(rbind,
             lapply(as.vector(symbolic_constraint), function(s)
-              RCaN:::build_vector_constraint(s, symbolic_enviro)))
+              build_vector_constraint(s, symbolic_enviro)))
   if (is.null(yr)) {
     yr <- seq_len(nrow(mat))
   } else{
