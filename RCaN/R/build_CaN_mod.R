@@ -107,9 +107,11 @@ build_CaNmod <- function(file) {
           components_param$Digestibility[match(fluxes_def$From, components)],
         1
       )
-    ) #if it is not a trophic flow, we do not take into account assimilation and digestibility
+    ) #if it is not a trophic flow, we do not take into account assimilation
+      # and digestibility
   N <-
-    sweep(N, 1, STATS = diag(H) / (components_param$OtherLosses[index_species]), "*")
+    sweep(N, 1, STATS = diag(H) /
+            (components_param$OtherLosses[index_species]), "*")
   rownames(N) <- species
   colnames(N) <- flow
   colnames(H) <- rownames(H) <- species
@@ -128,7 +130,8 @@ build_CaNmod <- function(file) {
   #build A matrix and b corresponding to constraints A.x<=b
   nbparam <- length(symbolic_enviro$param)
   A <-
-    Matrix::Matrix(0, 0, length(symbolic_enviro$param), sparse = TRUE) #first column stores -b
+    Matrix::Matrix(0, 0, length(symbolic_enviro$param), sparse = TRUE)
+  #first column stores -b
   colnames(A) <- as.character(symbolic_enviro$param)
 
   ####add flow positiveness
