@@ -12,7 +12,7 @@ To install RCaN, follow the following steps:
 Once these packages are installed, the process is easy using the library devools. On a R console:
 
     > require(devtools)
-    > devtools::install_git("https://gitlab.irstea.fr/hilaire.drouineau/can.git", subdir="RCaN", credentials = git2r::cred_user_pass("myusername", getPass::getPass()),dependencies=TRUE) = TRUE, dependencies=TRUE)
+    > devtools::install_git("https://gitlab.irstea.fr/hilaire.drouineau/can.git", subdir="RCaN", credentials = git2r::cred_user_pass("myusername", getPass::getPass()),dependencies=TRUE)
     
     Don't forget to replace myusername with your Irstea Gitlab username and provide your password.
     
