@@ -88,6 +88,9 @@ build_CaNmod <- function(file) {
         data_series_name,
         "mean",
         "sum",
+        "na.rm",
+        "TRUE",
+        "FALSE",
         ""
       ) & suppressWarnings(is.na(as.numeric(constraints_word)))
     )
