@@ -6,7 +6,7 @@
 #' @param N the number of samples required
 #' @param nchain the number of mcmc chains
 #' @param ncore number of cores to use
-#'
+#' @param thin thinning interval
 #' @return a \code{\link[coda]{mcmc.list}}
 #' @export
 #'
@@ -40,7 +40,8 @@
 fitmyCaNmod <- function(myCaNmod,
                         N,
                         nchain = 1,
-                        ncore = 1) {
+                        ncore = 1,
+                        thin = 1) {
   ncore <- min(min(detectCores() - 1, ncore), nchain)
   `%myinfix%` <- `%do%`
 
@@ -84,6 +85,7 @@ fitmyCaNmod <- function(myCaNmod,
     res <-
       fitCaN(
         N,
+        thin=thin,
         as.matrix(myCaNmod$A),
         myCaNmod$b,
         as.matrix(myCaNmod$C),
