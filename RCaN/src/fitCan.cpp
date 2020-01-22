@@ -15,15 +15,18 @@ using Eigen::VectorXd;
 
 
 // [[Rcpp::export]]
-List fitCaN(const int N,const Eigen::MatrixXd &A ,const Eigen::VectorXd &b,const Eigen::MatrixXd &C ,const Eigen::VectorXd &v,const Eigen::MatrixXd &L, const Eigen::VectorXd M,const Eigen::VectorXd &x0) {
+List fitCaN(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorXd &b,
+            const Eigen::MatrixXd &C ,const Eigen::VectorXd &v,
+            const Eigen::MatrixXd &L, const Eigen::VectorXd M,
+            const Eigen::VectorXd &x0, const int thin) {
   int p=A.cols();
   int m2=C.rows();
   MatrixXd F(N, p);
   MatrixXd B(N, M.size());
   if(m2>0){ //there are equality constraints
-    F=cpgsR::cpgsEquality(N, A, b, C, v, x0);
+    F=cpgsR::cpgsEquality(N, A, b, C, v, x0, thin);
   } else{
-    F=cpgsR::cpgs(N, A, b, x0);
+    F=cpgsR::cpgs(N, A, b, x0, thin);
   }
   for (int i=0;i<N;++i){
     B.row(i)=L*F.row(i).transpose()+M;

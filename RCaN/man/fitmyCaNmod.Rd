@@ -4,7 +4,7 @@
 \alias{fitmyCaNmod}
 \title{fitmyCaNmod}
 \usage{
-fitmyCaNmod(myCaNmod, N, nchain = 1, ncore = 1)
+fitmyCaNmod(myCaNmod, N, nchain = 1, ncore = 1, thin = 1)
 }
 \arguments{
 \item{myCaNmod}{a CaNmod object with following elements}
@@ -14,6 +14,8 @@ fitmyCaNmod(myCaNmod, N, nchain = 1, ncore = 1)
 \item{nchain}{the number of mcmc chains}
 
 \item{ncore}{number of cores to use}
+
+\item{thin}{thinning interval}
 }
 \value{
 a \code{\link[coda]{mcmc.list}}
