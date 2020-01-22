@@ -79,7 +79,7 @@ build_CaNmod <- function(file) {
 
   constraints_word <-
     unlist(sapply(as.character(constraints$Constraint), function(x)
-      strsplit(x, split = "/|\\+|=|<|\\*|>|\\-|\\)|\\(|[[:space:]]")))
+      strsplit(x, split = ",|/|\\+|=|<|\\*|>|\\-|\\)|\\(|[[:space:]]")))
   not_recognized <-
     which(
       !constraints_word %in% c(
