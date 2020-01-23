@@ -36,6 +36,11 @@ build_CaNmod <- function(file) {
   #Components & input parameter
   components_param <-
     read.xlsx(file, sheetName = "Components & input parameter")
+
+  #remove totally empty rows that sometimes happen with xlsx
+  components_param <-
+    components_param[!rowSums(is.na(components_param)) ==
+                       ncol(components_param), ]
   if (length(which(!(
     components_param$in_out %in% c("In", "Out")
   ))) > 0)
@@ -47,6 +52,11 @@ build_CaNmod <- function(file) {
 
   #read Fluxes
   fluxes_def <- read.xlsx(file, sheetName = "Fluxes")
+
+  #remove totally empty rows that sometimes happen with xlsx
+  fluxes_def <-
+    fluxes_def[!rowSums(is.na(fluxes_def)) ==
+                       ncol(fluxes_def), ]
   flow <- as.character(fluxes_def$Flux)
   nbfluxes <- nrow(fluxes_def)
   if (length(which(!(fluxes_def$From %in% components))) > 0)
@@ -67,12 +77,23 @@ build_CaNmod <- function(file) {
 
   #read Times series
   series <- read.xlsx(file, sheetName = "Input time-series")
+
+  #remove totally empty rows that sometimes happen with xlsx
+  series <-
+    series[!rowSums(is.na(series)) ==
+                       ncol(series), ]
   ntstep <- nrow(series)
   data_series_name <- names(series)[-1]
 
 
   #read constraints
   constraints <- read.xlsx(file, sheetName = "Constraints")
+
+  #remove totally empty rows that sometimes happen with xlsx
+  constraints <-
+    constraints[!rowSums(is.na(constraints)) ==
+             ncol(constraints), ]
+
   lessthan <- grep("<", constraints$Constraint)
   greaterthan <- grep(">", constraints$Constraint)
   equality <- grep("^[^<>]+$", constraints$Constraint)
