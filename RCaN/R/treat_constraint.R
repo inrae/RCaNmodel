@@ -32,27 +32,10 @@ treat_constraint <- function(myconstraint,
   } else{
     stop(paste("unrecognized sign in constraint:", myconstraint))
   }
-  ###check for division
-  left_numerator <- left
-  left_denominator <- 1
-  right_numerator <- right
-  right_denominator <- 1
-  if (length(grep("/", left)) > 0) {
-    left_numerator <- strsplit(left, "/")[[1]][1]
-    left_denominator <- strsplit(left, "/")[[1]][2]
-  }
-  if (length(grep("/", right)) > 0) {
-    right_numerator <- strsplit(right, "/")[[1]][1]
-    right_denominator <- strsplit(right, "/")[[1]][2]
-  }
 
   symbolic_constraint <-
-    symengine::expand(
-      eval(parse(text = left_numerator), symbolic_enviro) *
-        eval(parse(text = right_denominator), symbolic_enviro) -
-        eval(parse(text = right_numerator), symbolic_enviro) *
-        eval(parse(text = left_denominator), symbolic_enviro)
-    )
+      eval(parse(text = left), symbolic_enviro)  -
+      eval(parse(text = right), symbolic_enviro)
   mat <-
     do.call(rbind,
             lapply(as.vector(symbolic_constraint), function(s)
