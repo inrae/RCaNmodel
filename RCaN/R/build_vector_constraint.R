@@ -14,6 +14,49 @@ build_vector_constraint <- function(eq_constraint, symbolic_enviro) {
     Matrix::Matrix(0, 1, length(symbolic_enviro$param), sparse = TRUE)
   colnames(coeff_const) <- as.character(symbolic_enviro$param)
   basic_constraint <- (eq_constraint)
+
+  #We know check that there is no division
+  if(get_type(basic_constraint)=="Add"){
+    denom <- lapply(as.list(get_args(basic_constraint)),
+                    function(x){
+                      if (!get_type(x) %in% c("RealDouble","Symbol")){
+                        members <- as.list(get_args(x))
+                        types <- sapply(members,get_type)
+                        if ("Pow" %in% types)
+                          return(members[[which(types == "Pow")]])
+                        return(S(1))
+                      } else{
+                        return(S(1))
+                      }
+                    })
+
+    denominator <- 1/ do.call('prod',denom)
+    nb_elem <- length(as.list(get_args(basic_constraint)))
+    numerator<- do.call(sum,
+                        lapply(seq_len(nb_elem), function(x){
+                          as.list(get_args(basic_constraint))[[x]]*denominator
+                        }))
+  } else if (get_type(basic_constraint) != "Mul"){
+    numerator <- basic_constraint
+    denominator <- S(1)
+  } else {
+    members <- as.list(get_args(basic_constraint))
+    types <- sapply(members,get_type)
+    if ("Pow" %in% types){
+      numerator <- do.call(sum, members[-which(types=="Pow")])
+      denominator <- members[which(types=="Pow")]
+    } else {
+      numerator <- basic_constraint
+      denominator <- S(1)
+
+    }
+  }
+
+  basic_constraint <- expand(numerator)
+
+
+
+
   all_elements <- get_str(basic_constraint)
   myelem <- strsplit(gsub(" ", "", gsub(
     " +",
