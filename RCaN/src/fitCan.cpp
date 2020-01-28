@@ -21,6 +21,7 @@ List fitCaN(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorXd &b,
             const Eigen::VectorXd &x0, const int thin) {
   int p=A.cols();
   int m2=C.rows();
+  int nbflows=p-M.size();
   MatrixXd F(N, p);
   MatrixXd B(N, M.size());
   if(m2>0){ //there are equality constraints

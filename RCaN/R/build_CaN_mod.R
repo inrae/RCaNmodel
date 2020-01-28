@@ -147,7 +147,6 @@ build_CaNmod <- function(file) {
                               ntstep,
                               H,
                               N,
-                              components_param$InitialBiomass[index_species],
                               series)
 
 
@@ -302,7 +301,8 @@ build_CaNmod <- function(file) {
   A <- A [, -1]
 
   tmp <- expand.grid(flow, series$Year)
-  colnames(A) <- paste(tmp[, 1], "[", tmp[, 2], "]", sep = "")
+  colnames(A) <- c(paste(species, "[", series$Year[1], "]", sep = ""),
+                   paste(tmp[, 1], "[", tmp[, 2], "]", sep = ""))
 
 
   ####build matrix for equality constraint  C x = v and fill it

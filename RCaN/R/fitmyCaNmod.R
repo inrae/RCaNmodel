@@ -95,7 +95,9 @@ fitmyCaNmod <- function(myCaNmod,
         x0
       )
     names(res) <- c("F", "B")
-    colnames(res$F) <- colnames(myCaNmod$A)
+    res$F <- res$F[, -seq_len(length(myCaNmod$species))]
+    #we remove the first column which corresponds to initial biomasses
+    colnames(res$F) <- colnames(myCaNmod$A)[-seq_len(length(myCaNmod$species))]
     colnames(res$B) <- rownames(myCaNmod$L)
     mcmc(cbind(res$F, res$B), 1, nrow(res$F), 1)
   }

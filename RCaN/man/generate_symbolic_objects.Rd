@@ -4,7 +4,7 @@
 \alias{generate_symbolic_objects}
 \title{generate_symbolic_objects}
 \usage{
-generate_symbolic_objects(flow, species, ntstep, H, N, B0, series)
+generate_symbolic_objects(flow, species, ntstep, H, N, series)
 }
 \arguments{
 \item{flow}{names of the flow}
@@ -16,8 +16,6 @@ generate_symbolic_objects(flow, species, ntstep, H, N, B0, series)
 \item{H}{the H matrix of (I-H).B+N.F}
 
 \item{N}{the N matrix of (I-H).B+N.F}
-
-\item{B0}{initial biomasses}
 
 \item{series}{the names of the series}
 }
