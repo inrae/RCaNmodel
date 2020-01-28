@@ -8,6 +8,9 @@
 #' @importFrom Matrix Matrix
 #' @importFrom symengine free_symbols
 #' @importFrom symengine get_str
+#' @importFrom symengine get_type
+#' @importFrom symengine get_args
+
 
 build_vector_constraint <- function(eq_constraint, symbolic_enviro) {
   coeff_const <-
@@ -70,10 +73,12 @@ build_vector_constraint <- function(eq_constraint, symbolic_enviro) {
     param_used <- c("1", param_used)
   }
   coeff_const[, param_used] <-
-    mapply(function(expr, par)
-      eval(parse(text = gsub(
+    mapply(function(expr, par){
+      mycoef <- eval(parse(text = gsub(
         paste("\\*?", par, "$", sep = ""), "", expr
-      ))),
+        )))
+      ifelse(is.null(mycoef), 1, mycoef)
+      },
       myelem,
       ifelse(param_used != "1", param_used, ""))
   coeff_const

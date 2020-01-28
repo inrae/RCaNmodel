@@ -7,7 +7,6 @@
 #' @param ntstep number of the time step
 #' @param H the H matrix of (I-H).B+N.F
 #' @param N the N matrix of (I-H).B+N.F
-#' @param B0 initial biomasses
 #' @param series the names of the series
 #'
 #' @return en environment storing all symbolic elements including among others
@@ -23,13 +22,19 @@
 #' @importFrom symengine V
 
 generate_symbolic_objects <-
-  function(flow, species, ntstep, H, N, B0, series) {
+  function(flow, species, ntstep, H, N, series) {
     years <- series$Year
     nbspec <- length(species)
     Ie <- diag(nbspec) #diagonal_matrix
     IE_H <- symengine::Matrix(Ie - H)
     n <- symengine::Matrix(N)
-    assign(paste("B_", years[1], sep = ""), Vector(B0))
+    for (s in species)
+      assign(paste(s, years[1] ,sep = "_"),
+             S(paste(s, years[1], sep = "_"))) #initial biomass
+    assign(paste("B_", years[1], sep = ""),
+           eval(parse(text = paste(
+             "Vector(", paste(species, years[1], sep = "_", collapse = ","), ")"
+           ))))  #symbolic vector B_0 (all biomasses for time step 0)
     for (f in flow)
       assign(paste(f, years[1], sep = "_"),
              S(paste(f, years[1], sep = "_"))) #symbolic flow for time step 0
@@ -60,7 +65,9 @@ generate_symbolic_objects <-
     assign("Fmat", do.call("cbind", list_F))
     colnames(Fmat) <- years
     assign("param",
-           do.call("c", list_F)) #vector of flows on which we will sample
+           c(eval(parse(text = paste("B_", years[1], sep = ""))),
+             do.call("c",list_F))) #vector of parameters
+                                    #on which we will sample
     assign("Bmat", do.call("cbind", list_B))
     colnames(Bmat) <- years
     param <- c(V(1), param) #we add an intercept
@@ -83,9 +90,7 @@ generate_symbolic_objects <-
       "N",
       "flow",
       "species",
-      "ntstep",
       "series",
-      "B0",
       "f",
       "s",
       "t",
