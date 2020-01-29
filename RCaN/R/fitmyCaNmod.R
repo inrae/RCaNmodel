@@ -91,7 +91,6 @@ fitmyCaNmod <- function(myCaNmod,
         as.matrix(myCaNmod$C),
         myCaNmod$v,
         as.matrix(myCaNmod$L),
-        myCaNmod$M,
         x0
       )
     names(res) <- c("F", "B")

@@ -18,8 +18,7 @@
 #'  \item{"b"}{vector of constraints A.x<=b}
 #'  \item{"C"}{matrix of constraints C.x=v}
 #'  \item{"v"}{vector of constraints C.x=v}
-#'  \item{"L"}{matrix of B=L.F+M}
-#'  \item{"M"}{vector of B=L.F+M}
+#'  \item{"L"}{matrix of B=L.F, since B0 is a parameter, there is no M}
 #'  \item{"symbolic_enviro"}{an environment storing all symbolic objects
 #'  required for the computation}
 #' }
@@ -342,7 +341,6 @@ build_CaNmod <- function(file) {
       ))))
   tmp <- expand.grid(series$Year, species)
   rownames(L) <- paste(tmp[, 2], "[", tmp[, 1], "]", sep = "")
-  M <- L[, 1]
   L <- L[, -1]
   colnames(L) <- colnames(A)
 
@@ -362,7 +360,6 @@ build_CaNmod <- function(file) {
     C = C,
     v = v,
     L = L,
-    M = M,
     b = b,
     symbolic_enviro = symbolic_enviro
   )
