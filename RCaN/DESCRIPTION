@@ -16,7 +16,6 @@ Imports:
     lpSolveAPI,
     symengine,
     Matrix,
-    xlsx,
     cpgsR,
     igraph,
     tidyr,
@@ -26,7 +25,9 @@ Imports:
     coda,
     doParallel,
     doRNG,
-    foreach
+    foreach,
+    readxl,
+    dplyr
 LinkingTo: Rcpp, cpgsR, RcppEigen
 Suggests: 
     knitr,

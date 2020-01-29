@@ -20,6 +20,7 @@
 #' @importFrom symengine Vector
 #' @importFrom symengine S
 #' @importFrom symengine V
+#' @importFrom dplyr pull
 
 generate_symbolic_objects <-
   function(flow, species, ntstep, H, N, series) {
@@ -81,7 +82,7 @@ generate_symbolic_objects <-
     }
 
     for (s in names(series)[-1]) {
-      ser <- series[, s]
+      ser <- pull(series, s)
       ser[is.na(ser)] <- NaN
       assign(s, Vector(ser))
     }

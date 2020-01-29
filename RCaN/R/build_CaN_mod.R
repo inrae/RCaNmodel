@@ -28,13 +28,13 @@
 #' myCaNmod <- build_CaNmod(system.file("extdata",
 #'  "CaN_template_mini.xlsx", package = "RCaN"))
 #'
-#' @importFrom xlsx read.xlsx
+#' @importFrom readxl read_excel
 #' @importFrom Matrix Matrix
 #' @importFrom stats na.omit
 build_CaNmod <- function(file) {
   #Components & input parameter
   components_param <-
-    read.xlsx(file, sheetName = "Components & input parameter")
+    read_excel(file, sheet = "Components & input parameter")
 
   #remove totally empty rows that sometimes happen with xlsx
   components_param <-
@@ -50,7 +50,7 @@ build_CaNmod <- function(file) {
   nbspecies <- length(species)
 
   #read Fluxes
-  fluxes_def <- read.xlsx(file, sheetName = "Fluxes")
+  fluxes_def <- read_excel(file, sheet = "Fluxes")
 
   #remove totally empty rows that sometimes happen with xlsx
   fluxes_def <-
@@ -75,7 +75,7 @@ build_CaNmod <- function(file) {
   is_trophic_flux <- fluxes_def$Trophic == 1
 
   #read Times series
-  series <- read.xlsx(file, sheetName = "Input time-series")
+  series <- read_excel(file, sheet = "Input time-series")
 
   #remove totally empty rows that sometimes happen with xlsx
   series <-
@@ -86,7 +86,7 @@ build_CaNmod <- function(file) {
 
 
   #read constraints
-  constraints <- read.xlsx(file, sheetName = "Constraints")
+  constraints <- read_excel(file, sheet = "Constraints")
 
   #remove totally empty rows that sometimes happen with xlsx
   constraints <-
@@ -290,7 +290,7 @@ build_CaNmod <- function(file) {
           function(c, yr, id)
             treat_constraint(c, symbolic_enviro, yr, id),
           as.character(constraints$Constraint[c(lessthan, greaterthan)]),
-          as.character(constraints$Time.range[c(lessthan, greaterthan)]),
+          as.character(constraints$`Time-range`[c(lessthan, greaterthan)]),
           as.character(constraints$Id[c(lessthan, greaterthan)])
         )
       ))
@@ -316,7 +316,7 @@ build_CaNmod <- function(file) {
           function(c, yr, id)
             treat_constraint(c, symbolic_enviro, yr, id),
           as.character(constraints$Constraint[equality]),
-          as.character(constraints$Time.range[equality]),
+          as.character(constraints$`Time-range`[equality]),
           as.character(constraints$Id[equality])
         )
       ))
