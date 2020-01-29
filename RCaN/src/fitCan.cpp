@@ -17,20 +17,19 @@ using Eigen::VectorXd;
 // [[Rcpp::export]]
 List fitCaN(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorXd &b,
             const Eigen::MatrixXd &C ,const Eigen::VectorXd &v,
-            const Eigen::MatrixXd &L, const Eigen::VectorXd M,
+            const Eigen::MatrixXd &L,
             const Eigen::VectorXd &x0, const int thin) {
   int p=A.cols();
   int m2=C.rows();
-  int nbflows=p-M.size();
   MatrixXd F(N, p);
-  MatrixXd B(N, M.size());
+  MatrixXd B(N, L.rows());
   if(m2>0){ //there are equality constraints
     F=cpgsR::cpgsEquality(N, A, b, C, v, x0, thin);
   } else{
     F=cpgsR::cpgs(N, A, b, x0, thin);
   }
   for (int i=0;i<N;++i){
-    B.row(i)=L*F.row(i).transpose()+M;
+    B.row(i)=L*F.row(i).transpose();
   }
   return(List::create(F,B));
 }

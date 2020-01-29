@@ -24,8 +24,7 @@ a CaNmod object with following elements
  \item{"b"}{vector of constraints A.x<=b}
  \item{"C"}{matrix of constraints C.x=v}
  \item{"v"}{vector of constraints C.x=v}
- \item{"L"}{matrix of B=L.F+M}
- \item{"M"}{vector of B=L.F+M}
+ \item{"L"}{matrix of B=L.F, since B0 is a parameter, there is no M}
  \item{"symbolic_enviro"}{an environment storing all symbolic objects
  required for the computation}
 }
