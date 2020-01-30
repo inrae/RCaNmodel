@@ -40,13 +40,14 @@ pdfCaNmod <- function(myCaNmod, output_file = "summaryCaNmod.pdf") {
   print(gg_foodweb)
 
   # step 4: draw all time series
-  ns <- dim(myCaNmod$series)[2] - 1
+  series <- as.data.frame(myCaNmod$series)
+  ns <- dim(series)[2] - 1
   for (i in 1:ceiling(ns / 9)) {
     TS <-
-      gather(myCaNmod$series[, ((i - 1) * 9 + 2):(min(ns, (i * 9)) + 1)], key =
+      gather(series[, ((i - 1) * 9 + 2):(min(ns, (i * 9)) + 1)], key =
                "series", value = "value")
     TS$time <-
-      rep(myCaNmod$series[, 1], min(ns, (i * 9)) - (i - 1) * 9)
+      rep(series[, 1], min(ns, (i * 9)) - (i - 1) * 9)
     gg_timeseries <- ggplot(TS, aes(x = time, y = value)) +
       facet_wrap(. ~ series, scales = "free") +
       geom_line(colour = "darkcyan") +
