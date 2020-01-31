@@ -5,7 +5,7 @@
 #' @useDynLib RCaN
 NULL
 
-fitCaN <- function(N, A, b, C, v, L, x0, thin) {
-    .Call('_RCaN_fitCaN', PACKAGE = 'RCaN', N, A, b, C, v, L, x0, thin)
+fitCaN <- function(N, A, b, C, v, L, x0, thin, test) {
+    .Call('_RCaN_fitCaN', PACKAGE = 'RCaN', N, A, b, C, v, L, x0, thin, test)
 }
 

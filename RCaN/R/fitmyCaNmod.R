@@ -7,6 +7,7 @@
 #' @param nchain the number of mcmc chains
 #' @param ncore number of cores to use
 #' @param thin thinning interval
+#' @param test if TRUE try a new method aiming at reducing autocorrelation
 #' @return a \code{\link[coda]{mcmc.list}}
 #' @export
 #'
@@ -41,7 +42,8 @@ fitmyCaNmod <- function(myCaNmod,
                         N,
                         nchain = 1,
                         ncore = 1,
-                        thin = 1) {
+                        thin = 1,
+                        test = FALSE) {
   ncore <- min(min(detectCores() - 1, ncore), nchain)
   `%myinfix%` <- `%do%`
 
@@ -91,7 +93,8 @@ fitmyCaNmod <- function(myCaNmod,
         as.matrix(myCaNmod$C),
         myCaNmod$v,
         as.matrix(myCaNmod$L),
-        x0
+        x0,
+        test
       )
     names(res) <- c("F", "B")
     res$F <- res$F[, -seq_len(length(myCaNmod$species))]

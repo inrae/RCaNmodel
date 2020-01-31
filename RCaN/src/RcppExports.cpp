@@ -7,8 +7,8 @@
 using namespace Rcpp;
 
 // fitCaN
-List fitCaN(const int N, const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const Eigen::MatrixXd& C, const Eigen::VectorXd& v, const Eigen::MatrixXd& L, const Eigen::VectorXd& x0, const int thin);
-RcppExport SEXP _RCaN_fitCaN(SEXP NSEXP, SEXP ASEXP, SEXP bSEXP, SEXP CSEXP, SEXP vSEXP, SEXP LSEXP, SEXP x0SEXP, SEXP thinSEXP) {
+List fitCaN(const int N, const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const Eigen::MatrixXd& C, const Eigen::VectorXd& v, const Eigen::MatrixXd& L, const Eigen::VectorXd& x0, const int thin, const bool test);
+RcppExport SEXP _RCaN_fitCaN(SEXP NSEXP, SEXP ASEXP, SEXP bSEXP, SEXP CSEXP, SEXP vSEXP, SEXP LSEXP, SEXP x0SEXP, SEXP thinSEXP, SEXP testSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -20,13 +20,14 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type L(LSEXP);
     Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type x0(x0SEXP);
     Rcpp::traits::input_parameter< const int >::type thin(thinSEXP);
-    rcpp_result_gen = Rcpp::wrap(fitCaN(N, A, b, C, v, L, x0, thin));
+    Rcpp::traits::input_parameter< const bool >::type test(testSEXP);
+    rcpp_result_gen = Rcpp::wrap(fitCaN(N, A, b, C, v, L, x0, thin, test));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_RCaN_fitCaN", (DL_FUNC) &_RCaN_fitCaN, 8},
+    {"_RCaN_fitCaN", (DL_FUNC) &_RCaN_fitCaN, 9},
     {NULL, NULL, 0}
 };
 
