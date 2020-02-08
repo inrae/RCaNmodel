@@ -17,7 +17,7 @@
 #'  package = "RCaN"))
 #' res <- fitmyCaNmod(myCaNmod, 100)
 #' #with one series
-#' ggResult(res,myCaNmod,"F01")
+#' ggResult(res,myCaNmod,"F01", TRUE)
 #'
 #' #with 2 series
 #' ggResult(res,myCaNmod,c("F01","HerbZooplankton"))
