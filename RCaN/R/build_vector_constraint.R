@@ -63,7 +63,10 @@ build_vector_constraint <-
       if (get_type(basic_constraint) == "Symbol") {
         mycoeffs <- 1
         names(mycoeffs) <- get_str(basic_constraint)
-      } else {
+      } else if (get_type(basic_constraint) == "Mul"){
+        mycoeffs <- as.numeric(as.list(get_args(basic_constraint))[[1]])
+        names(mycoeffs) <- get_str(as.list(get_args(basic_constraint))[[2]])
+      } else{
         return(mycoeffs <- as.numeric(basic_constraint))
         names(mycoeffs) <- "1"
       }
