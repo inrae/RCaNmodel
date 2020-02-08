@@ -1,10 +1,10 @@
 ---
 title: "Tutorial of RCaN"
 output:
-  pdf_document:
-    toc: yes
   rmarkdown::html_vignette:
      keep_md: yes
+  pdf_document:
+    toc: yes
 author: 
 - "Hilaire Drouineau - INRAE Bordeaux, UR EABX"
 - "Benjamin Planque - IMR"
