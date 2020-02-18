@@ -57,6 +57,7 @@ build_vector_constraint <-
     }
 
     basic_constraint <- expand(numerator)
+
     mycoeffs <- NULL
 
     if (get_type(basic_constraint) != "Add") {
@@ -66,8 +67,11 @@ build_vector_constraint <-
       } else if (get_type(basic_constraint) == "Mul"){
         mycoeffs <- as.numeric(as.list(get_args(basic_constraint))[[1]])
         names(mycoeffs) <- get_str(as.list(get_args(basic_constraint))[[2]])
-      } else{
-        return(mycoeffs <- as.numeric(basic_constraint))
+      } else if (get_type(basic_constraint) == "NaN"){
+        mycoeffs <- NA
+        names(mycoeffs) <- "1"
+      }else{
+        mycoeffs <- as.numeric(basic_constraint)
         names(mycoeffs) <- "1"
       }
     } else {
@@ -78,8 +82,13 @@ build_vector_constraint <-
           val <- 1
           names(val) <- get_str(e)
           return (val)
+        } else if (get_type(e) == "NaN"){
+          return(c("1" = NA))
         } else {
-          val <- as.numeric(as.list(get_args(e))[[1]])
+          val <- as.list(get_args(e))[[1]]
+          val <- ifelse(get_type(val) == "NaN",
+                        NA,
+                        as.numeric(val))
           names(val) <- get_str(as.list(get_args(e))[[2]])
           return(val)
         }
