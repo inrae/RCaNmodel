@@ -9,8 +9,6 @@ ggCaNmod(myCaNmod)
 }
 \arguments{
 \item{myCaNmod}{a CaNmod oject}
-
-\item{...}{Additional arguments}
 }
 \value{
 a ggraph

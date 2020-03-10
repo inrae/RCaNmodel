@@ -1,7 +1,6 @@
 #' ggCaNmod
 #' produces a ggraph representing the flow foodweb
 #' @param myCaNmod a CaNmod oject
-#' @param ... Additional arguments
 #' @return a ggraph
 #'
 #' @examples

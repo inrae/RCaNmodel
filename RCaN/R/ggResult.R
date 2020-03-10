@@ -7,7 +7,7 @@
 #' @param param the name (or a vector of name) of a parameter (either a flow or
 #' a biomass)
 #' @param ylab default Biomass Flux
-#' @param plot_series if yes, draw three example of trajectories
+#' @param plot_series if yes, draw three example of trajectories (default TRUE)
 #' @return a ggplot
 #' @details the line corresponds to median of the mcmc simulation, the ribbon
 #' corresponds to quantiles 2.5% and 97.5%
@@ -20,9 +20,10 @@
 #' ggResult(res,myCaNmod,"F01", TRUE)
 #'
 #' #with 2 series
-#' ggResult(res,myCaNmod,c("F01","HerbZooplankton"))
+#' ggResult(res,myCaNmod,c("F01","HerbZooplankton"), TRUE)
 #'
 #' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 geom_path
 #' @importFrom ggplot2 aes_string
 #' @importFrom ggplot2 geom_ribbon
 #' @importFrom ggplot2 geom_line
@@ -31,7 +32,7 @@
 
 #' @export
 #'
-ggResult <- function(mcmc_res, myCaNmod, param, plot_series, ylab="Biomass/Flux") {
+ggResult <- function(mcmc_res, myCaNmod, param, plot_series=TRUE, ylab="Biomass/Flux") {
   mat_res <- as.matrix(mcmc_res)
   quantiles <- do.call("rbind.data.frame", lapply(param, function(p) {
     columns <- which(startsWith(colnames(mat_res), paste(p, "[", sep = "")))
