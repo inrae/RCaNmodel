@@ -93,8 +93,10 @@ build_CaNmod <- function(file) {
     constraints[!rowSums(is.na(constraints)) ==
              ncol(constraints), ]
   #we keep only active constraints
+  if (! "Active" %in% names(constraints))
+    constraints$Active <- TRUE
   constraints <- subset(constraints,
-                        constraints$Active)
+                        as.logical(constraints$Active))
 
   lessthan <- grep("<", constraints$Constraint)
   greaterthan <- grep(">", constraints$Constraint)
