@@ -27,7 +27,8 @@ Imports:
     doRNG,
     foreach,
     readxl,
-    dplyr
+    dplyr,
+    stringr
 LinkingTo: Rcpp, cpgsR, RcppEigen
 Suggests: 
     knitr,

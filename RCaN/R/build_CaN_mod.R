@@ -102,9 +102,20 @@ build_CaNmod <- function(file) {
   greaterthan <- grep(">", constraints$Constraint)
   equality <- grep("^[^<>]+$", constraints$Constraint)
 
+  pattern_indices <- "(\\[[[:digit:]]*:[[:digit:]]*\\])"
+  pattern_indices <- paste(pattern_indices,
+                           "(\\[c\\(([[:digit:]]*,)+[[:digit:]]*\\)\\])",
+                           sep="|")
+  pattern_indices <- paste(pattern_indices,
+                           "(\\[[[:digit:]]*\\])",
+                           sep="|")
+
   constraints_word <-
     unlist(sapply(as.character(constraints$Constraint), function(x)
       strsplit(x, split = ",|/|\\+|=|<|\\*|>|\\-|\\)|\\(|[[:space:]]")))
+  constraints_word <- gsub(pattern_indices,
+                           "",
+                           constraints_word)
   not_recognized <-
     which(
       !constraints_word %in% c(
