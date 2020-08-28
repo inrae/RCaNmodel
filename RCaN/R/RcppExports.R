@@ -5,7 +5,77 @@
 #' @useDynLib RCaN
 NULL
 
-fitCaN <- function(N, A, b, C, v, L, x0, thin) {
-    .Call('_RCaN_fitCaN', PACKAGE = 'RCaN', N, A, b, C, v, L, x0, thin)
+#' Complex Polytope Gibbs Sampling
+#' This function draw uniform samples in a convex polytope with inequality constraints
+#'
+#' @param N the number of samples to generate
+#' @param A a matrix
+#' @param b a vector of length equals to nrow(A)
+#' @param x0 a vector of length equals to nrcol(A) that should be in the polytope, for example returned by \code{\link{chebycenter}}
+#' @param thin thinning interval
+#' @param test if true, tryes a method to decrease autocorrelation
+#'
+#' @section Details:
+#' This function is based on an initial matlab code developped called CPRND
+#' (https://ch.mathworks.com/matlabcentral/fileexchange/34208-uniform-distribution-over-a-convex-polytope)
+#' It generates samples within the complex polytope defined by \eqn{A \cdot x \leqslant   b}
+#'
+#' @return a matrix with one row per sample and one column per parameter
+#' @examples
+#' n <- 20
+#' A1 <- -diag(n)
+#' b1 <- as.matrix(rep(0,n))
+#' A2 <- diag(n)
+#' b2 <- as.matrix(rep(1,n))
+#' A <- rbind(A1,A2)
+#' b <- rbind(b1,b2)
+#' X0 <- chebycenter(A,b)
+#' x <- cpgs(1000,A,b,X0)
+#' @export
+cpgs <- function(N, A, b, x0, thin = 1L, test = FALSE) {
+    .Call(`_RCaN_cpgs`, N, A, b, x0, thin, test)
 }
 
+#' Complex Polytope Gibbs Sampling
+#' This function draw uniform samples in a convex polytope with both equality and inequality constraints
+#'
+#' @param N the number of samples to generate
+#' @param A a matrix of coefficients of inequality constants A.x<=b
+#' @param b a vector of length equals to nrow(A)
+#' @param C a matrix of coefficients of inequality constants C.x=v
+#' @param v a vector of length equals to nrow(C)
+#' @param x0 a vector of length equals to ncol(A) that should be in the polytope, for example returned by \code{\link{chebycenter}}
+#' @param thin the thinning interval
+#' @param test if true, tryes a method to decrease autocorrelation
+#'
+#' @section Details:
+#' This function is based on an initial matlab code developped called CPRND
+#' (https://ch.mathworks.com/matlabcentral/fileexchange/34208-uniform-distribution-over-a-convex-polytope)
+#' It generates samples within the complex polytope defined by \eqn{A \cdot x \leqslant   b}
+#'
+#' @return a matrix with one row per sample and one column per parameter
+#' @examples
+#' n <- 20
+#' A1 <- -diag(n)
+#' b1 <- as.matrix(rep(0,n))
+#' A2 <- diag(n)
+#' b2 <- as.matrix(rep(1,n))
+#' A <- rbind(A1,A2)
+#' b <- rbind(b1,b2)
+#' C <- rbind(c(1,1,rep(0,n-2)),c(0,0,1,1,rep(0,n-4)))
+#' v <- matrix(rep(0.2,2),2)
+#' X0 <- rep(0.1,n)
+#' x <- cpgsEquality(1000,A,b,C,v,X0)
+#' @export
+cpgsEquality <- function(N, A, b, C, v, x0, thin = 1L, test = FALSE) {
+    .Call(`_RCaN_cpgsEquality`, N, A, b, C, v, x0, thin, test)
+}
+
+fitCaN <- function(N, A, b, C, v, L, x0, thin) {
+    .Call(`_RCaN_fitCaN`, N, A, b, C, v, L, x0, thin)
+}
+
+# Register entry points for exported C++ functions
+methods::setLoadAction(function(ns) {
+    .Call('_RCaN_RcppExport_registerCCallable', PACKAGE = 'RCaN')
+})

@@ -1,0 +1,370 @@
+---
+title: "Tutorial of cpgsR"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{vignette_cpgsR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width=16/2.54,
+  fig.height=10/2.54
+)
+library(RCaN)
+```
+This package aims at uniformly sampling points in a complex polytope defined by the inequalities \eqn{A \cdot x \leqslant   b}. It is based on an original matlab code called CPRND that can be found there
+<https://ch.mathworks.com/matlabcentral/fileexchange/34208-uniform-distribution-over-a-convex-polytope>. The package provides two functions:
+* \code{\link{cpgs}}: main function of the package that carry out the sampling
+* \code{\link{chebycenter}}: a function to compute the centroid of the polytope that can be used as inital point of the sampler
+
+To illustrate the usage of the package, we are going to sample in a hypercube with 50 dimensions ranging from 0 to 1.
+
+```{r}
+n <- 20
+A1 <- -diag(n)
+b1 <- as.matrix(rep(0,n))
+A2 <- diag(n)
+b2 <- as.matrix(rep(1,n))
+A <- rbind(A1,A2) #the coefficent matrix
+b <- rbind(b1,b2) #the bounds vector
+
+```
+Now, we need to provide an intial point. For this purpose, we use the function \code{\link{chebycenter}} as follows:
+
+```{r}
+n <- 20
+A1 <- -diag(n)
+b1 <- as.matrix(rep(0,n))
+A2 <- diag(n)
+b2 <- as.matrix(rep(1,n))
+A <- rbind(A1,A2) #the coefficent matrix
+X0 <- chebycenter(A,b)
+print(X0)
+```
+
+We see that, in our simple example, the centroid is the point with 0.5 in all dimensions. We can now carry out the sampling using the \code{\link{cpgs}}:
+
+```{r, results="hide"}
+library(RCaN)
+x <- cpgs(1000,A,b,X0)
+```
+
+```{r}
+par(mfrow=c(1,2),mar=c(2.5,2.5,1.5,.5),mgp=c(1.5,.5,0))
+hist(x[,1],50)
+plot(x[,1],type='l',main=1)
+```
+
+We show that the algorithm has correctly sampled for the first parameter. Among others, polytope arise when fitting lim model. Here we show a modification of the function \code{\link{[limSolve]xsample}} that allow using the Gibbs algorithm instead of the traditionnal mirror algorithm:
+
+```{r}
+xsampleCPGS <- function (A = NULL, B = NULL, E = NULL, F = NULL, G = NULL,
+                         H = NULL, sdB = NULL, W = 1, iter = 3000,
+                         outputlength = iter, burninlength = NULL, 
+                         type = "mirror", jmp = NULL, 
+                         tol = sqrt(.Machine$double.eps),
+                         x0 = NULL, fulloutput = FALSE, test = TRUE) 
+{
+  require(MASS)
+  mirror <- function(q1, g, h, k = length(q), jmp) {
+    q2 <- rnorm(k, q1, jmp)
+    if (!is.null(g)) {
+      residual <- g %*% q2 - h
+      q10 <- q1
+      while (any(residual < 0)) {
+        epsilon <- q2 - q10
+        w <- which(residual < 0)
+        alfa <- ((h - g %*% q10)/g %*% epsilon)[w]
+        whichminalfa <- which.min(alfa)
+        j <- w[whichminalfa]
+        d <- -residual[j]/sum(g[j, ]^2)
+        q2 <- q2 + 2 * d * g[j, ]
+        residual <- g %*% q2 - h
+        q10 <- q10 + alfa[whichminalfa] * epsilon
+      }
+    }
+    q2
+  }
+  cda <- function(q, g, h, k = length(q), ...) {
+    i <- sample(1:k, 1)
+    h1 <- h - as.matrix(g[, -i]) %*% q[-i]
+    maxqi <- min((h1/g[, i])[g[, i] < 0])
+    minqi <- max((h1/g[, i])[g[, i] > 0])
+    q[i] <- runif(1, minqi, maxqi)
+    return(q)
+  }
+  rda <- function(q, g, h, k = length(q), ...) {
+    e <- rnorm(k)
+    d <- e/norm(e)
+    alfa <- ((h - g %*% q)/g %*% d)
+    if (any(alfa > 0)) 
+      alfa.u <- min(alfa[alfa > 0])
+    else alfa.u <- 0
+    if (any(alfa < 0)) 
+      alfa.l <- max(alfa[alfa < 0])
+    else alfa.l <- 0
+    q.u <- q + alfa.u * d
+    q.l <- q + alfa.l * d
+    if (any(g %*% q.u < h)) 
+      alfa.u <- 0
+    if (any(g %*% q.l < h)) 
+      alfa.l <- 0
+    q <- q + runif(1, alfa.l, alfa.u) * d
+    return(q)
+  }
+  norm <- function(x) sqrt(x %*% x)
+  automatedjump <- function(a, b, g, h, g.scale = 5, a.scale = 1) {
+    if (is.null(g)) 
+      s1 <- rep(NA, k)
+    else {
+      q_ranges <- xranges(E = NULL, F = NULL, g, h)
+      s1 <- abs(q_ranges[, 1] - q_ranges[, 2])/g.scale
+    }
+    s2 <- rep(NA, k)
+    if (!is.null(A)) {
+      if (estimate_sdB) {
+        estVar <- SS0/(lb - lx) * solve(t(a) %*% a)
+        estSd <- sqrt(diag(estVar))
+        s2 <- estSd/a.scale
+      }
+      if (qr(A)$rank == lx & lx == lb) 
+        s2 <- sdB * 0.2
+    }
+    s <- pmin(s1, s2, na.rm = T)
+    s[s > tol^-2] <- NA
+    if (any(is.na(s))) {
+      if (all(is.na(s))) {
+        warning(" problem is unbounded - all jump lengths are set to 1")
+        s[] <- 1
+      }
+      else {
+        warning(" problem is unbounded - some jump lengths are set arbitrarily")
+        s[is.na(s)] <- mean(s, na.rm = T) * 100
+      }
+    }
+    return(s)
+  }
+  if (is.data.frame(A)) 
+    A <- as.matrix(A)
+  if (is.data.frame(E)) 
+    E <- as.matrix(E)
+  if (is.data.frame(G)) 
+    G <- as.matrix(G)
+  if (is.vector(A)) 
+    A <- t(A)
+  if (is.vector(E)) 
+    E <- t(E)
+  if (is.vector(G)) 
+    G <- t(G)
+  if (!is.null(A)) {
+    lb <- length(B)
+    lx <- ncol(A)
+    M <- rbind(cbind(A, B), cbind(E, F))
+    overdetermined <- !qr(M)$rank <= lx
+    if (overdetermined & is.null(sdB)) {
+      warning("The given linear problem is overdetermined. A standard deviation
+              for the data vector B is incorporated in the MCMC as a model
+              parameter.")
+      estimate_sdB = TRUE
+      A <- A * W
+      B <- B * W
+    }
+    else {
+      estimate_sdB = FALSE
+      if (overdetermined) 
+        warning("The given linear problem is overdetermined. Giving fixed
+                standard deviations for the data vector B can lead to dubious
+                results. Maybe you want to set sdB=NULL and estimate the data
+                error.")
+      if (!length(sdB) %in% c(1, lb)) 
+        stop("sdB does not have the correct length")
+      A <- A/sdB
+      B <- B/sdB
+    }
+  }
+  else {
+    estimate_sdB = FALSE
+  }
+  if (is.null(x0)) {
+    l <- lsei(A = A, B = B, E = E, F = F, G = G, H = H)
+    if (l$residualNorm > 1e-06) 
+      stop("no particular solution found;incompatible constraints")
+    else x0 <- l$X
+  }
+  lx <- length(x0)
+  if (test && !is.null(G)) {
+    xv <- varranges(E, F, G, H, EqA = G)
+    ii <- which(xv[, 1] - xv[, 2] == 0)
+    if (length(ii) > 0) {
+      E <- rbind(E, G[ii, ])
+      F <- c(F, xv[ii, 1])
+      G <- G[-ii, ]
+      H <- H[-ii]
+      if (length(H) == 0) 
+        G <- H <- NULL
+    }
+    xr <- xranges(E, F, G, H)
+    ii <- which(xr[, 1] - xr[, 2] == 0)
+    if (length(ii) > 0) {
+      dia <- diag(nrow = nrow(xr))
+      E <- rbind(E, dia[ii, ])
+      F <- c(F, xr[ii, 1])
+    }
+  }
+  if (!is.null(E)) {
+    Z <- Null(t(E))
+    Z[abs(Z) < tol] <- 0
+  }
+  else {
+    Z <- diag(lx)
+  }
+  if (length(Z) == 0) {
+    warning("the problem has a single solution; this solution is returned as
+            function value")
+    return(x0)
+  }
+  k <- ncol(Z)
+  if (!is.null(G)) {
+    g <- G %*% Z
+    h <- H - G %*% x0
+    g[abs(g) < tol] <- 0
+    h[abs(h) < tol] <- 0
+  }
+  else {
+    g <- G
+    h <- H
+  }
+  if (!is.null(A)) {
+    a <- A %*% Z
+    b <- B - A %*% x0
+    v <- svd(a, nv = k)$v
+    a <- a %*% v
+    if (!is.null(G)) 
+      g <- g %*% v
+    Z <- Z %*% v
+    if (estimate_sdB) {
+      q0 <- lsei(a, b)$X
+      SS0 <- sum((a %*% q0 - b)^2)
+      S <- lb/SS0
+    }
+    else {
+      S <- 1
+    }
+    SSR <- function(q) sum((a %*% q - b)^2)
+    prob <- function(q) exp(-0.5 * S * SSR(q))
+    test <- function(q2) exp(-0.5 * S * (SSR(q2) - SSR(q1))) > 
+      runif(1)
+  }
+  else {
+    prob <- function(q) 1
+    test <- function(q2) TRUE
+    S <- 1
+    overdetermined <- FALSE
+  }
+  outputlength <- min(outputlength, iter)
+  ou <- ceiling(iter/outputlength)
+  q1 <- rep(0, k)
+  x <- matrix(nrow = outputlength, ncol = lx, dimnames = list(NULL, 
+                                                              colnames(A)))
+  x[1, ] <- x0
+  naccepted <- 1
+  p <- vector(length = outputlength)
+  p[1] <- prob(q1)
+  if (fulloutput) {
+    q <- matrix(nrow = outputlength, ncol = k)
+    q[1, ] <- q1
+  }
+  if (is.null(jmp)) 
+    jmp <- automatedjump(a, b, g, h)
+  if (type == "mirror") 
+    newq <- mirror
+  if (type == "rda") 
+    newq <- rda
+  if (type == "cda") 
+    newq <- cda
+  if (type!="cpgs")
+  {
+    if (!is.null(burninlength)) 
+      for (i in 1:burninlength) {
+        q2 <- newq(q1, g, h, k, jmp)
+        if (test(q2)) 
+          q1 <- q2
+      }
+    for (i in 2:outputlength) {
+      for (ii in 1:ou) {
+        if (estimate_sdB) 
+          S <- rgamma(1, shape = lb, rate = 0.5 * (SS0 + 
+                                                     SSR(q1)))
+        q2 <- newq(q1, g, h, k, jmp)
+        if (test(q2)) {
+          q1 <- q2
+          naccepted <- naccepted + 1
+        }
+      }
+      x[i, ] <- x0 + Z %*% q1
+      p[i] <- prob(q1)
+      if (fulloutput) 
+        q[i, ] <- q1
+    }}
+  else{  
+    x=cpgs(iter,-g,-h,q1)
+    x=t(apply(x,1,function(i) x0+Z%*%i))[seq_len(outputlength),]
+  }
+  xnames <- colnames(A)
+  if (is.null(xnames)) 
+    xnames <- colnames(E)
+  if (is.null(xnames)) 
+    xnames <- colnames(G)
+  colnames(x) <- xnames
+  xsample <- list(X = x, acceptedratio = naccepted/iter, p = p, 
+                  jmp = jmp)
+  if (fulloutput) 
+    xsample <- list(X = x, acceptedratio = naccepted/iter, 
+                    Q = q, p = p, jmp = jmp)
+  return(xsample)
+}
+```
+
+We can now compare the sampling using example from the \code{\link{[limSolve]xsample}} function. Note that, using this function is also a way to deal with equality constraints in addition to unequality constraints.
+
+
+
+```{r, eval=FALSE}
+if (require("limSolve")) {
+  #test
+  E <- rbind(Minkdiet$Prey, rep(1, 7))
+  F <- c(Minkdiet$Mink, 1)
+  
+  #oldway
+  debut = Sys.time()
+  res1 = xsample(
+    E = E,
+    F = F,
+    G = diag(7),
+    H = rep(0, 7),
+    iter = 50000,
+    output = 1000,
+    type = "mirror"
+  )$X
+  end = Sys.time()
+  print(end - debut)
+  
+  #new way
+  debut = Sys.time()
+  res2 = xsampleCPGS(
+    E = E,
+    F = F,
+    G = diag(7),
+    H = rep(0, 7),
+    iter = 50000,
+    output = 1000,
+    type = "cpgs"
+  )$X
+  end = Sys.time()
+  print(end - debut)
+}
+```

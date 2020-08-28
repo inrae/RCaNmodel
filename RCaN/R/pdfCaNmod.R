@@ -15,7 +15,7 @@
 #' @importFrom ggplot2 geom_line
 #' @importFrom ggplot2 geom_point
 #' @importFrom ggplot2 theme
-#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 aes_string
 #' @importFrom ggplot2 labs
 #' @importFrom ggplot2 rel
 #' @importFrom ggplot2 element_text
@@ -48,7 +48,7 @@ pdfCaNmod <- function(myCaNmod, output_file = "summaryCaNmod.pdf") {
                "series", value = "value")
     TS$time <-
       rep(series[, 1], min(ns, (i * 9)) - (i - 1) * 9)
-    gg_timeseries <- ggplot(TS, aes(x = time, y = value)) +
+    gg_timeseries <- ggplot(TS, aes_string(x = "time", y = "value")) +
       facet_wrap(. ~ series, scales = "free") +
       geom_line(colour = "darkcyan") +
       geom_point(colour = "darkcyan", size = rel(.8)) +

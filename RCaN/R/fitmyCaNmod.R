@@ -20,7 +20,6 @@
 #' @importFrom lpSolveAPI lp.control
 #' @importFrom lpSolveAPI solve.lpExtPtr
 #' @importFrom lpSolveAPI get.primal.solution
-#' @importFrom cpgsR defineLPMod
 #' @importFrom parallel detectCores
 #' @importFrom parallel makeCluster
 #' @importFrom parallel clusterEvalQ
@@ -51,13 +50,7 @@ fitmyCaNmod <- function(myCaNmod,
       library(RCaN)
     })
     clusterEvalQ(cl, {
-      library(cpgsR)
-    })
-    clusterEvalQ(cl, {
       library(lpSolveAPI)
-    })
-    clusterEvalQ(cl, {
-      library(cpgsR)
     })
     clusterEvalQ(cl, {
       library(coda)

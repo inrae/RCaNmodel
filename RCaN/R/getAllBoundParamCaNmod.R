@@ -6,8 +6,6 @@
 #' bounds
 #' @export
 #'
-#' @importFrom cpgsR getAllBoundsParam
-#'
 #' @examples
 #' myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx",
 #'  package = "RCaN"))
