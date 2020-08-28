@@ -30,7 +30,7 @@ generate_symbolic_objects <-
     IE_H <- symengine::Matrix(Ie - H)
     n <- symengine::Matrix(N)
     for (s in species)
-      assign(paste(s, years[1] ,sep = "_"),
+      assign(paste(s, years[1], sep = "_"),
              S(paste(s, years[1], sep = "_"))) #initial biomass
     assign(paste("B_", years[1], sep = ""),
            eval(parse(text = paste(
@@ -67,7 +67,7 @@ generate_symbolic_objects <-
     colnames(Fmat) <- years
     assign("param",
            c(eval(parse(text = paste("B_", years[1], sep = ""))),
-             do.call("c",list_F))) #vector of parameters
+             do.call("c", list_F))) #vector of parameters
                                     #on which we will sample
     assign("Bmat", do.call("cbind", list_B))
     colnames(Bmat) <- years

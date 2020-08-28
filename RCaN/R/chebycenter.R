@@ -6,7 +6,7 @@
 #'
 #' @section Details:
 #' This code is a translation of the matlab code that can be found there
-#' (https://ch.mathworks.com/matlabcentral/fileexchange/34208-uniform-distribution-over-a-convex-polytope)
+#' (https://bit.ly/3b6Avav)
 #' It computes the centroid of the complex polytope defined by
 #' \eqn{A \cdot x \leqslant   b}
 #'

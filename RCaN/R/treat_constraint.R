@@ -23,12 +23,12 @@ treat_constraint <- function(myconstraint,
   ###for corresponding vector indices
   #[year:year]
   matches <- str_extract_all(myconstraint, "\\[[:digit:]*:[:digit:]*\\]")
-  if (length(matches[[1]]) > 0){
-    for (i in seq_along(matches[[1]])){
-      indices <- match(strsplit(matches[[1]][i], '\\[|\\]|:')[[1]][-1],
+  if (length(matches[[1]]) > 0) {
+    for (i in seq_along(matches[[1]])) {
+      indices <- match(strsplit(matches[[1]][i], "\\[|\\]|:")[[1]][-1],
                        years)
       indices <- paste("[",
-                       paste(indices,collapse = ":"),
+                       paste(indices, collapse = ":"),
                        "]",
                        sep = "")
       myconstraint <- gsub(matches[[1]][i],
@@ -39,13 +39,14 @@ treat_constraint <- function(myconstraint,
   }
 
   #[c(year,year,year...)]
-  matches <- str_extract_all(myconstraint,"\\[c\\(([:digit:]*,)+[:digit:]*\\)\\]")
-  if (length(matches[[1]]) > 0){
-    for (i in seq_along(matches[[1]])){
-      indices <- match(strsplit(matches[[1]][i], '\\[c\\(|\\,|\\)\\]')[[1]][-1],
+  matches <- str_extract_all(myconstraint,
+                             "\\[c\\(([:digit:]*,)+[:digit:]*\\)\\]")
+  if (length(matches[[1]]) > 0) {
+    for (i in seq_along(matches[[1]])) {
+      indices <- match(strsplit(matches[[1]][i], "\\[c\\(|\\,|\\)\\]")[[1]][-1],
                        years)
       indices <- paste("[c(",
-                       paste(indices,collapse = ","),
+                       paste(indices, collapse = ","),
                        ")]",
                        sep = "")
       myconstraint <- gsub(matches[[1]][i],
@@ -56,10 +57,10 @@ treat_constraint <- function(myconstraint,
   }
 
   #[year]
-  matches <- str_extract_all(myconstraint,"\\[[:digit:]*\\]")
-  if (length(matches[[1]]) > 0){
-    for (i in seq_along(matches[[1]])){
-      indices <- match(strsplit(matches[[1]][i], '\\[|\\]')[[1]][-1],
+  matches <- str_extract_all(myconstraint, "\\[[:digit:]*\\]")
+  if (length(matches[[1]]) > 0) {
+    for (i in seq_along(matches[[1]])) {
+      indices <- match(strsplit(matches[[1]][i], "\\[|\\]")[[1]][-1],
                        years)
       indices <- paste("[",
                        indices,

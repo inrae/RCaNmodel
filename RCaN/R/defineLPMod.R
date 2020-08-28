@@ -37,14 +37,14 @@ defineLPMod <-
     if (is.null(rownames(A)) & nrow(A) > 0) {
       rownames(A) <- paste("ineq", seq_len(nrow(A)))
     }
-    if (is.null(rownames(C)) & nrow(C)>0) {
+    if (is.null(rownames(C)) & nrow(C) > 0) {
       rownames(C) <- paste("eq", seq_len(nrow(C)))
     }
     if (is.null(colnames(A))) {
       colnames(A) <- paste("param", seq_len(ncol(A)))
     }
     lp_model <- make.lp(nrow(A) + nrow(C), nbparam)
-    set.bounds(lp_model, lower=lower)
+    set.bounds(lp_model, lower = lower)
     lp.control(lp_model, "presolve" = presolve, "verbose" = "neutral")
     for (p in 1:nbparam) {
       set.column(lp_model, p, c(A[, p], C[, p]))

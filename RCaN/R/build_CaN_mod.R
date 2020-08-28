@@ -55,7 +55,7 @@ build_CaNmod <- function(file) {
   #remove totally empty rows that sometimes happen with xlsx
   fluxes_def <-
     fluxes_def[!rowSums(is.na(fluxes_def)) ==
-                       ncol(fluxes_def), ]
+                 ncol(fluxes_def), ]
   flow <- as.character(fluxes_def$Flux)
   nbfluxes <- nrow(fluxes_def)
   if (length(which(!(fluxes_def$From %in% components))) > 0)
@@ -80,7 +80,7 @@ build_CaNmod <- function(file) {
   #remove totally empty rows that sometimes happen with xlsx
   series <-
     series[!rowSums(is.na(series)) ==
-                       ncol(series), ]
+             ncol(series), ]
   ntstep <- nrow(series)
   data_series_name <- names(series)[-1]
 
@@ -91,7 +91,7 @@ build_CaNmod <- function(file) {
   #remove totally empty rows that sometimes happen with xlsx
   constraints <-
     constraints[!rowSums(is.na(constraints)) ==
-             ncol(constraints), ]
+                  ncol(constraints), ]
   #we keep only active constraints
   if (! "Active" %in% names(constraints))
     constraints$Active <- TRUE
@@ -105,10 +105,10 @@ build_CaNmod <- function(file) {
   pattern_indices <- "(\\[[[:digit:]]*:[[:digit:]]*\\])"
   pattern_indices <- paste(pattern_indices,
                            "(\\[c\\(([[:digit:]]*,)+[[:digit:]]*\\)\\])",
-                           sep="|")
+                           sep = "|")
   pattern_indices <- paste(pattern_indices,
                            "(\\[[[:digit:]]*\\])",
-                           sep="|")
+                           sep = "|")
 
   constraints_word <-
     unlist(sapply(as.character(constraints$Constraint), function(x)
@@ -147,7 +147,7 @@ build_CaNmod <- function(file) {
         1
       )
     ) #if it is not a trophic flow, we do not take into account assimilation
-      # and digestibility
+  # and digestibility
   N <-
     sweep(N, 1, STATS = diag(H) /
             (components_param$OtherLosses[index_species]), "*")
@@ -182,16 +182,20 @@ build_CaNmod <- function(file) {
   A <-
     rbind(A, do.call(
       rbind,
-      lapply(components_param$Component[components_param$Component %in% species], function(sp)
-        treat_constraint(
-          paste(sp, ">=", ifelse(
-            is.na(components_param$RefugeBiomass[components_param$Component == sp]),
-            0,
-            components_param$RefugeBiomass[components_param$Component == sp]
-          )),
-          symbolic_enviro,
-          name_constr = paste("Biomass positiveness_refuge", sp, sep = "_")
-        ))
+      lapply(
+        components_param$Component[components_param$Component %in% species],
+        function(sp)
+          treat_constraint(
+            paste(sp, ">=", ifelse(
+              is.na(
+                components_param$RefugeBiomass[components_param$Component == sp]),
+
+              0,
+              components_param$RefugeBiomass[components_param$Component == sp]
+            )),
+            symbolic_enviro,
+            name_constr = paste("Biomass positiveness_refuge", sp, sep = "_")
+          ))
     ))
 
   ####add satiation
@@ -201,100 +205,119 @@ build_CaNmod <- function(file) {
   A <-
     rbind(A, do.call(
       rbind,
-      lapply(species_flow_to[!is.na(components_param$Satiation[match(species_flow_to, components_param$Component)])],
-             function(sp)
-               treat_constraint(
-                 paste(
-                   paste(fluxes_def$Flux[fluxes_def$To == sp &
-                                           is_trophic_flux], collapse = "+"),
-                   "<=",
-                   components_param$Satiation[components_param$Component == sp],
-                   "*",
-                   sp
-                 ),
-                 symbolic_enviro,
-                 name_constr = paste("satiation", sp, sep = "_")
-               ))
+      lapply(
+        species_flow_to[!is.na(
+          components_param$Satiation[match(species_flow_to,
+                                           components_param$Component)])],
+        function(sp)
+          treat_constraint(
+            paste(
+              paste(fluxes_def$Flux[fluxes_def$To == sp &
+                                      is_trophic_flux], collapse = "+"),
+              "<=",
+              components_param$Satiation[components_param$Component == sp],
+              "*",
+              sp
+            ),
+            symbolic_enviro,
+            name_constr = paste("satiation", sp, sep = "_")
+          ))
     ))
   ####add inertia
   A <-
-    rbind(A, do.call(rbind, lapply(components_param$Component[components_param$Component %in%
-                                                                species &
-                                                                !is.na(components_param$Inertia)],
-                                   function(sp) {
-                                     #increase
-                                     emigrants <-
-                                       as.character(fluxes_def$Flux)[as.character(fluxes_def$From) == sp &
-                                                                       !fluxes_def$Trophic]
-                                     treat_constraint(
-                                       paste(
-                                         sp,
-                                         "[-1] >=",
-                                         sp,
-                                         "[1:(length(",
-                                         sp,
-                                         ")-1)]*exp(-",
-                                         components_param$Inertia[components_param$Component == sp],
-                                         ")",
-                                         ifelse(length(emigrants) >
-                                                  0, paste(
-                                                    "-",
-                                                    paste(
-                                                      emigrants,
-                                                      collapse = "-",
-                                                      "[1:(length(",
-                                                      sp,
-                                                      ")-1)]",
-                                                      sep = ""
-                                                    ),
-                                                    sep = ""
-                                                  ), ""),
-                                         #we do not take into account emigrants
-                                         sep = ""
-                                       ),
-                                       symbolic_enviro,
-                                       name_constr = paste("inertia_sup", sp, sep = "_")
-                                     )
-                                   })))
+    rbind(A,
+          do.call(
+            rbind,
+            lapply(
+              components_param$Component[components_param$Component %in%
+                                           species &
+                                           !is.na(components_param$Inertia)],
+              function(sp) {
+                #increase
+                emigrants <-
+                  as.character(fluxes_def$Flux)[
+                    as.character(fluxes_def$From) == sp &
+                      !fluxes_def$Trophic]
+                treat_constraint(
+                  paste(
+                    sp,
+                    "[-1] >=",
+                    sp,
+                    "[1:(length(",
+                    sp,
+                    ")-1)]*exp(-",
+                    components_param$Inertia[
+                      components_param$Component == sp],
+                    ")",
+                    ifelse(length(emigrants) >
+                             0, paste(
+                               "-",
+                               paste(
+                                 emigrants,
+                                 collapse = "-",
+                                 "[1:(length(",
+                                 sp,
+                                 ")-1)]",
+                                 sep = ""
+                               ),
+                               sep = ""
+                             ), ""),
+                    #we do not take into account emigrants
+                    sep = ""
+                  ),
+                  symbolic_enviro,
+                  name_constr = paste("inertia_sup",
+                                      sp,
+                                      sep = "_")
+                )
+              })))
   A <-
-    rbind(A, do.call(rbind, lapply(components_param$Component[components_param$Component %in%
-                                                                species &
-                                                                !is.na(components_param$Inertia)],
-                                   function(sp) {
-                                     #decrease
-                                     immigrants <-
-                                       as.character(fluxes_def$Flux)[as.character(fluxes_def$To) == sp &
-                                                                       !fluxes_def$Trophic]
-                                     treat_constraint(
-                                       paste(
-                                         sp,
-                                         "[-1] <=",
-                                         sp,
-                                         "[1:(length(",
-                                         sp,
-                                         ")-1)]*exp(",
-                                         components_param$Inertia[components_param$Component == sp],
-                                         ")",
-                                         ifelse(length(immigrants) >
-                                                  0, paste(
-                                                    "+",
-                                                    paste(
-                                                      immigrants,
-                                                      collapse = "+",
-                                                      "[1:(length(",
-                                                      sp,
-                                                      ")-1)]",
-                                                      sep = ""
-                                                    ),
-                                                    sep = ""
-                                                  ), ""),
-                                         #we do not take into account imemigrants
-                                         sep = ""
-                                       ),
-                                       symbolic_enviro,
-                                       name_constr = paste("inertia_inf", sp, sep = "_")
-                                     )
-                                   })))
+    rbind(A,
+          do.call(rbind,
+                  lapply(
+                    components_param$Component[
+                      components_param$Component %in% species &
+                        !is.na(components_param$Inertia)],
+                    function(sp) {
+                      #decrease
+                      immigrants <-
+                        as.character(fluxes_def$Flux)[
+                          as.character(fluxes_def$To) == sp &
+                            !fluxes_def$Trophic]
+                      treat_constraint(
+                        paste(
+                          sp,
+                          "[-1] <=",
+                          sp,
+                          "[1:(length(",
+                          sp,
+                          ")-1)]*exp(",
+                          components_param$Inertia[
+                            components_param$Component == sp],
+                          ")",
+                          ifelse(length(immigrants) >
+                                   0, paste(
+                                     "+",
+                                     paste(
+                                       immigrants,
+                                       collapse = "+",
+                                       "[1:(length(",
+                                       sp,
+                                       ")-1)]",
+                                       sep = ""
+                                     ),
+                                     sep = ""
+                                   ), ""),
+                          #we do not take into account
+                          #imemigrants
+                          sep = ""
+                        ),
+                        symbolic_enviro,
+                        name_constr = paste("inertia_inf",
+                                            sp,
+                                            sep = "_")
+                      )
+                    })))
 
 
   ####add constraint provided by user
