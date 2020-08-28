@@ -69,7 +69,7 @@ fitmyCaNmod <- function(myCaNmod,
   res <- foreach(i = 1:nchain) %myinfix% {
     find_init <- FALSE
     nbiter <- 0
-    while (nbiter<100 & !find_init) {
+    while (nbiter < 100 & !find_init) {
       lp_model <- defineLPMod(myCaNmod$A, myCaNmod$b, myCaNmod$C, myCaNmod$v)
       ncontr <- length(get.constr.value(lp_model))
       set.objfn(lp_model, runif(ncol(myCaNmod$A)))
@@ -77,7 +77,8 @@ fitmyCaNmod <- function(myCaNmod,
       conv <- solve.lpExtPtr(lp_model)
       x0 <-
         get.primal.solution(lp_model,
-                            orig = TRUE)[(ncontr + 1):(ncontr + ncol(myCaNmod$A))]
+                            orig = TRUE)[(ncontr + 1):(ncontr +
+                                                         ncol(myCaNmod$A))]
       if (conv == 0)
         find_init <- TRUE
       nbiter < nbiter + 1
@@ -87,7 +88,7 @@ fitmyCaNmod <- function(myCaNmod,
     res <-
       fitCaN(
         N,
-        thin=thin,
+        thin = thin,
         as.matrix(myCaNmod$A),
         myCaNmod$b,
         as.matrix(myCaNmod$C),

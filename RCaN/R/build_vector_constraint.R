@@ -34,11 +34,12 @@ build_vector_constraint <-
                         }
                       })
 
-      denominator <- 1 / do.call('prod', denom)
+      denominator <- 1 / do.call("prod", denom)
       nb_elem <- length(as.list(get_args(basic_constraint)))
       numerator <- do.call(sum,
                            lapply(seq_len(nb_elem), function(x) {
-                             as.list(get_args(basic_constraint))[[x]] * denominator
+                             as.list(get_args(basic_constraint))[[x]] *
+                               denominator
                            }))
     } else if (get_type(basic_constraint) != "Mul") {
       numerator <- basic_constraint
@@ -64,10 +65,10 @@ build_vector_constraint <-
       if (get_type(basic_constraint) == "Symbol") {
         mycoeffs <- 1
         names(mycoeffs) <- get_str(basic_constraint)
-      } else if (get_type(basic_constraint) == "Mul"){
+      } else if (get_type(basic_constraint) == "Mul") {
         mycoeffs <- as.numeric(as.list(get_args(basic_constraint))[[1]])
         names(mycoeffs) <- get_str(as.list(get_args(basic_constraint))[[2]])
-      } else if (get_type(basic_constraint) == "NaN"){
+      } else if (get_type(basic_constraint) == "NaN") {
         mycoeffs <- NA
         names(mycoeffs) <- "1"
       }else{
@@ -81,8 +82,8 @@ build_vector_constraint <-
         } else if (get_type(e) == "Symbol") {
           val <- 1
           names(val) <- get_str(e)
-          return (val)
-        } else if (get_type(e) == "NaN"){
+          return(val)
+        } else if (get_type(e) == "NaN") {
           return(c("1" = NA))
         } else {
           val <- as.list(get_args(e))[[1]]

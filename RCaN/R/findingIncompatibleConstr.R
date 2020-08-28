@@ -109,10 +109,10 @@ findingIncompatibleConstr <- function(A, b, C=NULL, v=NULL) {
                                 (seq_len(length(solutions))) > (nbparam))]))
     })
     print("###polytope is ok when following constraints are relaxed:")
-    print(paste(gsub("^\\s*\\w*","", problematic), collapse = ", "))
+    print(paste(gsub("^\\s*\\w*", "", problematic), collapse = ", "))
     print("####Those constraints seem incompatible with:")
-    print(lapply(results,function(x)
-      paste(x[1], ": ", paste(x[-1], collapse=", "), sep = "")))
+    print(lapply(results, function(x)
+      paste(x[1], ": ", paste(x[-1], collapse = ", "), sep = "")))
     return(results)
   } else{
     return("no problem detected")
