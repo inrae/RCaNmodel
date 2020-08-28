@@ -16,13 +16,13 @@
 #' @importFrom ggraph geom_node_text
 #' @importFrom ggraph geom_edge_arc2
 #' @importFrom ggplot2 arrow
-#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 aes_
 #' @importFrom ggplot2 aes_string
 #' @importFrom ggplot2 theme
 #' @importFrom ggplot2 unit
 #' @importFrom ggraph geom_edge_loop
+#' @importFrom ggraph circle
 #' @importFrom ggraph geom_node_point
-#' @importFrom cpgsR getBoundParam
 #' @importFrom graphics plot
 #' @export
 ggCaNmod <- function(myCaNmod) {
@@ -33,24 +33,25 @@ ggCaNmod <- function(myCaNmod) {
   names(edge_graph)[c(1:2)] <- c("from", "to")
   vertices_graph <-
     myCaNmod$components_param[, c("Component", "in_out")]
-  vertices_graph$in_out <- ifelse(vertices_graph$in_out == "In", "internal", "external")
+  vertices_graph$in_out <- ifelse(vertices_graph$in_out == "In", "internal",
+                                  "external")
   names(vertices_graph)[2] <- "Status"
 
   g <-
     graph_from_data_frame(d = edge_graph, vertices = vertices_graph)
 
   gg_foodweb <- ggraph(g, "circle") +
-    geom_node_point(aes(
-      x = x * 1.05,
-      y = y * 1.05,
-      colour = Status
+    geom_node_point(aes_(
+      x = quote(x * 1.05),
+      y = quote(y * 1.05),
+      colour = quote(Status)
     ),
     size = 5,
     alpha = 0.33) +
-    geom_node_text(aes(
-      x = x * 1.1,
-      y = y * 1.1,
-      label = name
+    geom_node_text(aes_(
+      x = quote(x * 1.1),
+      y = quote(y * 1.1),
+      label = quote(name)
     ),
     size = 3,
     alpha = 1) +

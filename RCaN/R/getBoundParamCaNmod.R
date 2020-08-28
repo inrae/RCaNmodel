@@ -6,8 +6,6 @@
 #' @return a vector with lower bound and upper bound
 #' @export
 #'
-#' @importFrom cpgsR getBoundParam
-#'
 #' @examples
 #' myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx",
 #'  package = "RCaN"))

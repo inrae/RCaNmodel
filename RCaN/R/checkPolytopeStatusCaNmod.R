@@ -6,8 +6,6 @@
 #' @return  print a message to tell if the polygon is ok or not
 #' @export
 #'
-#' @importFrom cpgsR checkPolytopeStatus
-#'
 #' @examples
 #' myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx",
 #'  package = "RCaN"))
