@@ -10,6 +10,7 @@
 #' @return a matrix that correspond to the coefficient of the constraints, first
 #' column corresponds to the -intercept and each line to a constraint (year)
 #' @importFrom symengine expand
+#' @importFrom stringr str_extract_all
 
 
 
@@ -18,6 +19,60 @@ treat_constraint <- function(myconstraint,
                              yr = NULL,
                              name_constr = NULL) {
   years <- as.character(colnames(symbolic_enviro$Fmat))
+  ###first we checked if they are vector year indices and change them
+  ###for corresponding vector indices
+  #[year:year]
+  matches <- str_extract_all(myconstraint, "\\[[:digit:]*:[:digit:]*\\]")
+  if (length(matches[[1]]) > 0){
+    for (i in seq_along(matches[[1]])){
+      indices <- match(strsplit(matches[[1]][i], '\\[|\\]|:')[[1]][-1],
+                       years)
+      indices <- paste("[",
+                       paste(indices,collapse = ":"),
+                       "]",
+                       sep = "")
+      myconstraint <- gsub(matches[[1]][i],
+                           indices,
+                           myconstraint,
+                           fixed = TRUE)
+    }
+  }
+
+  #[c(year,year,year...)]
+  matches <- str_extract_all(myconstraint,"\\[c\\(([:digit:]*,)+[:digit:]*\\)\\]")
+  if (length(matches[[1]]) > 0){
+    for (i in seq_along(matches[[1]])){
+      indices <- match(strsplit(matches[[1]][i], '\\[c\\(|\\,|\\)\\]')[[1]][-1],
+                       years)
+      indices <- paste("[c(",
+                       paste(indices,collapse = ","),
+                       ")]",
+                       sep = "")
+      myconstraint <- gsub(matches[[1]][i],
+                           indices,
+                           myconstraint,
+                           fixed = TRUE)
+    }
+  }
+
+  #[year]
+  matches <- str_extract_all(myconstraint,"\\[[:digit:]*\\]")
+  if (length(matches[[1]]) > 0){
+    for (i in seq_along(matches[[1]])){
+      indices <- match(strsplit(matches[[1]][i], '\\[|\\]')[[1]][-1],
+                       years)
+      indices <- paste("[",
+                       indices,
+                       "]",
+                       sep = "")
+      myconstraint <- gsub(matches[[1]][i],
+                           indices,
+                           myconstraint,
+                           fixed = TRUE)
+    }
+  }
+
+
   sign <-
     ifelse(length(grep("<=", myconstraint)) > 0, "<=", ifelse(length(grep(
       ">=", myconstraint
