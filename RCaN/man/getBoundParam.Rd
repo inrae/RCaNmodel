@@ -3,7 +3,8 @@
 \name{getBoundParam}
 \alias{getBoundParam}
 \title{getBoundParam
-Computes the possible bounds for a parameter p of a polytope defined by+A.x<=b and C.x=v}
+Computes the possible bounds for a parameter p of a polytope defined
+by+A.x<=b and C.x=v}
 \usage{
 getBoundParam(A, b, p, C = NULL, v = NULL)
 }
@@ -23,7 +24,8 @@ a vector with lower bounds and upper bounds
 }
 \description{
 getBoundParam
-Computes the possible bounds for a parameter p of a polytope defined by+A.x<=b and C.x=v
+Computes the possible bounds for a parameter p of a polytope defined
+by+A.x<=b and C.x=v
 }
 \examples{
 n <- 20
