@@ -188,7 +188,8 @@ build_CaNmod <- function(file) {
           treat_constraint(
             paste(sp, ">=", ifelse(
               is.na(
-                components_param$RefugeBiomass[components_param$Component == sp]),
+                components_param$RefugeBiomass[
+                  components_param$Component == sp]),
 
               0,
               components_param$RefugeBiomass[components_param$Component == sp]
