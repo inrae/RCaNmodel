@@ -14,6 +14,8 @@ NULL
 #' @param x0 a vector of length equals to nrcol(A) that should be in the polytope, for example returned by \code{\link{chebycenter}}
 #' @param thin thinning interval
 #' @param test if true, tryes a method to decrease autocorrelation
+#' @param seed seed of the dqrng generator
+#' @param stream stream of the dqrng generator
 #'
 #' @section Details:
 #' This function is based on an initial matlab code developped called CPRND
@@ -32,8 +34,8 @@ NULL
 #' X0 <- chebycenter(A,b)
 #' x <- cpgs(1000,A,b,X0)
 #' @export
-cpgs <- function(N, A, b, x0, thin = 1L, test = FALSE) {
-    .Call(`_RCaN_cpgs`, N, A, b, x0, thin, test)
+cpgs <- function(N, A, b, x0, thin = 1L, test = FALSE, seed = 1L, stream = 1L) {
+    .Call(`_RCaN_cpgs`, N, A, b, x0, thin, test, seed, stream)
 }
 
 #' Complex Polytope Gibbs Sampling
@@ -47,6 +49,8 @@ cpgs <- function(N, A, b, x0, thin = 1L, test = FALSE) {
 #' @param x0 a vector of length equals to ncol(A) that should be in the polytope, for example returned by \code{\link{chebycenter}}
 #' @param thin the thinning interval
 #' @param test if true, tryes a method to decrease autocorrelation
+#' @param seed seed of the dqrng generator
+#' @param stream stream of the dqrng generator
 #'
 #' @section Details:
 #' This function is based on an initial matlab code developped called CPRND
@@ -67,12 +71,12 @@ cpgs <- function(N, A, b, x0, thin = 1L, test = FALSE) {
 #' X0 <- rep(0.1,n)
 #' x <- cpgsEquality(1000,A,b,C,v,X0)
 #' @export
-cpgsEquality <- function(N, A, b, C, v, x0, thin = 1L, test = FALSE) {
-    .Call(`_RCaN_cpgsEquality`, N, A, b, C, v, x0, thin, test)
+cpgsEquality <- function(N, A, b, C, v, x0, thin = 1L, test = FALSE, seed = 1L, stream = 1L) {
+    .Call(`_RCaN_cpgsEquality`, N, A, b, C, v, x0, thin, test, seed, stream)
 }
 
-fitCaN <- function(N, A, b, C, v, L, x0, thin) {
-    .Call(`_RCaN_fitCaN`, N, A, b, C, v, L, x0, thin)
+fitCaN <- function(N, A, b, C, v, L, x0, thin, seed = 1L, stream = 1L) {
+    .Call(`_RCaN_fitCaN`, N, A, b, C, v, L, x0, thin, seed, stream)
 }
 
 # Register entry points for exported C++ functions

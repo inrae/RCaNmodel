@@ -94,7 +94,9 @@ fitmyCaNmod <- function(myCaNmod,
         as.matrix(myCaNmod$C),
         myCaNmod$v,
         as.matrix(myCaNmod$L),
-        x0
+        x0,
+        i,
+        i
       )
     names(res) <- c("F", "B")
     res$F <- res$F[, -seq_len(length(myCaNmod$species))]

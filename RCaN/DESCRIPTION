@@ -27,8 +27,9 @@ Imports:
     foreach,
     readxl,
     dplyr,
-    stringr
-LinkingTo: Rcpp, RcppEigen
+    stringr,
+    dqrng
+LinkingTo: Rcpp, RcppEigen, dqrng
 Suggests: 
     knitr,
     rmarkdown,

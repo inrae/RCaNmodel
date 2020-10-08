@@ -3,8 +3,9 @@
 #include <Eigen/Cholesky>
 #include <Eigen/Sparse>
 #include <limits>
-
+#include <dqrng.h>
 // [[Rcpp::depends(RcppEigen)]]
+// [[Rcpp::depends(dqrng)]]
 using namespace Rcpp;
 using namespace RcppEigen;
 using Eigen::Map;
@@ -69,6 +70,8 @@ void findOrder(IntegerVector & index, const Eigen::MatrixXd &W, const Eigen::Vec
 //' @param x0 a vector of length equals to nrcol(A) that should be in the polytope, for example returned by \code{\link{chebycenter}}
 //' @param thin thinning interval
 //' @param test if true, tryes a method to decrease autocorrelation
+//' @param seed seed of the dqrng generator
+//' @param stream stream of the dqrng generator
 //'
 //' @section Details:
 //' This function is based on an initial matlab code developped called CPRND
@@ -90,7 +93,8 @@ void findOrder(IntegerVector & index, const Eigen::MatrixXd &W, const Eigen::Vec
 // [[Rcpp::export]]
 
 
-Eigen::MatrixXd cpgs(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorXd &b,const Eigen::VectorXd &x0, const int thin=1, const bool test=false) {
+Eigen::MatrixXd cpgs(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorXd &b,const Eigen::VectorXd &x0, const int thin=1, const bool test=false, const int seed=1, const int stream=1) {
+  dqrng::dqset_seed(IntegerVector::create(seed), IntegerVector::create(stream));
   int p=A.cols();
   int m=A.rows();
   double inf = std::numeric_limits<double>::max();
@@ -153,10 +157,10 @@ Eigen::MatrixXd cpgs(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorX
     if (test & !updatingS){
       findOrder(index,W,y,b,delta);
     } else{
-      index=sample(index,p,false);
+      index=dqrng::dqsample_int(p,p,false);
     }
     y=x;
-    NumericVector alea2=runif(p);
+    NumericVector alea2=dqrng::dqrunif(p);
     // compute approximate stochastic transformation
     if ((stage==1 && discard==0) || (stage>0 && updatingS==true)){ //first true
       //sample, we now make the isotropic transformation
@@ -267,6 +271,8 @@ using Eigen::FullPivLU;
 //' @param x0 a vector of length equals to ncol(A) that should be in the polytope, for example returned by \code{\link{chebycenter}}
 //' @param thin the thinning interval
 //' @param test if true, tryes a method to decrease autocorrelation
+//' @param seed seed of the dqrng generator
+//' @param stream stream of the dqrng generator
 //'
 //' @section Details:
 //' This function is based on an initial matlab code developped called CPRND
@@ -293,7 +299,8 @@ using Eigen::FullPivLU;
 Eigen::MatrixXd cpgsEquality(const int N, const Eigen::MatrixXd &A,
                              const Eigen::VectorXd &b, const Eigen::MatrixXd &C,
                              const Eigen::VectorXd &v, const Eigen::VectorXd &x0,
-                             const int thin=1, const bool test=false){
+                             const int thin=1, const bool test=false,
+                             const int seed=1, const int stream=1){
   int p=A.cols();
   int m=A.rows();
   int p2=C.cols();
@@ -315,7 +322,7 @@ Eigen::MatrixXd cpgsEquality(const int N, const Eigen::MatrixXd &A,
   VectorXd bbis=b-A*x0;
 
   VectorXd x0bis=VectorXd::Zero(Nt.cols());
-  MatrixXd x=cpgs(N, Abis, bbis, x0bis, thin,test);
+  MatrixXd x=cpgs(N, Abis, bbis, x0bis, thin,test,seed,stream);
   for(int i=0;i<N;++i) {
     X.row(i)=Nt*x.row(i).transpose()+x0;
   }
@@ -330,15 +337,16 @@ Eigen::MatrixXd cpgsEquality(const int N, const Eigen::MatrixXd &A,
 List fitCaN(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorXd &b,
             const Eigen::MatrixXd &C ,const Eigen::VectorXd &v,
             const Eigen::MatrixXd &L,
-            const Eigen::VectorXd &x0, const int thin) {
+            const Eigen::VectorXd &x0, const int thin,
+            const int seed=1, const int stream=1) {
   int p=A.cols();
   int m2=C.rows();
   MatrixXd F(N, p);
   MatrixXd B(N, L.rows());
   if(m2>0){ //there are equality constraints
-    F=cpgsEquality(N, A, b, C, v, x0, thin);
+    F=cpgsEquality(N, A, b, C, v, x0, thin, seed, stream);
   } else{
-    F=cpgs(N, A, b, x0, thin);
+    F=cpgs(N, A, b, x0, thin,seed, stream);
   }
   for (int i=0;i<N;++i){
     B.row(i)=L*F.row(i).transpose();
