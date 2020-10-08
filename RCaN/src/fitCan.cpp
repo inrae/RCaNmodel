@@ -27,6 +27,9 @@ void updateS(Eigen::MatrixXd &S, Eigen::MatrixXd &S2, Eigen::MatrixXd &S0, Eigen
     S2 +=(iter-1)/(double)(iter*iter)*(delta0*delta0.transpose())+(delta1*delta1.transpose());
     S0=S;
     S = S2/(double)(iter-1);           // sample covariance
+    S.diagonal() = S.diagonal().cwiseMax(0.0001 * M.cwiseProduct(M)); //this
+                                                                //ensures
+                                                            //a minimum CV of 1%
   }
 }
 
@@ -94,7 +97,9 @@ void findOrder(IntegerVector & index, const Eigen::MatrixXd &W, const Eigen::Vec
 
 
 Eigen::MatrixXd cpgs(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorXd &b,const Eigen::VectorXd &x0, const int thin=1, const bool test=false, const int seed=1, const int stream=1) {
-  dqrng::dqset_seed(IntegerVector::create(seed), IntegerVector::create(stream));
+  dqrng::dqRNGkind("Xoroshiro128+");
+  dqrng::dqset_seed(IntegerVector::create(seed),
+                    IntegerVector::create(stream));
   int p=A.cols();
   int m=A.rows();
   double inf = std::numeric_limits<double>::max();
@@ -203,11 +208,11 @@ Eigen::MatrixXd cpgs(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorX
     }
     x=T1*y;
 
-    if (stage==0){//still in updating phase
+    if (stage==0){//still in adapting phase
       ++runup;
       if (updatingS) updateS(S, S2, S0, M, delta0, delta1, x, runup);
-      crit=(S0-S).norm()/S0.norm();
-      if(runup>p & crit<0.5){
+      crit=(S0.diagonal()-S.diagonal()).array().abs().cwiseQuotient(S0.diagonal().array().abs()).matrix().maxCoeff();
+      if(runup>p & crit<0.001){
         stage=1;
         updatingS=false;
         Rcout<<"########adapation successful after "<<runup<<" iterations"<<std::endl;
@@ -221,9 +226,11 @@ Eigen::MatrixXd cpgs(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorX
       }
     } else if (stage==1){ //we are in adapting phase
       ++discard;
-      if (updatingS) updateS(S, S2, S0, M, delta0, delta1, x, discard);
-      crit=(S0-S).norm()/S0.norm();
-      if (crit < 0.5) {
+      if (updatingS) {
+        updateS(S, S2, S0, M, delta0, delta1, x, discard);
+        crit=(S0.diagonal()-S.diagonal()).array().abs().cwiseQuotient(S0.diagonal().array().abs()).matrix().maxCoeff();
+      }
+      if (crit < 0.001) {
         if (updatingS) Rcout<<"##stop updating S during discarding phase"<<std::endl;
         updatingS=false;
       }
@@ -240,9 +247,11 @@ Eigen::MatrixXd cpgs(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorX
         X.row(isample)=x.col(0);
         ++isample;
       }
-      if (updatingS) updateS(S, S2, S0, M, delta0, delta1, x, isample);
-      double crit=(S0-S).norm()/S0.norm();
-      if (crit < 0.5) {
+      if (updatingS) {
+        updateS(S, S2, S0, M, delta0, delta1, x, isample);
+        crit=(S0.diagonal()-S.diagonal()).array().abs().cwiseQuotient(S0.diagonal().array().abs()).matrix().maxCoeff();
+      }
+      if (crit < 0.001) {
         if (updatingS) Rcout<<"##stop updating S during sampling phase"<<std::endl;
         updatingS=false;
       }
@@ -337,16 +346,16 @@ Eigen::MatrixXd cpgsEquality(const int N, const Eigen::MatrixXd &A,
 List fitCaN(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorXd &b,
             const Eigen::MatrixXd &C ,const Eigen::VectorXd &v,
             const Eigen::MatrixXd &L,
-            const Eigen::VectorXd &x0, const int thin,
+            const Eigen::VectorXd &x0, const int thin, const bool test=false,
             const int seed=1, const int stream=1) {
   int p=A.cols();
   int m2=C.rows();
   MatrixXd F(N, p);
   MatrixXd B(N, L.rows());
   if(m2>0){ //there are equality constraints
-    F=cpgsEquality(N, A, b, C, v, x0, thin, seed, stream);
+    F=cpgsEquality(N, A, b, C, v, x0, thin, test, seed, stream);
   } else{
-    F=cpgs(N, A, b, x0, thin,seed, stream);
+    F=cpgs(N, A, b, x0, thin,test, seed, stream);
   }
   for (int i=0;i<N;++i){
     B.row(i)=L*F.row(i).transpose();
