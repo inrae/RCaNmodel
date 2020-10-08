@@ -7,6 +7,7 @@
 #' @param nchain the number of mcmc chains
 #' @param ncore number of cores to use
 #' @param thin thinning interval
+#' @param test whether we should test an improvment of the sampling algorith
 #' @return a \code{\link[coda]{mcmc.list}}
 #' @export
 #'
@@ -27,20 +28,19 @@
 #' @importFrom parallel stopCluster
 #' @importFrom doParallel registerDoParallel
 #' @importFrom doParallel stopImplicitCluster
-#' @importFrom doRNG registerDoRNG
 #' @importFrom coda mcmc
 #' @importFrom coda mcmc.list
 #' @importFrom foreach foreach
 #' @importFrom foreach %dopar%
 #' @importFrom foreach %do%
 #' @importFrom foreach %do%
-#' @importFrom doRNG "%dorng%"
 #' @importFrom stats runif
 fitmyCaNmod <- function(myCaNmod,
                         N,
                         nchain = 1,
                         ncore = 1,
-                        thin = 1) {
+                        thin = 1,
+                        test=FALSE) {
   ncore <- min(min(detectCores() - 1, ncore), nchain)
   `%myinfix%` <- `%do%`
 
@@ -63,7 +63,6 @@ fitmyCaNmod <- function(myCaNmod,
     })
     clusterExport(cl, c("myCaNmod", "N"), envir = environment())
     registerDoParallel(cl)
-    registerDoRNG(seed = 123)
     `%myinfix%` <- `%dopar%`
   }
   res <- foreach(i = 1:nchain) %myinfix% {
@@ -95,6 +94,7 @@ fitmyCaNmod <- function(myCaNmod,
         myCaNmod$v,
         as.matrix(myCaNmod$L),
         x0,
+        test,
         i,
         i
       )

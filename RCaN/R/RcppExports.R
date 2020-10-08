@@ -75,8 +75,8 @@ cpgsEquality <- function(N, A, b, C, v, x0, thin = 1L, test = FALSE, seed = 1L, 
     .Call(`_RCaN_cpgsEquality`, N, A, b, C, v, x0, thin, test, seed, stream)
 }
 
-fitCaN <- function(N, A, b, C, v, L, x0, thin, seed = 1L, stream = 1L) {
-    .Call(`_RCaN_fitCaN`, N, A, b, C, v, L, x0, thin, seed, stream)
+fitCaN <- function(N, A, b, C, v, L, x0, thin, test = FALSE, seed = 1L, stream = 1L) {
+    .Call(`_RCaN_fitCaN`, N, A, b, C, v, L, x0, thin, test, seed, stream)
 }
 
 # Register entry points for exported C++ functions

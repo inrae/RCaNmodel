@@ -4,7 +4,8 @@
 \alias{fitmyCaNmod}
 \title{fitmyCaNmod}
 \usage{
-fitmyCaNmod(myCaNmod, N, nchain = 1, ncore = 1, thin = 1)
+fitmyCaNmod(myCaNmod, N, nchain = 1, ncore = 1, thin = 1,
+  test = FALSE)
 }
 \arguments{
 \item{myCaNmod}{a CaNmod object with following elements}
@@ -16,6 +17,8 @@ fitmyCaNmod(myCaNmod, N, nchain = 1, ncore = 1, thin = 1)
 \item{ncore}{number of cores to use}
 
 \item{thin}{thinning interval}
+
+\item{test}{whether we should test an improvment of the sampling algorith}
 }
 \value{
 a \code{\link[coda]{mcmc.list}}
