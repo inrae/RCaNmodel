@@ -2,11 +2,7 @@
 
 ## RCaN installation
 ### Requirements
-To install RCaN, you should first install two libraries that are not yet available on CRAN
-
-To install RCaN, follow the following steps:
-* [symengine](https://github.com/symengine/symengine.R)
-* [cpgsR](https://github.com/Irstea/cpgsR)
+All RCaN dependencies are available on cran so there is no specific requirements. 
 
 ### Installation
 Once these packages are installed, the process is easy using the library devools. On a R console:
