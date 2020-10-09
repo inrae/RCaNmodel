@@ -73,7 +73,7 @@ ggResult <- function(mcmc_res,
                            fill = "series"),
                 alpha = .33) +
     ylab(ylab) +
-    facet_wrap(.~quantiles$series, scales = "free")
+    facet_wrap(~quantiles$series, scales = "free")
 
   if (plot_series) {
     fewseries <- do.call("rbind.data.frame", lapply(param, function(p) {

@@ -10,7 +10,7 @@ author:
 - "Benjamin Planque - IMR"
 - "Christian Mullon - IRD"
 vignette: >
-  %\VignetteIndexEntry{vignette_RCaN}
+  %\VignetteIndexEntry{Tutorial of RCaN}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---

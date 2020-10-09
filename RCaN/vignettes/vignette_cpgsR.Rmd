@@ -2,7 +2,7 @@
 title: "Tutorial of cpgsR"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{vignette_cpgsR}
+  %\VignetteIndexEntry{Tutorial of cpgsR}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
