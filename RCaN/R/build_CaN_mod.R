@@ -135,7 +135,8 @@ build_CaNmod <- function(file) {
                constraints_word[not_recognized]))
 
   #build matrices H and N
-  H <- diag(1 - exp(-components_param$OtherLosses[index_species]))
+  H <- diag(1 - exp(-components_param$OtherLosses[index_species]),
+            nrow=length(index_species))
   N <- matrix(0, nbspecies, nbfluxes)
   N[cbind(fluxes_from, 1:nbfluxes)] <- -1 #this is an outgoing flow
   N[na.omit(cbind(fluxes_to, 1:nbfluxes))] <-
@@ -150,7 +151,7 @@ build_CaNmod <- function(file) {
   # and digestibility
   N <-
     sweep(N, 1, STATS = diag(H) /
-            (components_param$OtherLosses[index_species]), "*")
+            (components_param$OtherLosses[index_species,drop=FALSE]), "*")
   rownames(N) <- species
   colnames(N) <- flow
   colnames(H) <- rownames(H) <- species

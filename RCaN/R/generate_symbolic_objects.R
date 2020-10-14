@@ -56,7 +56,7 @@ generate_symbolic_objects <-
       )))) #vector of fluxes for time step t
       assign(paste("B", t, sep = "_"), (IE_H %*% eval(parse(
         text = paste("B", t - 1, sep = "_")
-      )))[, 1] + (n %*% eval(parse(
+      )))[, 1,drop=FALSE] + (n %*% eval(parse(
         text = paste("F", t - 1, sep = "_")
       )))[, 1]) # biomass at time t+1 is B_t+1=(Ie-H)%*%B_t+N%*%F_t
       list_F <- c(list_F, eval(parse(text = paste("F", t, sep = "_"))))
