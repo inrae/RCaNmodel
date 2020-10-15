@@ -19,20 +19,24 @@ using Eigen::VectorXd;
 
 
 
-void updateS(Eigen::MatrixXd &S, Eigen::MatrixXd &S2, Eigen::MatrixXd &S0, Eigen::MatrixXd &M, Eigen::MatrixXd &delta0, Eigen::MatrixXd &delta1, const Eigen::VectorXd &x, int iter){
+void updateS(Eigen::MatrixXd &S, Eigen::MatrixXd &S2, Eigen::MatrixXd &S0, Eigen::MatrixXd &M, Eigen::MatrixXd &delta0, const Eigen::VectorXd &x, int iter){
   delta0 = x - M; // delta new point wrt old mean
   M+= delta0/(double)iter;     // sample mean
-  delta1= x - M;      // delta new point wrt new mean
   if (iter>1){
-    S2 +=(iter-1)/(double)(iter*iter)*(delta0*delta0.transpose())+(delta1*delta1.transpose());
-    S0=S;
-    S = S2/(double)(iter-1);           // sample covariance
-    S.diagonal() = S.diagonal().cwiseMax(0.0001 * M.cwiseProduct(M)); //this
-                                                                //ensures
-                                                            //a minimum CV of 1%
+    if (iter == 2) {
+      S2 += x*x.transpose();
+    } else {
+      Eigen::VectorXd xstd=x/sqrt(iter-2.);
+      S2 += xstd*xstd.transpose();
+      S2 *= (iter-2.)/(iter - 1.);
+      S=S2- iter*(M*M.transpose())/(iter-1.);
+    }
+    //S.diagonal() = S.diagonal().cwiseMax(0.0001 * M.cwiseProduct(M)); //this                                                                //ensures                                                          //a minimum CV of 1%
+  } else {
+    S2=x*x.transpose();
   }
-}
 
+}
 
 
 
