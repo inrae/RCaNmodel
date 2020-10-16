@@ -26,7 +26,7 @@ defineLPMod <-
            b,
            C = NULL,
            v = NULL,
-           presolve = c("rows", "lindep", "cols"),
+           presolve = c("rows", "lindep", "cols","rowdominate","coldominate","mergerows"),
            lower = NULL) {
     nbparam <- ncol(A)
     if (is.null(lower)) lower <- rep(0, ncol(A))
