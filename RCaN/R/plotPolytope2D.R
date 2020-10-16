@@ -61,7 +61,8 @@ plotPolytope2D <- function(A,
         x[2, ]))))
   names(polygon) <- colnames(A)[params]
   ggplot(polygon,
-         aes_string(x = colnames(A)[params[1]], y = colnames(A)[params[2]])) +
+         aes_string(x = as.name(colnames(A)[params[1]]),
+                    y = as.name(colnames(A)[params[2]]))) +
     geom_polygon()
 
 }
