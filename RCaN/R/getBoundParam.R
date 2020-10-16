@@ -28,30 +28,38 @@ getBoundParam <- function(A, b, p, C = NULL, v = NULL) {
   }
   lp_model <- defineLPMod(A, b, C, v)
   ncontr <- length(get.constr.value(lp_model))
-  set.objfn(lp_model, 1, p)
-  lp.control(lp_model, sense = "max")
-  res <- solve.lpExtPtr(lp_model)
-  if (res == 0) {
-    upbound <-
-      (get.primal.solution(lp_model,
-                           orig = TRUE)[(ncontr + 1):(ncontr + nbparam)])[p]
-  } else if (res == 3) {
-    upbound <- Inf
-  } else {
-    upbound <- NA
-  }
-  lp_model <- defineLPMod(A, b, C, v)
-  lp.control(lp_model, sense = "min")
-  set.objfn(lp_model, 1, p)
-  res <- solve.lpExtPtr(lp_model)
-  if (res == 0) {
-    lowbound <-
-      (get.primal.solution(lp_model,
-                           orig = TRUE)[(ncontr + 1):(ncontr + nbparam)])[p]
-  } else if (res == 3) {
-    lowbound <- -Inf
-  } else {
-    lowbound <- NA
+  solved <- c(FALSE,FALSE)
+  ntry <- 0
+  while (!all(solved) & ntry < 3) {
+    set.objfn(lp_model, 1, p)
+    lp.control(lp_model, sense = "max")
+    res <- solve.lpExtPtr(lp_model)
+    if (res == 0) {
+      upbound <-
+        (get.primal.solution(lp_model,
+                             orig = TRUE)[(ncontr + 1):(ncontr + nbparam)])[p]
+      solved[1] <- TRUE
+    } else if (res == 3) {
+      upbound <- Inf
+      solved[1] <- TRUE
+    } else {
+      upbound <- NA
+    }
+    lp_model <- defineLPMod(A, b, C, v)
+    lp.control(lp_model, sense = "min")
+    set.objfn(lp_model, 1, p)
+    res <- solve.lpExtPtr(lp_model)
+    if (res == 0) {
+      lowbound <-
+        (get.primal.solution(lp_model,
+                            orig = TRUE)[(ncontr + 1):(ncontr + nbparam)])[p]
+      solved[2] <- TRUE
+    } else if (res == 3) {
+      lowbound <- -Inf
+      solved[2] <- TRUE
+    } else {
+      lowbound <- NA
+    }
   }
   c(lowbound, upbound)
 }
