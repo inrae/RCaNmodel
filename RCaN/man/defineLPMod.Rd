@@ -6,7 +6,7 @@
 Specify an lp_model (mainly for internal use)}
 \usage{
 defineLPMod(A, b, C = NULL, v = NULL, presolve = c("rows", "lindep",
-  "cols"), lower = NULL)
+  "cols", "rowdominate", "coldominate", "mergerows"), lower = NULL)
 }
 \arguments{
 \item{A}{a matrix of inequality constraints A x <=b}
