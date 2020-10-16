@@ -31,7 +31,7 @@ void updateS(Eigen::MatrixXd &S, Eigen::MatrixXd &S2, Eigen::MatrixXd &S0, Eigen
       S2 *= (iter-2.)/(iter - 1.);
       S=S2- iter*(M*M.transpose())/(iter-1.);
     }
-    //S.diagonal() = S.diagonal().cwiseMax(0.0001 * M.cwiseProduct(M)); //this                                                                //ensures                                                          //a minimum CV of 1%
+    //S.diagonal() = S.diagonal().cwiseMax(0.0001 * M.cwiseProduct(M)); //this ensures a minimum CV of 1%
   } else {
     S2=x*x.transpose();
   }
@@ -39,6 +39,18 @@ void updateS(Eigen::MatrixXd &S, Eigen::MatrixXd &S2, Eigen::MatrixXd &S0, Eigen
 }
 
 
+double computeCrit(Eigen::MatrixXd &S, Eigen::MatrixXd &M, int iter){
+  //we know that the true variance is in the 95%interval
+  //k * s²/(qchish(0.975,k)) to k * s²/(qchish(0.975,k))
+  //therefore, we can look at the size of the range compared
+  //to squared sample mean to check whether we have achieved
+  //sufficient precision
+  int k = iter-1;
+  double chi025 = R::qchisq(0.025, k, true, false);
+  double chi975 = R::qchisq(0.975, k, true, false);
+  VectorXd Range=k*S.diagonal()*(1/chi025-1/chi975);
+  return Range.cwiseQuotient(M.cwiseProduct(M)).maxCoeff();
+}
 
 IntegerVector order_(const NumericVector & x) {
   NumericVector sorted = clone(x).sort();
@@ -105,6 +117,7 @@ Eigen::MatrixXd cpgs(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorX
   dqrng::dqset_seed(IntegerVector::create(seed),
                     IntegerVector::create(stream));
   int p=A.cols();
+  Eigen::ArrayXd critHist=Eigen::ArrayXd::Constant(p,999999); // keep tracks of the last criterion values
   int m=A.rows();
   double inf = std::numeric_limits<double>::max();
 
@@ -156,7 +169,7 @@ Eigen::MatrixXd cpgs(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorX
   int isample=0; //number of sample
   int n=0; //total number of iterations
   int stage=0; //0 adapting phase, 1 discarding phase, 2 sampling
-  int runupmax= 10*p*(p+1);
+  int runupmax= p*log2(p); //https://doi.org/10.1021/acs.jproteome.5b01029
   int sampleit=0; //total number of iteration during sampling, useful for thin
   int discardmax=runupmax;
   double crit=0;
@@ -214,14 +227,17 @@ Eigen::MatrixXd cpgs(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorX
 
     if (stage==0){//still in adapting phase
       ++runup;
-      if (updatingS) updateS(S, S2, S0, M, delta0, delta1, x, runup);
-      crit=(S0.diagonal()-S.diagonal()).array().abs().cwiseQuotient(S0.diagonal().array().abs()).matrix().maxCoeff();
-      if(runup>p & crit<0.001){
+      if (updatingS) updateS(S, S2, S0, M, delta0, x, runup);
+      crit=computeCrit(S,M,runup);
+      critHist(runup % p)=crit;
+      if (runup>p & critHist.minCoeff()==crit & std::sqrt((critHist - critHist.mean()).square().sum()/(p-1))/critHist.mean()<0.01){
         stage=1;
         updatingS=false;
         Rcout<<"########adapation successful after "<<runup<<" iterations"<<std::endl;
         discardmax=runup;
       } else if (runup==runupmax){
+        updatingS=false;
+        critHist.setConstant(99999999);
         stage=1;
         M.setZero();
         S2.setZero();
@@ -231,14 +247,16 @@ Eigen::MatrixXd cpgs(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorX
     } else if (stage==1){ //we are in adapting phase
       ++discard;
       if (updatingS) {
-        updateS(S, S2, S0, M, delta0, delta1, x, discard);
-        crit=(S0.diagonal()-S.diagonal()).array().abs().cwiseQuotient(S0.diagonal().array().abs()).matrix().maxCoeff();
+        updateS(S, S2, S0, M, delta0, x, discard);
+        crit=computeCrit(S,M,discard);
+        critHist(discard % p)=crit;
       }
-      if (crit < 0.001) {
+      if (discard>p & critHist.minCoeff()==crit & std::sqrt((critHist - critHist.mean()).square().sum()/(p-1))/critHist.mean()<0.01) {
         if (updatingS) Rcout<<"##stop updating S during discarding phase"<<std::endl;
         updatingS=false;
       }
       if (discard==discardmax){
+        critHist.setConstant(99999999);
         stage=2;
         M.setZero();
         S.setIdentity();
@@ -252,16 +270,17 @@ Eigen::MatrixXd cpgs(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorX
         ++isample;
       }
       if (updatingS) {
-        updateS(S, S2, S0, M, delta0, delta1, x, isample);
-        crit=(S0.diagonal()-S.diagonal()).array().abs().cwiseQuotient(S0.diagonal().array().abs()).matrix().maxCoeff();
+        updateS(S, S2, S0, M, delta0, x, isample);
+        crit=computeCrit(S,M,isample);
+        critHist(isample % p)=crit;
       }
-      if (crit < 0.001) {
+      if (isample>p & critHist.minCoeff()==crit & std::sqrt((critHist - critHist.mean()).square().sum()/(p-1))/critHist.mean()<0.0^1) {
         if (updatingS) Rcout<<"##stop updating S during sampling phase"<<std::endl;
         updatingS=false;
       }
       ++sampleit;
     }
-    if (n % 100 == 0) Rcout<<"##iteration "<<n<<" stage "<<stage<<" crit "<<crit<<" S0.norm "<<S0.norm()<<" S-S0 "<<(S-S0).norm()<<std::endl;
+    if (n % 100 == 0) Rcout<<"##iteration "<<n<<" stage "<<stage<<" crit "<<crit<<" cvHist "<<std::sqrt((critHist - critHist.mean()).square().sum()/(p-1))/critHist.mean()<<std::endl;
     ++n;
   }
   return X;
