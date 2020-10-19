@@ -20,10 +20,14 @@ a CaNmod object with following elements
  \item{"constraints"}{the table of constraints description}
  \item{"H"}{the H matrix from (I-H).B+N.F}
  \item{"N"}{the N matrix from (I-H).B+N.F}
- \item{"A"}{matrix of constraints A.x<=b}
- \item{"b"}{vector of constraints A.x<=b}
- \item{"C"}{matrix of constraints C.x=v}
- \item{"v"}{vector of constraints C.x=v}
+ \item{"A"}{matrix of active constraints A.x<=b}
+ \item{"AAll"}{matrix of all constraints A.x<=b}
+ \item{"b"}{vector of active constraints A.x<=b}
+ \item{"bAll"}{vector of all constraints A.x<=b}
+ \item{"C"}{matrix of active constraints C.x=v}
+ \item{"CAll"}{matrix of all constraints C.x=v}
+ \item{"v"}{vector of active constraints C.x=v}
+ \item{"vAll"}{vector of all constraints C.x=v}
  \item{"L"}{matrix of B=L.F, since B0 is a parameter, there is no M}
  \item{"symbolic_enviro"}{an environment storing all symbolic objects
  required for the computation}
