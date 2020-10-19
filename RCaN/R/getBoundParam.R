@@ -60,6 +60,7 @@ getBoundParam <- function(A, b, p, C = NULL, v = NULL) {
     } else {
       lowbound <- NA
     }
+    ntry <- ntry + 1
   }
   c(lowbound, upbound)
 }
