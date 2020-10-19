@@ -102,7 +102,7 @@ treat_constraint <- function(myconstraint,
     yr <- years %in% as.character(eval(parse(text = yr)))
   }
   mat <- mat[yr, ,drop=FALSE]
-  rownames(mat) <- paste(years[yr], name_constr, sep = " : ")
+  rownames(mat) <- paste(name_constr, years[yr], sep = " : ")
   mat <- mat[!is.na(Matrix::rowSums(mat)), ]
   if (nrow(mat) == 0)
     warning(paste("constraint", name_constr, "does not produce any constaints"))

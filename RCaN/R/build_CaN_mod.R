@@ -14,10 +14,14 @@
 #'  \item{"constraints"}{the table of constraints description}
 #'  \item{"H"}{the H matrix from (I-H).B+N.F}
 #'  \item{"N"}{the N matrix from (I-H).B+N.F}
-#'  \item{"A"}{matrix of constraints A.x<=b}
-#'  \item{"b"}{vector of constraints A.x<=b}
-#'  \item{"C"}{matrix of constraints C.x=v}
-#'  \item{"v"}{vector of constraints C.x=v}
+#'  \item{"A"}{matrix of active constraints A.x<=b}
+#'  \item{"AAll"}{matrix of all constraints A.x<=b}
+#'  \item{"b"}{vector of active constraints A.x<=b}
+#'  \item{"bAll"}{vector of all constraints A.x<=b}
+#'  \item{"C"}{matrix of active constraints C.x=v}
+#'  \item{"CAll"}{matrix of all constraints C.x=v}
+#'  \item{"v"}{vector of active constraints C.x=v}
+#'  \item{"vAll"}{vector of all constraints C.x=v}
 #'  \item{"L"}{matrix of B=L.F, since B0 is a parameter, there is no M}
 #'  \item{"symbolic_enviro"}{an environment storing all symbolic objects
 #'  required for the computation}
@@ -95,8 +99,6 @@ build_CaNmod <- function(file) {
   #we keep only active constraints
   if (! "Active" %in% names(constraints))
     constraints$Active <- TRUE
-  constraints <- subset(constraints,
-                        as.logical(constraints$Active))
 
   lessthan <- grep("<", constraints$Constraint)
   greaterthan <- grep(">", constraints$Constraint)
@@ -177,7 +179,7 @@ build_CaNmod <- function(file) {
   A <-
     rbind(A, cbind(rep(0, nbparam - 1), diag(-1, nbparam - 1, nbparam -
                                                1)))
-  rownames(A) <- paste(colnames(A)[-1], ">=0")
+  rownames(A) <- paste("Flow positiveness", colnames(A)[-1], sep = "_")
 
   ####add refuge biomasses/biomass positiveness
   A <-
@@ -365,6 +367,26 @@ build_CaNmod <- function(file) {
   v <- -C[, 1]
   C <- C[, -1]
 
+
+
+  AAll <- A
+  bAll <- b
+  CAll <- C
+  vAll <- v
+
+  activeconstr <- subset(constraints, as.logical(constraints$Active))
+  activeconstr <- paste("^[",
+                        paste(activeconstr, collapse = '|', sep = ""),
+                        "]")
+
+
+  A <- A[grep(activeconstr, rownames(A)), ]
+  b <- b[grep(activeconstr, rownames(A))]
+  C <- C[grep(activeconstr, rownames(C)), ]
+  v <- v[grep(activeconstr, rownames(C))]
+
+  #we remove inactive constraint
+
   ####build matrix L and M of B=L.F+M
   L <-
     Matrix::Matrix(0,
@@ -398,10 +420,14 @@ build_CaNmod <- function(file) {
     H = H,
     N = N,
     A = A,
+    AAll = AAll,
     C = C,
+    CAll = CAll,
     v = v,
+    vAll=vAll,
     L = L,
     b = b,
+    bAll= bAll,
     symbolic_enviro = symbolic_enviro
   )
   class(myCaNmod) <- "CaNmod"
