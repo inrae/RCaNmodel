@@ -40,8 +40,8 @@ toggle_constraint <- function(myCaNmod, constr){
 
     if (length(suballA) > 0){
       if (length(subactiveA) > 0){
-        myCaNmod$A <- myCaNmod$A[!rownames(myCaNmod$A) %in% subactiveA, ]
         myCaNmod$b <- myCaNmod$b[!rownames(myCaNmod$A) %in% subactiveA]
+        myCaNmod$A <- myCaNmod$A[!rownames(myCaNmod$A) %in% subactiveA, ]
         print(paste("disactivate inequality", subactiveA))
       }
       if (length(inactiveA) > 0){
@@ -54,8 +54,8 @@ toggle_constraint <- function(myCaNmod, constr){
     }
     if (length(suballC) > 0){
       if (length(subactiveC) > 0){
-        myCaNmod$C <- myCaNmod$C[!rownames(myCaNmod$C) %in% subactiveC, ]
         myCaNmod$v <- myCaNmod$v[!rownames(myCaNmod$C) %in% subactiveC]
+        myCaNmod$C <- myCaNmod$C[!rownames(myCaNmod$C) %in% subactiveC, ]
         print(paste("disactivate equality", subactiveC))
       }
       if (length(inactiveC) > 0){
