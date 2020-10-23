@@ -366,7 +366,7 @@ build_CaNmod <- function(file) {
   }
   v <- -C[, 1]
   C <- C[, -1]
-
+  colnames(C) <- colnames(A)
 
 
   AAll <- A
@@ -379,11 +379,11 @@ build_CaNmod <- function(file) {
                         paste(activeconstr, collapse = '|', sep = ""),
                         "]")
 
-
-  A <- A[grep(activeconstr, rownames(A)), ]
   b <- b[grep(activeconstr, rownames(A))]
-  C <- C[grep(activeconstr, rownames(C)), ]
+  A <- A[grep(activeconstr, rownames(A)), ]
   v <- v[grep(activeconstr, rownames(C))]
+  C <- C[grep(activeconstr, rownames(C)), ]
+
 
   #we remove inactive constraint
 
