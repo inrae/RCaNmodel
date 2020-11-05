@@ -22,6 +22,6 @@ Activate or inactivate a constraint.
 \examples{
 myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx",
  package = "RCaN"))
-toogle_constraint(myCaNmod, "C02")
+toggle_constraint(myCaNmod, "C02")
 
 }

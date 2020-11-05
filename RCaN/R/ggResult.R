@@ -19,7 +19,7 @@
 #' ggResult(res,"F01", TRUE)
 #'
 #' #with 2 series
-#' ggResult(res,myCaNmod,c("F01","HerbZooplankton"), TRUE)
+#' ggResult(res,c("F01","HerbZooplankton"), TRUE)
 #'
 #' @importFrom ggplot2 ggplot
 #' @importFrom ggplot2 geom_path

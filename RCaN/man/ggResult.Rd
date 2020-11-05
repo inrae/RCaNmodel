@@ -4,13 +4,10 @@
 \alias{ggResult}
 \title{ggResult}
 \usage{
-ggResult(mcmc_res, myCaNmod, param, plot_series = TRUE,
-  ylab = "Biomass/Flux")
+ggResult(myFitCaNmod, param, plot_series = TRUE, ylab = "Biomass/Flux")
 }
 \arguments{
-\item{mcmc_res}{result sent by \link{fitmyCaNmod}}
-
-\item{myCaNmod}{a CaNmod object}
+\item{myFitCaNmod}{result sent by \link{fitmyCaNmod}}
 
 \item{param}{the name (or a vector of name) of a parameter (either a flow or
 a biomass)}
@@ -34,9 +31,9 @@ myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx",
  package = "RCaN"))
 res <- fitmyCaNmod(myCaNmod, 100)
 #with one series
-ggResult(res,myCaNmod,"F01", TRUE)
+ggResult(res,"F01", TRUE)
 
 #with 2 series
-ggResult(res,myCaNmod,c("F01","HerbZooplankton"), TRUE)
+ggResult(res,c("F01","HerbZooplankton"), TRUE)
 
 }
