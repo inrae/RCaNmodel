@@ -175,7 +175,7 @@ Eigen::MatrixXd cpgs(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorX
     }
     if (stage>0) y=T2*y; //otherwise y=I^-1 * y=y
 
-    if (gibbs == true || n < p){
+    if (gibbs == true || stage == 0){
       NumericVector alea2=dqrng::dqrunif(p);
       // choose p new components
       for (int ip=0;ip<p;++ip){
