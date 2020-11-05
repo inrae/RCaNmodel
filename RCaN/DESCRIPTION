@@ -28,7 +28,8 @@ Imports:
     readxl,
     dplyr,
     stringr,
-    dqrng
+    dqrng,
+    writexl
 LinkingTo: Rcpp, RcppEigen, dqrng
 Suggests: 
     knitr,
