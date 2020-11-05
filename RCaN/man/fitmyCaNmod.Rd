@@ -21,7 +21,11 @@ fitmyCaNmod(myCaNmod, N, nchain = 1, ncore = 1, thin = 1,
 \item{test}{whether we should test an improvment of the sampling algorith}
 }
 \value{
-a \code{\link[coda]{mcmc.list}}
+a fitCaNmod object which contains two elements
+\itemize{
+ \item{"CaNmod"}{the CaNmod object descring the model}
+ \item{"mcmc"}{\code{\link[coda]{mcmc.list}}}
+}
 }
 \description{
 fit the CaNmod model
