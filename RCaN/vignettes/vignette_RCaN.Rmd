@@ -48,6 +48,8 @@ There are a few important things to remember:
 * it is worthwile giving as much information as possible in the "Info" sheet
 * you can add other sheets and other columns in your file is needed, as the minimal sets of sheets and columns are provided
 
+Note that the object can also build directly from R using the build_CaNmod_fromR function.
+
 ## Sheet "Components & input parameter"
 ```{r,echo=FALSE,include=TRUE}
 myCaNmod$components_param
