@@ -5,7 +5,7 @@
 \title{Complex Polytope Gibbs Sampling
 This function draw uniform samples in a convex polytope with both equality and inequality constraints}
 \usage{
-cpgsEquality(N, A, b, C, v, x0, thin = 1L, test = FALSE, seed = 1L,
+cpgsEquality(N, A, b, C, v, x0, thin = 1L, gibbs = TRUE, seed = 1L,
   stream = 1L)
 }
 \arguments{
@@ -23,7 +23,7 @@ cpgsEquality(N, A, b, C, v, x0, thin = 1L, test = FALSE, seed = 1L,
 
 \item{thin}{the thinning interval}
 
-\item{test}{if true, tryes a method to decrease autocorrelation}
+\item{gibbs}{if true, gibbs sampling, else hitandrun}
 
 \item{seed}{seed of the dqrng generator}
 

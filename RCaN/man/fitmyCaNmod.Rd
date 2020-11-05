@@ -5,7 +5,7 @@
 \title{fitmyCaNmod}
 \usage{
 fitmyCaNmod(myCaNmod, N, nchain = 1, ncore = 1, thin = 1,
-  test = FALSE)
+  method = "gibbs")
 }
 \arguments{
 \item{myCaNmod}{a CaNmod object with following elements}
@@ -18,7 +18,7 @@ fitmyCaNmod(myCaNmod, N, nchain = 1, ncore = 1, thin = 1,
 
 \item{thin}{thinning interval}
 
-\item{test}{whether we should test an improvment of the sampling algorith}
+\item{method}{one of gibbs (default) or hitandrun}
 }
 \value{
 a fitCaNmod object which contains two elements

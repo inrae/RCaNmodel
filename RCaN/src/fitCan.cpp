@@ -58,23 +58,6 @@ IntegerVector order_(const NumericVector & x) {
 }
 
 
-void findOrder(IntegerVector & index, const Eigen::MatrixXd &W, const Eigen::VectorXd &y, const Eigen::VectorXd & b, Eigen::VectorXd &delta){
-  /*  int nbpar = W.cols();
-   int nbconstr = b.size();
-   delta = b - W*y;
-
-   Eigen::VectorXd deltastd(nbpar);
-   Eigen::VectorXd coeff(nbconstr);
-   NumericVector range(nbpar);
-
-   for (int param = 0; param<nbpar; ++param){
-   coeff=W.col(param);
-   deltastd=delta.cwiseQuotient(coeff);
-   range[param]=(coeff.array()>0).select(deltastd,9e9).minCoeff()-(coeff.array()<0).select(deltastd,-9e9).maxCoeff();
-   }
-   index=index[order_(range)];*/
-}
-
 
 
 
@@ -88,7 +71,7 @@ void findOrder(IntegerVector & index, const Eigen::MatrixXd &W, const Eigen::Vec
 //' @param b a vector of length equals to nrow(A)
 //' @param x0 a vector of length equals to nrcol(A) that should be in the polytope, for example returned by \code{\link{chebycenter}}
 //' @param thin thinning interval
-//' @param test if true, tryes a method to decrease autocorrelation
+//' @param gibbs if true, gibbs sampling, else hitandrun
 //' @param seed seed of the dqrng generator
 //' @param stream stream of the dqrng generator
 //'
@@ -112,7 +95,7 @@ void findOrder(IntegerVector & index, const Eigen::MatrixXd &W, const Eigen::Vec
 // [[Rcpp::export]]
 
 
-Eigen::MatrixXd cpgs(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorXd &b,const Eigen::VectorXd &x0, const int thin=1, const bool test=false, const int seed=1, const int stream=1) {
+Eigen::MatrixXd cpgs(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorXd &b,const Eigen::VectorXd &x0, const int thin=1, const bool gibbs=true, const int seed=1, const int stream=1) {
   dqrng::dqRNGkind("Xoroshiro128+");
   dqrng::dqset_seed(IntegerVector::create(seed),
                     IntegerVector::create(stream));
@@ -144,6 +127,7 @@ Eigen::MatrixXd cpgs(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorX
   S.setIdentity();
 
   IntegerVector index=Rcpp::seq(0,p-1);
+  NumericVector u(p);
 
   Eigen::MatrixXd T1(p,p);
   Eigen::MatrixXd T2(p,p);
@@ -176,13 +160,9 @@ Eigen::MatrixXd cpgs(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorX
   while (isample<N){               //sampling loop
     //std::random_shuffle(index.begin(), index.end()); //we change the order to
     //limit the influence of initial ordering
-    if (test & !updatingS){
-      findOrder(index,W,y,b,delta);
-    } else{
+
       index=dqrng::dqsample_int(p,p,false);
-    }
     y=x;
-    NumericVector alea2=dqrng::dqrunif(p);
     // compute approximate stochastic transformation
     if ((stage==1 && discard==0) || (stage>0 && updatingS==true)){ //first true
       //sample, we now make the isotropic transformation
@@ -195,34 +175,57 @@ Eigen::MatrixXd cpgs(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorX
     }
     if (stage>0) y=T2*y; //otherwise y=I^-1 * y=y
 
-    // choose p new components
-    for (int ip=0;ip<p;++ip){
-      int i=index[p-ip-1];
-      //Find points where the line with the (p-1) components x_i
-      //fixed intersects the bounding polytope.
-      z = W.col(i); //prevent any divisions by 0
-      if (ip==0)
-        d2=(b - W*y);
-      d=d2.cwiseQuotient(z);
-      double tmin=-inf;
-      double tmax=inf;
-      for (int j=0;j<m;++j){
-        if (z(j)<0 && tmin<d(j)) tmin=d(j);
-        if (z(j)>0 && tmax>d(j)) tmax=d(j);
+    if (gibbs == true || n < p){
+      NumericVector alea2=dqrng::dqrunif(p);
+      // choose p new components
+      for (int ip=0;ip<p;++ip){
+        int i=index[p-ip-1];
+        //Find points where the line with the (p-1) components x_i
+        //fixed intersects the bounding polytope.
+        z = W.col(i); //prevent any divisions by 0
+        if (ip==0)
+          d2=(b - W*y);
+        d=d2.cwiseQuotient(z);
+        double tmin=-inf;
+        double tmax=inf;
+        for (int j=0;j<m;++j){
+          if (z(j)<0 && tmin<d(j)) tmin=d(j);
+          if (z(j)>0 && tmax>d(j)) tmax=d(j);
+        }
+        tmin=std::min(0.0, tmin);
+        tmax=std::max(0.0, tmax);
+
+
+        double delta = -y(i);
+        y(i) += (tmin+(tmax-tmin)*alea2(i));
+        y(i)=std::min(std::max(y(i),-inf),inf);
+        //Rcout<<tmin<<" "<<tmax<<" "<<y(i)<<std::endl;
+        delta += y(i);
+        d2 =d2- W.col(i)*delta; //we do this to avoid making a matrix
+        //multiplication for each parameter (we just update the value of the
+        //constraint with the delta of parameter)
       }
-      tmin=std::min(0.0, tmin);
-      tmax=std::max(0.0, tmax);
-
-
-      double delta = -y(i);
-      y(i) += (tmin+(tmax-tmin)*alea2(i));
-      y(i)=std::min(std::max(y(i),-inf),inf);
-      //Rcout<<tmin<<" "<<tmax<<" "<<y(i)<<std::endl;
-      delta += y(i);
-      d2 =d2- W.col(i)*delta; //we do this to avoid making a matrix
-      //multiplication for each parameter (we just update the value of the
-      //constraint with the delta of parameter)
     }
+    else {
+        Eigen::Map<Eigen::VectorXd> u(Rcpp::as<Eigen::Map<Eigen::VectorXd> >(dqrng::dqrnorm(p)));
+        u /= u.norm();
+        z = W * u;
+        d2=(b - W*y);
+        d=d2.cwiseQuotient(z);
+        double tmin=-inf;
+        double tmax=inf;
+        for (int j=0;j<m;++j){
+          if (z(j)<0 && tmin<d(j)) tmin=d(j);
+          if (z(j)>0 && tmax>d(j)) tmax=d(j);
+        }
+        tmin=std::min(0.0, tmin);
+        tmax=std::max(0.0, tmax);
+
+
+        y += (tmin+(tmax-tmin)*dqrng::runif())*u;
+
+        //y =std::min(std::max(y(i),-inf),inf);
+      }
     x=T1*y;
 
     if (stage==0){//still in adapting phase
@@ -302,7 +305,7 @@ using Eigen::FullPivLU;
 //' @param v a vector of length equals to nrow(C)
 //' @param x0 a vector of length equals to ncol(A) that should be in the polytope, for example returned by \code{\link{chebycenter}}
 //' @param thin the thinning interval
-//' @param test if true, tryes a method to decrease autocorrelation
+//' @param gibbs if true, gibbs sampling, else hitandrun
 //' @param seed seed of the dqrng generator
 //' @param stream stream of the dqrng generator
 //'
@@ -331,7 +334,7 @@ using Eigen::FullPivLU;
 Eigen::MatrixXd cpgsEquality(const int N, const Eigen::MatrixXd &A,
                              const Eigen::VectorXd &b, const Eigen::MatrixXd &C,
                              const Eigen::VectorXd &v, const Eigen::VectorXd &x0,
-                             const int thin=1, const bool test=false,
+                             const int thin=1, const bool gibbs=true,
                              const int seed=1, const int stream=1){
   int p=A.cols();
   int m=A.rows();
@@ -354,7 +357,7 @@ Eigen::MatrixXd cpgsEquality(const int N, const Eigen::MatrixXd &A,
   VectorXd bbis=b-A*x0;
 
   VectorXd x0bis=VectorXd::Zero(Nt.cols());
-  MatrixXd x=cpgs(N, Abis, bbis, x0bis, thin,test,seed,stream);
+  MatrixXd x=cpgs(N, Abis, bbis, x0bis, thin, gibbs, seed, stream);
   for(int i=0;i<N;++i) {
     X.row(i)=Nt*x.row(i).transpose()+x0;
   }
@@ -369,16 +372,16 @@ Eigen::MatrixXd cpgsEquality(const int N, const Eigen::MatrixXd &A,
 List fitCaN(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorXd &b,
             const Eigen::MatrixXd &C ,const Eigen::VectorXd &v,
             const Eigen::MatrixXd &L,
-            const Eigen::VectorXd &x0, const int thin, const bool test=false,
+            const Eigen::VectorXd &x0, const int thin, const bool gibbs=true,
             const int seed=1, const int stream=1) {
   int p=A.cols();
   int m2=C.rows();
   MatrixXd F(N, p);
   MatrixXd B(N, L.rows());
   if(m2>0){ //there are equality constraints
-    F=cpgsEquality(N, A, b, C, v, x0, thin, test, seed, stream);
+    F=cpgsEquality(N, A, b, C, v, x0, thin, gibbs, seed, stream);
   } else{
-    F=cpgs(N, A, b, x0, thin,test, seed, stream);
+    F=cpgs(N, A, b, x0, thin,gibbs, seed, stream);
   }
   for (int i=0;i<N;++i){
     B.row(i)=L*F.row(i).transpose();
