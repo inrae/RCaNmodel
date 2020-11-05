@@ -33,11 +33,12 @@
 #' @export
 #'
 #' @examples
+#' require(readxl)
 #' file <- system.file("extdata",
 #'  "CaN_template_mini.xlsx", package = "RCaN")
 #'
 #'  #for this example, we take the table as provided in the template file
-#'  but you can provide your own table form other sources
+#'  #but you can provide your own table form other sources
 #'
 #'  #read compartments
 #'   components_param <-
