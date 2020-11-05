@@ -7,7 +7,7 @@
 #' @param nchain the number of mcmc chains
 #' @param ncore number of cores to use
 #' @param thin thinning interval
-#' @param test whether we should test an improvment of the sampling algorith
+#' @param method one of gibbs (default) or hitandrun
 #' @return a fitCaNmod object which contains two elements
 #' \itemize{
 #'  \item{"CaNmod"}{the CaNmod object descring the model}
@@ -45,7 +45,9 @@ fitmyCaNmod <- function(myCaNmod,
                         nchain = 1,
                         ncore = 1,
                         thin = 1,
-                        test=FALSE) {
+                        method="gibbs") {
+  if (! method %in% c("gibbs","hitandrun"))
+    stop("method should be either gibbs or hitandrun")
   ncore <- min(min(detectCores() - 1, ncore), nchain)
   `%myinfix%` <- `%do%`
 
@@ -99,7 +101,7 @@ fitmyCaNmod <- function(myCaNmod,
         myCaNmod$v,
         as.matrix(myCaNmod$L),
         x0,
-        test,
+        method == "gibbs",
         i,
         i
       )
