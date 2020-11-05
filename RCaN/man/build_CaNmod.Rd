@@ -16,7 +16,7 @@ a CaNmod object with following elements
  \item{"species"}{the name of the species}
  \item{"fluxes_def}{the table of fluxes definition}
  \item{"ntstep"}{the number of time steps}
- \item{"data_series_name"}{the names of the data series}
+ \item{"data_series_name"}{the names of the data series}a
  \item{"constraints"}{the table of constraints description}
  \item{"H"}{the H matrix from (I-H).B+N.F}
  \item{"N"}{the N matrix from (I-H).B+N.F}

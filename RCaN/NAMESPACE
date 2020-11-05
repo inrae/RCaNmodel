@@ -3,6 +3,7 @@
 S3method(mean,VecBasic)
 export()
 export(build_CaNmod)
+export(build_CaNmod_fromR)
 export(chebycenter)
 export(checkPolytopeStatus)
 export(checkPolytopeStatusCaNmod)
