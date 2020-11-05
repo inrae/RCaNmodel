@@ -67,7 +67,7 @@ Column "Flux" aims at providing name to identify the differents fluxes. Then, "F
 ```{r,echo=FALSE,include=TRUE}
 myCaNmod$series
 ```
-Here you provide all the time series you have. The first column correspond to years and define the time range of the model. Then following time series correspond to the different time series (observations) that you will use to define constraints. 
+Here you provide all the time series you have. The first column correspond to years and define the time range of the model. Then following time series correspond to the different time series (observations) that you will use to define constraints. Active can be used to specify whether constraints should be used or not (by default, all constraints are used if no column Active is supplied)
 
 ##sheet "Constraints"
 ```{r,echo=FALSE,include=TRUE}
@@ -84,11 +84,11 @@ myCaNmod <- toggle_constraint(myCaNmod, "C01")
 #reactivate
 myCaNmod <- toggle_constraint(myCaNmod, "C01")
 
-#disactivate constraints c01 for year 2000
-myCaNmod <- toggle_constraint(myCaNmod, "C01 : 2000")
+#disactivate constraints c01 for year 1991
+myCaNmod <- toggle_constraint(myCaNmod, "C01 : 1991")
 
 #reactivate 
-myCaNmod <- toggle_constraint(myCaNmod, "C01 : 2000")
+myCaNmod <- toggle_constraint(myCaNmod, "C01 : 1991")
 
 ```
 
