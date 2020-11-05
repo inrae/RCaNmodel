@@ -145,22 +145,22 @@ res <- fitmyCaNmod(myCaNmod, 1000,nchain=2,ncore=2)
 
 The argument ncore allows to use several cores in parallel, however the library ensure that the computation leave one core unused and that the number of cores remain smaller than the number of chains
 
-Since the result is a mcmc.list object, we can use all the diagnostics tools provided in the package coda, such traceplot, summary or gelman and rubin tests or autocorrelograms.
+The return object contains the model description and a  mcmc.list object so that we can use all the diagnostics tools provided in the package coda, such traceplot, summary or gelman and rubin tests or autocorrelograms.
 
 ```{r}
 library(coda)
-nchain(res)
-summary(res)
-traceplot(res[,"F01[1988]"])
-gelman.diag(res[,"F01[1988]"])
-acfplot(res[,"F01[1988]"])
+nchain(res$mcmc)
+summary(res$mcmc)
+traceplot(res$mcmc[,"F01[1988]"])
+gelman.diag(res$mcmc[,"F01[1988]"])
+acfplot(res$mcmc[,"F01[1988]"])
 ```
 
 We can also do a posteriori thinning if required, for example if we chose to keep only one iteration on two:
 
 ```{r}
-thin(res)
-thinned_res <- window(res,thin=2)
+thin(res$mcmc)
+thinned_res <- window(res$mcmc,thin=2)
 thin(thinned_res)
 acfplot(thinned_res[,"F01[1988]"])
 ```
@@ -168,11 +168,11 @@ acfplot(thinned_res[,"F01[1988]"])
 The package provides a function that draw a ggplot of time series of biomass or flux. For example, here we draw a combination of time trends of "HerbZooPlankton" and "F01":
 
 ```{r}
-herbzoo<-ggResult(res,myCaNmod,"HerbZooplankton", TRUE)
-f01<-ggResult(res,myCaNmod,"F01", TRUE)
+herbzoo<-ggResult(res,"HerbZooplankton", TRUE)
+f01<-ggResult(res,"F01", TRUE)
 library(gridExtra)
 grid.arrange(f01,herbzoo,nrow=1)
 
 #same graph with two series in same plot
-ggResult(res,myCaNmod,c("F01","HerbZooplankton"), TRUE)
+ggResult(res,c("F01","HerbZooplankton"), TRUE)
 ```

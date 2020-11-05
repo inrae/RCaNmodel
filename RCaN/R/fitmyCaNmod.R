@@ -8,7 +8,12 @@
 #' @param ncore number of cores to use
 #' @param thin thinning interval
 #' @param test whether we should test an improvment of the sampling algorith
-#' @return a \code{\link[coda]{mcmc.list}}
+#' @return a fitCaNmod object which contains two elements
+#' \itemize{
+#'  \item{"CaNmod"}{the CaNmod object descring the model}
+#'  \item{"mcmc"}{\code{\link[coda]{mcmc.list}}}
+#' }
+#'
 #' @export
 #'
 #' @examples
@@ -110,5 +115,9 @@ fitmyCaNmod <- function(myCaNmod,
     stopCluster(cl)
     stopImplicitCluster()
   }
-  mcmc.list(res)
+  fitCaNmod <- list(CaNmod = myCaNmod,
+                    mcmc = mcmc.list(res))
+  class(fitCaNmod) <- "fitCaNmod"
+  return(fitCaNmod)
+
 }

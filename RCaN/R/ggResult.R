@@ -2,8 +2,7 @@
 #' ggResult
 #'
 #' provide a ggplot of the fit
-#' @param mcmc_res result sent by \link{fitmyCaNmod}
-#' @param myCaNmod a CaNmod object
+#' @param myFitCaNmod result sent by \link{fitmyCaNmod}
 #' @param param the name (or a vector of name) of a parameter (either a flow or
 #' a biomass)
 #' @param ylab default Biomass Flux
@@ -17,7 +16,7 @@
 #'  package = "RCaN"))
 #' res <- fitmyCaNmod(myCaNmod, 100)
 #' #with one series
-#' ggResult(res,myCaNmod,"F01", TRUE)
+#' ggResult(res,"F01", TRUE)
 #'
 #' #with 2 series
 #' ggResult(res,myCaNmod,c("F01","HerbZooplankton"), TRUE)
@@ -32,12 +31,13 @@
 
 #' @export
 #'
-ggResult <- function(mcmc_res,
-                     myCaNmod,
+ggResult <- function(myFitCaNmod,
                      param,
                      plot_series=TRUE,
                      ylab="Biomass/Flux") {
-  mat_res <- as.matrix(mcmc_res)
+  if (class(myFitCaNmod) != "fitCaNmod")
+    stop("you should provide a fitCaNmod object")
+  mat_res <- as.matrix(myFitCaNmod$mcmc)
   quantiles <- do.call("rbind.data.frame", lapply(param, function(p) {
     columns <- which(startsWith(colnames(mat_res), paste(p, "[", sep = "")))
     if (length(columns) == 0)
@@ -49,7 +49,7 @@ ggResult <- function(mcmc_res,
         quantile,
         probs = c(0, .025, 0.25, .50, .75, .975, 1)
       )),
-      year = myCaNmod$series$Year,
+      year = myFitCaNmod$CaNmod$series$Year,
       series = as.character(p))
   }))
   names(quantiles)[1:7] <- c("q0", "q2.5", "q25", "q50", "q75", "q97.5", "q100")
