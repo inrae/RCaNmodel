@@ -87,7 +87,7 @@ fitmyCaNmod <- function(myCaNmod,
                                                          ncol(myCaNmod$A))]
       if (conv == 0)
         find_init <- TRUE
-      nbiter < nbiter + 1
+      nbiter <- nbiter + 1
     }
     if (!find_init)
       stop("unable to find any suitable solutions after 100 tries")
