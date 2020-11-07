@@ -37,17 +37,24 @@
 #' @importFrom stats na.omit
 build_CaNmod <- function(file) {
   #Components & input parameter
-  components_param <-
+  components_param <- as.data.frame(
     read_excel(file, sheet = "Components & input parameter")
+  )
 
   #read Fluxes
-  fluxes_def <- read_excel(file, sheet = "Fluxes")
+  fluxes_def <- as.data.frame(
+    read_excel(file, sheet = "Fluxes")
+  )
 
   #read Times series
-  series <- read_excel(file, sheet = "Input time-series")
+  series <- as.data.frame(
+    read_excel(file, sheet = "Input time-series")
+  )
 
   #read constraints
-  constraints <- read_excel(file, sheet = "Constraints")
+  constraints <- as.data.frame(
+    read_excel(file, sheet = "Constraints")
+  )
 
   myCaNmod <- build_CaNmod_fromR(components_param,
                                  fluxes_def,
