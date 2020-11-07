@@ -397,16 +397,17 @@ build_CaNmod_fromR <- function(components_param,
   CAll <- C
   vAll <- v
 
-  activeconstr <- subset(constraints, as.logical(constraints$Active))
-  activeconstr <- paste("^[",
-                        paste(activeconstr, collapse = '|', sep = ""),
-                        "]",
-                        " : ")
+  notactiveconstr <- subset(constraints, !as.logical(constraints$Active))
+  notactiveconstr <- as.vector(
+    outer(paste(notactiveconstr$Id, " : ", sep = ""),
+          series$Year,
+          paste,
+          sep = ""))
 
-  b <- b[grep(activeconstr, rownames(A))]
-  A <- A[grep(activeconstr, rownames(A)), ]
-  v <- v[grep(activeconstr, rownames(C))]
-  C <- C[grep(activeconstr, rownames(C)), ]
+  b <- b[! rownames(A) %in% notactiveconstr]
+  A <- A[! rownames(A) %in% notactiveconstr, ]
+  v <- v[! rownames(C) %in% notactiveconstr]
+  C <- C[! rownames(C) %in% notactiveconstr, ]
 
 
   #we remove inactive constraint
