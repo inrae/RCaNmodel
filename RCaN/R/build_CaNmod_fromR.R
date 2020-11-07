@@ -201,7 +201,7 @@ build_CaNmod_fromR <- function(components_param,
     rbind(A, cbind(rep(0, nbparam - 1), diag(-1, nbparam - 1, nbparam -
                                                1)))
   rownames(A) <- paste("Flow positiveness",
-                       gsub(colnames(A)[-1], "_"," : "),
+                       gsub( "_"," : ", colnames(A)[-1]),
                        sep = "_")
 
   ####add refuge biomasses/biomass positiveness
