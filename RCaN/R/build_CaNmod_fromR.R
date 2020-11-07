@@ -200,7 +200,9 @@ build_CaNmod_fromR <- function(components_param,
   A <-
     rbind(A, cbind(rep(0, nbparam - 1), diag(-1, nbparam - 1, nbparam -
                                                1)))
-  rownames(A) <- paste("Flow positiveness", colnames(A)[-1], sep = "_")
+  rownames(A) <- paste("Flow positiveness",
+                       gsub(colnames(A)[-1], "_"," : "),
+                       sep = "_")
 
   ####add refuge biomasses/biomass positiveness
   A <-
@@ -398,7 +400,8 @@ build_CaNmod_fromR <- function(components_param,
   activeconstr <- subset(constraints, as.logical(constraints$Active))
   activeconstr <- paste("^[",
                         paste(activeconstr, collapse = '|', sep = ""),
-                        "]")
+                        "]",
+                        " : ")
 
   b <- b[grep(activeconstr, rownames(A))]
   A <- A[grep(activeconstr, rownames(A)), ]
