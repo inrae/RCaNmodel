@@ -85,7 +85,7 @@ ggResult <- function(myFitCaNmod,
         data.frame(t(apply(
           mat_res[selectedsamples, columns], 2, identity
         )),
-        year = myCaNmod$series$Year,
+        year = myFitCaNmod$CaNmod$series$Year,
         series = as.character(p))
     }))
     names(fewseries)[1:3] <- c("S1", "S2", "S3")
