@@ -54,9 +54,9 @@ Note that the object can also build directly from R using the build_CaNmod_fromR
 ```{r,echo=FALSE,include=TRUE}
 myCaNmod$components_param
 ```
-Components correspond to the boxes of the trophic food web. Most components are internal to the ecosystem (denoted "In"), but other can be external, for example to deal with fishery or migrations, and are denoted "Out". The definition of the parameters are provided in Planque and Mullon (in press). You can leave some cells empty:
+Components correspond to the boxes of the trophic food web. Most components are internal to the ecosystem (denoted 1), but other can be external, for example to deal with fishery or migrations, and are denoted 0. The definition of the parameters are provided in Planque and Mullon (in press). You can leave some cells empty:
 * if you do not want to use a specific constraint (for example, if you do not want to use a satiety constraint for a component, leave the cell empty)
-* for "Out" component, you can leave all cells empty since the dynamics of external components are not modelled, except digestibility of components that are eated by internal components (for example in the template, we have a digestibility for PhytoAndBacteria).
+* for external component, you can leave all cells empty since the dynamics of external components are not modelled, except digestibility of components that are eated by internal components (for example in the template, we have a digestibility for PhytoAndBacteria).
 
 ## Sheet "Fluxes"
 ```{r,echo=FALSE,include=TRUE}

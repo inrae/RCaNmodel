@@ -71,11 +71,9 @@ build_CaNmod_fromR <- function(components_param,
   components_param <-
     components_param[!rowSums(is.na(components_param)) ==
                        ncol(components_param), ]
-  if (length(which(!(
-    components_param$in_out %in% c("In", "Out")
-  ))) > 0)
-    paste("compontents in_out should be either 'Out' or 'In'")
-  index_species <- which(components_param$in_out == "In")
+  if (!all(components_param$Inside %in% c(0, 1)))
+    paste("components inside should be either 0 or 1")
+  index_species <- which(components_param$Inside == 1)
   components <- components_param$Component
   species <- as.character(components_param$Component[index_species])
   nbspecies <- length(species)
@@ -87,20 +85,19 @@ build_CaNmod_fromR <- function(components_param,
                  ncol(fluxes_def), ]
   flow <- as.character(fluxes_def$Flux)
   nbfluxes <- nrow(fluxes_def)
-  if (length(which(!(fluxes_def$From %in% components))) > 0)
+  if (!all(fluxes_def$From %in% components))
     stop(paste(
       "In sheet fluxes, column From, not recognized:",
       fluxes_def$From[!(fluxes_def$From %in% components)]
     ))
-  if (length(which(!(fluxes_def$To %in% components))) > 0)
+  if (!all(fluxes_def$To %in% components))
     stop(paste("In sheet fluxes, column To, not recognized:",
                fluxes_def$To[!(fluxes_def$To %in% components)]))
   fluxes_from <- match(fluxes_def$From, species)
   fluxes_to <- match(fluxes_def$To, species)
 
-  if (length(which(fluxes_def$Trophic != 0 &
-                   fluxes_def$Trophic != 1)) > 0)
-    stop("In sheet fluxes, Trophic should be 1 or 0")
+  if (!all(fluxes_def$Trophic %in% c(0, 1)))
+    stop("In sheet fluxes, Trophic should be 0 or 1")
   is_trophic_flux <- fluxes_def$Trophic == 1
 
   # Times series
@@ -117,6 +114,8 @@ build_CaNmod_fromR <- function(components_param,
   constraints <-
     constraints[!rowSums(is.na(constraints)) ==
                   ncol(constraints), ]
+  if (!all(constraints$Active %in% c(NA, 0, 1)))
+    stop("In sheet constraints, Active should be empty, 0 or 1")
   #we keep only active constraints
   if (! "Active" %in% names(constraints))
     constraints$Active <- TRUE
