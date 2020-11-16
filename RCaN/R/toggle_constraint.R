@@ -30,12 +30,28 @@ toggle_constraint <- function(myCaNmod, constr){
 
   #we make a loop over constraint
   for (co in constr){
-    suballA <- rownames(myCaNmod$AAll)[startsWith(rownames(myCaNmod$AAll), co)]
-    subactiveA <- rownames(myCaNmod$A)[startsWith(rownames(myCaNmod$A), co)]
+    if (is.null(rownames(myCaNmod$AAll))) {
+      suballA <- character(0)
+    } else {
+      suballA <- rownames(myCaNmod$AAll)[startsWith(rownames(myCaNmod$AAll), co)]
+    }
+    if (is.null(rownames(myCaNmod$AAll))) {
+      subactiveA <- character(0)
+    } else {
+      subactiveA <- rownames(myCaNmod$A)[startsWith(rownames(myCaNmod$A), co)]
+    }
     inactiveA <- suballA[!suballA %in% subactiveA]
 
-    suballC <- rownames(myCaNmod$CAll)[startsWith(rownames(myCaNmod$CAll), co)]
-    subactiveC <- rownames(myCaNmod$C)[startsWith(rownames(myCaNmod$C), co)]
+    if (is.null(rownames(myCaNmod$CAll))) {
+      suballC <- character(0)
+    } else {
+      suballC <- rownames(myCaNmod$CAll)[startsWith(rownames(myCaNmod$CAll), co)]
+    }
+    if (is.null(rownames(myCaNmod$CAll))) {
+      subactiveC <- character(0)
+    } else {
+      subactiveC <- rownames(myCaNmod$C)[startsWith(rownames(myCaNmod$C), co)]
+    }
     inactiveC <- suballC[!suballC %in% subactiveC]
 
     if (length(suballA) > 0){
