@@ -32,8 +32,8 @@ ggCaNmod <- function(myCaNmod) {
   edge_graph$Trophic <- as.factor(edge_graph$Trophic)
   names(edge_graph)[c(1:2)] <- c("from", "to")
   vertices_graph <-
-    myCaNmod$components_param[, c("Component", "in_out")]
-  vertices_graph$in_out <- ifelse(vertices_graph$in_out == "In", "internal",
+    myCaNmod$components_param[, c("Component", "Inside")]
+  vertices_graph$Inside <- ifelse(vertices_graph$Inside == 1, "internal",
                                   "external")
   names(vertices_graph)[2] <- "Status"
 
