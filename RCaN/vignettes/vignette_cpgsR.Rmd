@@ -43,7 +43,7 @@ A2 <- diag(n)
 b2 <- as.matrix(rep(1,n))
 A <- rbind(A1,A2) #the coefficent matrix
 X0 <- chebycenter(A,b)
-print(X0)
+  print(X0)
 ```
 
 We see that, in our simple example, the centroid is the point with 0.5 in all dimensions. We can now carry out the sampling using the \code{\link{cpgs}}:
