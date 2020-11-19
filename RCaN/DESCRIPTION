@@ -13,7 +13,6 @@ Imports:
     Rcpp (>= 1.0.3),
     RcppEigen,
     ggplot2,
-    lpSolveAPI,
     symengine,
     Matrix,
     igraph,
@@ -29,7 +28,8 @@ Imports:
     dplyr,
     stringr,
     dqrng,
-    writexl
+    writexl,
+    ROI.plugin.lpsolve
 LinkingTo: Rcpp, RcppEigen, dqrng
 Suggests: 
     knitr,
@@ -39,3 +39,5 @@ VignetteBuilder: knitr
 RoxygenNote: 6.1.1
 Encoding: UTF-8
 LazyData: true
+Depends: 
+    ROI

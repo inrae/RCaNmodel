@@ -7,6 +7,8 @@
 #' @param C the matrix of equality C.x=v (default NULL for no equality)
 #' @param v the vector of equality C.x=v (default NULL for no equality
 #'
+#' @importFrom ROI ROI_solve
+#'
 #' @return a vector with lower bounds and upper bounds
 #' @examples
 #' n <- 20
@@ -26,35 +28,28 @@ getBoundParam <- function(A, b, p, C = NULL, v = NULL) {
     C <- matrix(0, 0, nbparam)
     v <- numeric(0)
   }
-  lp_model <- defineLPMod(A, b, C, v)
-  ncontr <- length(get.constr.value(lp_model))
   solved <- c(FALSE,FALSE)
   ntry <- 0
   while (!all(solved) & ntry < 3) {
-    set.objfn(lp_model, 1, p)
-    lp.control(lp_model, sense = "max")
-    res <- solve.lpExtPtr(lp_model)
-    if (res == 0) {
-      upbound <-
-        (get.primal.solution(lp_model,
-                             orig = TRUE)[(ncontr + 1):(ncontr + nbparam)])[p]
+    ob <- rep(0, nbparam)
+    ob[p] <- 1
+    lp_model <- defineLPMod(A, b, C, v, maximum = TRUE, ob = ob)
+    res <- ROI_solve(lp_model, solver = "lpsolve")
+    if (res$status$msg$code == 0) {
+      upbound <- res$solution[p]
       solved[1] <- TRUE
-    } else if (res == 3) {
+    } else if (res$status$msg$code == 3) {
       upbound <- Inf
       solved[1] <- TRUE
     } else {
       upbound <- NA
     }
-    lp_model <- defineLPMod(A, b, C, v)
-    lp.control(lp_model, sense = "min")
-    set.objfn(lp_model, 1, p)
-    res <- solve.lpExtPtr(lp_model)
-    if (res == 0) {
-      lowbound <-
-        (get.primal.solution(lp_model,
-                            orig = TRUE)[(ncontr + 1):(ncontr + nbparam)])[p]
+    lp_model <- defineLPMod(A, b, C, v, maximum = FALSE, ob = ob)
+    res <- ROI_solve(lp_model, solver = "lpsolve")
+    if (res$status$msg$code == 0) {
+      lowbound <- res$solution[p]
       solved[2] <- TRUE
-    } else if (res == 3) {
+    } else if (res$status$msg$code == 3) {
       lowbound <- -Inf
       solved[2] <- TRUE
     } else {

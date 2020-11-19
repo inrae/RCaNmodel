@@ -12,8 +12,7 @@
 #'  relaxed and that
 #' A is incompatible with B and that D is incompatible with both E and F
 #'
-#' @importFrom lpSolveAPI add.column
-#' @importFrom lpSolveAPI add.column
+#' @importFrom ROI ROI_solve
 #'
 #' @examples
 #' n <- 20
@@ -32,12 +31,15 @@
 
 findingIncompatibleConstr <- function(A, b, C=NULL, v=NULL) {
   nbparam <- ncol(A)
-  lp_model <- defineLPMod(A, b, C, v)
   nbineq <- nrow(A)
   if (is.null(C)) {
     C <- matrix(0, 0, nbparam)
     v <- numeric(0)
   }
+  Aslacked <- A
+  bslacked <- b
+  Cslacked <- C
+  vslacked <- v
   nbeq <- nrow(C)
   if (is.null(rownames(A))) {
     rownames(A) <- paste("inequality", seq_len(nrow(A)))
@@ -45,64 +47,68 @@ findingIncompatibleConstr <- function(A, b, C=NULL, v=NULL) {
   if (is.null(rownames(C)) & nrow(C) > 0) {
     rownames(C) <- paste("equality", seq_len(nrow(C)))
   }
+  param_name <- colnames(A)
   ####add slack variable for inequality constraint
   for (s in seq_len(nrow(A))) {
-    slack <- rep(0, nbineq + nbeq)
+    slack <- rep(0, nbineq)
     slack[s] <- -1
-    add.column(lp_model, slack)
-    dimnames(lp_model)[[2]][nbparam + s] <-
-      paste("slack", rownames(A)[s])
+    Aslacked <- cbind(Aslacked, slack)
+    Cslacked <- cbind(Cslacked, rep(0, nbeq))
+    param_name <- c(param_name,
+                     paste("slack", rownames(A)[s]))
   }
   for (s in seq_len(nrow(C))) {
-    slack <- rep(0, nbineq + nbeq)
-    slack[nbineq + s] <- -1
-    add.column(lp_model, slack)
-    add.column(lp_model, -slack)
-    dimnames(lp_model)[[2]][nbparam + nbineq + 2 * (s - 1) + 1] <-
-      paste("slack", rownames(C)[s])
-    dimnames(lp_model)[[2]][nbparam + nbineq + 2 * (s - 1) + 2] <-
-      paste("slackbis", rownames(C)[s])
+    slack <- rep(0, nbeq)
+    slack[s] <- -1
+    Aslacked <- cbind(Aslacked, rep(0 ,nbineq), rep(0,nbineq))
+    Cslacked <- cbind(Cslacked, slack, -slack)
+    param_name <- c(param_name,
+                     paste("slack", rownames(C)[s]),
+                    paste("slackbis", rownames(C)[s]))
   }
-  contr_name <- dimnames(lp_model)[[1]]
-  param_name <- dimnames(lp_model)[[2]]
-  set.objfn(lp_model, c(rep(1, nbparam), rep(1000, nbineq + 2 * nbeq)))
-  res <- solve.lpExtPtr(lp_model)
-  solutions <-
-    get.primal.solution(lp_model, orig = TRUE)[- (1:(nbeq + nbineq))]
+
+  lp_model <- defineLPMod(Aslacked, bslacked, Cslacked, vslacked,
+                         ob = c(rep(1, nbparam), rep(1000, nbineq + 2 * nbeq)),
+                         maximum = FALSE)
+  res <- ROI_solve(lp_model, solver = "lpsolve")
+  solutions <- res$solution
   problematic <-
     param_name[which(solutions > 0 & (seq_len(length(solutions))) > (nbparam))]
   if (length(problematic) > 0) {
     results <- lapply(seq_len(length(problematic)), function(p) {
-      lp_model <- defineLPMod(A, b, C, v)
+      Aslacked <- A
+      bslacked <- b
+      Cslacked <- C
+      vslacked <- v
+      param_name <- colnames(A)
       for (s in seq_len(nrow(A))) {
         if (paste("slack", rownames(A)[s]) != problematic[p]) {
-          slack <- rep(0, nbineq + nbeq)
+          slack <- rep(0, nbineq)
           slack[s] <- -1
-          add.column(lp_model, slack)
-          dimnames(lp_model)[[2]][length(dimnames(lp_model)[[2]])] <-
-            paste("slack", rownames(A)[s])
+          Aslacked <- cbind(Aslacked, slack)
+          Cslacked <- cbind(Cslacked, rep(0, nbeq))
+          param_name <- c(param_name,
+                          paste("slack", rownames(A)[s]))
         }
       }
       for (s in seq_len(nrow(C))) {
         if (paste("slack", rownames(C)[s]) != problematic[p] &
             paste("slackbis", rownames(C)[s]) != problematic[p]) {
-          slack <- rep(0, nbineq + nbeq)
-          slack[nbineq + s] <- -1
-          add.column(lp_model, slack)
-          add.column(lp_model, -slack)
-          dimnames(lp_model)[[2]][length(dimnames(lp_model)[[2]]) - 1] <-
-            paste("slack", rownames(C)[s])
-          dimnames(lp_model)[[2]][length(dimnames(lp_model)[[2]])] <-
-            paste("slackbis", rownames(C)[s])
+          slack <- rep(0, nbeq)
+          slack[s] <- -1
+          Cslacked <- cbind(C, slack, -slack)
+          Aslacked <- cbind(Aslacked, rep(0, nbineq), rep(0, nbineq))
+          param_name <- c(param_name,
+                          paste("slack", rownames(C)[s]),
+                          paste("slackbis", rownames(C)[s]))
         }
       }
-      contr_name <- dimnames(lp_model)[[1]]
-      param_name <- dimnames(lp_model)[[2]]
-      set.objfn(lp_model, c(rep(1, nbparam), rep(1000, dim(lp_model)[2] -
-                                                   nbparam)))
-      res <- solve.lpExtPtr(lp_model)
-      solutions <-
-        get.primal.solution(lp_model, orig = TRUE)[- (1:(nbeq + nbineq))]
+      lp_model <- defineLPMod(Aslacked, bslacked, Cslacked, vslacked,
+                              ob= c(rep(1, nbparam),
+                                    ncol(Aslacked) - nbparam),
+                              maximum = FALSE)
+      res <- ROI_solve(lp_model, solver = "lpsolve")
+      solutions <- res$solution
       c(gsub("^\\s*\\w*", "", problematic[p]),
         gsub("^\\s*\\w*", "",
              param_name[which(solutions > 0 &

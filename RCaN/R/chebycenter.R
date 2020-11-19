@@ -12,11 +12,8 @@
 #'
 #' @return a vector corresponding to the centroid of the polytope
 #'
-#' @importFrom lpSolveAPI set.objfn
-#' @importFrom lpSolveAPI lp.control
-#' @importFrom lpSolveAPI solve.lpExtPtr
-#' @importFrom lpSolveAPI get.primal.solution
-#' @importFrom lpSolveAPI get.constr.value
+#' @importFrom ROI ROI_solve
+#' @import ROI.plugin.lpsolve
 #' @examples
 #' n <- 20
 #' A1 <- -diag(n)
@@ -40,19 +37,15 @@ chebycenter <- function(A, b) {
 
   A1[, p + 1] <- an
 
-  f <- matrix(data = 0,
-              nrow = p + 1,
-              ncol = 1)
+  f <- rep(0, p + 1)
   f[p + 1] <- -1
 
   lp_mod <- defineLPMod(A1,
-                        b)
-  ncontr <- length(get.constr.value(lp_mod))
-  set.objfn(lp_mod, f)
-  lp.control(lp_mod, sense = "min")
-  solve.lpExtPtr(lp_mod)
-  x <-
-    get.primal.solution(lp_mod, orig = TRUE)[(ncontr + 1):(ncontr + ncol(A1))]
+                        b,
+                        maximum = FALSE,
+                        ob = f)
+  res <- ROI_solve(lp_mod, solver="lpsolve")
+  x <- res$solution
 
   return(x[-p - 1])
 }

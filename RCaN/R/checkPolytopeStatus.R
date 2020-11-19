@@ -11,10 +11,7 @@
 #' @importFrom ggplot2 ggplot
 #' @importFrom ggplot2 aes_string
 #' @importFrom ggplot2 geom_polygon
-#' @importFrom lpSolveAPI lp.control
-#' @importFrom lpSolveAPI solve.lpExtPtr
-#' @importFrom lpSolveAPI get.constr.value
-#' @importFrom lpSolveAPI set.objfn
+#' @importFrom ROI ROI_solve
 #' @examples
 #' n <- 20
 #' A1 <- -diag(n)
@@ -37,26 +34,21 @@ checkPolytopeStatus <- function(A,
                                 C = NULL,
                                 v = NULL) {
   nbparam <- ncol(A)
-  lp_model <- defineLPMod(A, b, C, v)
-  lp.control(lp_model, sense = "min")
-  set.objfn(lp_model, rep(1, nbparam))
-  res <- solve.lpExtPtr(lp_model)
-  if (res == 0) {
-    nbparam <- ncol(A)
-    lp_model <- defineLPMod(A, b, C, v)
-    lp.control(lp_model, sense = "max")
-    set.objfn(lp_model, rep(1, nbparam))
-    res <- solve.lpExtPtr(lp_model)
+  lp_model <- defineLPMod(A, b, C, v, maximum = FALSE)
+  res <- ROI_solve(lp_model, solver = "lpsolve")
+  if (res$status$msg$code == 0) {
+    lp_model <- defineLPMod(A, b, C, v, maximum = TRUE)
+    res <- ROI_solve(lp_model, solver = "lpsolve")
   }
-  if (res == 0) {
+  if (res$status$msg$code == 0) {
     print("polytope ok")
-  } else if (res == 2) {
+  } else if (res$status$msg$code == 2) {
     print("empty polytope")
-  } else if (res == 3) {
+  } else if (res$status$msg$code == 3) {
     print("polytope not bounded")
-  } else if (res == 9) {
+  } else if (res$status$msg$code == 9) {
     print("unique solution")
-  } else if (res == 5) {
+  } else if (res$status$msg$code == 5) {
     print("numerical error")
   } else {
     print("potential problem")
