@@ -21,11 +21,7 @@
 #'  package = "RCaN"))
 #' res <- fitmyCaNmod(myCaNmod, 100)
 #'
-#' @importFrom lpSolveAPI get.constr.value
-#' @importFrom lpSolveAPI set.objfn
-#' @importFrom lpSolveAPI lp.control
-#' @importFrom lpSolveAPI solve.lpExtPtr
-#' @importFrom lpSolveAPI get.primal.solution
+#' @importFrom ROI ROI_solve
 #' @importFrom parallel detectCores
 #' @importFrom parallel makeCluster
 #' @importFrom parallel clusterEvalQ
@@ -57,7 +53,7 @@ fitmyCaNmod <- function(myCaNmod,
       library(RCaN)
     })
     clusterEvalQ(cl, {
-      library(lpSolveAPI)
+      library(ROI)
     })
     clusterEvalQ(cl, {
       library(coda)
@@ -76,16 +72,13 @@ fitmyCaNmod <- function(myCaNmod,
     find_init <- FALSE
     nbiter <- 0
     while (nbiter < 100 & !find_init) {
-      lp_model <- defineLPMod(myCaNmod$A, myCaNmod$b, myCaNmod$C, myCaNmod$v)
-      ncontr <- length(get.constr.value(lp_model))
-      set.objfn(lp_model, runif(ncol(myCaNmod$A)))
-      lp.control(lp_model, sense = "min")
-      conv <- solve.lpExtPtr(lp_model)
-      x0 <-
-        get.primal.solution(lp_model,
-                            orig = TRUE)[(ncontr + 1):(ncontr +
-                                                         ncol(myCaNmod$A))]
-      if (conv == 0)
+      lp_model <- defineLPMod(myCaNmod$A, myCaNmod$b, myCaNmod$C, myCaNmod$v,
+                              maximum = FALSE,
+                              ob = runif(ncol(myCaNmod$A)))
+      res <- ROI_solve(lp_model, solver = "lpsolve")
+      x0 <- res$solution
+
+      if (res$status$code == 0)
         find_init <- TRUE
       nbiter <- nbiter + 1
     }

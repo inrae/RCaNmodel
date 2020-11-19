@@ -7,17 +7,16 @@
 #' absence of such constraints
 #' @param v a vector of equality constraints C x = v, should be null in the
 #' absence of such constraints
-#' @param presolve argument send to \code{\link[lpSolveAPI]{lp.control}}
 #' @param lower minimal bounds for paramaters, by default set to zero
+#' @param maximum tells whether the objective function is maximised or not
+#' @param ob the coefficient of the ojective function (default all 1)
 #'
-#' @return a vector corresponding to the centroid of the polytope
+#' @return returns an OP object
 #'
-#' @importFrom lpSolveAPI make.lp
-#' @importFrom lpSolveAPI set.bounds
-#' @importFrom lpSolveAPI set.rhs
-#' @importFrom lpSolveAPI set.constr.type
-#' @importFrom lpSolveAPI lp.control
-#' @importFrom lpSolveAPI set.column
+#' @importFrom ROI OP
+#' @importFrom ROI L_constraint
+#' @importFrom ROI V_bound
+#' @importFrom ROI L_objective
 #'
 
 
@@ -26,31 +25,30 @@ defineLPMod <-
            b,
            C = NULL,
            v = NULL,
-           presolve = c("rows", "lindep", "cols","rowdominate","coldominate","mergerows"),
-           lower = NULL) {
+           lower = NULL,
+           maximum=TRUE,
+           ob = NULL) {
     nbparam <- ncol(A)
     if (is.null(lower)) lower <- rep(0, ncol(A))
+    if (is.null(ob)) ob <- rep(1, ncol(A))
     if (is.null(C)) {
       C <- matrix(0, 0, nbparam)
       v <- numeric(0)
     }
-    if (is.null(rownames(A)) & nrow(A) > 0) {
-      rownames(A) <- paste("ineq", seq_len(nrow(A)))
+    dir <- c(rep("<=", nrow(A)),rep("==", nrow(C)))
+    rhs <- c(b,v)
+    lfs <- as.matrix(rbind(A,C))
+    if (all(lower == 0)){
+      return (OP(constraints = L_constraint(lfs,dir,rhs),
+                 maximum = maximum,
+                 objective = L_objective(ob)))
+    } else {
+      return (OP(V_bound(li = which(lower != 0),
+                         ld = lower[lower != 0]),
+                 constraints = L_constraint(lfs,dir,rhs),
+                 maximum = maximum,
+                 objective = L_objective(ob)))
+
     }
-    if (is.null(rownames(C)) & nrow(C) > 0) {
-      rownames(C) <- paste("eq", seq_len(nrow(C)))
-    }
-    if (is.null(colnames(A))) {
-      colnames(A) <- paste("param", seq_len(ncol(A)))
-    }
-    lp_model <- make.lp(nrow(A) + nrow(C), nbparam)
-    set.bounds(lp_model, lower = lower)
-    lp.control(lp_model, "presolve" = presolve, "verbose" = "neutral")
-    for (p in 1:nbparam) {
-      set.column(lp_model, p, c(A[, p], C[, p]))
-    }
-    set.rhs(lp_model, c(b, v))
-    set.constr.type(lp_model, c(rep("<=", nrow(A)), rep("=", nrow(C))))
-    dimnames(lp_model) <- list(c(rownames(A), rownames(C)), colnames(A))
-    lp_model
+
   }

@@ -5,8 +5,8 @@
 \title{defineLPMod
 Specify an lp_model (mainly for internal use)}
 \usage{
-defineLPMod(A, b, C = NULL, v = NULL, presolve = c("rows", "lindep",
-  "cols", "rowdominate", "coldominate", "mergerows"), lower = NULL)
+defineLPMod(A, b, C = NULL, v = NULL, lower = NULL, maximum = TRUE,
+  ob = NULL)
 }
 \arguments{
 \item{A}{a matrix of inequality constraints A x <=b}
@@ -19,12 +19,14 @@ absence of such constraints}
 \item{v}{a vector of equality constraints C x = v, should be null in the
 absence of such constraints}
 
-\item{presolve}{argument send to \code{\link[lpSolveAPI]{lp.control}}}
-
 \item{lower}{minimal bounds for paramaters, by default set to zero}
+
+\item{maximum}{tells whether the objective function is maximised or not}
+
+\item{ob}{the coefficient of the ojective function (default all 1)}
 }
 \value{
-a vector corresponding to the centroid of the polytope
+returns an OP object
 }
 \description{
 defineLPMod
