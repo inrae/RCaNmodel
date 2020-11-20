@@ -44,7 +44,11 @@ chebycenter <- function(A, b) {
                         b,
                         maximum = FALSE,
                         ob = f)
-  res <- ROI_solve(lp_mod, solver="lpsolve")
+  res <- ROI_solve(lp_mod, solver="lpsolve",
+                   control = list(presolve <- c("rows",
+                                                "lindep",
+                                                "rowdominate",
+                                                "mergerows")))
   x <- res$solution
 
   return(x[-p - 1])
