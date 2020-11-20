@@ -36,9 +36,9 @@ findingIncompatibleConstr <- function(A, b, C=NULL, v=NULL) {
     C <- matrix(0, 0, nbparam)
     v <- numeric(0)
   }
-  Aslacked <- A
+  Aslacked <- as.matrix(A)
   bslacked <- b
-  Cslacked <- C
+  Cslacked <- as.matrix(C)
   vslacked <- v
   nbeq <- nrow(C)
   if (is.null(rownames(A))) {
@@ -47,6 +47,8 @@ findingIncompatibleConstr <- function(A, b, C=NULL, v=NULL) {
   if (is.null(rownames(C)) & nrow(C) > 0) {
     rownames(C) <- paste("equality", seq_len(nrow(C)))
   }
+  if (is.null(colnames(A)))
+    colnames(A) <- paste("p", seq_len(nbparam), sep = "")
   param_name <- colnames(A)
   ####add slack variable for inequality constraint
   for (s in seq_len(nrow(A))) {
@@ -76,9 +78,9 @@ findingIncompatibleConstr <- function(A, b, C=NULL, v=NULL) {
     param_name[which(solutions > 0 & (seq_len(length(solutions))) > (nbparam))]
   if (length(problematic) > 0) {
     results <- lapply(seq_len(length(problematic)), function(p) {
-      Aslacked <- A
+      Aslacked <- as.matrix(A)
       bslacked <- b
-      Cslacked <- C
+      Cslacked <- as.matrix(C)
       vslacked <- v
       param_name <- colnames(A)
       for (s in seq_len(nrow(A))) {
@@ -96,7 +98,7 @@ findingIncompatibleConstr <- function(A, b, C=NULL, v=NULL) {
             paste("slackbis", rownames(C)[s]) != problematic[p]) {
           slack <- rep(0, nbeq)
           slack[s] <- -1
-          Cslacked <- cbind(C, slack, -slack)
+            Cslacked <- cbind(Cslacked, slack, -slack)
           Aslacked <- cbind(Aslacked, rep(0, nbineq), rep(0, nbineq))
           param_name <- c(param_name,
                           paste("slack", rownames(C)[s]),
@@ -105,10 +107,11 @@ findingIncompatibleConstr <- function(A, b, C=NULL, v=NULL) {
       }
       lp_model <- defineLPMod(Aslacked, bslacked, Cslacked, vslacked,
                               ob= c(rep(1, nbparam),
-                                    ncol(Aslacked) - nbparam),
+                                    rep(1000,
+                                        ncol(Aslacked) - nbparam)),
                               maximum = FALSE)
       res <- ROI_solve(lp_model, solver = "lpsolve")
-      solutions <- res$solution
+        solutions <- res$solution
       c(gsub("^\\s*\\w*", "", problematic[p]),
         gsub("^\\s*\\w*", "",
              param_name[which(solutions > 0 &

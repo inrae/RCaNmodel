@@ -16,7 +16,6 @@
 #' @importFrom lpSolveAPI set.rhs
 #' @importFrom lpSolveAPI set.constr.type
 #' @importFrom lpSolveAPI lp.control
-#' @importFrom lpSolveAPI set.objfn
 #' @importFrom lpSolveAPI solve.lpExtPtr
 #' @importFrom lpSolveAPI set.column
 #' @importFrom lpSolveAPI get.column
@@ -31,11 +30,11 @@ presolveLPMod <-
            C = NULL,
            v = NULL,
            lower = NULL) {
-    presolve = c("rows", "lindep", "cols","rowdominate","coldominate","mergerows")
     nbparam <- ncol(A)
     presolve <- c("rows",
                   "lindep",
-                  "rowdominate")
+                  "rowdominate",
+                  "mergerows")
     if (is.null(lower)) lower <- rep(0, ncol(A))
     if (is.null(C)) {
       C <- matrix(0, 0, nbparam)
@@ -52,7 +51,6 @@ presolveLPMod <-
     }
     lp_model <- make.lp(nrow(A) + nrow(C), nbparam)
     set.bounds(lp_model, lower = lower)
-    lp.control(lp_model, "presolve" = presolve, "verbose" = "neutral")
     for (p in 1:nbparam) {
       set.column(lp_model, p, c(A[, p], C[, p]))
     }
@@ -60,24 +58,24 @@ presolveLPMod <-
     set.constr.type(lp_model, c(rep("<=", nrow(A)), rep("=", nrow(C))))
     dimnames(lp_model) <- list(c(rownames(A), rownames(C)), colnames(A))
 
-    set.objfn(lp_model, runif(nbparam))
-    lp.control(lp_model, sense = "max")
+    lp.control(lp_model, sense = "max", presolve = presolve)
     res <- solve.lpExtPtr(lp_model)
 
 
     dir <- get.constr.type(lp_model)
     rhs <- get.rhs(lp_model)
-    lhs <- matrix(0,length(rhs),dim(lp_model)[2])
+    lhs <- matrix(0,length(rhs), dim(lp_model)[2])
     for (i in seq_len(dim(lp_model)[2]))
-      lhs[get.column(lp_model,i)$nzrow,i] <- get.column(lp_model,i)$column
+      lhs[get.column(lp_model,i)$nzrow, i] <- get.column(lp_model,i)$column
     bounds <- get.bounds(lp_model)
-    bounds <- list(lower = list(ind = which(bounds$lower != 0),
-                                val = bounds$lower[bounds$lower!= 0]),
-                   upper = list(ind = which(bounds$upper !=  0),
-                                val = bounds$upper[bounds$upper != 0]))
+    lower <- bounds$lower
+    if (all(lower == 0)) lower <- NULL
+    upper <- bounds$upper
+    if (all(is.infinite(upper))) upper <- NULL
     return (list(lhs = lhs,
                  dir = dir,
                  rhs = rhs,
-                 bounds = bounds))
+                 lower = lower,
+                 upper = upper))
   }
 
