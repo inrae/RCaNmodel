@@ -75,7 +75,11 @@ fitmyCaNmod <- function(myCaNmod,
       lp_model <- defineLPMod(myCaNmod$A, myCaNmod$b, myCaNmod$C, myCaNmod$v,
                               maximum = FALSE,
                               ob = runif(ncol(myCaNmod$A)))
-      res <- ROI_solve(lp_model, solver = "lpsolve")
+      res <- ROI_solve(lp_model, solver = "lpsolve",
+                       control = list(presolve <- c("rows",
+                                                    "lindep",
+                                                    "rowdominate",
+                                                    "mergerows")))
       x0 <- res$solution
 
       if (res$status$code == 0)

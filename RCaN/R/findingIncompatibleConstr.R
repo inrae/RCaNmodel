@@ -72,7 +72,11 @@ findingIncompatibleConstr <- function(A, b, C=NULL, v=NULL) {
   lp_model <- defineLPMod(Aslacked, bslacked, Cslacked, vslacked,
                          ob = c(rep(1, nbparam), rep(1000, nbineq + 2 * nbeq)),
                          maximum = FALSE)
-  res <- ROI_solve(lp_model, solver = "lpsolve")
+  res <- ROI_solve(lp_model, solver = "lpsolve",
+                   control = list(presolve <- c("rows",
+                                                "lindep",
+                                                "rowdominate",
+                                                "mergerows")))
   solutions <- res$solution
   problematic <-
     param_name[which(solutions > 0 & (seq_len(length(solutions))) > (nbparam))]
@@ -110,7 +114,11 @@ findingIncompatibleConstr <- function(A, b, C=NULL, v=NULL) {
                                     rep(1000,
                                         ncol(Aslacked) - nbparam)),
                               maximum = FALSE)
-      res <- ROI_solve(lp_model, solver = "lpsolve")
+      res <- ROI_solve(lp_model, solver = "lpsolve",
+                       control = list(presolve <- c("rows",
+                                                    "lindep",
+                                                    "rowdominate",
+                                                    "mergerows")))
         solutions <- res$solution
       c(gsub("^\\s*\\w*", "", problematic[p]),
         gsub("^\\s*\\w*", "",
