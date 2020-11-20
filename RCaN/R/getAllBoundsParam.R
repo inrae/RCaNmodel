@@ -27,10 +27,27 @@ getAllBoundsParam <- function(A, b, C = NULL, v = NULL) {
   if (is.null(colnames(A))) {
     colnames(A) <- paste("col", seq_len(ncol(A)), sep = "")
   }
+  presolved <- presolveLPMod(A, b, C, v)
+  if (nrow(presolved$lhs) > 0){
+    A2 <- presolved$lhs[presolved$dir == "<=", ]
+    b2 <- presolved$rhs[presolved$dir == "<="]
+    C2 <- presolved$lhs[presolved$dir == "=", ]
+    v2 <- presolved$rhs[presolved$dir == "="]
+    lower <- presolved$lower
+    upper <- presolved$upper
+  } else{
+    A2 <- A
+    b2 <- b
+    C2 <- C
+    v2 <- v
+    lower <- rep(0, ncol(A))
+    upper <- rep(Inf, ncol(A))
+  }
+
   pb <- txtProgressBar(min = 0, max = nbparam, style = 3)
   bounds <- sapply(1:nbparam, function(p) {
     setTxtProgressBar(pb, p)
-    getBoundParam(A, b, p, C, v)
+    getBoundParam(A2, b2, p, C2, v2, lower, upper, presolve = FALSE)
   })
   data.frame(
     param = colnames(A),

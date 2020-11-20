@@ -5,8 +5,8 @@
 \title{defineLPMod
 Specify an lp_model (mainly for internal use)}
 \usage{
-defineLPMod(A, b, C = NULL, v = NULL, lower = NULL, maximum = TRUE,
-  ob = NULL)
+defineLPMod(A, b, C = NULL, v = NULL, lower = NULL, upper = NULL,
+  maximum = TRUE, ob = NULL)
 }
 \arguments{
 \item{A}{a matrix of inequality constraints A x <=b}
@@ -20,6 +20,8 @@ absence of such constraints}
 absence of such constraints}
 
 \item{lower}{minimal bounds for paramaters, by default set to zero}
+
+\item{upper}{maximum bounds for paramaters, by default set to Inf}
 
 \item{maximum}{tells whether the objective function is maximised or not}
 

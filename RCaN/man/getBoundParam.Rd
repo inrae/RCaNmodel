@@ -6,7 +6,8 @@
 Computes the possible bounds for a parameter p of a polytope defined
 by+A.x<=b and C.x=v}
 \usage{
-getBoundParam(A, b, p, C = NULL, v = NULL)
+getBoundParam(A, b, p, C = NULL, v = NULL, lower = NULL,
+  upper = NULL, presolve = TRUE)
 }
 \arguments{
 \item{A}{the matrix of inequality A.x<=b}
@@ -18,6 +19,12 @@ getBoundParam(A, b, p, C = NULL, v = NULL)
 \item{C}{the matrix of equality C.x=v (default NULL for no equality)}
 
 \item{v}{the vector of equality C.x=v (default NULL for no equality}
+
+\item{lower}{lower bounds (default NULL for bounds 0)}
+
+\item{upper}{upper bounds (default NULL for bounds Inf)}
+
+\item{presolve}{should presolve should be done}
 }
 \value{
 a vector with lower bounds and upper bounds

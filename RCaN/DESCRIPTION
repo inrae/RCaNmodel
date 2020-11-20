@@ -29,7 +29,9 @@ Imports:
     stringr,
     dqrng,
     writexl,
-    ROI.plugin.lpsolve
+    ROI.plugin.lpsolve,
+    ROI.plugin.glpk,
+    lpSolveAPI
 LinkingTo: Rcpp, RcppEigen, dqrng
 Suggests: 
     knitr,
