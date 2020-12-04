@@ -15,7 +15,7 @@
 #' myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx",
 #'  package = "RCaN"))
 #' res <- fitmyCaNmod(myCaNmod, 100)
-#' #with one series
+  #' #with one series
 #' ggResult(res,"F01", TRUE)
 #'
 #' #with 2 series
@@ -49,7 +49,10 @@ ggResult <- function(myFitCaNmod,
         quantile,
         probs = c(0, .025, 0.25, .50, .75, .975, 1)
       )),
-      year = myFitCaNmod$CaNmod$series$Year,
+      year = myFitCaNmod$CaNmod$series$Year[
+        paste(p, "[", myFitCaNmod$CaNmod$series$Year, "]", sep = "") %in%
+          colnames(mat_res)[columns]
+      ],
       series = as.character(p))
   }))
   names(quantiles)[1:7] <- c("q0", "q2.5", "q25", "q50", "q75", "q97.5", "q100")
@@ -85,7 +88,10 @@ ggResult <- function(myFitCaNmod,
         data.frame(t(apply(
           mat_res[selectedsamples, columns], 2, identity
         )),
-        year = myFitCaNmod$CaNmod$series$Year,
+        year = myFitCaNmod$CaNmod$series$Year[
+          paste(p, "[", myFitCaNmod$CaNmod$series$Year, "]", sep = "") %in%
+            colnames(mat_res)[columns]
+          ],
         series = as.character(p))
     }))
     names(fewseries)[1:3] <- c("S1", "S2", "S3")

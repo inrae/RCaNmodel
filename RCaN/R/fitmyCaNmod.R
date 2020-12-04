@@ -8,6 +8,7 @@
 #' @param ncore number of cores to use
 #' @param thin thinning interval
 #' @param method one of gibbs (default) or hitandrun
+#' @param lastF should flow for last year be simulated (default = FALSE)
 #' @return a fitCaNmod object which contains two elements
 #' \itemize{
 #'  \item{"CaNmod"}{the CaNmod object descring the model}
@@ -41,7 +42,8 @@ fitmyCaNmod <- function(myCaNmod,
                         nchain = 1,
                         ncore = 1,
                         thin = 1,
-                        method="gibbs") {
+                        method="gibbs",
+                        lastF = FALSE) {
   if (! method %in% c("gibbs","hitandrun"))
     stop("method should be either gibbs or hitandrun")
   ncore <- min(min(detectCores() - 1, ncore), nchain)
@@ -106,7 +108,17 @@ fitmyCaNmod <- function(myCaNmod,
     res$F <- res$F[, -seq_len(length(myCaNmod$species))]
     #we remove the first column which corresponds to initial biomasses
     colnames(res$F) <- colnames(myCaNmod$A)[-seq_len(length(myCaNmod$species))]
-    colnames(res$B) <- rownames(myCaNmod$L)
+
+    if (!lastF) {#we removed last time step
+        lastid <- which(colnames(res$F) %in% paste(myCaNmod$fluxes_def$Flux,
+                                                   "[",
+                                                   max(myCaNmod$series$Year),
+                                                   "]",
+                                                   sep = ""))
+        if (length(lastid) > 0)
+          res$F <- res$F[, - lastid]
+    }
+      colnames(res$B) <- rownames(myCaNmod$L)
     mcmc(cbind(res$F, res$B), 1, nrow(res$F), 1)
   }
 
