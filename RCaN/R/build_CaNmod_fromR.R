@@ -275,20 +275,6 @@ build_CaNmod_fromR <- function(components_param,
                     components_param$Inertia[
                       components_param$Component == sp],
                     ")",
-                    ifelse(length(emigrants) >
-                             0, paste(
-                               "-",
-                               paste(
-                                 emigrants,
-                                 collapse = "-",
-                                 "[1:(length(",
-                                 sp,
-                                 ")-1)]",
-                                 sep = ""
-                               ),
-                               sep = ""
-                             ), ""),
-                    #we do not take into account emigrants
                     sep = ""
                   ),
                   symbolic_enviro,
@@ -305,6 +291,8 @@ build_CaNmod_fromR <- function(components_param,
                       components_param$Component %in% species &
                         !is.na(components_param$Inertia)],
                     function(sp) {
+                      mu <- components_param$Inertia[
+                        components_param$Component == sp]
                       #decrease
                       immigrants <-
                         as.character(fluxes_def$Flux)[
@@ -317,13 +305,12 @@ build_CaNmod_fromR <- function(components_param,
                           sp,
                           "[1:(length(",
                           sp,
-                          ")-1)]*exp(",
-                          components_param$Inertia[
-                            components_param$Component == sp],
+                          ")-1)]*exp(", mu
+                          ,
                           ")",
                           ifelse(length(immigrants) >
                                    0, paste(
-                                     "+",
+                                     "+", (1-exp(-mu))/mu, "* (",
                                      paste(
                                        immigrants,
                                        collapse = "+",
@@ -331,7 +318,7 @@ build_CaNmod_fromR <- function(components_param,
                                        sp,
                                        ")-1)]",
                                        sep = ""
-                                     ),
+                                     ), ")",
                                      sep = ""
                                    ), ""),
                           #we do not take into account
