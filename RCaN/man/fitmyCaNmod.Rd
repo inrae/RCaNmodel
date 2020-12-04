@@ -5,7 +5,7 @@
 \title{fitmyCaNmod}
 \usage{
 fitmyCaNmod(myCaNmod, N, nchain = 1, ncore = 1, thin = 1,
-  method = "gibbs")
+  method = "gibbs", lastF = FALSE)
 }
 \arguments{
 \item{myCaNmod}{a CaNmod object with following elements}
@@ -19,6 +19,8 @@ fitmyCaNmod(myCaNmod, N, nchain = 1, ncore = 1, thin = 1,
 \item{thin}{thinning interval}
 
 \item{method}{one of gibbs (default) or hitandrun}
+
+\item{lastF}{should flow for last year be simulated (default = FALSE)}
 }
 \value{
 a fitCaNmod object which contains two elements
