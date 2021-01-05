@@ -51,6 +51,8 @@ ggViolin <- function(myFitCaNmod,
                  names_to = c("Var","Year"),
                  names_pattern = "(.*)\\[(.*)\\]",
                  values_to = "val")
+  mat_res$Var <- factor(mat_res$Var,
+                        levels = param)
   if (nrow(mat_res) < 1)
     stop("no data found")
   g <- ggplot(mat_res, aes(x = Var, y = val)) +
