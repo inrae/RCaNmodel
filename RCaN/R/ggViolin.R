@@ -8,7 +8,7 @@
 #' @param year the year
 #' @param logscale flag to indicate to use a log scale (default TRUE)
 #' @param xlab default Component Flux
-#' @param ylab default Biomass
+#' @param ylab default Distribution
 #' @return a ggplot
 #' @details distribution of fluxes or biomass for a specific year
 #'
@@ -34,7 +34,7 @@ ggViolin <- function(myFitCaNmod,
                      year,
                      logscale=TRUE,
                      xlab = "Component/Flux",
-                     ylab = "Biomass") {
+                     ylab = "Distribution") {
   if (length(year) != 1)
     stop("a single year should be provided")
   if (class(myFitCaNmod) != "fitCaNmod")

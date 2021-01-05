@@ -5,7 +5,7 @@
 \title{ggViolin}
 \usage{
 ggViolin(myFitCaNmod, param, year, logscale = TRUE,
-  xlab = "Component/Flux", ylab = "Biomass")
+  xlab = "Component/Flux", ylab = "Distribution")
 }
 \arguments{
 \item{myFitCaNmod}{result sent by \link{fitmyCaNmod}}
@@ -19,7 +19,7 @@ a biomass)}
 
 \item{xlab}{default Component Flux}
 
-\item{ylab}{default Biomass}
+\item{ylab}{default Distribution}
 }
 \value{
 a ggplot
