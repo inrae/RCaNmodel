@@ -55,6 +55,8 @@ ggResult <- function(myFitCaNmod,
       ],
       series = as.character(p))
   }))
+  quantiles$series <- factor(as.character(quantiles$series),
+                                levels = param)
   names(quantiles)[1:7] <- c("q0", "q2.5", "q25", "q50", "q75", "q97.5", "q100")
   g <- ggplot() +
     geom_ribbon(data = quantiles,
