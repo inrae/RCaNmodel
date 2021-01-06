@@ -60,7 +60,7 @@ ggGrowth <- function(myFitCaNmod,
                      "Sample_id" = "Sample_id",
                      "Var" = "Var"),
               suffix = c("_curr", "_next")) %>%
-    mutate("growth" = b_next/b_curr) %>%
+    mutate("growth" = !!sym("b_next")/!!sym("b_curr")) %>%
     rename("species" = !!sym("Var"))
   Inertia <- myFitCaNmod$CaNmod$components_param %>%
     filter(!!sym("Component") %in% species) %>%
