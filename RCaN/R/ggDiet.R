@@ -21,7 +21,6 @@
 #' @importFrom ggplot2 geom_violin
 #' @importFrom ggplot2 geom_bar
 #' @importFrom ggplot2 aes_string
-#' @importFrom ggplot2 aes
 #' @importFrom ggplot2 ylab
 #' @importFrom ggplot2 xlab
 #' @importFrom dplyr left_join
