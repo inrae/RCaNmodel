@@ -33,6 +33,7 @@
 #' @importFrom rlang !! sym
 #' @importFrom tidyr pivot_longer
 #' @importFrom ggplot2 facet_wrap
+#' @importFrom ggplot2 theme
 #' @export
 #'
 ggGrowth <- function(myFitCaNmod,
@@ -80,11 +81,12 @@ ggGrowth <- function(myFitCaNmod,
     facet_wrap(~ species, ncol = ceiling(length(species)^0.5),
                scales = "free") +
     scale_x_continuous(trans = 'log10') +
-    scale_y_continuous(trans = 'log10') +
-    theme(legend.position = "none") +
+    scale_y_continuous(trans = 'log10')  +
     ggtitle('Growth (B(t+1)/B(t)) vs. Biomass')+
     xlab("biomass") +
-    ylab("growth")
+    ylab("growth") +
+    theme_bw() +
+    theme(legend.position = "none")
   return(g)
 }
 
