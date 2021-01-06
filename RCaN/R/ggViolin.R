@@ -1,7 +1,8 @@
 
 #' ggViolin
 #'
-#' provide a violin plot for specific years
+#' provide a violin plot of the distribution of flow of biomass
+#' for specific years
 #' @param myFitCaNmod result sent by \link{fitmyCaNmod}
 #' @param param the name (or a vector of name) of a parameter (either a flow or
 #' a biomass)
@@ -22,11 +23,15 @@
 #'
 #' @importFrom ggplot2 ggplot
 #' @importFrom ggplot2 geom_violin
-#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 scale_y_continuous
+#' @importFrom ggplot2 theme_bw
+#' @importFrom ggplot2 aes_string
 #' @importFrom ggplot2 ggtitle
 #' @importFrom ggplot2 ylab
+#' @importFrom ggplot2 theme_bw
+#' @importFrom magrittr %>%
+#' @importFrom tidyselect everything
 #' @importFrom tidyr pivot_longer
-
 #' @export
 #'
 ggViolin <- function(myFitCaNmod,
@@ -55,8 +60,8 @@ ggViolin <- function(myFitCaNmod,
                         levels = param)
   if (nrow(mat_res) < 1)
     stop("no data found")
-  g <- ggplot(mat_res, aes(x = Var, y = val)) +
-    geom_violin(trim=TRUE,scale="width",aes(fill = Var))+
+  g <- ggplot(mat_res, aes_string(x = "Var", y = "val")) +
+    geom_violin(trim=TRUE,scale="width",aes_string(fill = "Var"))+
     theme_bw()
   if (logscale)
     g <- g + scale_y_continuous(trans='log10')

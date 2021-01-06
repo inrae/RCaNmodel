@@ -31,7 +31,10 @@ Imports:
     writexl,
     ROI.plugin.lpsolve,
     ROI.plugin.glpk,
-    lpSolveAPI
+    lpSolveAPI,
+    magrittr,
+    rlang,
+    tidyselect
 LinkingTo: Rcpp, RcppEigen, dqrng
 Suggests: 
     knitr,

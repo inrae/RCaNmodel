@@ -17,7 +17,8 @@ ggDiet(myFitCaNmod, species, barplot = TRUE)
 a ggplot
 }
 \description{
-provide ggplot of diet
+provide a ggplot of diet, barplot provides an average diet while violin plot
+provides a distribution over iterations and years
 }
 \details{
 distribution of fluxes or biomass for a specific year
