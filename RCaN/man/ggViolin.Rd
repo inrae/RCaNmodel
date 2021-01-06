@@ -25,7 +25,8 @@ a biomass)}
 a ggplot
 }
 \description{
-provide a violin plot for specific years
+provide a violin plot of the distribution of flow of biomass
+for specific years
 }
 \details{
 distribution of fluxes or biomass for a specific year
