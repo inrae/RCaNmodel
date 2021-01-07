@@ -34,7 +34,8 @@ Imports:
     lpSolveAPI,
     magrittr,
     rlang,
-    tidyselect
+    tidyselect,
+    GGally
 LinkingTo: Rcpp, RcppEigen, dqrng
 Suggests: 
     knitr,
