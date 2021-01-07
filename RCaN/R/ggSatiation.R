@@ -1,7 +1,6 @@
-#' ggGrowth
+#' ggSatiation
 #'
-#' plots biomass growth as a function of biomass
-#' provides a distribution over iterations and years
+#' plots incoming trophic fluxes versus biomass
 #' @param myFitCaNmod result sent by \link{fitmyCaNmod}
 #' @param species the name (or a vector of name) of the species of interest
 #' by default, all species
@@ -14,7 +13,7 @@
 #' res <- fitmyCaNmod(myCaNmod, 100)
 #' #with one series#'
 #' #with 2 series
-#' ggGrowth(res)
+#' ggSatiation(res)
 #'
 #' @importFrom ggplot2 ggplot
 #' @importFrom ggplot2 geom_bar
@@ -36,13 +35,13 @@
 #' @importFrom ggplot2 theme
 #' @export
 #'
-ggGrowth <- function(myFitCaNmod,
+ggSatiation <- function(myFitCaNmod,
                      species = NULL) {
   if (is.null(species))
     species <- myFitCaNmod$CaNmod$species
   if (!all(species %in% myFitCaNmod$CaNmod$species))
     stop("some species are not recognized")
-
+  species <- factor(species, levels = species)
   myCaNmodFit_long <- as.data.frame(as.matrix(myFitCaNmod$mcmc)) %>%
     mutate("Sample_id" = 1:nrow(as.matrix(myFitCaNmod$mcmc))) %>%
     pivot_longer(col = -!!sym("Sample_id"),
@@ -53,42 +52,52 @@ ggGrowth <- function(myFitCaNmod,
     filter(!!sym("Var") %in% species) %>%
     rename("b" = "value") %>%
     mutate("Year" = as.numeric(!!sym("Year"))) %>%
-    mutate("next_year" = !!sym("Year") + 1)
-  biomass <- biomass %>%
-    left_join(select(biomass, -!!sym("next_year")),
-              by = c("next_year" = "Year",
-                     "Sample_id" = "Sample_id",
-                     "Var" = "Var"),
-              suffix = c("_curr", "_next")) %>%
-    mutate("growth" = !!sym("b_next")/!!sym("b_curr")) %>%
-    rename("species" = !!sym("Var"))
-  Inertia <- myFitCaNmod$CaNmod$components_param %>%
-    filter(!!sym("Component") %in% species) %>%
-    mutate(inertia_low = exp(-!!sym("Inertia")),
-           inertia_high = exp(!!sym("Inertia"))) %>%
-    mutate("species" = factor(!!sym("Component"),
-                            levels = species))
+    rename("predator" = "Var")
+  trophic_flows <- fluxes_def$Flux[
+    myFitCaNmod$CaNmod$fluxes_def$Trophic == 1]
+  fluxes <- myCaNmodFit_long %>%
+    filter(!!sym("Var") %in% trophic_flows) %>%
+    rename("Flux" = "Var") %>%
+    mutate("Year" = as.numeric(!!sym("Year"))) %>%
+    left_join(myFitCaNmod$CaNmod$fluxes_def) %>%
+    rename("predator" = !!sym("To"),
+           "prey" = !!sym("From")) %>%
+    group_by(!!sym("Sample_id"),
+             !!sym("Year"),
+             !!sym("predator")) %>%
+    summarize("consumption" = sum(!!sym("value"))) %>%
+    left_join(biomass)
 
-  biomass$species <- factor(biomass$species,
+  fluxes$predator <- factor(fluxes$predator,
                             levels = species)
-  g <- ggplot(na.omit(biomass),
-              aes_string(x = "b_curr", y = "growth", col = "species")) +
+
+
+  Satiation <- myFitCaNmod$CaNmod$components_param %>%
+    filter(!!sym("Component") %in% species) %>%
+    mutate("predator" = factor(!!sym("Component"),
+                               levels=species),
+           "intercept" = 0 ) %>%
+    select(!!sym("predator"),
+           !!sym("Satiation"),
+           !!sym("intercept"))
+
+  g <- ggplot(fluxes,
+              aes_string(x = "b", y = "consumption")) +
     geom_point(size=.1, alpha = 0.5) +
-    stat_smooth(method = "gam", colour = "chocolate4") +
-    geom_hline(yintercept = 1, colour = 'black', linetype = "dashed") +
-    geom_hline(data = Inertia, aes_string(yintercept = "inertia_low"),
-               colour = "firebrick3", linetype = "dashed") +
-    geom_hline(data = Inertia, aes_string(yintercept = "inertia_high"),
-               colour = "firebrick3", linetype = "dashed") +
-    facet_wrap(~ species, ncol = ceiling(length(species)^0.5),
+    geom_hline(yintercept = 0, colour = "firebrick3", linetype = "dashed") +
+    geom_abline(data = Satiation,
+                aes_string(slope = "Satiation",
+                           intercept = "intercept"),
+                colour = "firebrick3",
+                linetype = "dashed") +
+    facet_wrap(~predator,
+               ncol = ceiling(length(species)^0.5),
                scales = "free") +
-    scale_x_continuous(trans = 'log10') +
-    scale_y_continuous(trans = 'log10')  +
-    ggtitle('Growth (B(t+1)/B(t)) vs. Biomass')+
-    xlab("biomass") +
-    ylab("growth") +
-    theme_bw() +
-    theme(legend.position = "none")
+    xlab('Predator biomass') +
+    ylab('Total flux to predator') +
+    theme(legend.position = "none") +
+    theme_bw()+
+    ggtitle('Satiation')
   return(g)
 }
 
