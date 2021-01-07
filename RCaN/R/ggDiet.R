@@ -18,6 +18,7 @@
 #' ggDiet(res,"OmniZooplankton")
 #'
 #' @importFrom ggplot2 ggplot
+#' @importFrom dplyr sample_n
 #' @importFrom ggplot2 geom_violin
 #' @importFrom ggplot2 geom_bar
 #' @importFrom ggplot2 aes_string
@@ -54,6 +55,7 @@ ggDiet <- function(myFitCaNmod,
                      drop = FALSE]
   mat_res <- as.data.frame(mat_res) %>%
     mutate(iter =  1:nrow(mat_res)) %>%
+    sample_n(min(1000, nrow(mat_res)), replace = FALSE) %>%
     pivot_longer(cols = - !!sym("iter"),
                  names_to = c("Var","Year"),
                  names_pattern = "(.*)\\[(.*)\\]",

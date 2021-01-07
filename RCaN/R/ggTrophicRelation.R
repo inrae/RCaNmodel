@@ -16,7 +16,8 @@
 #' ggTrophicRelation(res)
 #'
 #' @importFrom ggplot2 ggplot
-#' @importFrom ggplot2 geom_bar
+#' @importFrom dplyr sample_n
+#' @importFrom ggplot2 geom_point
 #' @importFrom ggplot2 aes_string
 #' @importFrom ggplot2 scale_y_continuous scale_x_continuous
 #' @importFrom ggplot2 stat_smooth
@@ -44,7 +45,8 @@ ggTrophicRelation <- function(myFitCaNmod,
   species <- factor(species, levels = species)
   myCaNmodFit_long <- as.data.frame(as.matrix(myFitCaNmod$mcmc)) %>%
     mutate("Sample_id" = 1:nrow(as.matrix(myFitCaNmod$mcmc))) %>%
-    pivot_longer(col = -!!sym("Sample_id"),
+    sample_n(min(1000, nrow(as.matrix(myFitCaNmod$mcmc))), replace = FALSE) %>%
+    pivot_longer(cols = -!!sym("Sample_id"),
                  names_to = c("Var","Year"),
                  names_pattern = "(.*)\\[(.*)\\]",
                  values_to = 'value')
