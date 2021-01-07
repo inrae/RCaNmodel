@@ -1,6 +1,6 @@
-#' ggSatiation
+#' ggTrophicRelation
 #'
-#' plots incoming trophic fluxes versus biomass
+#' plots fluxes from prey to predators
 #' @param myFitCaNmod result sent by \link{fitmyCaNmod}
 #' @param species the name (or a vector of name) of the species of interest
 #' by default, all species
@@ -13,7 +13,7 @@
 #' res <- fitmyCaNmod(myCaNmod, 100)
 #' #with one series#'
 #' #with 2 series
-#' ggSatiation(res)
+#' ggTrophicRelation(res)
 #'
 #' @importFrom ggplot2 ggplot
 #' @importFrom ggplot2 geom_bar
@@ -31,11 +31,11 @@
 #' @importFrom magrittr %>%
 #' @importFrom rlang !! sym
 #' @importFrom tidyr pivot_longer
-#' @importFrom ggplot2 facet_wrap
+#' @importFrom ggplot2 facet_grid
 #' @importFrom ggplot2 theme
 #' @export
 #'
-ggSatiation <- function(myFitCaNmod,
+ggTrophicRelation <- function(myFitCaNmod,
                      species = NULL) {
   if (is.null(species))
     species <- myFitCaNmod$CaNmod$species
@@ -52,7 +52,7 @@ ggSatiation <- function(myFitCaNmod,
     filter(!!sym("Var") %in% species) %>%
     rename("b" = "value") %>%
     mutate("Year" = as.numeric(!!sym("Year"))) %>%
-    rename("predator" = "Var")
+    rename("prey" = "Var")
   trophic_flows <- myFitCaNmod$CaNmod$fluxes_def$Flux[
     myFitCaNmod$CaNmod$fluxes_def$Trophic == 1]
   fluxes <- myCaNmodFit_long %>%
@@ -62,42 +62,33 @@ ggSatiation <- function(myFitCaNmod,
     left_join(myFitCaNmod$CaNmod$fluxes_def) %>%
     rename("predator" = !!sym("To"),
            "prey" = !!sym("From")) %>%
+    filter(!!sym("prey") %in% species &
+             !!sym("predator") %in% species) %>%
     group_by(!!sym("Sample_id"),
              !!sym("Year"),
-             !!sym("predator")) %>%
-    summarize("consumption" = sum(!!sym("value"))) %>%
-    left_join(biomass)
+             !!sym("predator"),
+             !!sym("prey")) %>%
+    summarize("consumption" = sum(!!sym("value")))
+  biomass <- biomass %>%
+    left_join(fluxes)
 
-  fluxes$predator <- factor(fluxes$predator,
+  biomass$predator <- factor(biomass$predator,
                             levels = species)
+  biomass$prey <- factor(biomass$prey,
+                             levels = species)
 
 
-  Satiation <- myFitCaNmod$CaNmod$components_param %>%
-    filter(!!sym("Component") %in% species) %>%
-    mutate("predator" = factor(!!sym("Component"),
-                               levels=species),
-           "intercept" = 0 ) %>%
-    select(!!sym("predator"),
-           !!sym("Satiation"),
-           !!sym("intercept"))
 
-  g <- ggplot(fluxes,
+  g <- ggplot(na.omit(biomass),
               aes_string(x = "b", y = "consumption")) +
     geom_point(size=.1, alpha = 0.5) +
-    geom_hline(yintercept = 0, colour = "firebrick3", linetype = "dashed") +
-    geom_abline(data = Satiation,
-                aes_string(slope = "Satiation",
-                           intercept = "intercept"),
-                colour = "firebrick3",
-                linetype = "dashed") +
-    facet_wrap(~predator,
-               ncol = ceiling(length(species)^0.5),
+    stat_smooth(method = "gam", colour = "chocolate4") +
+    facet_grid(predator ~  prey,
                scales = "free") +
-    xlab('Predator biomass') +
-    ylab('Total flux to predator') +
+    xlab('Biomass prey') +
+    ylab('Flux to predator') +
     theme(legend.position = "none") +
-    theme_bw()+
-    ggtitle('Satiation')
+    theme_bw()
   return(g)
 }
 
