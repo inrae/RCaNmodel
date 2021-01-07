@@ -11,8 +11,6 @@
 #' myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx",
 #'  package = "RCaN"))
 #' res <- fitmyCaNmod(myCaNmod, 100)
-#' #with one series#'
-#' #with 2 series
 #' ggSatiation(res)
 #'
 #' @importFrom ggplot2 ggplot
