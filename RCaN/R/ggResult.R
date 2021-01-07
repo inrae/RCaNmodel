@@ -15,7 +15,7 @@
 #' myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx",
 #'  package = "RCaN"))
 #' res <- fitmyCaNmod(myCaNmod, 100)
-  #' #with one series
+#' #with one series
 #' ggResult(res,"F01", TRUE)
 #'
 #' #with 2 series
