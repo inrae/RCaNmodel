@@ -70,6 +70,7 @@ fitmyCaNmod <- function(myCaNmod,
     registerDoParallel(cl)
     `%myinfix%` <- `%dopar%`
   }
+  i <- NULL
   res <- foreach(i = 1:nchain) %myinfix% {
     find_init <- FALSE
     nbiter <- 0
