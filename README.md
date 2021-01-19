@@ -1,4 +1,5 @@
 # CaN
+<img src="RCaN/man/figures/logo.png" align="right" width="220" />
 
 ## RCaN installation
 ### Requirements
