@@ -8,6 +8,8 @@
 #' @param v a vector of equality constraints C x = v, should be null in the
 #' absence of such constraints
 #' @param lower minimal bounds for paramaters, by default set to zero
+#' @param fixed value of potentially fixed values (Null if no parameter are
+#' fixed)
 #'
 #' @return a vector corresponding to the centroid of the polytope
 #'
@@ -65,6 +67,8 @@ presolveLPMod <-
     dir <- get.constr.type(lp_model)
     rhs <- get.rhs(lp_model)
     lhs <- matrix(0,length(rhs), dim(lp_model)[2])
+    dimnames(lhs) <- dimnames(lp_model)
+    names(rhs) <- dimnames(lp_model)[[1]]
     for (i in seq_len(dim(lp_model)[2]))
       lhs[get.column(lp_model,i)$nzrow, i] <- get.column(lp_model,i)$column
     bounds <- get.bounds(lp_model)
@@ -72,10 +76,17 @@ presolveLPMod <-
     if (all(lower == 0)) lower <- NULL
     upper <- bounds$upper
     if (all(is.infinite(upper))) upper <- NULL
+    fixed <- NA
+    if (ncol(A2) < ncol(A)){
+      sol <- get.primal.solution(lp_model,orig=TRUE)[- (1:(nrow(A)+nrow(C)))]
+      fixed <- sol[! colnames(A) %in% colnames(A2)]
+      names(fixed) <- colnames(A)[! colnames(A) %in% colnames(A2)]
+    }
     return (list(lhs = lhs,
                  dir = dir,
                  rhs = rhs,
                  lower = lower,
-                 upper = upper))
+                 upper = upper,
+                 fixed = fixed))
   }
 
