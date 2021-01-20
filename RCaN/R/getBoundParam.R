@@ -36,38 +36,48 @@ getBoundParam <- function(A, b, p, C = NULL, v = NULL,
   if (presolve) {
     presolved <- presolveLPMod(A, b, C, v)
     if (nrow(presolved$lhs) > 0){
-      A <- presolved$lhs[presolved$dir == "<=", ]
-      b <- presolved$rhs[presolved$dir == "<="]
-      C <- presolved$lhs[presolved$dir == "=", ]
-      v <- presolved$rhs[presolved$dir == "="]
+      A2 <- presolved$lhs[presolved$dir == "<=", ]
+      b2 <- presolved$rhs[presolved$dir == "<="]
+      C2 <- presolved$lhs[presolved$dir == "=", ]
+      v2 <- presolved$rhs[presolved$dir == "="]
       lower <- presolved$lower
       upper <- presolved$upper
     }
   }
   solved <- c(FALSE,FALSE)
   ntry <- 0
-  while (!all(solved) & ntry < 3) {
-    ob <- rep(0, nbparam)
-    ob[p] <- 1
-    lp_model <- defineLPMod(A, b, C, v, lower, upper, maximum = TRUE, ob = ob)
-    res <- ROI_solve(lp_model, solver = "glpk")
 
-    if (res$status$code == 0) {
-      upbound <- res$solution[p]
-      solved[1] <- TRUE
-    } else  {
-      upbound <- NA
-    }
-    lp_model <- defineLPMod(A, b, C, v, lower, upper, maximum = FALSE, ob = ob)
-    res <- ROI_solve(lp_model, solver = "glpk")
 
-    if (res$status$code == 0) {
-      lowbound <- res$solution[p]
-      solved[2] <- TRUE
-    } else {
-      lowbound <- NA
+
+  if (colnames(A)[p] %in% colnames(A2)){
+    while (!all(solved) & ntry < 3) {
+      ob <- rep(0, nbparam)
+      ob[p] <- 1
+      lp_model <- defineLPMod(A2, b2, C2, v2, lower, upper,
+                              maximum = TRUE, ob = ob)
+      res <- ROI_solve(lp_model, solver = "glpk")
+
+      if (res$status$code == 0) {
+        upbound <- res$solution[p]
+        solved[1] <- TRUE
+      } else  {
+        upbound <- NA
+      }
+      lp_model <- defineLPMod(A2, b2, C2, v2, lower, upper,
+                              maximum = FALSE, ob = ob)
+      res <- ROI_solve(lp_model, solver = "glpk")
+
+      if (res$status$code == 0) {
+        lowbound <- res$solution[p]
+        solved[2] <- TRUE
+      } else {
+        lowbound <- NA
+      }
+      ntry <- ntry + 1
     }
-    ntry <- ntry + 1
+    res <- c(lowbound, upbound)
+  } else {
+    res <-rep(presolved$fixed[colnames(A)[p]],2)
   }
-  c(lowbound, upbound)
+  return (res)
 }
