@@ -96,6 +96,8 @@ ggResult <- function(myFitCaNmod,
           ],
         series = as.character(p))
     }))
+    fewseries$series <- factor(as.character(fewseries$series),
+                      levels = param)
     names(fewseries)[1:3] <- c("S1", "S2", "S3")
     g <- g + geom_path(data = fewseries,
                        aes_string(x = "year", y = "S1", col = "series"),
