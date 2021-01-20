@@ -47,7 +47,13 @@ getAllBoundsParam <- function(A, b, C = NULL, v = NULL) {
   pb <- txtProgressBar(min = 0, max = nbparam, style = 3)
   bounds <- sapply(1:nbparam, function(p) {
     setTxtProgressBar(pb, p)
-    getBoundParam(A2, b2, p, C2, v2, lower, upper, presolve = FALSE)
+    if (colnames(A)[p] %in% colnames(A2)){
+      p2 <- match(colnames(A)[p], colnames(A2))
+      bound <-getBoundParam(A2, b2, p2, C2, v2, lower, upper, presolve = FALSE)
+    } else {
+      bound <-rep(presolved$fixed[colnames(A)[p]],2)
+    }
+    bound
   })
   data.frame(
     param = colnames(A),
