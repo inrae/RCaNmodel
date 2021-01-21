@@ -33,6 +33,10 @@ getBoundParam <- function(A, b, p, C = NULL, v = NULL,
     C <- matrix(0, 0, nbparam)
     v <- numeric(0)
   }
+  if (is.null(lower))
+    lower <- rep(0, ncol(A))
+  if (is.null(upper))
+    upper <- rep(Inf, ncol(A))
   if (presolve) {
     presolved <- presolveLPMod(A, b, C, v)
     if (nrow(presolved$lhs) > 0){
@@ -43,6 +47,13 @@ getBoundParam <- function(A, b, p, C = NULL, v = NULL,
       lower <- presolved$lower
       upper <- presolved$upper
     }
+  } else {
+    A2 <- A
+    b2 <- b
+    C2 <- C
+    v2 <- v
+    lower <- lower
+    upper <- upper
   }
   solved <- c(FALSE,FALSE)
   ntry <- 0
