@@ -77,10 +77,10 @@ presolveLPMod <-
     upper <- bounds$upper
     if (all(is.infinite(upper))) upper <- NULL
     fixed <- NA
-    if (ncol(A2) < ncol(A)){
+    if (ncol(lhs) < ncol(A)){
       sol <- get.primal.solution(lp_model,orig=TRUE)[- (1:(nrow(A)+nrow(C)))]
-      fixed <- sol[! colnames(A) %in% colnames(A2)]
-      names(fixed) <- colnames(A)[! colnames(A) %in% colnames(A2)]
+      fixed <- sol[! colnames(A) %in% colnames(lhs)]
+      names(fixed) <- colnames(A)[! colnames(A) %in% colnames(lhs)]
     }
     return (list(lhs = lhs,
                  dir = dir,
