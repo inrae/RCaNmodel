@@ -1,5 +1,4 @@
 #' ggGrowth
-#'
 #' plots biomass growth as a function of biomass
 #' provides a distribution over iterations and years
 #' @param myFitCaNmod result sent by \link{fitmyCaNmod}

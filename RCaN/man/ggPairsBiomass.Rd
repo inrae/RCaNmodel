@@ -2,7 +2,9 @@
 % Please edit documentation in R/ggPairsBiomass.R
 \name{ggPairsBiomass}
 \alias{ggPairsBiomass}
-\title{ggPairsBiomass}
+\title{ggPairsBiomass
+plots pairs plot of biomass among species and provided Kendall correlation
+tau}
 \usage{
 ggPairsBiomass(myFitCaNmod, species = NULL, logscale = TRUE)
 }
@@ -18,6 +20,7 @@ by default, all species}
 a ggplot
 }
 \description{
+ggPairsBiomass
 plots pairs plot of biomass among species and provided Kendall correlation
 tau
 }

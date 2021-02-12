@@ -2,7 +2,8 @@
 % Please edit documentation in R/ggSatiation.R
 \name{ggSatiation}
 \alias{ggSatiation}
-\title{ggSatiation}
+\title{ggSatiation
+plots incoming trophic fluxes versus biomass}
 \usage{
 ggSatiation(myFitCaNmod, species = NULL)
 }
@@ -16,6 +17,7 @@ by default, all species}
 a ggplot
 }
 \description{
+ggSatiation
 plots incoming trophic fluxes versus biomass
 }
 \details{

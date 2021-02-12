@@ -1,10 +1,8 @@
-
 #' ggViolin
-#'
-#' provide a violin plot of the distribution of flow of biomass
+#' provides a violin plot of the distribution of flux or biomass
 #' for specific years
 #' @param myFitCaNmod result sent by \link{fitmyCaNmod}
-#' @param param the name (or a vector of name) of a parameter (either a flow or
+#' @param param the name (or a vector of name) of a parameter (either a flux or
 #' a biomass)
 #' @param year the year
 #' @param logscale flag to indicate to use a log scale (default TRUE)

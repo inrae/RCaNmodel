@@ -2,7 +2,9 @@
 % Please edit documentation in R/ggViolin.R
 \name{ggViolin}
 \alias{ggViolin}
-\title{ggViolin}
+\title{ggViolin
+provides a violin plot of the distribution of flux or biomass
+for specific years}
 \usage{
 ggViolin(myFitCaNmod, param, year, logscale = TRUE,
   xlab = "Component/Flux", ylab = "Distribution")
@@ -10,7 +12,7 @@ ggViolin(myFitCaNmod, param, year, logscale = TRUE,
 \arguments{
 \item{myFitCaNmod}{result sent by \link{fitmyCaNmod}}
 
-\item{param}{the name (or a vector of name) of a parameter (either a flow or
+\item{param}{the name (or a vector of name) of a parameter (either a flux or
 a biomass)}
 
 \item{year}{the year}
@@ -25,7 +27,8 @@ a biomass)}
 a ggplot
 }
 \description{
-provide a violin plot of the distribution of flow of biomass
+ggViolin
+provides a violin plot of the distribution of flux or biomass
 for specific years
 }
 \details{

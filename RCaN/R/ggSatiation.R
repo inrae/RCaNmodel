@@ -1,5 +1,4 @@
 #' ggSatiation
-#'
 #' plots incoming trophic fluxes versus biomass
 #' @param myFitCaNmod result sent by \link{fitmyCaNmod}
 #' @param species the name (or a vector of name) of the species of interest

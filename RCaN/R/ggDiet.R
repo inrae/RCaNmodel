@@ -1,7 +1,6 @@
 
 #' ggDiet
-#'
-#' provide a ggplot of diet, barplot provides an average diet while violin plot
+#' provides a ggplot of diet, barplot provides an average diet while violin plot
 #' provides a distribution over iterations and years
 #' @param myFitCaNmod result sent by \link{fitmyCaNmod}
 #' @param species the name (or a vector of name) of the species of interest
