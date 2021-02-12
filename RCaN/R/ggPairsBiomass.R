@@ -1,5 +1,4 @@
 #' ggPairsBiomass
-#'
 #' plots pairs plot of biomass among species and provided Kendall correlation
 #' tau
 #' @param myFitCaNmod result sent by \link{fitmyCaNmod}

@@ -2,7 +2,8 @@
 % Please edit documentation in R/ggTrophicRelation.R
 \name{ggTrophicRelation}
 \alias{ggTrophicRelation}
-\title{ggTrophicRelation}
+\title{ggTrophicRelation
+plots fluxes from prey to predators}
 \usage{
 ggTrophicRelation(myFitCaNmod, species = NULL)
 }
@@ -16,6 +17,7 @@ by default, all species}
 a ggplot
 }
 \description{
+ggTrophicRelation
 plots fluxes from prey to predators
 }
 \details{

@@ -2,7 +2,9 @@
 % Please edit documentation in R/ggGrowth.R
 \name{ggGrowth}
 \alias{ggGrowth}
-\title{ggGrowth}
+\title{ggGrowth
+plots biomass growth as a function of biomass
+provides a distribution over iterations and years}
 \usage{
 ggGrowth(myFitCaNmod, species = NULL)
 }
@@ -16,6 +18,7 @@ by default, all species}
 a ggplot
 }
 \description{
+ggGrowth
 plots biomass growth as a function of biomass
 provides a distribution over iterations and years
 }
