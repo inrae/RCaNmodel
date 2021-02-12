@@ -37,7 +37,8 @@ presolveLPMod <-
     presolve <- c("rows",
                   "lindep",
                   "rowdominate",
-                  "mergerows")
+                  "mergerows",
+                  "coldominate")
     if (is.null(lower)) lower <- rep(0, ncol(A))
     if (is.null(C)) {
       C <- matrix(0, 0, nbparam)
@@ -62,6 +63,7 @@ presolveLPMod <-
     dimnames(lp_model) <- list(c(rownames(A), rownames(C)), colnames(A))
 
     lp.control(lp_model, sense = "max", presolve = presolve)
+    set.objfn(lp_model,ifelse((1:nbparam)==p,1,0))
     res <- solve.lpExtPtr(lp_model)
 
 

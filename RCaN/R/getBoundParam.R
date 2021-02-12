@@ -66,7 +66,10 @@ getBoundParam <- function(A, b, p, C = NULL, v = NULL,
       ob[p] <- 1
       lp_model <- defineLPMod(A2, b2, C2, v2, lower, upper,
                               maximum = TRUE, ob = ob)
-      res <- ROI_solve(lp_model, solver = "glpk", control=list(tm_limit = 1000))
+      res <- ROI_solve(lp_model, solver = "lpsolve")
+      if (res$status$code != 0)
+        res <- ROI_solve(lp_model, solver = "glpk",
+                         control=list(tm_limit = 1000))
 
       if (res$status$code == 0) {
         upbound <- res$solution[p]
@@ -76,7 +79,10 @@ getBoundParam <- function(A, b, p, C = NULL, v = NULL,
       }
       lp_model <- defineLPMod(A2, b2, C2, v2, lower, upper,
                               maximum = FALSE, ob = ob)
-      res <- ROI_solve(lp_model, solver = "glpk", control=list(tm_limit = 1000))
+      res <- ROI_solve(lp_model, solver = "lpsolve")
+      if (res$status$code != 0)
+        res <- ROI_solve(lp_model, solver = "glpk",
+                         control=list(tm_limit = 1000))
 
       if (res$status$code == 0) {
         lowbound <- res$solution[p]
