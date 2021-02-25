@@ -19,7 +19,7 @@ cpgsEquality(N, A, b, C, v, x0, thin = 1L, gibbs = TRUE, seed = 1L,
 
 \item{v}{a vector of length equals to nrow(C)}
 
-\item{x0}{a vector of length equals to ncol(A) that should be in the polytope, for example returned by \code{\link{chebycenter}}}
+\item{x0}{a vector of length equals to ncol(A) that should be in the polytope, for example returned by \code{\link{chebyCentre}}}
 
 \item{thin}{the thinning interval}
 

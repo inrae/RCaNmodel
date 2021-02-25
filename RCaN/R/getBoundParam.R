@@ -32,6 +32,13 @@ getBoundParam <- function(x, p,
   C <- x$C
   v <- x$v
 
+  if (is.null(colnames(A))) {
+    colnames(A) <- paste("col", seq_len(ncol(A)), sep = "")
+  }
+
+  if (is.null(colnames(C)))
+    colnames(C) <- colnames(A)
+
   nbparam <- ncol(A)
   if (is.null(C)) {
     C <- matrix(0, 0, nbparam)

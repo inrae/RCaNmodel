@@ -11,7 +11,7 @@ NULL
 #' @param N the number of samples to generate
 #' @param A a matrix
 #' @param b a vector of length equals to nrow(A)
-#' @param x0 a vector of length equals to nrcol(A) that should be in the polytope, for example returned by \code{\link{chebycenter}}
+#' @param x0 a vector of length equals to nrcol(A) that should be in the polytope, for example returned by \code{\link{chebyCentre}}
 #' @param thin thinning interval
 #' @param gibbs if true, gibbs sampling, else hitandrun
 #' @param seed seed of the dqrng generator
@@ -46,7 +46,7 @@ cpgs <- function(N, A, b, x0, thin = 1L, gibbs = TRUE, seed = 1L, stream = 1L) {
 #' @param b a vector of length equals to nrow(A)
 #' @param C a matrix of coefficients of inequality constants C.x=v
 #' @param v a vector of length equals to nrow(C)
-#' @param x0 a vector of length equals to ncol(A) that should be in the polytope, for example returned by \code{\link{chebycenter}}
+#' @param x0 a vector of length equals to ncol(A) that should be in the polytope, for example returned by \code{\link{chebyCentre}}
 #' @param thin the thinning interval
 #' @param gibbs if true, gibbs sampling, else hitandrun
 #' @param seed seed of the dqrng generator
