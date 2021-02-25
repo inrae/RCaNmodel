@@ -24,10 +24,10 @@ getAllBoundsParam <- function(x) {
   if (!class(x) %in% c("CaNmod", "list"))
     stop("x should either be a CaNmod object or a list")
   if (class(x) == "CaNmod"){
-    A <- as.matrix(myCaNmod$A)
-    b <- myCaNmod$b
-    C <-as.matrix(myCaNmod$C)
-    v <- myCaNmod$v
+    A <- as.matrix(x$A)
+    b <- x$b
+    C <-as.matrix(x$C)
+    v <- x$v
   } else {
     if (is.null(names(x)))
       stop("x should be a named list")

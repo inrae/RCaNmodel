@@ -124,9 +124,9 @@ The set of constraints define a convex polytope, i.e. a conspace subspace of a n
 checkPolytopeStatus(myCaNmod)
 ```
 
-If your polytope is not bounded, you should probably add additional constraints on not bounded parameter. To see which parameter is not bounded, you can use the function getAllBoundsParamCaNmod. An Inf in the upperbound column would correspond to a non bounded parameter, otherwise you have lower and upperbounds of each parameter
+If your polytope is not bounded, you should probably add additional constraints on not bounded parameter. To see which parameter is not bounded, you can use the function getAllBoundsParam An Inf in the upperbound column would correspond to a non bounded parameter, otherwise you have lower and upperbounds of each parameter
 ```{r}
-getAllBoundsParamCaNmod(myCaNmod)
+getAllBoundsParam(myCaNmod)
 ```
 Since this function can be time consuming, we provide a version that focus on a parameter of interest, here for example the first parameter:
 

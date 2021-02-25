@@ -19,9 +19,6 @@ absence of such constraints}
 absence of such constraints}
 
 \item{lower}{minimal bounds for paramaters, by default set to zero}
-
-\item{fixed}{value of potentially fixed values (Null if no parameter are
-fixed)}
 }
 \value{
 a vector corresponding to the centroid of the polytope

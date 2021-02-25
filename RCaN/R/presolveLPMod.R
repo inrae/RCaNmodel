@@ -8,8 +8,6 @@
 #' @param v a vector of equality constraints C x = v, should be null in the
 #' absence of such constraints
 #' @param lower minimal bounds for paramaters, by default set to zero
-#' @param fixed value of potentially fixed values (Null if no parameter are
-#' fixed)
 #'
 #' @return a vector corresponding to the centroid of the polytope
 #'

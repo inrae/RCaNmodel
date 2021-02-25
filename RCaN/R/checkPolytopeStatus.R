@@ -18,14 +18,14 @@
 #' b2 <- as.matrix(rep(1,n))
 #' A <- rbind(A1,A2)
 #' b <- rbind(b1,b2)
-#' X0 <- checkPolytopeStatus(list(A = A, b = b)
+#' X0 <- checkPolytopeStatus(list(A = A, b = b))
 #'
 #' #this one is empty
 #' C <- matrix(c(1,rep(0,n-1)),1)
 #' v <- 3
-#' X0 <- checkPolytopeStatus(list(A=A,b=b,C=C,v,v)
+#' X0 <- checkPolytopeStatus(list(A = A, b = b, C = C,v = v)
 #'
-#' #exemple with a CaNmod object
+#' #example with a CaNmod object
 #' myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
 #'  package = "RCaN"))
 #' checkPolytopeStatus(myCaNmod)
@@ -35,7 +35,6 @@
 #' rownames(myCaNmod$A)[nrow(myCaNmod$A)]<-"neg_flow"
 #' myCaNmod$b <- c(myCaNmod$b,-1)
 #' checkPolytopeStatus(myCaNmod)
-
 #'
 #' @export
 
@@ -43,14 +42,14 @@ checkPolytopeStatus <- function(x) {
   if (!class(x) %in% c("CaNmod", "list"))
     stop("x should either be a CaNmod object or a list")
   if (class(x) == "CaNmod"){
-    A <- as.matrix(myCaNmod$A)
-    b <- myCaNmod$b
-    C <-as.matrix(myCaNmod$C)
-    v <- myCaNmod$v
+    A <- as.matrix(x$A)
+    b <- x$b
+    C <-as.matrix(x$C)
+    v <- x$v
   } else {
     if (is.null(names(x)))
       stop("x should be a named list")
-    if (all(c("A", "b") %in% names(x)))
+    if (!all(c("A", "b") %in% names(x)))
       stop("x should at least contain a matrix A and a list b")
     if (all(names(x)) %in% c("A", "b", "C", "v"))
       stop("names of x should be A, b, C or v")
