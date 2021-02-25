@@ -7,7 +7,7 @@
 #' @export
 #'
 #' @examples
-#' myCaNmod <- build_CaNmod(system.file("extdata",
+#' myCaNmod <- buildCaN(system.file("extdata",
 #'  "CaN_template_mini.xlsx", package = "RCaN"))
 #'  writeCaNmod_toXLS(paste(tempdir(),
 #'                          "/export.xlsx",

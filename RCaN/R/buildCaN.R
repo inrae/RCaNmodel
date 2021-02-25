@@ -1,12 +1,10 @@
-#' build_CaNmod_fromR
+#' buildCaN
 #'
-#' builds a CaNmodobject directly from R by providing dataframes instead of
-#' an excel template
+#' builds a CaNmodobject directly either by reading an RCaN input file or by
+#' using a list of dataframes instead of and returns the complete model
 #' description, including all the underlying equations
-#' @param components_param a data frame describing compartments
-#' @param fluxes_def a data frame describing fluxes
-#' @param series a data frame describing time series of observations
-#' @param constraints a data frame describing constraints
+#' @param x either the path to a RCaN input file or a named list with
+#' 4 elements (components_param, fluxes_def, series, constraints)
 #'
 #' @return a CaNmod object with following elements
 #' \itemize{
@@ -53,19 +51,55 @@
 #' #read constraints
 #' constraints <- read_excel(file, sheet = "Constraints")
 #'
-#' myCaNmod <- build_CaNmod_fromR(components_param,
-#'                                fluxes_def,
-#'                                series,
-#'                                constraints)
+#' myCaNmod <- buildCaN(list(components_param = components_param,
+#'                                fluxes_def = fluxes_def,
+#'                                series = series,
+#'                                constraints = constraints))
 #'
 #' @importFrom Matrix Matrix
 #' @importFrom stats na.omit
+#' @importFrom readxl read_excel
 #'
-build_CaNmod_fromR <- function(components_param,
-                               fluxes_def,
-                               series,
-                               constraints
-                         ) {
+buildCaN <- function(x) {
+  if (! class(x) %in% c("character", "list")){
+    stop("x should either be the path to an RCaN file or a named list")
+  }
+  if (class(x) == "character"){
+    if (!file.exists(x))
+      stop("the specified file does not exit")
+    components_param <- as.data.frame(
+      read_excel(x, sheet = "Components & input parameter")
+    )
+
+    #read Fluxes
+    fluxes_def <- as.data.frame(
+      read_excel(x, sheet = "Fluxes")
+    )
+
+    #read Times series
+    series <- as.data.frame(
+      read_excel(x, sheet = "Input time-series")
+    )
+
+    #read constraints
+    constraints <- as.data.frame(
+      read_excel(x, sheet = "Constraints")
+    )
+
+  } else {
+    if (is.null(names(x)))
+      stop("x should be a named list")
+    if (!all(sort(names(x)) == c("components_param",
+                                 "constraints",
+                                 "fluxes_def",
+                                 "series")))
+        stop("names of x should be components_param, constraints,
+             fluxes_def, series")
+    constraints <- x$constraints
+    fluxes_def <- x$fluxes_def
+    series <- x$series
+    components_param <- x$components_param
+  }
   #Components & input parameter
   #remove totally empty rows that sometimes happen with xlsx
   components_param <-

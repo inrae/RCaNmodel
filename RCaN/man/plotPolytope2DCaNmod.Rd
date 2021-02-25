@@ -20,7 +20,7 @@ plotPolytope2DCaNmod
 polt the possible values of the polytope 2 dimensions
 }
 \examples{
-myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx",
+myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
  package = "RCaN"))
 plotPolytope2DCaNmod(myCaNmod, c("OmniZooplankton[1988]", "F01[1988]"))
 

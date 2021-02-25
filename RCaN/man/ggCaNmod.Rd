@@ -20,7 +20,7 @@ produces a ggraph representing the flow foodweb
 \examples{
 require(ggraph)
 require(ggplot2)
-myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx",
+myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
  package = "RCaN"))
 ggCaNmod(myCaNmod)
 }
