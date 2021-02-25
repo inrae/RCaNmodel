@@ -5,16 +5,11 @@
 \title{checkPolytopeStatus
 check if the polytope has solution or not}
 \usage{
-checkPolytopeStatus(A, b, C = NULL, v = NULL)
+checkPolytopeStatus(x)
 }
 \arguments{
-\item{A}{the matrix of inequality A.x<=b}
-
-\item{b}{the vector A.x<=b}
-
-\item{C}{the matrix of equality C.x=v (default NULL for no equality)}
-
-\item{v}{the vector of equality C.x=v (default NULL for no equality}
+\item{x}{eigher a CaNmod oject or a named list with at least a matrix A and
+a vector b (A.x<=b) and optionnally a matrix C and a vector v (C.x=v)}
 }
 \value{
 print a message to tell if the polygon is ok or not
@@ -31,11 +26,22 @@ A2 <- diag(n)
 b2 <- as.matrix(rep(1,n))
 A <- rbind(A1,A2)
 b <- rbind(b1,b2)
-X0 <- checkPolytopeStatus(A,b)
+X0 <- checkPolytopeStatus(list(A = A, b = b)
 
 #this one is empty
 C <- matrix(c(1,rep(0,n-1)),1)
 v <- 3
-X0 <- checkPolytopeStatus(A,b,C,v)
+X0 <- checkPolytopeStatus(list(A=A,b=b,C=C,v,v)
+
+#exemple with a CaNmod object
+myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
+ package = "RCaN"))
+checkPolytopeStatus(myCaNmod)
+
+#we artificially add incompatible constraints (negative flow)
+myCaNmod$A <- rbind(myCaNmod$A,c(1,rep(0,ncol(myCaNmod$A)-1)))
+rownames(myCaNmod$A)[nrow(myCaNmod$A)]<-"neg_flow"
+myCaNmod$b <- c(myCaNmod$b,-1)
+checkPolytopeStatus(myCaNmod)
 
 }

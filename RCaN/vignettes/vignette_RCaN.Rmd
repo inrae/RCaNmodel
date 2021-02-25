@@ -39,7 +39,7 @@ system.file("extdata", "CaN_template_mini.xlsx", package = "RCaN")
 ```
 
 ```{r,echo=FALSE,include=FALSE}
-myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx", package = "RCaN"))
+myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx", package = "RCaN"))
 ```
 
 There are a few important things to remember:
@@ -48,7 +48,7 @@ There are a few important things to remember:
 * it is worthwile giving as much information as possible in the "Info" sheet
 * you can add other sheets and other columns in your file is needed, as the minimal sets of sheets and columns are provided
 
-Note that the object can also build directly from R using the build_CaNmod_fromR function.
+Note that the object can also build directly from R using the buildCaN function.
 
 ## Sheet "Components & input parameter"
 ```{r,echo=FALSE,include=TRUE}
@@ -96,10 +96,10 @@ myCaNmod <- toggle_constraint(myCaNmod, "C01 : 1991")
 
 
 # Building the model
-The first step of the workflow is to build the model. The function build_CaNmod does this job. It reads the template file and provides a CaNmod object that includes all necessary data to fit the model.  You see here the different elements included in the object.
+The first step of the workflow is to build the model. The function buildCaN does this job. It reads the template file and provides a CaNmod object that includes all necessary data to fit the model.  You see here the different elements included in the object.
 
 ```{r}
-myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx", package = "RCaN"))
+myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx", package = "RCaN"))
 names(myCaNmod)
 ```
 Everything should be all right if your template was well created. The function retrieves meaningful error message if a problem is detected. Two functions can be used to check that the model is correct. The function ggCaNmod draws a graph to show you the trophic food web
@@ -118,10 +118,10 @@ pdfCaNmod(myCaNmod, output_file = "summaryCaNmod.pdf")
 
 
 # Checking the model configuration
-The set of constraints define a convex polytope, i.e. a conspace subspace of a n-dimensional space (n corresponding to the number of the parameter) with flat sides. Each point inside the polytope is a possible solution of the model. The idea of Chance and Necessity model is to uniformly sample within those polytopes in order to explore the whole space of possible solutions. Nevertheless, the polytope should not be empty (otherwise, there is no solution) and preferentially should be bounded (otherwise a parameter can range to infinity). To check that the polytope is ok, you can use checkPolytopeStatusCaNmod which will tell you the status of your polytope.
+The set of constraints define a convex polytope, i.e. a conspace subspace of a n-dimensional space (n corresponding to the number of the parameter) with flat sides. Each point inside the polytope is a possible solution of the model. The idea of Chance and Necessity model is to uniformly sample within those polytopes in order to explore the whole space of possible solutions. Nevertheless, the polytope should not be empty (otherwise, there is no solution) and preferentially should be bounded (otherwise a parameter can range to infinity). To check that the polytope is ok, you can use checkPolytopeStatus which will tell you the status of your polytope.
 
 ```{r}
-checkPolytopeStatusCaNmod(myCaNmod)
+checkPolytopeStatus(myCaNmod)
 ```
 
 If your polytope is not bounded, you should probably add additional constraints on not bounded parameter. To see which parameter is not bounded, you can use the function getAllBoundsParamCaNmod. An Inf in the upperbound column would correspond to a non bounded parameter, otherwise you have lower and upperbounds of each parameter

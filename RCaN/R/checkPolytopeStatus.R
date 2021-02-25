@@ -1,10 +1,8 @@
 
 #' checkPolytopeStatus
 #' check if the polytope has solution or not
-#' @param A the matrix of inequality A.x<=b
-#' @param b the vector A.x<=b
-#' @param C the matrix of equality C.x=v (default NULL for no equality)
-#' @param v the vector of equality C.x=v (default NULL for no equality
+#' @param x eigher a CaNmod oject or a named list with at least a matrix A and
+#' a vector b (A.x<=b) and optionnally a matrix C and a vector v (C.x=v)
 #' @return print a message to tell if the polygon is ok or not
 #'
 #' @importFrom utils setTxtProgressBar
@@ -20,19 +18,49 @@
 #' b2 <- as.matrix(rep(1,n))
 #' A <- rbind(A1,A2)
 #' b <- rbind(b1,b2)
-#' X0 <- checkPolytopeStatus(A,b)
+#' X0 <- checkPolytopeStatus(list(A = A, b = b)
 #'
 #' #this one is empty
 #' C <- matrix(c(1,rep(0,n-1)),1)
 #' v <- 3
-#' X0 <- checkPolytopeStatus(A,b,C,v)
+#' X0 <- checkPolytopeStatus(list(A=A,b=b,C=C,v,v)
+#'
+#' #exemple with a CaNmod object
+#' myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
+#'  package = "RCaN"))
+#' checkPolytopeStatus(myCaNmod)
+#'
+#' #we artificially add incompatible constraints (negative flow)
+#' myCaNmod$A <- rbind(myCaNmod$A,c(1,rep(0,ncol(myCaNmod$A)-1)))
+#' rownames(myCaNmod$A)[nrow(myCaNmod$A)]<-"neg_flow"
+#' myCaNmod$b <- c(myCaNmod$b,-1)
+#' checkPolytopeStatus(myCaNmod)
+
 #'
 #' @export
 
-checkPolytopeStatus <- function(A,
-                                b,
-                                C = NULL,
-                                v = NULL) {
+checkPolytopeStatus <- function(x) {
+  if (!class(x) %in% c("CaNmod", "list"))
+    stop("x should either be a CaNmod object or a list")
+  if (class(x) == "CaNmod"){
+    A <- as.matrix(myCaNmod$A)
+    b <- myCaNmod$b
+    C <-as.matrix(myCaNmod$C)
+    v <- myCaNmod$v
+  } else {
+    if (is.null(names(x)))
+      stop("x should be a named list")
+    if (all(c("A", "b") %in% names(x)))
+      stop("x should at least contain a matrix A and a list b")
+    if (all(names(x)) %in% c("A", "b", "C", "v"))
+      stop("names of x should be A, b, C or v")
+    A <- x$A
+    b <- x$b
+    C <- x$C
+    v <- x$v
+  }
+
+
   nbparam <- ncol(A)
   lp_model <- defineLPMod(A, b, C, v, maximum = FALSE)
   res <- ROI_solve(lp_model, solver = "lpsolve",
