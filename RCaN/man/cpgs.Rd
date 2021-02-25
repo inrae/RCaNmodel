@@ -14,7 +14,7 @@ cpgs(N, A, b, x0, thin = 1L, gibbs = TRUE, seed = 1L, stream = 1L)
 
 \item{b}{a vector of length equals to nrow(A)}
 
-\item{x0}{a vector of length equals to nrcol(A) that should be in the polytope, for example returned by \code{\link{chebycenter}}}
+\item{x0}{a vector of length equals to nrcol(A) that should be in the polytope, for example returned by \code{\link{chebyCentre}}}
 
 \item{thin}{thinning interval}
 
