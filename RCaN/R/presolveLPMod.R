@@ -24,6 +24,7 @@
 #' @importFrom lpSolveAPI get.bounds
 #' @importFrom lpSolveAPI get.rhs
 #' @importFrom lpSolveAPI get.constr.type
+#' @importFrom lpSolveAPI set.objfn
 #' @importFrom lpSolveAPI get.primal.solution
 
 
