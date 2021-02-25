@@ -1,4 +1,3 @@
-
 #' sampleCaN
 #'
 #' sample the polytope corresponding to the CaNmod model
