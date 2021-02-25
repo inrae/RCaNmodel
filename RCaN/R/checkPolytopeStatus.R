@@ -1,7 +1,7 @@
 
 #' checkPolytopeStatus
 #' check if the polytope has solution or not
-#' @param x eigher a CaNmod oject or a named list with at least a matrix A and
+#' @param x either a CaNmod oject or a named list with at least a matrix A and
 #' a vector b (A.x<=b) and optionnally a matrix C and a vector v (C.x=v)
 #' @return print a message to tell if the polygon is ok or not
 #'
