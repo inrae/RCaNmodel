@@ -1,9 +1,8 @@
 #' findingIncompatibleConstraints
-#' help to dectect constraints that leads to an empty polytope
-#' @param A the matrix of inequality A.x<=b
-#' @param b the vector A.x<=b
-#' @param C the matrix of equality C.x=v (default NULL for no equality)
-#' @param v the vector of equality C.x=v (default NULL for no equality
+#' help to dectect constraints that leads to an empty polytope defined
+#' by+A.x<=b and C.x=v or by the polytope of the CaNmod object
+#' @param x either a CaNmod oject or a named list with at least a matrix A and
+#' a vector b (A.x<=b) and optionnally a matrix C and a vector v (C.x=v)
 #'
 #' @return a list of vector. To be fitted, constraints corresponding to the
 #' first elements of each vector of the list should be relaxed.
@@ -24,12 +23,18 @@
 #' b <- rbind(b1,b2)
 #' C <- matrix(c(1,rep(0,n-1)),1)
 #' v <- 3
-#' X0 <- findingIncompatibleConstr(A,b,C,v)
+#' X0 <- findingIncompatibleConstr(list(A = A, b = b, C = C, v = v))
 #'
 #' @export
 
 
-findingIncompatibleConstr <- function(A, b, C=NULL, v=NULL) {
+findingIncompatibleConstr <- function(x) {
+  x <- reformatX(x)
+  A <- x$A
+  b <- x$b
+  C <- x$C
+  v <- x$v
+
   nbparam <- ncol(A)
   nbineq <- nrow(A)
   if (is.null(C)) {

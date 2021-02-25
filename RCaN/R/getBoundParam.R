@@ -1,11 +1,9 @@
 #' getBoundParam
 #' Computes the possible bounds for a parameter p of a polytope defined
-#' by+A.x<=b and C.x=v
-#' @param A the matrix of inequality A.x<=b
-#' @param b the vector A.x<=b
+#' by+A.x<=b and C.x=v or by the polytope of the CaNmod object
+#' @param x either a CaNmod oject or a named list with at least a matrix A and
+#' a vector b (A.x<=b) and optionnally a matrix C and a vector v (C.x=v)
 #' @param p the index of the parameter for which the bounds should be computed
-#' @param C the matrix of equality C.x=v (default NULL for no equality)
-#' @param v the vector of equality C.x=v (default NULL for no equality
 #' @param lower lower bounds (default NULL for bounds 0)
 #' @param upper upper bounds (default NULL for bounds Inf)
 #' @param presolve should presolve should be done
@@ -21,13 +19,19 @@
 #' b2 <- as.matrix(rep(1,n))
 #' A <- rbind(A1,A2)
 #' b <- rbind(b1,b2)
-#' X0 <- getBoundParam(A,b,1)
+#' X0 <- getBoundParam(list(A = A, b = b),1)
 #'
 #' @export
 
-getBoundParam <- function(A, b, p, C = NULL, v = NULL,
+getBoundParam <- function(x, p,
                           lower = NULL, upper = NULL,
                           presolve = TRUE) {
+  x <- reformatX(x)
+  A <- x$A
+  b <- x$b
+  C <- x$C
+  v <- x$v
+
   nbparam <- ncol(A)
   if (is.null(C)) {
     C <- matrix(0, 0, nbparam)

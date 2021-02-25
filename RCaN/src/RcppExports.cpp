@@ -93,9 +93,9 @@ RcppExport SEXP _RCaN_cpgsEquality(SEXP NSEXP, SEXP ASEXP, SEXP bSEXP, SEXP CSEX
     UNPROTECT(1);
     return rcpp_result_gen;
 }
-// fitCaN
-List fitCaN(const int N, const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const Eigen::MatrixXd& C, const Eigen::VectorXd& v, const Eigen::MatrixXd& L, const Eigen::VectorXd& x0, const int thin, const bool gibbs, const int seed, const int stream);
-static SEXP _RCaN_fitCaN_try(SEXP NSEXP, SEXP ASEXP, SEXP bSEXP, SEXP CSEXP, SEXP vSEXP, SEXP LSEXP, SEXP x0SEXP, SEXP thinSEXP, SEXP gibbsSEXP, SEXP seedSEXP, SEXP streamSEXP) {
+// sampleCaNCPP
+List sampleCaNCPP(const int N, const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const Eigen::MatrixXd& C, const Eigen::VectorXd& v, const Eigen::MatrixXd& L, const Eigen::VectorXd& x0, const int thin, const bool gibbs, const int seed, const int stream);
+static SEXP _RCaN_sampleCaNCPP_try(SEXP NSEXP, SEXP ASEXP, SEXP bSEXP, SEXP CSEXP, SEXP vSEXP, SEXP LSEXP, SEXP x0SEXP, SEXP thinSEXP, SEXP gibbsSEXP, SEXP seedSEXP, SEXP streamSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< const int >::type N(NSEXP);
@@ -109,15 +109,15 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const bool >::type gibbs(gibbsSEXP);
     Rcpp::traits::input_parameter< const int >::type seed(seedSEXP);
     Rcpp::traits::input_parameter< const int >::type stream(streamSEXP);
-    rcpp_result_gen = Rcpp::wrap(fitCaN(N, A, b, C, v, L, x0, thin, gibbs, seed, stream));
+    rcpp_result_gen = Rcpp::wrap(sampleCaNCPP(N, A, b, C, v, L, x0, thin, gibbs, seed, stream));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _RCaN_fitCaN(SEXP NSEXP, SEXP ASEXP, SEXP bSEXP, SEXP CSEXP, SEXP vSEXP, SEXP LSEXP, SEXP x0SEXP, SEXP thinSEXP, SEXP gibbsSEXP, SEXP seedSEXP, SEXP streamSEXP) {
+RcppExport SEXP _RCaN_sampleCaNCPP(SEXP NSEXP, SEXP ASEXP, SEXP bSEXP, SEXP CSEXP, SEXP vSEXP, SEXP LSEXP, SEXP x0SEXP, SEXP thinSEXP, SEXP gibbsSEXP, SEXP seedSEXP, SEXP streamSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_RCaN_fitCaN_try(NSEXP, ASEXP, bSEXP, CSEXP, vSEXP, LSEXP, x0SEXP, thinSEXP, gibbsSEXP, seedSEXP, streamSEXP));
+        rcpp_result_gen = PROTECT(_RCaN_sampleCaNCPP_try(NSEXP, ASEXP, bSEXP, CSEXP, vSEXP, LSEXP, x0SEXP, thinSEXP, gibbsSEXP, seedSEXP, streamSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -144,7 +144,7 @@ static int _RCaN_RcppExport_validate(const char* sig) {
     if (signatures.empty()) {
         signatures.insert("Eigen::MatrixXd(*cpgs)(const int,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::VectorXd&,const int,const bool,const int,const int)");
         signatures.insert("Eigen::MatrixXd(*cpgsEquality)(const int,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::VectorXd&,const int,const bool,const int,const int)");
-        signatures.insert("List(*fitCaN)(const int,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::MatrixXd&,const Eigen::VectorXd&,const int,const bool,const int,const int)");
+        signatures.insert("List(*sampleCaNCPP)(const int,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::MatrixXd&,const Eigen::VectorXd&,const int,const bool,const int,const int)");
     }
     return signatures.find(sig) != signatures.end();
 }
@@ -153,7 +153,7 @@ static int _RCaN_RcppExport_validate(const char* sig) {
 RcppExport SEXP _RCaN_RcppExport_registerCCallable() { 
     R_RegisterCCallable("RCaN", "_RCaN_cpgs", (DL_FUNC)_RCaN_cpgs_try);
     R_RegisterCCallable("RCaN", "_RCaN_cpgsEquality", (DL_FUNC)_RCaN_cpgsEquality_try);
-    R_RegisterCCallable("RCaN", "_RCaN_fitCaN", (DL_FUNC)_RCaN_fitCaN_try);
+    R_RegisterCCallable("RCaN", "_RCaN_sampleCaNCPP", (DL_FUNC)_RCaN_sampleCaNCPP_try);
     R_RegisterCCallable("RCaN", "_RCaN_RcppExport_validate", (DL_FUNC)_RCaN_RcppExport_validate);
     return R_NilValue;
 }
@@ -161,7 +161,7 @@ RcppExport SEXP _RCaN_RcppExport_registerCCallable() {
 static const R_CallMethodDef CallEntries[] = {
     {"_RCaN_cpgs", (DL_FUNC) &_RCaN_cpgs, 8},
     {"_RCaN_cpgsEquality", (DL_FUNC) &_RCaN_cpgsEquality, 10},
-    {"_RCaN_fitCaN", (DL_FUNC) &_RCaN_fitCaN, 11},
+    {"_RCaN_sampleCaNCPP", (DL_FUNC) &_RCaN_sampleCaNCPP, 11},
     {"_RCaN_RcppExport_registerCCallable", (DL_FUNC) &_RCaN_RcppExport_registerCCallable, 0},
     {NULL, NULL, 0}
 };

@@ -1,4 +1,4 @@
-#' ggCaNmod
+#' ggNetwork
 #' produces a ggraph representing the flow foodweb
 #' @param myCaNmod a CaNmod oject
 #' @return a ggraph
@@ -8,7 +8,7 @@
 #' require(ggplot2)
 #' myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
 #'  package = "RCaN"))
-#' ggCaNmod(myCaNmod)
+#' ggNetwork(myCaNmod)
 #' @importFrom igraph graph_from_data_frame
 #' @importFrom igraph which_loop
 #' @importFrom ggraph ggraph
@@ -25,7 +25,7 @@
 #' @importFrom ggraph geom_node_point
 #' @importFrom graphics plot
 #' @export
-ggCaNmod <- function(myCaNmod) {
+ggNetwork <- function(myCaNmod) {
   # need to order the links table so that it matches the order of the components
   edge_graph <-
     myCaNmod$fluxes_def[, c("From", "To", "Trophic", "Flux")]

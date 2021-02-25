@@ -1,5 +1,6 @@
-#' chebycenter
-#' Computes the centroid of a convex polytope
+#' chebyCentre
+#' Computes the centroid of a convex polytope. chebyCentre and chebyCenter are
+#' synonyms.
 #'
 #' @param A a matrix
 #' @param b a vector of length equals to nrow(A)
@@ -22,10 +23,10 @@
 #' b2 <- as.matrix(rep(1,n))
 #' A <- rbind(A1,A2)
 #' b <- rbind(b1,b2)
-#' X0 <- chebycenter(A,b)
+#' X0 <- chebyCentre(A,b)
 #' @export
 
-chebycenter <- function(A, b) {
+chebyCentre <- function(A, b) {
   n <- dim(A)[1]
   p <- dim(A)[2]
 
@@ -53,3 +54,7 @@ chebycenter <- function(A, b) {
 
   return(x[-p - 1])
 }
+
+#' @rdname chebyCentre
+#' @export
+chebyCenter <- chebyCentre

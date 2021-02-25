@@ -78,19 +78,19 @@ myCaNmod$constraints
 The "Id" correspond to identifiers of the constraints. Then, the constraint correspond to a mathematical linear equation of constraint. You can potentially use "sum" and "mean" to computes sum or means over the time range. Both inequality ("<=" or ">=") and equality ("=") constraints can be used. Time.Range defines the time range of the constraint, they can be denoted either either with "firstyear:lastyear" or as a vector of years "c(year1,year2...)". It is also possible to make a reference to a specific year of a vector by indexing with "_year"; for example a constraint F01<=PrimaryProduction_1988 would mean that flux F01 should always be inferior to the 1988 PrimaryProduction. Users can also add a column "Active" with 1 for constraints that should be used and 0 for constraints to ignore. This possibility aims at facilitating scenario explorations.
 User can also use "sum" and "mean" in their constraints. This may be useful to deal with relative abundance indices. For example, "HerbZooplankton_Biomass/sum(HerbZooplankton_Biomass)=HerbZooplankton/sum(HerbZooplankton)" would ensure that HerbZooplankton variations have the same relative variations as in the observed data series HerbZooplankton_Biomass. In case of missing data, indices should be specified to ignore missing data. For example, considering the previous example, if 1990 is missing, the constraint should be written "HerbZooplankton_Biomass/sum(HerbZooplankton_Biomass[c(1988,1991)])=HerbZooplankton/sum(HerbZooplankton[c(1988,1991)])". Indexing can be specied by using either [c(year1,year2,...)], [yearmin:yearmax] or [year].
 
-It is possible to activate or deactive constraints by using the toggle_constraint function:
+It is possible to activate or deactive constraints by using the toggleConstraint function:
 ```{r,echo=FALSE,include=TRUE}
 #disactivate constraints C01
-myCaNmod <- toggle_constraint(myCaNmod, "C01")
+myCaNmod <- toggleConstraint(myCaNmod, "C01")
 
 #reactivate
-myCaNmod <- toggle_constraint(myCaNmod, "C01")
+myCaNmod <- toggleConstraint(myCaNmod, "C01")
 
 #disactivate constraints c01 for year 1991
-myCaNmod <- toggle_constraint(myCaNmod, "C01 : 1991")
+myCaNmod <- toggleConstraint(myCaNmod, "C01 : 1991")
 
 #reactivate 
-myCaNmod <- toggle_constraint(myCaNmod, "C01 : 1991")
+myCaNmod <- toggleConstraint(myCaNmod, "C01 : 1991")
 
 ```
 
@@ -107,7 +107,7 @@ Everything should be all right if your template was well created. The function r
 ```{r}
 require(ggplot2)
 require(ggraph)
-g<-ggCaNmod(myCaNmod)
+g<-ggNetwork(myCaNmod)
 print(g)
 ```
 The function pdfCaNmod builds an even more detailed summary of the model as a pdffile
@@ -131,10 +131,10 @@ getAllBoundsParam(myCaNmod)
 Since this function can be time consuming, we provide a version that focus on a parameter of interest, here for example the first parameter:
 
 ```{r}
-getBoundParamCaNmod(myCaNmod, p="F01[1988]")
+getBoundParam(myCaNmod, p="F01[1988]")
 ```
 
-If your polytope is empty, it means that there is no possible solutions and that some constraints should be relaxed. A function can help you to find which constraint raise problem: findingIncompatibleConstraintsCaNmod. For example, here we artificially add a constraint corresponding to a negative flow and look at the result:
+If your polytope is empty, it means that there is no possible solutions and that some constraints should be relaxed. A function can help you to find which constraint raise problem: findingIncompatibleConstr. For example, here we artificially add a constraint corresponding to a negative flow and look at the result:
 
 ```{r}
 myCaNmod2 <- myCaNmod
@@ -147,7 +147,7 @@ myCaNmod2$b <- c(myCaNmod2$b,-1)
 With these lines, we added a constraint telling that F01[1998]<=0. Since by construction of the model, F01[1988]>=0, this imposes F01[1988]. Since it is the only incoming flow for HerbZooplankton, they are only submitted to predation and other mortality and consequently necessarily decrease.
 
 ```{r}
-incomp<-findingIncompatibleConstrCaNmod(myCaNmod2)
+incomp<-findingIncompatibleConstr(myCaNmod2)
 ```
 
 Here the first line tells you that the algorithm successfully fit the model by relaxing 4 constraints: "neg_flow" is the one we added, two constraints of biomass positiveness and one constraint of inertia. This is logical: with no incoming flow, the HerbZooplankton biomass decreases below zero and the change of biomass during the first time step is too important. Then the algorithm tell you that "1989 : Biomass positiveness_refuge_HerbZooplankton" appears to be incompatible with "neg_flow", "1990 : Biomass positiveness_refuge_HerbZooplankton" with both "1989 : Biomass positiveness_refuge_HerbZooplankton" and "neg_flow"... Since neg_flow is always listed in the incompabible list, and that neg_flow can not be subtituted by another constraint (neg_flow: ), it would be the first one to be removed.
@@ -187,11 +187,11 @@ acfplot(thinned_res[,"F01[1988]"])
 The package provides a function that draw a ggplot of time series of biomass or flux. For example, here we draw a combination of time trends of "HerbZooPlankton" and "F01":
 
 ```{r}
-herbzoo<-ggResult(res,"HerbZooplankton", TRUE)
-f01<-ggResult(res,"F01", TRUE)
+herbzoo<-ggSeries(res,"HerbZooplankton", TRUE)
+f01<-ggSeries(res,"F01", TRUE)
 library(gridExtra)
 grid.arrange(f01,herbzoo,nrow=1)
 
 #same graph with two series in same plot
-ggResult(res,c("F01","HerbZooplankton"), TRUE)
+ggSeries(res,c("F01","HerbZooplankton"), TRUE)
 ```

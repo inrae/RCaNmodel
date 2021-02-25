@@ -91,7 +91,7 @@ sampleCaN <- function(myCaNmod,
     if (!find_init)
       stop("unable to find any suitable solutions after 100 tries")
     res <-
-      fitCaN(
+      sampleCaNCPP(
         N,
         thin = thin,
         as.matrix(myCaNmod$A),

@@ -4,21 +4,16 @@
 \alias{plotPolytope2D}
 \title{plotPolytope2D
 polt the possible values of a multimensional convex polytope by A.x<=b and
-C.x=v for 2 dimensions}
+C.x=v or by a CaNmod object in 2D}
 \usage{
-plotPolytope2D(A, b, C = NULL, v = NULL, params = c(1, 2))
+plotPolytope2D(x, params = c(1, 2))
 }
 \arguments{
-\item{A}{the matrix of inequality A.x<=b}
-
-\item{b}{the vector A.x<=b}
-
-\item{C}{the matrix of equality C.x=v (default NULL for no equality)}
-
-\item{v}{the vector of equality C.x=v (default NULL for no equality}
+\item{x}{either a CaNmod oject or a named list with at least a matrix A and
+a vector b (A.x<=b) and optionnally a matrix C and a vector v (C.x=v)}
 
 \item{params}{a vector of length 2 corresponding to the index of the
-parameters}
+parameters (default, two first)}
 }
 \value{
 a ggplot
@@ -26,7 +21,7 @@ a ggplot
 \description{
 plotPolytope2D
 polt the possible values of a multimensional convex polytope by A.x<=b and
-C.x=v for 2 dimensions
+C.x=v or by a CaNmod object in 2D
 }
 \examples{
 n <- 20
@@ -36,6 +31,6 @@ A2 <- diag(n)
 b2 <- as.matrix(rep(1,n))
 A <- rbind(A1,A2)
 b <- rbind(b1,b2)
-X0 <- plotPolytope2D(A,b)
+X0 <- plotPolytope2D(list(A = A, b = b))
 
 }

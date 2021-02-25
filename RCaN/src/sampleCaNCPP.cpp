@@ -69,7 +69,7 @@ IntegerVector order_(const NumericVector & x) {
 //' @param N the number of samples to generate
 //' @param A a matrix
 //' @param b a vector of length equals to nrow(A)
-//' @param x0 a vector of length equals to nrcol(A) that should be in the polytope, for example returned by \code{\link{chebycenter}}
+//' @param x0 a vector of length equals to nrcol(A) that should be in the polytope, for example returned by \code{\link{chebyCentre}}
 //' @param thin thinning interval
 //' @param gibbs if true, gibbs sampling, else hitandrun
 //' @param seed seed of the dqrng generator
@@ -89,7 +89,7 @@ IntegerVector order_(const NumericVector & x) {
 //' b2 <- as.matrix(rep(1,n))
 //' A <- rbind(A1,A2)
 //' b <- rbind(b1,b2)
-//' X0 <- chebycenter(A,b)
+//' X0 <- chebyCentre(A,b)
 //' x <- cpgs(1000,A,b,X0)
 //' @export
 // [[Rcpp::export]]
@@ -303,7 +303,7 @@ using Eigen::FullPivLU;
 //' @param b a vector of length equals to nrow(A)
 //' @param C a matrix of coefficients of inequality constants C.x=v
 //' @param v a vector of length equals to nrow(C)
-//' @param x0 a vector of length equals to ncol(A) that should be in the polytope, for example returned by \code{\link{chebycenter}}
+//' @param x0 a vector of length equals to ncol(A) that should be in the polytope, for example returned by \code{\link{chebyCentre}}
 //' @param thin the thinning interval
 //' @param gibbs if true, gibbs sampling, else hitandrun
 //' @param seed seed of the dqrng generator
@@ -369,11 +369,11 @@ Eigen::MatrixXd cpgsEquality(const int N, const Eigen::MatrixXd &A,
 
 
 // [[Rcpp::export]]
-List fitCaN(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorXd &b,
-            const Eigen::MatrixXd &C ,const Eigen::VectorXd &v,
-            const Eigen::MatrixXd &L,
-            const Eigen::VectorXd &x0, const int thin, const bool gibbs=true,
-            const int seed=1, const int stream=1) {
+List sampleCaNCPP(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorXd &b,
+               const Eigen::MatrixXd &C ,const Eigen::VectorXd &v,
+               const Eigen::MatrixXd &L,
+               const Eigen::VectorXd &x0, const int thin, const bool gibbs=true,
+               const int seed=1, const int stream=1) {
   int p=A.cols();
   int m2=C.rows();
   MatrixXd F(N, p);

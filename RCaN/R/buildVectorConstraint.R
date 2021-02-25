@@ -1,4 +1,4 @@
-#' build_vector_constraint
+#' buildVectorConstraint
 #' internal function that convert a symbolic equation of constraint into a
 #' matrix storing the coefficients of the constraint
 #' @param eq_constraint a symbolic equation corresponding to a constraint
@@ -12,7 +12,7 @@
 #' @importFrom symengine get_args
 
 
-build_vector_constraint <-
+buildVectorConstraint <-
   function(eq_constraint, symbolic_enviro) {
     coeff_const <-
       Matrix::Matrix(0, 1, length(symbolic_enviro$param), sparse = TRUE)

@@ -46,6 +46,6 @@ A2 <- diag(n)
 b2 <- as.matrix(rep(1,n))
 A <- rbind(A1,A2)
 b <- rbind(b1,b2)
-X0 <- chebycenter(A,b)
+X0 <- chebyCentre(A,b)
 x <- cpgs(1000,A,b,X0)
 }

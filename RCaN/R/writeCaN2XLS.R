@@ -1,4 +1,4 @@
-#' writeCaNmod_toXLS
+#' writeCaN2XLS
 #'
 #' writes an xlsx file that would correspond to the template of the CaNMod
 #' object
@@ -9,13 +9,13 @@
 #' @examples
 #' myCaNmod <- buildCaN(system.file("extdata",
 #'  "CaN_template_mini.xlsx", package = "RCaN"))
-#'  writeCaNmod_toXLS(paste(tempdir(),
+#'  writeCaN2XLS(paste(tempdir(),
 #'                          "/export.xlsx",
 #'                          sep = ""),
 #'                    myCaNmod)
 #'
 #' @importFrom writexl write_xlsx
-writeCaNmod_toXLS <- function(file,myCaNmod) {
+writeCaN2XLS <- function(file,myCaNmod) {
   if (!endsWith(file, ".xlsx"))
     stop("file name should end with .xlsx")
   if (!dir.exists(dirname(file))){

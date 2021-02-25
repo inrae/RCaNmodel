@@ -3,18 +3,14 @@
 \name{findingIncompatibleConstr}
 \alias{findingIncompatibleConstr}
 \title{findingIncompatibleConstraints
-help to dectect constraints that leads to an empty polytope}
+help to dectect constraints that leads to an empty polytope defined
+by+A.x<=b and C.x=v or by the polytope of the CaNmod object}
 \usage{
-findingIncompatibleConstr(A, b, C = NULL, v = NULL)
+findingIncompatibleConstr(x)
 }
 \arguments{
-\item{A}{the matrix of inequality A.x<=b}
-
-\item{b}{the vector A.x<=b}
-
-\item{C}{the matrix of equality C.x=v (default NULL for no equality)}
-
-\item{v}{the vector of equality C.x=v (default NULL for no equality}
+\item{x}{either a CaNmod oject or a named list with at least a matrix A and
+a vector b (A.x<=b) and optionnally a matrix C and a vector v (C.x=v)}
 }
 \value{
 a list of vector. To be fitted, constraints corresponding to the
@@ -26,7 +22,8 @@ A is incompatible with B and that D is incompatible with both E and F
 }
 \description{
 findingIncompatibleConstraints
-help to dectect constraints that leads to an empty polytope
+help to dectect constraints that leads to an empty polytope defined
+by+A.x<=b and C.x=v or by the polytope of the CaNmod object
 }
 \examples{
 n <- 20
@@ -38,6 +35,6 @@ A <- rbind(A1,A2)
 b <- rbind(b1,b2)
 C <- matrix(c(1,rep(0,n-1)),1)
 v <- 3
-X0 <- findingIncompatibleConstr(A,b,C,v)
+X0 <- findingIncompatibleConstr(list(A = A, b = b, C = C, v = v))
 
 }

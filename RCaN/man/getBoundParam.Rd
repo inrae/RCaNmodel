@@ -4,21 +4,15 @@
 \alias{getBoundParam}
 \title{getBoundParam
 Computes the possible bounds for a parameter p of a polytope defined
-by+A.x<=b and C.x=v}
+by+A.x<=b and C.x=v or by the polytope of the CaNmod object}
 \usage{
-getBoundParam(A, b, p, C = NULL, v = NULL, lower = NULL,
-  upper = NULL, presolve = TRUE)
+getBoundParam(x, p, lower = NULL, upper = NULL, presolve = TRUE)
 }
 \arguments{
-\item{A}{the matrix of inequality A.x<=b}
-
-\item{b}{the vector A.x<=b}
+\item{x}{either a CaNmod oject or a named list with at least a matrix A and
+a vector b (A.x<=b) and optionnally a matrix C and a vector v (C.x=v)}
 
 \item{p}{the index of the parameter for which the bounds should be computed}
-
-\item{C}{the matrix of equality C.x=v (default NULL for no equality)}
-
-\item{v}{the vector of equality C.x=v (default NULL for no equality}
 
 \item{lower}{lower bounds (default NULL for bounds 0)}
 
@@ -32,7 +26,7 @@ a vector with lower bounds and upper bounds
 \description{
 getBoundParam
 Computes the possible bounds for a parameter p of a polytope defined
-by+A.x<=b and C.x=v
+by+A.x<=b and C.x=v or by the polytope of the CaNmod object
 }
 \examples{
 n <- 20
@@ -42,6 +36,6 @@ A2 <- diag(n)
 b2 <- as.matrix(rep(1,n))
 A <- rbind(A1,A2)
 b <- rbind(b1,b2)
-X0 <- getBoundParam(A,b,1)
+X0 <- getBoundParam(list(A = A, b = b),1)
 
 }
