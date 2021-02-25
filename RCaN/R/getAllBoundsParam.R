@@ -1,15 +1,13 @@
 #' getAllBoundsParam
 #' Computes the possible bounds for all parameters of a polytope defined by
-#' A.x<=b and C.x=v
-#' @param A the matrix of inequality A.x<=b
-#' @param b the vector A.x<=b
-#' @param C the matrix of equality C.x=v (default NULL for no equality)
-#' @param v the vector of equality C.x=v (default NULL for no equality
+#' A.x<=b and C.x=v or by a CaNmod object
+#' @param x either a CaNmod oject or a named list with at least a matrix A and
+#' a vector b (A.x<=b) and optionnally a matrix C and a vector v (C.x=v)
 #'
 #' @importFrom utils setTxtProgressBar
 #' @importFrom utils txtProgressBar
 #'
-#' @return a datrame with first column corresponding to colnames(A), and
+#' @return a datafame with first column corresponding to colnames(A), and
 #' corresponding lower bounds (column 2) and upper bounds (column 3)
 #' @examples
 #' n <- 20
@@ -19,10 +17,31 @@
 #' b2 <- as.matrix(rep(1,n))
 #' A <- rbind(A1,A2)
 #' b <- rbind(b1,b2)
-#' X0 <- getAllBoundsParam(A,b)
+#' X0 <- getAllBoundsParam(list(A = A, b = b))
 #' @export
 
-getAllBoundsParam <- function(A, b, C = NULL, v = NULL) {
+getAllBoundsParam <- function(x) {
+  if (!class(x) %in% c("CaNmod", "list"))
+    stop("x should either be a CaNmod object or a list")
+  if (class(x) == "CaNmod"){
+    A <- as.matrix(myCaNmod$A)
+    b <- myCaNmod$b
+    C <-as.matrix(myCaNmod$C)
+    v <- myCaNmod$v
+  } else {
+    if (is.null(names(x)))
+      stop("x should be a named list")
+    if (all(c("A", "b") %in% names(x)))
+      stop("x should at least contain a matrix A and a list b")
+    if (all(names(x)) %in% c("A", "b", "C", "v"))
+      stop("names of x should be A, b, C or v")
+    A <- x$A
+    b <- x$b
+    C <- x$C
+    v <- x$v
+  }
+
+
   nbparam <- ncol(A)
   if (is.null(colnames(A))) {
     colnames(A) <- paste("col", seq_len(ncol(A)), sep = "")
