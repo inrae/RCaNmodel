@@ -23,7 +23,7 @@ findingIncompatibleConstrCaNmod
 compute bounds for all paramaters
 }
 \examples{
-myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx",
+myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
  package = "RCaN"))
 #we artificially add incompatible constraints (negative flow)
 myCaNmod$A <- rbind(myCaNmod$A,c(1,rep(0,ncol(myCaNmod$A)-1)))

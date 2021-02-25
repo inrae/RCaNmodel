@@ -27,7 +27,7 @@ the line corresponds to median of the mcmc simulation, the ribbon
 corresponds to quantiles 2.5% and 97.5%
 }
 \examples{
-myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx",
+myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
  package = "RCaN"))
 res <- fitmyCaNmod(myCaNmod, 100)
 #with one series

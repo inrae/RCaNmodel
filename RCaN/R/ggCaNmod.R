@@ -6,7 +6,7 @@
 #' @examples
 #' require(ggraph)
 #' require(ggplot2)
-#' myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx",
+#' myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
 #'  package = "RCaN"))
 #' ggCaNmod(myCaNmod)
 #' @importFrom igraph graph_from_data_frame

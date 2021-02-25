@@ -18,7 +18,7 @@ checkPolytopeStatusCaNmod
 check whether the polytope is well defined or not
 }
 \examples{
-myCaNmod <- build_CaNmod(system.file("extdata", "CaN_template_mini.xlsx",
+myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
  package = "RCaN"))
 checkPolytopeStatusCaNmod(myCaNmod)
 
