@@ -1,6 +1,6 @@
 #' ggSatiation
 #' plots incoming trophic fluxes versus biomass
-#' @param myFitCaNmod result sent by \link{fitmyCaNmod}
+#' @param mysampleCaNmod result sent by \link{sampleCaN}
 #' @param species the name (or a vector of name) of the species of interest
 #' by default, all species
 #' @return a ggplot
@@ -9,7 +9,7 @@
 #' @examples
 #' myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
 #'  package = "RCaN"))
-#' res <- fitmyCaNmod(myCaNmod, 100)
+#' res <- sampleCaNmod(myCaNmod, 100)
 #' ggSatiation(res)
 #'
 #' @importFrom ggplot2 ggplot
@@ -34,16 +34,16 @@
 #' @importFrom ggplot2 theme
 #' @export
 #'
-ggSatiation <- function(myFitCaNmod,
+ggSatiation <- function(mysampleCaNmod,
                      species = NULL) {
   if (is.null(species))
-    species <- myFitCaNmod$CaNmod$species
-  if (!all(species %in% myFitCaNmod$CaNmod$species))
+    species <- mysampleCaNmod$CaNmod$species
+  if (!all(species %in% mysampleCaNmod$CaNmod$species))
     stop("some species are not recognized")
   species <- factor(species, levels = species)
-  myCaNmodFit_long <- as.data.frame(as.matrix(myFitCaNmod$mcmc)) %>%
-    mutate("Sample_id" = 1:nrow(as.matrix(myFitCaNmod$mcmc))) %>%
-    sample_n(min(1000, nrow(as.matrix(myFitCaNmod$mcmc))), replace = FALSE) %>%
+  myCaNmodFit_long <- as.data.frame(as.matrix(mysampleCaNmod$mcmc)) %>%
+    mutate("Sample_id" = 1:nrow(as.matrix(mysampleCaNmod$mcmc))) %>%
+    sample_n(min(1000, nrow(as.matrix(mysampleCaNmod$mcmc))), replace = FALSE) %>%
     pivot_longer(cols = -!!sym("Sample_id"),
                  names_to = c("Var","Year"),
                  names_pattern = "(.*)\\[(.*)\\]",
@@ -53,13 +53,13 @@ ggSatiation <- function(myFitCaNmod,
     rename("b" = "value") %>%
     mutate("Year" = as.numeric(!!sym("Year"))) %>%
     rename("predator" = "Var")
-  trophic_flows <- myFitCaNmod$CaNmod$fluxes_def$Flux[
-    myFitCaNmod$CaNmod$fluxes_def$Trophic == 1]
+  trophic_flows <- mysampleCaNmod$CaNmod$fluxes_def$Flux[
+    mysampleCaNmod$CaNmod$fluxes_def$Trophic == 1]
   fluxes <- myCaNmodFit_long %>%
     filter(!!sym("Var") %in% trophic_flows) %>%
     rename("Flux" = "Var") %>%
     mutate("Year" = as.numeric(!!sym("Year"))) %>%
-    left_join(myFitCaNmod$CaNmod$fluxes_def) %>%
+    left_join(mysampleCaNmod$CaNmod$fluxes_def) %>%
     rename("predator" = !!sym("To"),
            "prey" = !!sym("From")) %>%
     group_by(!!sym("Sample_id"),
@@ -72,7 +72,7 @@ ggSatiation <- function(myFitCaNmod,
                             levels = species)
 
 
-  Satiation <- myFitCaNmod$CaNmod$components_param %>%
+  Satiation <- mysampleCaNmod$CaNmod$components_param %>%
     filter(!!sym("Component") %in% species) %>%
     mutate("predator" = factor(!!sym("Component"),
                                levels=species),

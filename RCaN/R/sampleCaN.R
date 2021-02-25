@@ -1,7 +1,7 @@
 
-#' fitmyCaNmod
+#' sampleCaN
 #'
-#' fit the CaNmod model
+#' sample the polytope corresponding to the CaNmod model
 #' @param myCaNmod a CaNmod object with following elements
 #' @param N the number of samples required
 #' @param nchain the number of mcmc chains
@@ -9,7 +9,7 @@
 #' @param thin thinning interval
 #' @param method one of gibbs (default) or hitandrun
 #' @param lastF should flow for last year be simulated (default = FALSE)
-#' @return a fitCaNmod object which contains two elements
+#' @return a sampleCaNmod object which contains two elements
 #' \itemize{
 #'  \item{"CaNmod"}{the CaNmod object descring the model}
 #'  \item{"mcmc"}{\code{\link[coda]{mcmc.list}}}
@@ -20,7 +20,7 @@
 #' @examples
 #' myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
 #'  package = "RCaN"))
-#' res <- fitmyCaNmod(myCaNmod, 100)
+#' res <- sampleCaNmod(myCaNmod, 100)
 #'
 #' @importFrom ROI ROI_solve
 #' @importFrom parallel detectCores
@@ -37,7 +37,7 @@
 #' @importFrom foreach %do%
 #' @importFrom foreach %do%
 #' @importFrom stats runif
-fitmyCaNmod <- function(myCaNmod,
+sampleCaN <- function(myCaNmod,
                         N,
                         nchain = 1,
                         ncore = 1,
@@ -127,9 +127,9 @@ fitmyCaNmod <- function(myCaNmod,
     stopCluster(cl)
     stopImplicitCluster()
   }
-  fitCaNmod <- list(CaNmod = myCaNmod,
+  sampleCaNmod <- list(CaNmod = myCaNmod,
                     mcmc = mcmc.list(res))
-  class(fitCaNmod) <- "fitCaNmod"
-  return(fitCaNmod)
+  class(sampleCaNmod) <- "sampleCaNmod"
+  return(sampleCaNmod)
 
 }

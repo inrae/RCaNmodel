@@ -2,7 +2,7 @@
 #' ggDiet
 #' provides a ggplot of diet, barplot provides an average diet while violin plot
 #' provides a distribution over iterations and years
-#' @param myFitCaNmod result sent by \link{fitmyCaNmod}
+#' @param mysampleCaNmod result sent by \link{sampleCaN}
 #' @param species the name (or a vector of name) of the species of interest
 #' @param barplot if TRUE a barplot (default), else a violin plot
 #' @return a ggplot
@@ -11,7 +11,7 @@
 #' @examples
 #' myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
 #'  package = "RCaN"))
-#' res <- fitmyCaNmod(myCaNmod, 100)
+#' res <- sampleCaNmod(myCaNmod, 100)
 #' ggDiet(res,"OmniZooplankton")
 #'
 #' @importFrom ggplot2 ggplot
@@ -34,16 +34,16 @@
 #' @importFrom ggplot2 facet_wrap
 #' @export
 #'
-ggDiet <- function(myFitCaNmod,
+ggDiet <- function(mysampleCaNmod,
                    species,
                    barplot = TRUE) {
-  if (!all(species %in% myFitCaNmod$CaNmod$species))
+  if (!all(species %in% mysampleCaNmod$CaNmod$species))
     stop("some species are not recognized")
   if (!is.logical(barplot))
     stop("barplot should be logical")
-  fluxes <- myFitCaNmod$CaNmod$fluxes_def %>%
+  fluxes <- mysampleCaNmod$CaNmod$fluxes_def %>%
     filter(!!sym("To") %in% species & !!sym("Trophic"))
-  mat_res <- as.matrix(myFitCaNmod$mcmc)
+  mat_res <- as.matrix(mysampleCaNmod$mcmc)
   mat_res <- mat_res[, grep(paste("^(",
                                   paste(fluxes$Flux, collapse = "|"),
                                   ")\\[",

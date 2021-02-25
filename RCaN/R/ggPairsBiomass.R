@@ -1,7 +1,7 @@
 #' ggPairsBiomass
 #' plots pairs plot of biomass among species and provided Kendall correlation
 #' tau
-#' @param myFitCaNmod result sent by \link{fitmyCaNmod}
+#' @param mysampleCaNmod result sent by \link{sampleCaN}
 #' @param species the name (or a vector of name) of the species of interest
 #' by default, all species
 #' @param logscale should biomass be log10 transformed (default yes)
@@ -11,7 +11,7 @@
 #' @examples
 #' myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
 #'  package = "RCaN"))
-#' res <- fitmyCaNmod(myCaNmod, 100)
+#' res <- sampleCaNmod(myCaNmod, 100)
 #' ggPairsBiomass(res)
 #'
 #' @importFrom ggplot2 ggplot
@@ -36,19 +36,19 @@
 #' @importFrom ggplot2 theme
 #' @export
 #'
-ggPairsBiomass <- function(myFitCaNmod,
+ggPairsBiomass <- function(mysampleCaNmod,
                      species = NULL,
                      logscale = TRUE) {
   if (!is.logical(logscale))
     stop("logscale should be a logical")
   if (is.null(species))
-    species <- myFitCaNmod$CaNmod$species
-  if (!all(species %in% myFitCaNmod$CaNmod$species))
+    species <- mysampleCaNmod$CaNmod$species
+  if (!all(species %in% mysampleCaNmod$CaNmod$species))
     stop("some species are not recognized")
 
-  myCaNmodFit_long <- as.data.frame(as.matrix(myFitCaNmod$mcmc)) %>%
-    mutate("Sample_id" = 1:nrow(as.matrix(myFitCaNmod$mcmc))) %>%
-    sample_n(min(1000, nrow(as.matrix(myFitCaNmod$mcmc))), replace = FALSE) %>%
+  myCaNmodFit_long <- as.data.frame(as.matrix(mysampleCaNmod$mcmc)) %>%
+    mutate("Sample_id" = 1:nrow(as.matrix(mysampleCaNmod$mcmc))) %>%
+    sample_n(min(1000, nrow(as.matrix(mysampleCaNmod$mcmc))), replace = FALSE) %>%
     pivot_longer(cols = -!!sym("Sample_id"),
                  names_to = c("Var","Year"),
                  names_pattern = "(.*)\\[(.*)\\]",

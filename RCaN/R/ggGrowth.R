@@ -1,7 +1,7 @@
 #' ggGrowth
 #' plots biomass growth as a function of biomass
 #' provides a distribution over iterations and years
-#' @param myFitCaNmod result sent by \link{fitmyCaNmod}
+#' @param mysampleCaNmod result sent by \link{sampleCaN}
 #' @param species the name (or a vector of name) of the species of interest
 #' by default, all species
 #' @return a ggplot
@@ -10,7 +10,7 @@
 #' @examples
 #' myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
 #'  package = "RCaN"))
-#' res <- fitmyCaNmod(myCaNmod, 100)
+#' res <- sampleCaN(myCaNmod, 100)
 #' ggGrowth(res)
 #'
 #' @importFrom ggplot2 ggplot
@@ -34,16 +34,16 @@
 #' @importFrom ggplot2 theme
 #' @export
 #'
-ggGrowth <- function(myFitCaNmod,
+ggGrowth <- function(mysampleCaNmod,
                      species = NULL) {
   if (is.null(species))
-    species <- myFitCaNmod$CaNmod$species
-  if (!all(species %in% myFitCaNmod$CaNmod$species))
+    species <- mysampleCaNmod$CaNmod$species
+  if (!all(species %in% mysampleCaNmod$CaNmod$species))
     stop("some species are not recognized")
 
-  myCaNmodFit_long <- as.data.frame(as.matrix(myFitCaNmod$mcmc)) %>%
-    mutate("Sample_id" = 1:nrow(as.matrix(myFitCaNmod$mcmc))) %>%
-    sample_n(min(1000, nrow(as.matrix(myFitCaNmod$mcmc))), replace = FALSE) %>%
+  myCaNmodFit_long <- as.data.frame(as.matrix(mysampleCaNmod$mcmc)) %>%
+    mutate("Sample_id" = 1:nrow(as.matrix(mysampleCaNmod$mcmc))) %>%
+    sample_n(min(1000, nrow(as.matrix(mysampleCaNmod$mcmc))), replace = FALSE) %>%
     pivot_longer(cols = -!!sym("Sample_id"),
                  names_to = c("Var","Year"),
                  names_pattern = "(.*)\\[(.*)\\]",
@@ -61,7 +61,7 @@ ggGrowth <- function(myFitCaNmod,
               suffix = c("_curr", "_next")) %>%
     mutate("growth" = !!sym("b_next")/!!sym("b_curr")) %>%
     rename("species" = !!sym("Var"))
-  Inertia <- myFitCaNmod$CaNmod$components_param %>%
+  Inertia <- mysampleCaNmod$CaNmod$components_param %>%
     filter(!!sym("Component") %in% species) %>%
     mutate(inertia_low = exp(-!!sym("Inertia")),
            inertia_high = exp(!!sym("Inertia"))) %>%

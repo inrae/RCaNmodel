@@ -6,11 +6,11 @@
 provides a violin plot of the distribution of flux or biomass
 for specific years}
 \usage{
-ggViolin(myFitCaNmod, param, year, logscale = TRUE,
+ggViolin(mysampleCaNmod, param, year, logscale = TRUE,
   xlab = "Component/Flux", ylab = "Distribution")
 }
 \arguments{
-\item{myFitCaNmod}{result sent by \link{fitmyCaNmod}}
+\item{mysampleCaNmod}{result sent by \link{sampleCaN}}
 
 \item{param}{the name (or a vector of name) of a parameter (either a flux or
 a biomass)}
@@ -37,7 +37,7 @@ distribution of fluxes or biomass for a specific year
 \examples{
 myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
  package = "RCaN"))
-res <- fitmyCaNmod(myCaNmod, 100)
+res <- sampleCaN(myCaNmod, 100)
 #with 2 series
 ggViolin(res,c("F01","HerbZooplankton"), year=1988, TRUE)
 

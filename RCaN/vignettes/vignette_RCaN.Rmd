@@ -159,7 +159,7 @@ After this step, you should be able to fit the model.
 The aim of this step is to achieve a uniform sampling within the convex poltyope. To do that, we use the routines from the former cpgsR package. Since the sampling is based on a mcmc algorithm, it can be a good idea to run several independent chains; the library allows you to run several chain in parallel using multicore facility provided by package parallel and doParallel. For example, here is the solution to run 2 chains in parrallel with 1000 samples in each chain:
 
 ```{r}
-res <- fitmyCaNmod(myCaNmod, 1000,nchain=2,ncore=2)
+res <- sampleCaN(myCaNmod, 1000,nchain=2,ncore=2)
 ```
 
 The argument ncore allows to use several cores in parallel, however the library ensure that the computation leave one core unused and that the number of cores remain smaller than the number of chains
