@@ -2,7 +2,7 @@
 #' ggResult
 #'
 #' provide a ggplot of the fit
-#' @param myFitCaNmod result sent by \link{fitmyCaNmod}
+#' @param mysampleCaNmod result sent by \link{sampleCaN}
 #' @param param the name (or a vector of name) of a parameter (either a flow or
 #' a biomass)
 #' @param ylab default Biomass Flux
@@ -14,7 +14,7 @@
 #' @examples
 #' myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
 #'  package = "RCaN"))
-#' res <- fitmyCaNmod(myCaNmod, 100)
+#' res <- sampleCaNmod(myCaNmod, 100)
 #' #with one series
 #' ggResult(res,"F01", TRUE)
 #'
@@ -31,13 +31,13 @@
 
 #' @export
 #'
-ggResult <- function(myFitCaNmod,
+ggResult <- function(mysampleCaNmod,
                      param,
                      plot_series=TRUE,
                      ylab="Biomass/Flux") {
-  if (class(myFitCaNmod) != "fitCaNmod")
-    stop("you should provide a fitCaNmod object")
-  mat_res <- as.matrix(myFitCaNmod$mcmc)
+  if (class(mysampleCaNmod) != "sampleCaNmod")
+    stop("you should provide a sampleCaNmod object")
+  mat_res <- as.matrix(mysampleCaNmod$mcmc)
   quantiles <- do.call("rbind.data.frame", lapply(param, function(p) {
     columns <- which(startsWith(colnames(mat_res), paste(p, "[", sep = "")))
     if (length(columns) == 0)
@@ -49,8 +49,8 @@ ggResult <- function(myFitCaNmod,
         quantile,
         probs = c(0, .025, 0.25, .50, .75, .975, 1)
       )),
-      year = myFitCaNmod$CaNmod$series$Year[
-        paste(p, "[", myFitCaNmod$CaNmod$series$Year, "]", sep = "") %in%
+      year = mysampleCaNmod$CaNmod$series$Year[
+        paste(p, "[", mysampleCaNmod$CaNmod$series$Year, "]", sep = "") %in%
           colnames(mat_res)[columns]
       ],
       series = as.character(p))
@@ -90,8 +90,8 @@ ggResult <- function(myFitCaNmod,
         data.frame(t(apply(
           mat_res[selectedsamples, columns], 2, identity
         )),
-        year = myFitCaNmod$CaNmod$series$Year[
-          paste(p, "[", myFitCaNmod$CaNmod$series$Year, "]", sep = "") %in%
+        year = mysampleCaNmod$CaNmod$series$Year[
+          paste(p, "[", mysampleCaNmod$CaNmod$series$Year, "]", sep = "") %in%
             colnames(mat_res)[columns]
           ],
         series = as.character(p))

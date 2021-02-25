@@ -6,10 +6,10 @@
 provides a ggplot of diet, barplot provides an average diet while violin plot
 provides a distribution over iterations and years}
 \usage{
-ggDiet(myFitCaNmod, species, barplot = TRUE)
+ggDiet(mysampleCaNmod, species, barplot = TRUE)
 }
 \arguments{
-\item{myFitCaNmod}{result sent by \link{fitmyCaNmod}}
+\item{mysampleCaNmod}{result sent by \link{sampleCaN}}
 
 \item{species}{the name (or a vector of name) of the species of interest}
 
@@ -29,7 +29,7 @@ distribution of fluxes or biomass for a specific year
 \examples{
 myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
  package = "RCaN"))
-res <- fitmyCaNmod(myCaNmod, 100)
+res <- sampleCaNmod(myCaNmod, 100)
 ggDiet(res,"OmniZooplankton")
 
 }

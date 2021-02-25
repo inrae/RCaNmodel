@@ -1,7 +1,7 @@
 #' ggViolin
 #' provides a violin plot of the distribution of flux or biomass
 #' for specific years
-#' @param myFitCaNmod result sent by \link{fitmyCaNmod}
+#' @param mysampleCaNmod result sent by \link{sampleCaN}
 #' @param param the name (or a vector of name) of a parameter (either a flux or
 #' a biomass)
 #' @param year the year
@@ -14,7 +14,7 @@
 #' @examples
 #' myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
 #'  package = "RCaN"))
-#' res <- fitmyCaNmod(myCaNmod, 100)
+#' res <- sampleCaN(myCaNmod, 100)
 #' #with 2 series
 #' ggViolin(res,c("F01","HerbZooplankton"), year=1988, TRUE)
 #'
@@ -31,7 +31,7 @@
 #' @importFrom tidyr pivot_longer
 #' @export
 #'
-ggViolin <- function(myFitCaNmod,
+ggViolin <- function(mysampleCaNmod,
                      param,
                      year,
                      logscale=TRUE,
@@ -39,9 +39,9 @@ ggViolin <- function(myFitCaNmod,
                      ylab = "Distribution") {
   if (length(year) != 1)
     stop("a single year should be provided")
-  if (class(myFitCaNmod) != "fitCaNmod")
-    stop("you should provide a fitCaNmod object")
-  mat_res <- as.matrix(myFitCaNmod$mcmc)
+  if (class(mysampleCaNmod) != "sampleCaNmod")
+    stop("you should provide a sampleCaNmod object")
+  mat_res <- as.matrix(mysampleCaNmod$mcmc)
   mat_res <- mat_res[, colnames(mat_res) %in% paste(param,
                                                     "[",
                                                     year,

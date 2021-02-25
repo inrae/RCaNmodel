@@ -4,10 +4,11 @@
 \alias{ggResult}
 \title{ggResult}
 \usage{
-ggResult(myFitCaNmod, param, plot_series = TRUE, ylab = "Biomass/Flux")
+ggResult(mysampleCaNmod, param, plot_series = TRUE,
+  ylab = "Biomass/Flux")
 }
 \arguments{
-\item{myFitCaNmod}{result sent by \link{fitmyCaNmod}}
+\item{mysampleCaNmod}{result sent by \link{sampleCaN}}
 
 \item{param}{the name (or a vector of name) of a parameter (either a flow or
 a biomass)}
@@ -29,7 +30,7 @@ corresponds to quantiles 2.5% and 97.5%
 \examples{
 myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
  package = "RCaN"))
-res <- fitmyCaNmod(myCaNmod, 100)
+res <- sampleCaNmod(myCaNmod, 100)
 #with one series
 ggResult(res,"F01", TRUE)
 

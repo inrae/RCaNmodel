@@ -5,10 +5,10 @@
 \title{ggSatiation
 plots incoming trophic fluxes versus biomass}
 \usage{
-ggSatiation(myFitCaNmod, species = NULL)
+ggSatiation(mysampleCaNmod, species = NULL)
 }
 \arguments{
-\item{myFitCaNmod}{result sent by \link{fitmyCaNmod}}
+\item{mysampleCaNmod}{result sent by \link{sampleCaN}}
 
 \item{species}{the name (or a vector of name) of the species of interest
 by default, all species}
@@ -26,7 +26,7 @@ distribution of fluxes or biomass for a specific year
 \examples{
 myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
  package = "RCaN"))
-res <- fitmyCaNmod(myCaNmod, 100)
+res <- sampleCaNmod(myCaNmod, 100)
 ggSatiation(res)
 
 }
