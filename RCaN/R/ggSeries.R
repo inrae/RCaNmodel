@@ -1,5 +1,5 @@
 
-#' ggResult
+#' ggSeries
 #'
 #' provide a ggplot of the fit
 #' @param mysampleCaNmod result sent by \link{sampleCaN}
@@ -16,10 +16,10 @@
 #'  package = "RCaN"))
 #' res <- sampleCaNmod(myCaNmod, 100)
 #' #with one series
-#' ggResult(res,"F01", TRUE)
+#' ggSeries(res,"F01", TRUE)
 #'
 #' #with 2 series
-#' ggResult(res,c("F01","HerbZooplankton"), TRUE)
+#' ggSeries(res,c("F01","HerbZooplankton"), TRUE)
 #'
 #' @importFrom ggplot2 ggplot
 #' @importFrom ggplot2 geom_path
@@ -31,7 +31,7 @@
 
 #' @export
 #'
-ggResult <- function(mysampleCaNmod,
+ggSeries <- function(mysampleCaNmod,
                      param,
                      plot_series=TRUE,
                      ylab="Biomass/Flux") {

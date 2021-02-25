@@ -31,7 +31,7 @@ X0 <- checkPolytopeStatus(list(A = A, b = b))
 #this one is empty
 C <- matrix(c(1,rep(0,n-1)),1)
 v <- 3
-X0 <- checkPolytopeStatus(list(A = A, b = b, C = C,v = v)
+X0 <- checkPolytopeStatus(list(A = A, b = b, C = C, v = v))
 
 #example with a CaNmod object
 myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",

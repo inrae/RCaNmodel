@@ -1,12 +1,10 @@
 #' plotPolytope2D
 #' polt the possible values of a multimensional convex polytope by A.x<=b and
-#' C.x=v for 2 dimensions
-#' @param A the matrix of inequality A.x<=b
-#' @param b the vector A.x<=b
-#' @param C the matrix of equality C.x=v (default NULL for no equality)
-#' @param v the vector of equality C.x=v (default NULL for no equality
+#' C.x=v or by a CaNmod object in 2D
+#' @param x either a CaNmod oject or a named list with at least a matrix A and
+#' a vector b (A.x<=b) and optionnally a matrix C and a vector v (C.x=v)
 #' @param params a vector of length 2 corresponding to the index of the
-#' parameters
+#' parameters (default, two first)
 #' @return a ggplot
 #'
 #' @importFrom utils setTxtProgressBar
@@ -22,16 +20,19 @@
 #' b2 <- as.matrix(rep(1,n))
 #' A <- rbind(A1,A2)
 #' b <- rbind(b1,b2)
-#' X0 <- plotPolytope2D(A,b)
+#' X0 <- plotPolytope2D(list(A = A, b = b))
 #'
 #' @export
 
 
-plotPolytope2D <- function(A,
-                           b,
-                           C = NULL,
-                           v = NULL,
+plotPolytope2D <- function(x,
                            params = c(1, 2)) {
+  x <- reformatX(x)
+  A <- x$A
+  b <- x$b
+  C <- x$C
+  v <- x$v
+
   nbparam <- ncol(A)
   if (length(params) != 2)
     stop("only works for two params")
@@ -44,16 +45,21 @@ plotPolytope2D <- function(A,
   if (is.null(colnames(A))) {
     colnames(A) <- paste("col", seq_len(ncol(A)), sep = "")
   }
-  bounds_param1 <- getBoundParam(A, b, params[1], C, v)
+  bounds_param1 <- getBoundParam(list(A = A, b = b,
+                                      C = C, v = v),
+                                 params[1])
   seqx1 <- seq(bounds_param1[1], bounds_param1[2], length.out = 50)
   pb <- txtProgressBar(min = 0, max = 50, style = 3)
   polygon <- lapply(seqx1, function(x) {
     setTxtProgressBar(pb, which(seqx1 == x))
     cbind(rep(x, 2),
-          getBoundParam(A, b,
-                        params[2], rbind(C, ifelse((1:nbparam) ==
-                                                     params[1], 1, 0
-                        )), c(v, x)))
+          getBoundParam(list(A = A,
+                             b = b,
+                             C = rbind(C, ifelse((1:nbparam) ==
+                                                   params[1], 1, 0
+                                                 )),
+                             v = c(v, x)),
+                        params[2]))
   })
   polygon <-
     as.data.frame(rbind(do.call("rbind", lapply(polygon, function(x)

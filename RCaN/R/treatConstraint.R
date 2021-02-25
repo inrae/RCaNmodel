@@ -1,4 +1,4 @@
-#' treat_constraint
+#' treatConstraint
 #'
 #' This is an internal function used to convert a string constraint into a
 #' symbolic expression
@@ -14,7 +14,7 @@
 
 
 
-treat_constraint <- function(myconstraint,
+treatConstraint <- function(myconstraint,
                              symbolic_enviro,
                              yr = NULL,
                              name_constr = NULL) {
@@ -95,7 +95,7 @@ treat_constraint <- function(myconstraint,
   mat <-
     do.call(rbind,
             lapply(as.vector(symbolic_constraint), function(s)
-              build_vector_constraint(s, symbolic_enviro)))
+              buildVectorConstraint(s, symbolic_enviro)))
   if (is.null(yr)) {
     yr <- seq_len(nrow(mat))
   } else{

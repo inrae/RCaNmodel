@@ -31,7 +31,7 @@ NULL
 #' b2 <- as.matrix(rep(1,n))
 #' A <- rbind(A1,A2)
 #' b <- rbind(b1,b2)
-#' X0 <- chebycenter(A,b)
+#' X0 <- chebyCentre(A,b)
 #' x <- cpgs(1000,A,b,X0)
 #' @export
 cpgs <- function(N, A, b, x0, thin = 1L, gibbs = TRUE, seed = 1L, stream = 1L) {
@@ -75,8 +75,8 @@ cpgsEquality <- function(N, A, b, C, v, x0, thin = 1L, gibbs = TRUE, seed = 1L, 
     .Call(`_RCaN_cpgsEquality`, N, A, b, C, v, x0, thin, gibbs, seed, stream)
 }
 
-fitCaN <- function(N, A, b, C, v, L, x0, thin, gibbs = TRUE, seed = 1L, stream = 1L) {
-    .Call(`_RCaN_fitCaN`, N, A, b, C, v, L, x0, thin, gibbs, seed, stream)
+sampleCaNCPP <- function(N, A, b, C, v, L, x0, thin, gibbs = TRUE, seed = 1L, stream = 1L) {
+    .Call(`_RCaN_sampleCaNCPP`, N, A, b, C, v, L, x0, thin, gibbs, seed, stream)
 }
 
 # Register entry points for exported C++ functions

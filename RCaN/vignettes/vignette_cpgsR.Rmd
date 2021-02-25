@@ -19,7 +19,7 @@ library(RCaN)
 This package aims at uniformly sampling points in a complex polytope defined by the inequalities \eqn{A \cdot x \leqslant   b}. It is based on an original matlab code called CPRND that can be found there
 <https://ch.mathworks.com/matlabcentral/fileexchange/34208-uniform-distribution-over-a-convex-polytope>. The package provides two functions:
 * \code{\link{cpgs}}: main function of the package that carry out the sampling
-* \code{\link{chebycenter}}: a function to compute the centroid of the polytope that can be used as inital point of the sampler
+* \code{\link{chebyCentre}}: a function to compute the centroid of the polytope that can be used as inital point of the sampler
 
 To illustrate the usage of the package, we are going to sample in a hypercube with 50 dimensions ranging from 0 to 1.
 
@@ -33,7 +33,7 @@ A <- rbind(A1,A2) #the coefficent matrix
 b <- rbind(b1,b2) #the bounds vector
 
 ```
-Now, we need to provide an intial point. For this purpose, we use the function \code{\link{chebycenter}} as follows:
+Now, we need to provide an intial point. For this purpose, we use the function \code{\link{chebyCentre}} as follows:
 
 ```{r}
 n <- 20
@@ -42,7 +42,7 @@ b1 <- as.matrix(rep(0,n))
 A2 <- diag(n)
 b2 <- as.matrix(rep(1,n))
 A <- rbind(A1,A2) #the coefficent matrix
-X0 <- chebycenter(A,b)
+X0 <- chebyCentre(A,b)
   print(X0)
 ```
 

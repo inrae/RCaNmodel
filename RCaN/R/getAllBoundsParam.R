@@ -21,25 +21,11 @@
 #' @export
 
 getAllBoundsParam <- function(x) {
-  if (!class(x) %in% c("CaNmod", "list"))
-    stop("x should either be a CaNmod object or a list")
-  if (class(x) == "CaNmod"){
-    A <- as.matrix(x$A)
-    b <- x$b
-    C <-as.matrix(x$C)
-    v <- x$v
-  } else {
-    if (is.null(names(x)))
-      stop("x should be a named list")
-    if (all(c("A", "b") %in% names(x)))
-      stop("x should at least contain a matrix A and a list b")
-    if (all(names(x)) %in% c("A", "b", "C", "v"))
-      stop("names of x should be A, b, C or v")
-    A <- x$A
-    b <- x$b
-    C <- x$C
-    v <- x$v
-  }
+  x <- reformatX(x)
+  A <- x$A
+  b <- x$b
+  C <- x$C
+  v <- x$v
 
 
   nbparam <- ncol(A)
@@ -68,7 +54,11 @@ getAllBoundsParam <- function(x) {
     setTxtProgressBar(pb, p)
     if (colnames(A)[p] %in% colnames(A2)){
       p2 <- match(colnames(A)[p], colnames(A2))
-      bound <-getBoundParam(A2, b2, p2, C2, v2, lower, upper, presolve = FALSE)
+      bound <-getBoundParam(list(A = A2,
+                                 b = b2,
+                                 C = C2,
+                                 v = v2),
+                            p2, lower, upper, presolve = FALSE)
     } else {
       bound <-rep(presolved$fixed[colnames(A)[p]],2)
     }

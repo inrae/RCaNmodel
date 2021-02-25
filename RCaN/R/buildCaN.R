@@ -214,12 +214,12 @@ buildCaN <- function(x) {
 
   #build symbolic objects in a specific environment
   symbolic_enviro <-
-    generate_symbolic_objects(flow,
-                              species,
-                              ntstep,
-                              H,
-                              N,
-                              series)
+    generateSymbolicObjects(flow,
+                            species,
+                            ntstep,
+                            H,
+                            N,
+                            series)
 
 
   #build A matrix and b corresponding to constraints A.x<=b
@@ -244,7 +244,7 @@ buildCaN <- function(x) {
       lapply(
         components_param$Component[components_param$Component %in% species],
         function(sp)
-          treat_constraint(
+          treatConstraint(
             paste(sp, ">=", ifelse(
               is.na(
                 components_param$RefugeBiomass[
@@ -270,7 +270,7 @@ buildCaN <- function(x) {
           components_param$Satiation[match(species_flow_to,
                                            components_param$Component)])],
         function(sp)
-          treat_constraint(
+          treatConstraint(
             paste(
               paste(fluxes_def$Flux[fluxes_def$To == sp &
                                       is_trophic_flux], collapse = "+"),
@@ -298,7 +298,7 @@ buildCaN <- function(x) {
                   as.character(fluxes_def$Flux)[
                     as.character(fluxes_def$From) == sp &
                       !fluxes_def$Trophic]
-                treat_constraint(
+                treatConstraint(
                   paste(
                     sp,
                     "[-1] >=",
@@ -332,7 +332,7 @@ buildCaN <- function(x) {
                         as.character(fluxes_def$Flux)[
                           as.character(fluxes_def$To) == sp &
                             !fluxes_def$Trophic]
-                      treat_constraint(
+                      treatConstraint(
                         paste(
                           sp,
                           "[-1] <=",
@@ -374,7 +374,7 @@ buildCaN <- function(x) {
         rbind,
         mapply(
           function(c, yr, id)
-            treat_constraint(c, symbolic_enviro, yr, id),
+            treatConstraint(c, symbolic_enviro, yr, id),
           as.character(constraints$Constraint[c(lessthan, greaterthan)]),
           as.character(constraints$`Time-range`[c(lessthan, greaterthan)]),
           as.character(constraints$Id[c(lessthan, greaterthan)])
@@ -400,7 +400,7 @@ buildCaN <- function(x) {
         rbind,
         mapply(
           function(c, yr, id)
-            treat_constraint(c, symbolic_enviro, yr, id),
+            treatConstraint(c, symbolic_enviro, yr, id),
           as.character(constraints$Constraint[equality]),
           as.character(constraints$`Time-range`[equality]),
           as.character(constraints$Id[equality])
@@ -445,7 +445,7 @@ buildCaN <- function(x) {
         lapply(as.vector(expand(eval(
           parse(text = sp), symbolic_enviro
         ))), function(s)
-          build_vector_constraint(s, symbolic_enviro))
+          buildVectorConstraint(s, symbolic_enviro))
       ))))
   tmp <- expand.grid(series$Year, species)
   rownames(L) <- paste(tmp[, 2], "[", tmp[, 1], "]", sep = "")

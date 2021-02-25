@@ -1,4 +1,4 @@
-#' generate_symbolic_objects
+#' generateSymbolicObjects
 #'
 #' This is an internal function that builds all the required symbolic objects
 #' required for the computation of the model
@@ -22,7 +22,7 @@
 #' @importFrom symengine V
 #' @importFrom dplyr pull
 
-generate_symbolic_objects <-
+generateSymbolicObjects <-
   function(flow, species, ntstep, H, N, series) {
     years <- series$Year
     nbspec <- length(species)

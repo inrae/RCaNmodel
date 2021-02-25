@@ -1,4 +1,4 @@
-#' toggle_constraint
+#' toggleConstraint
 #'
 #' Activate or inactivate a constraint.
 #' @param myCaNmod a CaNmod object with following elements
@@ -11,13 +11,13 @@
 #' @examples
 #' myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
 #'  package = "RCaN"))
-#' toggle_constraint(myCaNmod, "C02")
+#' toggleConstraint(myCaNmod, "C02")
 #'
 #' @importFrom Matrix rbind2
 
 
 
-toggle_constraint <- function(myCaNmod, constr){
+toggleConstraint <- function(myCaNmod, constr){
   allconstraints <- c(rownames(myCaNmod$AAll),
                       rownames(myCaNmod$CAll))
   allconstraintsactive <- c(rownames(myCaNmod$A),
