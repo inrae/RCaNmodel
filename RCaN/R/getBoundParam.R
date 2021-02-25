@@ -36,7 +36,7 @@ getBoundParam <- function(x, p,
     colnames(A) <- paste("col", seq_len(ncol(A)), sep = "")
   }
 
-  if (is.null(colnames(C)))
+  if (is.null(colnames(C)) & !is.null(C))
     colnames(C) <- colnames(A)
 
   nbparam <- ncol(A)
