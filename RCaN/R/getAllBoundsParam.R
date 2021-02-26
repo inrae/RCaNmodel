@@ -32,37 +32,19 @@ getAllBoundsParam <- function(x) {
   if (is.null(colnames(A))) {
     colnames(A) <- paste("col", seq_len(ncol(A)), sep = "")
   }
-  presolved <- presolveLPMod(A, b, C, v)
-  if (nrow(presolved$lhs) > 0){
-    A2 <- presolved$lhs[presolved$dir == "<=", ]
-    b2 <- presolved$rhs[presolved$dir == "<="]
-    C2 <- presolved$lhs[presolved$dir == "=", ]
-    v2 <- presolved$rhs[presolved$dir == "="]
-    lower <- presolved$lower
-    upper <- presolved$upper
-  } else{
-    A2 <- A
-    b2 <- b
-    C2 <- C
-    v2 <- v
-    lower <- rep(0, ncol(A))
-    upper <- rep(Inf, ncol(A))
-  }
+  if (is.null(colnames(C)) & !is.null(C))
+    colnames(C) <- colnames(A)
+
+  presolvedmin <- presolveLPMod(A, b, C, v, sense = "min")
+  presolvedmax <- presolveLPMod(A, b, C, v, sense = "max")
+
+  x <- list(A = A, b = b, C = C, v = v)
 
   pb <- txtProgressBar(min = 0, max = nbparam, style = 3)
   bounds <- sapply(1:nbparam, function(p) {
     setTxtProgressBar(pb, p)
-    if (colnames(A)[p] %in% colnames(A2)){
-      p2 <- match(colnames(A)[p], colnames(A2))
-      bound <-getBoundParam(list(A = A2,
-                                 b = b2,
-                                 C = C2,
-                                 v = v2),
-                            p2, lower, upper, presolve = FALSE)
-    } else {
-      bound <-rep(presolved$fixed[colnames(A)[p]],2)
-    }
-    bound
+    c(getParamMinMax(x, p, presolvedmin, FALSE),
+      getParamMinMax(x, p, presolvedmax, TRUE))
   })
   data.frame(
     param = colnames(A),

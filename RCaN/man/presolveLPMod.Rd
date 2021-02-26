@@ -5,7 +5,8 @@
 \title{presolveLPMod
 simplify the lp problem using lpsolveAPI}
 \usage{
-presolveLPMod(A, b, C = NULL, v = NULL, lower = NULL)
+presolveLPMod(A, b, C = NULL, v = NULL, lower = NULL, upper = NULL,
+  sense = "max")
 }
 \arguments{
 \item{A}{a matrix of inequality constraints A x <=b}
@@ -19,6 +20,10 @@ absence of such constraints}
 absence of such constraints}
 
 \item{lower}{minimal bounds for paramaters, by default set to zero}
+
+\item{upper}{maximal bounds for parameters, by default Inifinty}
+
+\item{sense}{min or max (maximisation of minimation)}
 }
 \value{
 a vector corresponding to the centroid of the polytope
