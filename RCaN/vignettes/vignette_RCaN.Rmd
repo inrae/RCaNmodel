@@ -110,11 +110,6 @@ require(ggraph)
 g<-ggNetwork(myCaNmod)
 print(g)
 ```
-The function pdfCaNmod builds an even more detailed summary of the model as a pdffile
-
-```{r,eval=FALSE,echo=FALSE}
-pdfCaNmod(myCaNmod, output_file = "summaryCaNmod.pdf")
-```
 
 
 # Checking the model configuration
