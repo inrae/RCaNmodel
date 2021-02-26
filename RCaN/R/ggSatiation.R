@@ -9,7 +9,7 @@
 #' @examples
 #' myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
 #'  package = "RCaN"))
-#' res <- sampleCaNmod(myCaNmod, 100)
+#' res <- sampleCaN(myCaNmod, 100)
 #' ggSatiation(res)
 #'
 #' @importFrom ggplot2 ggplot

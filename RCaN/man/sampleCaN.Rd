@@ -35,6 +35,6 @@ sample the polytope corresponding to the CaNmod model
 \examples{
 myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
  package = "RCaN"))
-res <- sampleCaNmod(myCaNmod, 100)
+res <- sampleCaN(myCaNmod, 100)
 
 }

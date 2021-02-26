@@ -8,7 +8,8 @@
 #' @param v a vector of equality constraints C x = v, should be null in the
 #' absence of such constraints
 #' @param lower minimal bounds for paramaters, by default set to zero
-#'
+#' @param upper maximal bounds for parameters, by default Inifinty
+#' @param sense min or max (maximisation of minimation)
 #' @return a vector corresponding to the centroid of the polytope
 #'
 #' @importFrom lpSolveAPI make.lp
@@ -31,7 +32,11 @@ presolveLPMod <-
            b,
            C = NULL,
            v = NULL,
-           lower = NULL) {
+           lower = NULL,
+           upper = NULL,
+           sense = "max") {
+    if (! sense %in% c("min", "max"))
+      stop("error in presolve, sense should be min or max")
     nbparam <- ncol(A)
     presolve <- c("rows",
                   "lindep",
@@ -39,6 +44,7 @@ presolveLPMod <-
                   "mergerows",
                   "coldominate")
     if (is.null(lower)) lower <- rep(0, ncol(A))
+    if (is.null(upper)) upper <- rep(Inf, ncol(A))
     if (is.null(C)) {
       C <- matrix(0, 0, nbparam)
       v <- numeric(0)
@@ -53,7 +59,7 @@ presolveLPMod <-
       colnames(A) <- paste("param", seq_len(ncol(A)))
     }
     lp_model <- make.lp(nrow(A) + nrow(C), nbparam)
-    set.bounds(lp_model, lower = lower)
+    set.bounds(lp_model, lower = lower, upper = upper)
     for (p in 1:nbparam) {
       set.column(lp_model, p, c(A[, p], C[, p]))
     }
@@ -61,8 +67,8 @@ presolveLPMod <-
     set.constr.type(lp_model, c(rep("<=", nrow(A)), rep("=", nrow(C))))
     dimnames(lp_model) <- list(c(rownames(A), rownames(C)), colnames(A))
 
-    lp.control(lp_model, sense = "max", presolve = presolve)
-    set.objfn(lp_model,ifelse((1:nbparam)==p,1,0))
+    lp.control(lp_model, sense = sense, presolve = presolve)
+    set.objfn(lp_model, rep(1, nbparam))
     res <- solve.lpExtPtr(lp_model)
 
 
@@ -72,7 +78,8 @@ presolveLPMod <-
     dimnames(lhs) <- dimnames(lp_model)
     names(rhs) <- dimnames(lp_model)[[1]]
     for (i in seq_len(dim(lp_model)[2]))
-      lhs[get.column(lp_model,i)$nzrow, i] <- get.column(lp_model,i)$column
+      lhs[get.column(lp_model,i)$nzrow[get.column(lp_model,i)$nzrow!=0], i] <-
+      get.column(lp_model,i)$column[get.column(lp_model,i)$nzrow!=0]
     bounds <- get.bounds(lp_model)
     lower <- bounds$lower
     if (all(lower == 0)) lower <- NULL
@@ -80,7 +87,7 @@ presolveLPMod <-
     if (all(is.infinite(upper))) upper <- NULL
     fixed <- NA
     if (ncol(lhs) < ncol(A)){
-      sol <- get.primal.solution(lp_model,orig=TRUE)[- (1:(nrow(A)+nrow(C)))]
+      sol <- get.primal.solution(lp_model, orig = TRUE)[- (1:(nrow(A)+nrow(C)))]
       fixed <- sol[! colnames(A) %in% colnames(lhs)]
       names(fixed) <- colnames(A)[! colnames(A) %in% colnames(lhs)]
     }

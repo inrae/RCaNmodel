@@ -4,21 +4,15 @@
 \alias{getBoundParam}
 \title{getBoundParam
 Computes the possible bounds for a parameter p of a polytope defined
-by+A.x<=b and C.x=v or by the polytope of the CaNmod object}
+by A.x<=b and C.x=v or by the polytope of the CaNmod object}
 \usage{
-getBoundParam(x, p, lower = NULL, upper = NULL, presolve = TRUE)
+getBoundParam(x, p)
 }
 \arguments{
 \item{x}{either a CaNmod oject or a named list with at least a matrix A and
-a vector b (A.x<=b) and optionnally a matrix C and a vector v (C.x=v)}
+a vector b (A.x<=b) and optionally a matrix C and a vector v (C.x=v)}
 
 \item{p}{the index of the parameter for which the bounds should be computed}
-
-\item{lower}{lower bounds (default NULL for bounds 0)}
-
-\item{upper}{upper bounds (default NULL for bounds Inf)}
-
-\item{presolve}{should presolve should be done}
 }
 \value{
 a vector with lower bounds and upper bounds
@@ -26,7 +20,7 @@ a vector with lower bounds and upper bounds
 \description{
 getBoundParam
 Computes the possible bounds for a parameter p of a polytope defined
-by+A.x<=b and C.x=v or by the polytope of the CaNmod object
+by A.x<=b and C.x=v or by the polytope of the CaNmod object
 }
 \examples{
 n <- 20
