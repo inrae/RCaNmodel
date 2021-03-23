@@ -1,0 +1,49 @@
+\documentclass{article}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+\section{R Environment}
+First, we need to load a few libraries.
+
+<<libraries>>=
+library(RCaN) #the main package
+library(ggplot2) #to draw results
+library(coda) #to explore mcmc 
+library(dplyr) #to manipulate data frame
+library(xtable) #to create latex tables
+@
+
+\section{The RCaN file}
+
+
+\section{Building polytope}
+
+<<libraries>>=
+POLYTOPE <- buildCaN('/Users/christianmullon/Desktop/Ocean/BarentsSeaReconstructions_01_02_21.xlsx')
+@
+
+\section{Checking polytope}
+
+\section{Sampling polytope}
+
+<<libraries>>=
+begin = Sys.time()
+SAMPLE <- sampleCaN(POLYTOPE, 
+                      N=100,thin=100, 
+                      nchain=2,
+                      ncore=2)
+end=Sys.time()
+end-begin
+@
+
+\section{Analyzing sample}
+
+\subsection{Convergence}
+
+\subsection{Sample characteristics}
+
+\section{Iterations}
+
+\subsection{Activating/Desactivating contsraints}
+\end{document}
