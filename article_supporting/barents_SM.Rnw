@@ -4,7 +4,7 @@
 \SweaveOpts{concordance=TRUE}
 
 \section{R Environment}
-First, we need to load a few libraries.
+A few libraries are to be loaded.
 
 <<libraries>>=
 library(RCaN) #the main package
@@ -15,12 +15,25 @@ library(xtable) #to create latex tables
 @
 
 \section{The RCaN file}
+Parameters, observations and constraints have been gathered in an Excel file with a specific structure. 
+
+<<data>>=
+NAMEFILE <- '/Users/christianmullon/Desktop/Ocean/BarentsSeaReconstructions_01_02_21.xlsx'
+library("xlsx")
+@
+
+\subsection{Components}
+
+<<components>>=
+COMPONENTS <- read.xlsx(NAMEFILE, 1) 
+head(COMPONENTS)
+@
 
 
 \section{Building polytope}
 
-<<libraries>>=
-POLYTOPE <- buildCaN('/Users/christianmullon/Desktop/Ocean/BarentsSeaReconstructions_01_02_21.xlsx')
+<<build>>=
+POLYTOPE <- buildCaN(NAMEFILE)
 @
 
 \section{Checking polytope}
