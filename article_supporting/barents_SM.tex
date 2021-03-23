@@ -1,0 +1,81 @@
+\documentclass{article}
+
+\usepackage{Sweave}
+\begin{document}
+\input{barents_SM-concordance}
+
+\section{R Environment}
+A few libraries are to be loaded.
+
+\begin{Schunk}
+\begin{Sinput}
+> library(RCaN) #the main package
+> library(ggplot2) #to draw results
+> library(coda) #to explore mcmc 
+> library(dplyr) #to manipulate data frame
+> library(xtable) #to create latex tables
+\end{Sinput}
+\end{Schunk}
+
+\section{The RCaN file}
+Parameters, observations and constraints have been gathered in an Excel file with a specific structure. 
+
+\begin{Schunk}
+\begin{Sinput}
+> NAMEFILE <- '/Users/christianmullon/Desktop/Ocean/BarentsSeaReconstructions_01_02_21.xlsx'
+> library("xlsx")
+\end{Sinput}
+\end{Schunk}
+
+\subsection{Components}
+
+\begin{Schunk}
+\begin{Sinput}
+> COMPONENTS <- read.xlsx(NAMEFILE, 1) 
+> head(COMPONENTS)
+\end{Sinput}
+\begin{Soutput}
+                    PathName
+1              Caracteristic
+2 <NAME VERSION AND AUTHORS>
+3                 Model Name
+4     Model Version and date
+5                    Authors
+6         <DOMAIN AND UNITS>
+  X.Users.christianmullon.Desktop.Ocean.BarentsSeaReconstructions_01_02_21.xlsx
+1                                                                         Value
+2                                                                              
+3                                              Barents Sea reconstructions 2021
+4                                                           2.0 - February 2021
+5                                             Benjamin Planque and Elliot Sivel
+6                                                                              
+                                                                                                 NA.
+1                                                                                               <NA>
+2                                                                                                   
+3                                                                   Title/name of the food-web model
+4                                          Specific code used to uniquely identify the model version
+5  Names and addresses of the principal investigators associated with the food-web model development
+6                                                                                                   
+\end{Soutput}
+\end{Schunk}
+
+
+\section{Building polytope}
+
+\begin{Schunk}
+\begin{Sinput}
+> POLYTOPE <- buildCaN(NAMEFILE)
+\end{Sinput}
+\end{Schunk}
+
+\section{Checking polytope}
+
+\section{Sampling polytope}
+
+\begin{Schunk}
+\begin{Sinput}
+> begin = Sys.time()
+> SAMPLE <- sampleCaN(POLYTOPE, 
++                       N=100,thin=100, 
++                       nchain=2,
++                       ncore=2)
