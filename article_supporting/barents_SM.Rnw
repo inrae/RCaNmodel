@@ -1,9 +1,34 @@
 \documentclass{article}
 
+\usepackage[utf8x]{inputenc} 
+\usepackage{authblk}
+
+\title{ \bf{RCaN \\ \vspace{1cm} Supplementary Material \vspace{1cm}} }                 
+\author[1]{Hilaire Drouineau}
+\affil[1]{INRAE, Bordeaux, France}
+\author[2]{Benjamin Planque}
+\affil[2]{HI, Tromsoe, Norway}
+\author[3]{Christian Mullon}
+\affil[3]{IRD, MARBEC, Sete, France}
+
+
 \begin{document}
 \SweaveOpts{concordance=TRUE}
 
-\section{R Environment}
+
+\maketitle
+
+\section{Introduction}
+\begin{enumerate}
+\item Goals: an example of a RCaN study.
+\item The case study: the Barents sea (main text).
+\item The RCaN file has been previously built. It is joined.
+\item All following commands in joined R script.
+\item A first run with all main steps.
+\item A second run after removing some constraints
+\item Comparisons between both runs and interpretation
+\end{enumerate}
+\section{Preliminary: R Environment}
 A few libraries are to be loaded.
 
 <<libraries>>=
@@ -12,35 +37,105 @@ library(ggplot2) #to draw results
 library(coda) #to explore mcmc 
 library(dplyr) #to manipulate data frame
 library(xtable) #to create latex tables
+library(xlsx) # to import excel files
 @
+
+\clearpage
 
 \section{The RCaN file}
 Parameters, observations and constraints have been gathered in an Excel file with a specific structure. 
 
-<<data>>=
+<<label=data>>=
 NAMEFILE <- '/Users/christianmullon/Desktop/Ocean/BarentsSeaReconstructions_01_02_21.xlsx'
-library("xlsx")
+# NAMEFILE <- '/Users/christianmullon/Desktop/Ocean/CaN_template_mini.xlsx'
 @
+
+\clearpage
 
 \subsection{Components}
 
-<<components>>=
-COMPONENTS <- read.xlsx(NAMEFILE, 1) 
-head(COMPONENTS)
+<<label=components, eval=TRUE, results=tex, echo=FALSE>>=
+COMPONENTS <- read.xlsx(NAMEFILE, 2) 
+print(xtable(COMPONENTS[,1:5],label="Components", caption = "Components"))
 @
 
+\subsection{Fluxes}
+
+<<label=fluxes, eval=TRUE, results=tex, echo=FALSE>>=
+FLUXES <- read.xlsx(NAMEFILE, 3) 
+print(xtable(FLUXES,label="Fluxes", caption = "Fluxes"))
+@
+
+\subsection{Observations}
+
+<<label=fluxes, eval=TRUE, results=tex, echo=FALSE>>=
+OBSERVATIONS <- read.xlsx(NAMEFILE, 5) 
+print(xtable(OBSERVATIONS[1:10,1:5],label="Observations",caption = "Observations"))
+@
+
+
+\subsection{Constraints}
+
+<<label=fluxes, eval=TRUE, results=tex, echo=FALSE>>=
+CONSTRAINTS <- read.xlsx(NAMEFILE, 4) 
+print(xtable(CONSTRAINTS[1:7,1:2],label="Constraints",caption="Constraints"))
+@
+
+\clearpage
 
 \section{Building polytope}
 
-<<build>>=
+<<label=build>>=
+begin <- Sys.time()
 POLYTOPE <- buildCaN(NAMEFILE)
+end <- Sys.time()
+end-begin
+summary(POLYTOPE)
 @
+
+\section{Structure of polytope}
+
+The polytope is defined by two pairs of a matrix and and a vector. $F$ being the vector of all flows at all timesteps, first one $(A,b)$ is an equality $ A.F = b$, second one $(C,v)$ is an eqality  $ C.F \le v$. For the Barents sea, we have: :
+
+<<label=dims>>=
+dim(POLYTOPE$A)
+length(POLYTOPE$b)
+dim(POLYTOPE$C)
+length(POLYTOPE$v)
+@
+
+\clearpage
 
 \section{Checking polytope}
 
+As it is defined in the RCaN file for the Barents' sea, the polytope is non-empty and bounded:
+
+<<label=check>>=
+checkPolytopeStatus(POLYTOPE)
+@
+
+Limits of the Barents' sea polytope in all dimensions are obtained with getAllBoundsParam:
+
+<<label=bounds>>=
+BOUNDS <- getAllBoundsParam(POLYTOPE)
+summary(BOUNDS)
+@
+
+Function plotPolytope2DCaNmod allows seeing the polytope in the plane defined by two parameters. In its first two dimensions, for the second 1990, the Barents sea polytope dimensions appears as. 
+
+<<fig=true>>=
+fluxX <- paste(FLUXES[1,1],'[1990]',sep="")
+fluxY <- paste(FLUXES[2,1],'[1990]',sep="")
+plotPolytope2D(POLYTOPE, c(fluxX, fluxY))
+@
+
+\clearpage
+
 \section{Sampling polytope}
 
-<<libraries>>=
+\subsection{Sampling}
+
+<<label=sample>>=
 begin = Sys.time()
 SAMPLE <- sampleCaN(POLYTOPE, 
                       N=100,thin=100, 
@@ -50,13 +145,68 @@ end=Sys.time()
 end-begin
 @
 
-\section{Analyzing sample}
+
+\clearpage
 
 \subsection{Convergence}
 
-\subsection{Sample characteristics}
+<<label=nchain>>=
+nchain(SAMPLE$mcmc)
+# summary(SAMPLE$mcmc)
+@
 
-\section{Iterations}
+Gelman diagnostics
 
-\subsection{Activating/Desactivating contsraints}
+<<label=gelman>>=
+fluxY <- paste(FLUXES[2,1],'[1990]',sep="")
+gelman.diag(SAMPLE$mcmc[,fluxY])
+@
+
+
+Autocorrelation function
+
+<<fig=true>>=
+fluxZ <- paste(FLUXES[3,1],'[1990]',sep="")
+thinned_SAMPLE <- window(SAMPLE$mcmc,thin=2)
+thin(thinned_SAMPLE)
+acfplot(thinned_SAMPLE[,fluxZ])
+@
+
+
+\clearpage
+
+\subsection{Dynamics}
+
+For several variables or flux, plots of sampled dynamics. 
+<<label=varrz>>==
+fluxX <- FLUXES[1,1]
+fluxY <- FLUXES[2,1]
+compA <- COMPONENTS[2,1] 
+c(fluxX,fluxY,compA)
+@
+
+<<fig=true>>=
+g <- ggSeries(SAMPLE, c(fluxX,fluxY,compA), TRUE)
+g + scale_y_log10() + guides(color = FALSE, fill = FALSE)
+@
+
+
+\clearpage
+
+\subsection{Distribution}
+
+For a component or a flux, for a year, the distribution of sampled values. 
+<<fig=true>>=
+ggViolin(SAMPLE,c(fluxX,fluxY,compA),year=1990,TRUE)
+@
+
+
+\clearpage
+
+\subsection{Diet relationships}
+
+<<fig=true>>=
+ggDiet(SAMPLE, compA)
+@
+
 \end{document}
