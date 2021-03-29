@@ -3,6 +3,8 @@
 #' A.x<=b and C.x=v or by a CaNmod object
 #' @param x either a CaNmod oject or a named list with at least a matrix A and
 #' a vector b (A.x<=b) and optionnally a matrix C and a vector v (C.x=v)
+#' @param progressBar should a progress bar be displayed (default TRUE)
+
 #'
 #' @importFrom utils setTxtProgressBar
 #' @importFrom utils txtProgressBar
@@ -20,7 +22,8 @@
 #' X0 <- getAllBoundsParam(list(A = A, b = b))
 #' @export
 
-getAllBoundsParam <- function(x) {
+getAllBoundsParam <- function(x,
+                              progressBar = TRUE) {
   x <- reformatX(x)
   A <- x$A
   b <- x$b
@@ -40,9 +43,11 @@ getAllBoundsParam <- function(x) {
 
   x <- list(A = A, b = b, C = C, v = v)
 
-  pb <- txtProgressBar(min = 0, max = nbparam, style = 3)
+  if (progressBar)
+    pb <- txtProgressBar(min = 0, max = nbparam, style = 3)
   bounds <- sapply(1:nbparam, function(p) {
-    setTxtProgressBar(pb, p)
+    if (progressBar)
+      setTxtProgressBar(pb, p)
     c(getParamMinMax(x, p, presolvedmin, FALSE),
       getParamMinMax(x, p, presolvedmax, TRUE))
   })

@@ -6,7 +6,7 @@
 polt the possible values of a multimensional convex polytope by A.x<=b and
 C.x=v or by a CaNmod object in 2D}
 \usage{
-plotPolytope2D(x, params = c(1, 2))
+plotPolytope2D(x, params = c(1, 2), progressBar = TRUE)
 }
 \arguments{
 \item{x}{either a CaNmod oject or a named list with at least a matrix A and
@@ -14,6 +14,8 @@ a vector b (A.x<=b) and optionnally a matrix C and a vector v (C.x=v)}
 
 \item{params}{a vector of length 2 corresponding to the index of the
 parameters (default, two first)}
+
+\item{progressBar}{should a progress bar be displayed (default TRUE)}
 }
 \value{
 a ggplot
