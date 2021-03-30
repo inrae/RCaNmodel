@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.5.9)  25 MAR 2021 01:38
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.5.9)  30 MAR 2021 13:28
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -200,7 +200,7 @@ LaTeX Font Info:    Trying to load font information for T1+aett on input line 3
 File: t1aett.fd 1997/11/16 Font definitions for T1/aett.
 ) [1
 
-{/usr/local/texlive/2020/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+{/usr/local/texlive/2020/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2]
 LaTeX Font Info:    Trying to load font information for TS1+aett on input line 
 53.
 
@@ -215,84 +215,126 @@ File: ts1cmtt.fd 2019/12/16 v2.5j Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `TS1/aett/m/sl' in size <10> not available
 (Font)              Font shape `TS1/cmtt/m/sl' tried instead on input line 53.
- [2
-
-]
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 66.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 66.
  [3
 
-] [4]
-[5] [6
+]
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 68.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 68.
 
-] [7] [8
+Overfull \hbox (6.45613pt too wide) in paragraph at lines 68--78
+ [][] 
+ []
 
-] [9] [10] [11] [12] [13] [14] [15] [16]
-<barents_SM-011.pdf, id=63, 433.62pt x 433.62pt>
+
+Overfull \hbox (79.04582pt too wide) in paragraph at lines 87--97
+ [][] 
+ []
+
+
+Overfull \hbox (183.3957pt too wide) in paragraph at lines 106--122
+ [][] 
+ []
+
+
+Overfull \hbox (197.62201pt too wide) in paragraph at lines 132--145
+ [][] 
+ []
+
+[4
+
+] [5] [6
+
+] [7]
+<barents_SM-011.pdf, id=35, 433.62pt x 433.62pt>
 File: barents_SM-011.pdf Graphic file (type pdf)
 <use barents_SM-011.pdf>
-Package pdftex.def Info: barents_SM-011.pdf  used on input line 717.
+Package pdftex.def Info: barents_SM-011.pdf  used on input line 263.
 (pdftex.def)             Requested size: 276.00105pt x 276.0139pt.
- [17] [18 <./barents_SM-011.pdf>] [19
+ [8
+
+] [9 <./barents_SM-011.pdf>] [10
 
 ]
-<barents_SM-015.pdf, id=79, 433.62pt x 433.62pt>
+<barents_SM-015.pdf, id=50, 433.62pt x 433.62pt>
 File: barents_SM-015.pdf Graphic file (type pdf)
 <use barents_SM-015.pdf>
-Package pdftex.def Info: barents_SM-015.pdf  used on input line 788.
+Package pdftex.def Info: barents_SM-015.pdf  used on input line 334.
 (pdftex.def)             Requested size: 276.00105pt x 276.0139pt.
- [20
+ [11
 
  <./barents_SM-015.pdf>]
-<barents_SM-017.pdf, id=88, 433.62pt x 433.62pt>
+<barents_SM-017.pdf, id=59, 433.62pt x 433.62pt>
 File: barents_SM-017.pdf Graphic file (type pdf)
 <use barents_SM-017.pdf>
-Package pdftex.def Info: barents_SM-017.pdf  used on input line 814.
+Package pdftex.def Info: barents_SM-017.pdf  used on input line 361.
 (pdftex.def)             Requested size: 276.00105pt x 276.0139pt.
- [21
+[12
 
  <./barents_SM-017.pdf>]
-<barents_SM-018.pdf, id=100, 433.62pt x 433.62pt>
+<barents_SM-018.pdf, id=71, 433.62pt x 433.62pt>
 File: barents_SM-018.pdf Graphic file (type pdf)
 <use barents_SM-018.pdf>
-Package pdftex.def Info: barents_SM-018.pdf  used on input line 827.
+Package pdftex.def Info: barents_SM-018.pdf  used on input line 373.
 (pdftex.def)             Requested size: 276.00105pt x 276.0139pt.
- [22
+ [13
 
  <./barents_SM-018.pdf>]
-<barents_SM-019.pdf, id=109, 433.62pt x 433.62pt>
+<barents_SM-019.pdf, id=81, 433.62pt x 433.62pt>
 File: barents_SM-019.pdf Graphic file (type pdf)
 <use barents_SM-019.pdf>
-Package pdftex.def Info: barents_SM-019.pdf  used on input line 839.
+Package pdftex.def Info: barents_SM-019.pdf  used on input line 385.
 (pdftex.def)             Requested size: 276.00105pt x 276.0139pt.
- [23
+<barents_SM-020.pdf, id=82, 433.62pt x 433.62pt>
+File: barents_SM-020.pdf Graphic file (type pdf)
+<use barents_SM-020.pdf>
+Package pdftex.def Info: barents_SM-020.pdf  used on input line 394.
+(pdftex.def)             Requested size: 276.00105pt x 276.0139pt.
+ [14
 
- <./barents_SM-019.pdf>] (./barents_SM.aux) ) 
+ <./barents_SM-019.pdf>]
+<barents_SM-021.pdf, id=91, 433.62pt x 433.62pt>
+File: barents_SM-021.pdf Graphic file (type pdf)
+<use barents_SM-021.pdf>
+Package pdftex.def Info: barents_SM-021.pdf  used on input line 404.
+(pdftex.def)             Requested size: 276.00105pt x 276.0139pt.
+ [15 <./barents_SM-020.pdf>]
+<barents_SM-022.pdf, id=105, 433.62pt x 433.62pt>
+File: barents_SM-022.pdf Graphic file (type pdf)
+<use barents_SM-022.pdf>
+Package pdftex.def Info: barents_SM-022.pdf  used on input line 413.
+(pdftex.def)             Requested size: 276.00105pt x 276.0139pt.
+ [16 <./barents_SM-021.pdf>] [17 <./barents_SM-022.pdf>]
+<barents_SM-026.pdf, id=131, 433.62pt x 433.62pt>
+File: barents_SM-026.pdf Graphic file (type pdf)
+<use barents_SM-026.pdf>
+Package pdftex.def Info: barents_SM-026.pdf  used on input line 494.
+(pdftex.def)             Requested size: 276.00105pt x 276.0139pt.
+ [18] [19 <./barents_SM-026.pdf>] (./barents_SM.aux) ) 
 Here is how much of TeX's memory you used:
- 2801 strings out of 480608
- 43565 string characters out of 5903631
- 296767 words of memory out of 5000000
- 18615 multiletter control sequences out of 15000+600000
+ 2825 strings out of 480608
+ 44341 string characters out of 5903631
+ 289767 words of memory out of 5000000
+ 18639 multiletter control sequences out of 15000+600000
  555291 words of font info for 66 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  38i,8n,29p,330b,310s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/local/texlive/2020/texmf-dis
-t/fonts/enc/dvips/cm-super/cm-super-ts1.enc}</usr/local/texlive/2020/texmf-dist
-/fonts/type1/public/amsfonts/cm/cmb10.pfb></usr/local/texlive/2020/texmf-dist/f
-onts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2020/texmf-dist/fo
-nts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2020/texmf-dist/font
-s/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2020/texmf-dist/fonts/
-type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2020/texmf-dist/fonts/typ
-e1/public/amsfonts/cm/cmsltt10.pfb></usr/local/texlive/2020/texmf-dist/fonts/ty
-pe1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2020/texmf-dist/fonts/typ
-e1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type
-1/public/cm-super/sfst1000.pfb>
-Output written on barents_SM.pdf (23 pages, 170843 bytes).
+{/usr/local/texlive/2020/
+texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}</usr/local/texlive/2020/t
+exmf-dist/fonts/type1/public/amsfonts/cm/cmb10.pfb></usr/local/texlive/2020/tex
+mf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2020/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2020/texmf-
+dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2020/texmf-di
+st/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2020/texmf-dist/
+fonts/type1/public/amsfonts/cm/cmsltt10.pfb></usr/local/texlive/2020/texmf-dist
+/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2020/texmf-dist/
+fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2020/texmf-dist/f
+onts/type1/public/cm-super/sfst1000.pfb>
+Output written on barents_SM.pdf (19 pages, 283330 bytes).
 PDF statistics:
- 150 PDF objects out of 1000 (max. 8388607)
- 103 compressed objects within 2 object streams
+ 179 PDF objects out of 1000 (max. 8388607)
+ 128 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
- 30 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 50 words of extra memory for PDF output out of 10000 (max. 10000000)
 
