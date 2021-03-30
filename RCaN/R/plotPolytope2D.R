@@ -5,9 +5,11 @@
 #' a vector b (A.x<=b) and optionnally a matrix C and a vector v (C.x=v)
 #' @param params a vector of length 2 corresponding to the index of the
 #' parameters (default, two first)
+#' @param progressBar should a progress bar be displayed (default TRUE)
 #' @return a ggplot
 #'
 #' @importFrom utils setTxtProgressBar
+#' @importFrom utils txtProgressBar
 #' @importFrom ggplot2 ggplot
 #' @importFrom ggplot2 aes_string
 #' @importFrom ggplot2 geom_polygon
@@ -26,7 +28,8 @@
 
 
 plotPolytope2D <- function(x,
-                           params = c(1, 2)) {
+                           params = c(1, 2),
+                           progressBar = TRUE) {
   x <- reformatX(x)
   A <- x$A
   b <- x$b
@@ -49,9 +52,11 @@ plotPolytope2D <- function(x,
                                       C = C, v = v),
                                  params[1])
   seqx1 <- seq(bounds_param1[1], bounds_param1[2], length.out = 50)
-  pb <- txtProgressBar(min = 0, max = 50, style = 3)
+  if (progressBar)
+    pb <- txtProgressBar(min = 0, max = 50, style = 3)
   polygon <- lapply(seqx1, function(x) {
-    setTxtProgressBar(pb, which(seqx1 == x))
+    if (progressBar)
+      setTxtProgressBar(pb, which(seqx1 == x))
     cbind(rep(x, 2),
           getBoundParam(list(A = A,
                              b = b,

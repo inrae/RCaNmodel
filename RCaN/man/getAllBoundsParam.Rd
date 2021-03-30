@@ -6,11 +6,13 @@
 Computes the possible bounds for all parameters of a polytope defined by
 A.x<=b and C.x=v or by a CaNmod object}
 \usage{
-getAllBoundsParam(x)
+getAllBoundsParam(x, progressBar = TRUE)
 }
 \arguments{
 \item{x}{either a CaNmod oject or a named list with at least a matrix A and
 a vector b (A.x<=b) and optionnally a matrix C and a vector v (C.x=v)}
+
+\item{progressBar}{should a progress bar be displayed (default TRUE)}
 }
 \value{
 a datafame with first column corresponding to colnames(A), and
