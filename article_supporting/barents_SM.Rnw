@@ -71,7 +71,7 @@ print(xtable(FLUXES,label="Fluxes", caption = "Fluxes"))
 
 <<label=fluxes, eval=TRUE, results=tex, echo=FALSE>>=
 OBSERVATIONS <- read.xlsx(NAMEFILE, 5) 
-print(xtable(OBSERVATIONS[1:10,1:5],label="Observations",caption = "Observations"))
+print(xtable(OBSERVATIONS[1:10,1:5], label = "Observations", caption = "Observations"))
 @
 
 
@@ -79,7 +79,7 @@ print(xtable(OBSERVATIONS[1:10,1:5],label="Observations",caption = "Observations
 
 <<label=fluxes, eval=TRUE, results=tex, echo=FALSE>>=
 CONSTRAINTS <- read.xlsx(NAMEFILE, 4) 
-print(xtable(CONSTRAINTS[1:7,1:2],label="Constraints",caption="Constraints"))
+print(xtable(CONSTRAINTS[1:7,1:2], label = "Constraints", caption="Constraints"))
 @
 
 \clearpage
@@ -122,7 +122,7 @@ BOUNDS <- getAllBoundsParam(POLYTOPE, progressBar = FALSE)
 summary(BOUNDS)
 @
 
-Function plotPolytope2DCaNmod allows seeing the polytope in the plane defined by two parameters. In its first two dimensions, for the second 1990, the Barents sea polytope dimensions appears as. 
+Function plotPolytope2D allows seeing the polytope in the plane defined by two parameters. In its first two dimensions, for the second 1990, the Barents sea polytope dimensions appears as. 
 
 <<fig=true>>=
 fluxX <- paste(FLUXES[1,1],'[1990]',sep="")
@@ -151,12 +151,14 @@ end-begin
 
 \subsection{Convergence}
 
+Using coda. 
+
 <<label=nchain>>=
 nchain(SAMPLE$mcmc)
 # summary(SAMPLE$mcmc)
 @
 
-Gelman diagnostics
+Gelman diagnostics. Gelman and Rubin (1992) propose a general approach to monitoring convergence of MCMC output in which $ m > 1$ parallel chains are run with starting values that are overdispersed relative to the posterior distribution. Convergence is diagnosed when the chains have `forgotten' their initial values, and the output from all chains is indistinguishable. The gelman.diag diagnostic is applied to a single variable from the chain. It is based a comparison of within-chain and between-chain variances, and is similar to a classical analysis of variance.
 
 <<label=gelman>>=
 fluxY <- paste(FLUXES[2,1],'[1990]',sep="")
@@ -233,25 +235,22 @@ ggSatiation(SAMPLE, compB)
 \subsection{Activating and desactivating constraint}
 
 <<toggle>>=
-#disactivate constraints C02
+# disactivate constraints C02
 constA = CONSTRAINTS[2,1]
 constA
 POLYTOPEA <- toggleConstraint(POLYTOPE, constA)
-#disactivate constraints C02 for year 1991
-constYearA = paste(constA, "1991", sep = " : ")
-POLYTOPEB <- toggleConstraint(POLYTOPE, constYearA)
+# disactivate constraints C02 for year 1991
 @
 
 <<checknew>>=
 checkPolytopeStatus(POLYTOPEA)
-checkPolytopeStatus(POLYTOPEB)
 @
 
 \subsection{Building and analyzing sample}
 
 <<label=sampleNew>>=
 begin = Sys.time()
-SAMPLEB <- sampleCaN(POLYTOPEB, 
+SAMPLEA <- sampleCaN(POLYTOPEA, 
                       N=100,thin=100, 
                       nchain=2,
                       ncore=2)
@@ -265,7 +264,7 @@ fluxY <- FLUXES[2,1]
 compA <- COMPONENTS[2,1] 
 compB <- COMPONENTS[3,1] 
 c(fluxX,fluxY,compA)
-g <- ggSeries(SAMPLEB, c(fluxX,fluxY,compA), TRUE)
+g <- ggSeries(SAMPLEA, c(fluxX,fluxY,compA), TRUE)
 g + scale_y_log10() + guides(color = FALSE, fill = FALSE)
 @
 
