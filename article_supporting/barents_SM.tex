@@ -51,9 +51,8 @@ Parameters, observations and constraints have been gathered in an Excel file wit
 \begin{Schunk}
 \begin{Sinput}
 > setwd('/Users/christianmullon/gitC/article_supporting')
-> # NAMEFILE <- 'BarentsSeaReconstructions_01_02_21.xlsx'
-> NAMEFILE <- 'CaN_template_miniS.xlsx'
-> 
+> NAMEFILE <- 'BarentsSeaReconstructions_01_02_21.xlsx'
+> # NAMEFILE <- 'CaN_template_miniS.xlsx'
 \end{Sinput}
 \end{Schunk}
 
@@ -62,17 +61,23 @@ Parameters, observations and constraints have been gathered in an Excel file wit
 \subsection{Components}
 
 % latex table generated in R 4.0.3 by xtable 1.8-4 package
-% Tue Mar 30 13:27:57 2021
+% Tue Mar 30 15:45:27 2021
 \begin{table}[ht]
 \centering
 \begin{tabular}{rlrrrr}
   \hline
  & Component & Inside & AssimilationE & Digestibility & OtherLosses \\ 
   \hline
-1 & PhytoAndBacteria & 0.00 &  & 0.65 &  \\ 
-  2 & HerbZooplankton & 1.00 & 1.00 & 0.90 & 8.40 \\ 
-  3 & OmniZooplankton & 1.00 & 1.00 & 0.90 & 5.50 \\ 
-  4 & Fishery & 0.00 &  &  &  \\ 
+1 & PP & 0.00 & 0.00 & 0.65 & 0.00 \\ 
+  2 & Hzoo & 1.00 & 1.00 & 0.90 & 8.40 \\ 
+  3 & Ozoo & 1.00 & 1.00 & 0.90 & 5.50 \\ 
+  4 & Benthos & 1.00 & 0.94 & 0.60 & 1.50 \\ 
+  5 & PelF & 1.00 & 0.90 & 0.90 & 2.85 \\ 
+  6 & DemF & 1.00 & 0.93 & 0.85 & 1.65 \\ 
+  7 & MM & 1.00 & 1.00 & 0.00 & 5.50 \\ 
+  8 & Birds & 1.00 & 0.84 & 0.00 & 60.00 \\ 
+  9 & Fisheries & 0.00 & 0.00 & 0.00 & 0.00 \\ 
+  10 & NorSeaZoo & 0.00 & 0.00 & 0.00 & 0.00 \\ 
    \hline
 \end{tabular}
 \caption{Components} 
@@ -81,17 +86,37 @@ Parameters, observations and constraints have been gathered in an Excel file wit
 \subsection{Fluxes}
 
 % latex table generated in R 4.0.3 by xtable 1.8-4 package
-% Tue Mar 30 13:27:57 2021
+% Tue Mar 30 15:45:27 2021
 \begin{table}[ht]
 \centering
 \begin{tabular}{rlllr}
   \hline
  & Flux & From & To & Trophic \\ 
   \hline
-1 & PhytoAndBacteria\_HerbZooplankton & PhytoAndBacteria & HerbZooplankton & 1.00 \\ 
-  2 & PhytoAndBacteria\_OmniZooplankton & PhytoAndBacteria & OmniZooplankton & 1.00 \\ 
-  3 & HerbZooplankton\_OmniZooplankton & HerbZooplankton & OmniZooplankton & 1.00 \\ 
-  4 & OmniZooplankton\_Fishery & OmniZooplankton & Fishery & 0.00 \\ 
+1 & PP\_Hzoo & PP & Hzoo & 1.00 \\ 
+  2 & PP\_Ozoo & PP & Ozoo & 1.00 \\ 
+  3 & PP\_Benthos & PP & Benthos & 1.00 \\ 
+  4 & Hzoo\_Ozoo & Hzoo & Ozoo & 1.00 \\ 
+  5 & Hzoo\_PelF & Hzoo & PelF & 1.00 \\ 
+  6 & Ozoo\_Ozoo & Ozoo & Ozoo & 1.00 \\ 
+  7 & Ozoo\_PelF & Ozoo & PelF & 1.00 \\ 
+  8 & Ozoo\_DemF & Ozoo & DemF & 1.00 \\ 
+  9 & Ozoo\_MM & Ozoo & MM & 1.00 \\ 
+  10 & Ozoo\_Birds & Ozoo & Birds & 1.00 \\ 
+  11 & Benthos\_Benthos & Benthos & Benthos & 1.00 \\ 
+  12 & Benthos\_DemF & Benthos & DemF & 1.00 \\ 
+  13 & PelF\_PelF & PelF & PelF & 1.00 \\ 
+  14 & PelF\_DemF & PelF & DemF & 1.00 \\ 
+  15 & PelF\_MM & PelF & MM & 1.00 \\ 
+  16 & PelF\_Birds & PelF & Birds & 1.00 \\ 
+  17 & DemF\_DemF & DemF & DemF & 1.00 \\ 
+  18 & DemF\_MM & DemF & MM & 1.00 \\ 
+  19 & NorSeaZoo\_Hzoo & NorSeaZoo & Hzoo & 0.00 \\ 
+  20 & NorSeaZoo\_Ozoo & NorSeaZoo & Ozoo & 0.00 \\ 
+  21 & PelF\_Fisheries & PelF & Fisheries & 0.00 \\ 
+  22 & DemF\_Fisheries & DemF & Fisheries & 0.00 \\ 
+  23 & MM\_Fisheries & MM & Fisheries & 0.00 \\ 
+  24 & Ozoo\_Fisheries & Ozoo & Fisheries & 0.00 \\ 
    \hline
 \end{tabular}
 \caption{Fluxes} 
@@ -100,23 +125,23 @@ Parameters, observations and constraints have been gathered in an Excel file wit
 \subsection{Observations}
 
 % latex table generated in R 4.0.3 by xtable 1.8-4 package
-% Tue Mar 30 13:27:58 2021
+% Tue Mar 30 15:45:28 2021
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrrr}
   \hline
- & Year & HerbZooplankton\_Biomass & OmniZooplankton\_Biomass & Benthos\_Biomass & PelagicFish\_Biomass \\ 
+ & Year & Prod\_Sat & Hzoo\_Biomass & Ozoo\_Biomass & Pelagics \\ 
   \hline
-1 & 1988.00 & 16608.00 & 16864.00 & 105000.00 & 576.00 \\ 
-  2 & 1989.00 & 27872.00 & 13616.00 & 105000.00 & 1200.00 \\ 
-  3 & 1990.00 & 23504.00 & 7696.00 & 105000.00 & 6304.00 \\ 
-  4 & 1991.00 & 21776.00 & 14640.00 & 105000.00 & 8304.00 \\ 
-  NA &  &  &  &  &  \\ 
-  NA.1 &  &  &  &  &  \\ 
-  NA.2 &  &  &  &  &  \\ 
-  NA.3 &  &  &  &  &  \\ 
-  NA.4 &  &  &  &  &  \\ 
-  NA.5 &  &  &  &  &  \\ 
+1 & 1988.00 &  & 25432.12 & 24275.61 & 428.28 \\ 
+  2 & 1989.00 &  & 31987.20 & 16130.85 & 864.52 \\ 
+  3 & 1990.00 &  & 23027.73 & 7481.54 & 5831.66 \\ 
+  4 & 1991.00 &  & 21188.34 & 16833.36 & 7288.56 \\ 
+  5 & 1992.00 &  & 27314.02 & 7940.31 & 5152.50 \\ 
+  6 & 1993.00 &  & 37612.31 & 11880.41 & 799.64 \\ 
+  7 & 1994.00 &  & 72438.19 & 22699.62 & 203.94 \\ 
+  8 & 1995.00 &  & 57941.78 & 23526.60 & 195.66 \\ 
+  9 & 1996.00 &  & 38465.04 & 24633.25 & 504.21 \\ 
+  10 & 1997.00 &  & 43364.75 & 19153.71 & 912.15 \\ 
    \hline
 \end{tabular}
 \caption{Observations} 
@@ -126,20 +151,20 @@ Parameters, observations and constraints have been gathered in an Excel file wit
 \subsection{Constraints}
 
 % latex table generated in R 4.0.3 by xtable 1.8-4 package
-% Tue Mar 30 13:27:58 2021
+% Tue Mar 30 15:45:28 2021
 \begin{table}[ht]
 \centering
 \begin{tabular}{rll}
   \hline
  & Id & Constraint \\ 
   \hline
-1 & C01 & PhytoAndBacteria\_HerbZooplankton+PhytoAndBacteria\_OmniZooplankton$<$=PrimaryProduction*1.3 \\ 
-  2 & C02 & -(PhytoAndBacteria\_HerbZooplankton+PhytoAndBacteria\_OmniZooplankton)$<$=-PrimaryProduction*0.7 \\ 
-  3 & C03 & OmniZooplankton\_Fishery=OmniZooplankton\_Landings \\ 
-  NA &  &  \\ 
-  NA.1 &  &  \\ 
-  NA.2 &  &  \\ 
-  NA.3 &  &  \\ 
+1 & C01 & PP\_Hzoo + PP\_Ozoo + PP\_Benthos $<$= Prod\_Sat * 1.5  \\ 
+  2 & C02 & PP\_Hzoo + PP\_Ozoo + PP\_Benthos $>$= Prod\_Sat / 1.5  \\ 
+  3 & C03 & PP\_Hzoo + PP\_Ozoo + PP\_Benthos $<$= 2000000  \\ 
+  4 & C04 & PP\_Hzoo + PP\_Ozoo + PP\_Benthos $>$= 500000  \\ 
+  5 & C05 & NorSeaZoo\_Hzoo = 8 * 1600  \\ 
+  6 & C06 & NorSeaZoo\_Ozoo = 2 * 1600  \\ 
+  7 & C07 & PelF\_Fisheries $>$= Pel\_landings  \\ 
    \hline
 \end{tabular}
 \caption{Constraints} 
@@ -157,33 +182,33 @@ Parameters, observations and constraints have been gathered in an Excel file wit
 > end-begin
 \end{Sinput}
 \begin{Soutput}
-Time difference of 1.036968 secs
+Time difference of 2.304302 mins
 \end{Soutput}
 \begin{Sinput}
 > summary(POLYTOPE)
 \end{Sinput}
 \begin{Soutput}
-                 Length Class      Mode       
-components_param  10    data.frame list       
-species            2    -none-     character  
-fluxes_def         4    data.frame list       
-flow               4    -none-     character  
-series            13    data.frame list       
-ntstep             1    -none-     numeric    
-data_series_name  12    -none-     character  
-constraints        5    data.frame list       
-H                  4    -none-     numeric    
-N                  8    -none-     numeric    
-A                972    dgCMatrix  S4         
-AAll             972    dgCMatrix  S4         
-C                 72    dgCMatrix  S4         
-CAll              72    dgCMatrix  S4         
-v                  4    -none-     numeric    
-vAll               4    -none-     numeric    
-L                144    dgCMatrix  S4         
-b                 54    -none-     numeric    
-bAll              54    -none-     numeric    
-symbolic_enviro   56    -none-     environment
+                 Length  Class      Mode       
+components_param      10 data.frame list       
+species                7 -none-     character  
+fluxes_def             4 data.frame list       
+flow                  24 -none-     character  
+series                22 data.frame list       
+ntstep                 1 -none-     numeric    
+data_series_name      21 -none-     character  
+constraints            5 data.frame list       
+H                     49 -none-     numeric    
+N                    168 -none-     numeric    
+A                2009575 dgCMatrix  S4         
+AAll             2009575 dgCMatrix  S4         
+C                  49600 dgCMatrix  S4         
+CAll               49600 dgCMatrix  S4         
+v                     64 -none-     numeric    
+vAll                  64 -none-     numeric    
+L                 173600 dgCMatrix  S4         
+b                   2593 -none-     numeric    
+bAll                2593 -none-     numeric    
+symbolic_enviro      903 -none-     environment
 \end{Soutput}
 \end{Schunk}
 
@@ -196,25 +221,25 @@ The polytope is defined by two pairs of a matrix and and a vector. $F$ being the
 > dim(POLYTOPE$A)
 \end{Sinput}
 \begin{Soutput}
-[1] 54 18
+[1] 2593  775
 \end{Soutput}
 \begin{Sinput}
 > length(POLYTOPE$b)
 \end{Sinput}
 \begin{Soutput}
-[1] 54
+[1] 2593
 \end{Soutput}
 \begin{Sinput}
 > dim(POLYTOPE$C)
 \end{Sinput}
 \begin{Soutput}
-[1]  4 18
+[1]  64 775
 \end{Soutput}
 \begin{Sinput}
 > length(POLYTOPE$v)
 \end{Sinput}
 \begin{Soutput}
-[1] 4
+[1] 64
 \end{Soutput}
 \end{Schunk}
 
@@ -238,259 +263,3 @@ Limits of the Barents' sea polytope in all dimensions are obtained with getAllBo
 \begin{Schunk}
 \begin{Sinput}
 > BOUNDS <- getAllBoundsParam(POLYTOPE, progressBar = FALSE)
-> summary(BOUNDS)
-\end{Sinput}
-\begin{Soutput}
-    param             lowerbound        upperbound       
- Length:18          Min.   :   0.00   Min.   :       49  
- Class :character   1st Qu.:   0.00   1st Qu.:   843805  
- Mode  :character   Median :  24.34   Median :  1298552  
-                    Mean   : 296.54   Mean   : 21517685  
-                    3rd Qu.: 144.85   3rd Qu.:  1300000  
-                    Max.   :1884.94   Max.   :364556692  
-\end{Soutput}
-\end{Schunk}
-
-Function plotPolytope2DCaNmod allows seeing the polytope in the plane defined by two parameters. In its first two dimensions, for the second 1990, the Barents sea polytope dimensions appears as. 
-
-\begin{Schunk}
-\begin{Sinput}
-> fluxX <- paste(FLUXES[1,1],'[1990]',sep="")
-> fluxY <- paste(FLUXES[2,1],'[1990]',sep="")
-> plotPolytope2D(POLYTOPE, c(fluxX, fluxY), progressBar=FALSE)
-\end{Sinput}
-\end{Schunk}
-\includegraphics{barents_SM-011}
-
-\clearpage
-
-\section{Sampling polytope}
-
-\subsection{Sampling}
-
-\begin{Schunk}
-\begin{Sinput}
-> begin = Sys.time()
-> SAMPLE <- sampleCaN(POLYTOPE, 
-+                       N=100,thin=100, 
-+                       nchain=2,
-+                       ncore=2)
-> end=Sys.time()
-> end-begin
-\end{Sinput}
-\begin{Soutput}
-Time difference of 6.5403 secs
-\end{Soutput}
-\end{Schunk}
-
-
-\clearpage
-
-\subsection{Convergence}
-
-\begin{Schunk}
-\begin{Sinput}
-> nchain(SAMPLE$mcmc)
-\end{Sinput}
-\begin{Soutput}
-[1] 2
-\end{Soutput}
-\begin{Sinput}
-> # summary(SAMPLE$mcmc)
-\end{Sinput}
-\end{Schunk}
-
-Gelman diagnostics
-
-\begin{Schunk}
-\begin{Sinput}
-> fluxY <- paste(FLUXES[2,1],'[1990]',sep="")
-> gelman.diag(SAMPLE$mcmc[,fluxY])
-\end{Sinput}
-\begin{Soutput}
-Potential scale reduction factors:
-
-     Point est. Upper C.I.
-[1,]       1.01       1.07
-\end{Soutput}
-\end{Schunk}
-
-
-Autocorrelation function
-
-\begin{Schunk}
-\begin{Sinput}
-> fluxZ <- paste(FLUXES[3,1],'[1990]',sep="")
-> thinned_SAMPLE <- window(SAMPLE$mcmc,thin=2)
-> thin(thinned_SAMPLE)
-\end{Sinput}
-\begin{Soutput}
-[1] 2
-\end{Soutput}
-\begin{Sinput}
-> acfplot(thinned_SAMPLE[,fluxZ])
-\end{Sinput}
-\end{Schunk}
-\includegraphics{barents_SM-015}
-
-\clearpage
-
-\subsection{Dynamics}
-
-For several variables or flux, plots of sampled dynamics. 
-\begin{Schunk}
-\begin{Sinput}
-> fluxX <- FLUXES[1,1]
-> fluxY <- FLUXES[2,1]
-> compA <- COMPONENTS[2,1] 
-> compB <- COMPONENTS[3,1] 
-> c(fluxX,fluxY,compA)
-\end{Sinput}
-\begin{Soutput}
-[1] "PhytoAndBacteria_HerbZooplankton" "PhytoAndBacteria_OmniZooplankton"
-[3] "HerbZooplankton"                 
-\end{Soutput}
-\end{Schunk}
-
-\begin{Schunk}
-\begin{Sinput}
-> g <- ggSeries(SAMPLE, c(fluxX,fluxY,compA), TRUE)
-> g + scale_y_log10() + guides(color = FALSE, fill = FALSE)
-\end{Sinput}
-\end{Schunk}
-\includegraphics{barents_SM-017}
-
-\clearpage
-
-\subsection{Distribution}
-
-For a component or a flux, for a year, the distribution of sampled values. 
-\begin{Schunk}
-\begin{Sinput}
-> ggViolin(SAMPLE,c(fluxX,fluxY,compA),year=1990,TRUE)
-\end{Sinput}
-\end{Schunk}
-\includegraphics{barents_SM-018}
-
-
-\clearpage
-
-\subsection{Diet relationships}
-
-\begin{Schunk}
-\begin{Sinput}
-> ggDiet(SAMPLE, compB)
-\end{Sinput}
-\end{Schunk}
-\includegraphics{barents_SM-019}
-
-\subsection{Growth}
-
-\begin{Schunk}
-\begin{Sinput}
-> ggGrowth(SAMPLE, compB)
-\end{Sinput}
-\end{Schunk}
-\includegraphics{barents_SM-020}
-
-\subsection{Trophic relation}
-
-\begin{Schunk}
-\begin{Sinput}
-> ggTrophicRelation(SAMPLE)
-> # ggTrophicRelation(SAMPLE, compB)
-\end{Sinput}
-\end{Schunk}
-\includegraphics{barents_SM-021}
-
-\subsection{Satiation}
-
-\begin{Schunk}
-\begin{Sinput}
-> ggSatiation(SAMPLE, compB)
-\end{Sinput}
-\end{Schunk}
-\includegraphics{barents_SM-022}
-
-\section{Try and errors}
-
-\subsection{Activating and desactivating constraint}
-
-\begin{Schunk}
-\begin{Sinput}
-> #disactivate constraints C02
-> constA = CONSTRAINTS[2,1]
-> constA
-\end{Sinput}
-\begin{Soutput}
-[1] "C02"
-\end{Soutput}
-\begin{Sinput}
-> POLYTOPEA <- toggleConstraint(POLYTOPE, constA)
-\end{Sinput}
-\begin{Soutput}
-[1] "disactivate inequality C02 : 1988" "disactivate inequality C02 : 1989"
-[3] "disactivate inequality C02 : 1990" "disactivate inequality C02 : 1991"
-\end{Soutput}
-\begin{Sinput}
-> #disactivate constraints C02 for year 1991
-> constYearA = paste(constA, "1991", sep = " : ")
-> POLYTOPEB <- toggleConstraint(POLYTOPE, constYearA)
-\end{Sinput}
-\begin{Soutput}
-[1] "disactivate inequality C02 : 1991"
-\end{Soutput}
-\end{Schunk}
-
-\begin{Schunk}
-\begin{Sinput}
-> checkPolytopeStatus(POLYTOPEA)
-\end{Sinput}
-\begin{Soutput}
-[1] "polytope ok"
-\end{Soutput}
-\begin{Sinput}
-> checkPolytopeStatus(POLYTOPEB)
-\end{Sinput}
-\begin{Soutput}
-[1] "polytope ok"
-\end{Soutput}
-\end{Schunk}
-
-\subsection{Building and analyzing sample}
-
-\begin{Schunk}
-\begin{Sinput}
-> begin = Sys.time()
-> SAMPLEB <- sampleCaN(POLYTOPEB, 
-+                       N=100,thin=100, 
-+                       nchain=2,
-+                       ncore=2)
-> end=Sys.time()
-> end-begin
-\end{Sinput}
-\begin{Soutput}
-Time difference of 6.61147 secs
-\end{Soutput}
-\end{Schunk}
-
-\begin{Schunk}
-\begin{Sinput}
-> fluxX <- FLUXES[1,1]
-> fluxY <- FLUXES[2,1]
-> compA <- COMPONENTS[2,1] 
-> compB <- COMPONENTS[3,1] 
-> c(fluxX,fluxY,compA)
-\end{Sinput}
-\begin{Soutput}
-[1] "PhytoAndBacteria_HerbZooplankton" "PhytoAndBacteria_OmniZooplankton"
-[3] "HerbZooplankton"                 
-\end{Soutput}
-\begin{Sinput}
-> g <- ggSeries(SAMPLEB, c(fluxX,fluxY,compA), TRUE)
-> g + scale_y_log10() + guides(color = FALSE, fill = FALSE)
-\end{Sinput}
-\end{Schunk}
-\includegraphics{barents_SM-026}
-
-\end{document}

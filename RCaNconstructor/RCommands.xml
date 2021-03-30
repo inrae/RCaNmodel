@@ -12,7 +12,7 @@
 <!-- dans le texte d'une formule, la présence en majuscule d'un des mots clé suivants -->
 <!-- FILENAME sera remplace par le nom du fichier .xlsx -->
 <!-- POLYTOPE et SAMPLE sont les noms du polytope et de l'échanntillon en cours -->
-<!-- SIZE, NCHAIN, THIN, YEAR, YEARS, FLUX, FLUXES, COMPONENT, COMPONENTS, FLUXESCOMPONENTS, -->
+<!-- SIZE, NCHAIN, THIN, YEAR, YEARS, FLUX, FLUXES, COMPONENT, COMPONENTS, FLUXESCOMPONENTS, TWOFLUXESONEYEAR, -->
 <!-- sont les parametres des functions -->
 <!-- un dialogue apparait pour permettre de les définir -->
 <!-- syntaxe xml : dans tout le texte le signe '<-' est remplacé par '&lt;-'    -->
@@ -47,8 +47,6 @@
         <!--  CHECKED -->
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
-    <!--  +++++++++++++++++++++++++++++ -->
-    <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
         <id>
             build
@@ -66,7 +64,7 @@
             built
         </contextchange>
         <rcompute>
-            POLYTOPE &lt;- build_CaNmod('FILENAME')
+            POLYTOPE &lt;- buildCaN('FILENAME')
             resultR &lt;- 'Polytope is built'
         </rcompute>
         <help>
@@ -92,7 +90,7 @@
             built
         </condition>
         <rplots>
-            ggCaNmod(POLYTOPE)
+            plotPolytope2D(POLYTOPE, c(FLUXES))
         </rplots>
         <help>
             This command gives a the plot of the polytope acording to the ... representation.
@@ -115,7 +113,7 @@
             built
         </condition>
         <rcompute>
-            resultR &lt;-  checkPolytopeStatusCaNmod(POLYTOPE)
+            resultR &lt;-  checkPolytopeStatus(POLYTOPE)
         </rcompute>
         <help>
             Let n be the number of trophic flows. Let t be the number of time steps.
@@ -144,8 +142,7 @@
             built
         </condition>
         <rcompute>
-            # resultsR &lt;- getAllBoundsParamCaNmod(POLYTOPE)
-            resultR &lt; 'not yet'
+            resultsR &lt;- getAllBoundsParam(POLYTOPE)
         </rcompute>
         <help>
             If the polytope is not bounded, you should add additional constraints on not bounded parameter. To see which parameter is not bounded, you can use the function getAllBoundsParamCaNmod. An Inf in the upperbound column would correspond to a non bounded parameter, otherwise you have lower and upperbounds of each parameter
@@ -166,8 +163,7 @@
             built
         </condition>
         <rcompute>
-            # resultsR &lt;- getBoundParamCaNmod(POLYTOPE, p='FLUX[YEAR]')
-            resultR &lt; 'not yet'
+            resultsR &lt;- getBoundParam(POLYTOPE, p='FLUX[YEAR]')
         </rcompute>
         <help>
             Since this function can be time consuming, we provide a version that focus on a parameter of interest, here for example the first parameter:
@@ -188,14 +184,12 @@
             built
         </condition>
         <rcompute>
-            resultsR &lt;- findingIncompatibleConstrCaNmod(POLYTOPE)
+            resultsR &lt;- findingIncompatibleConstr(POLYTOPE)
         </rcompute>
         <help>
             Finding incompatible constraints.
         </help>
     </rcommand>
-    <!--  +++++++++++++++++++++++++++++ -->
-    <!--  +++++++++++++++++++++++++++++ -->
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
         <id>
@@ -214,18 +208,7 @@
             sampled
         </contextchange>
         <rcompute>
-            SAMPLE &lt;- fitmyCaNmod(POLYTOPE, SIZE, nchain = NCHAIN, ncore = 2, thin = THIN)
-            SAMPLE_long &lt;- as_tibble(as.matrix(SAMPLE$mcmc)) %>%
-            mutate(Sample_id = 1:dim(as.matrix(SAMPLE$mcmc))[1]) %>%
-            pivot_longer(col = -Sample_id,
-            names_to = c('Var','Year'),
-            names_pattern = '(.*)\\[(.*)\\]',
-            values_to = 'value')
-            SAMPLE_wide &lt;- pivot_wider(SAMPLE_long, names_from = 'Var') %>%
-            mutate(Year = as.numeric(Year), Sample_id = factor(Sample_id))
-            Component_names &lt;- SAMPLE$CaNmod$species
-            Flux_names &lt;- SAMPLE$CaNmod$fluxes_def$Flux
-            resultR &lt;- 'Polytope is sampled'
+            SAMPLE &lt;- sampleCaN(POLYTOPE, SIZE, nchain = NCHAIN, ncore = 2, thin = THIN)
         </rcompute>
         <help>
             This commands allows sampling the polytope.  The aim of this step is to achieve a uniform sampling within the convex poltyope. To do that, we use the routines from the former cpgsR package. Since the sampling is based on a mcmc algorithm, it can be a good idea to run several independent chains; the library allows you to run several chain in parallel using multicore facility provided by package parallel and doParallel. For example, here is the solution to run 2 chains in parrallel with 1000 samples in each chain:
@@ -240,38 +223,12 @@
         </help>
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
-
-    <!--  +++++++++++++++++++++++++++++ -->
-    <rcommand>
-        <id>
-            samplePlot
-        </id>
-        <textmenu>
-            Plot sample
-        </textmenu>
-        <submenu>
-            sample
-        </submenu>
-        <condition>
-            sampled
-        </condition>
-        <rplots>
-            traceplot(SAMPLE$mcmc[,'FLUX[YEAR]'])
-        </rplots>
-        <help>
-            Plot sample for a given flux and a given year.
-        </help>
-        <parameters>
-            flux; year
-        </parameters>
-    </rcommand>
-    <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
         <id>
             gelmanDiag
         </id>
         <textmenu>
-            Gelman diagram
+            Gelman diagnostic
         </textmenu>
         <submenu>
             sample
@@ -283,7 +240,7 @@
             gelman.diag(SAMPLE$mcmc[,'FLUX[YEAR]'])
         </rplots>
         <help>
-            Gelman diagram for a given flux and a given year. Does not work.
+            Gelman diagnostic for a given flux and a given year. Does not work.
         </help>
         <parameters>
             FLUX : one flow
@@ -308,19 +265,20 @@
             acfplot(SAMPLE$mcmc[,'FLUX[YEAR]'])
         </rplots>
         <help>
-            Plot autocorrelation sample for a given flux and a given year.
+            Plot autocorrelation in sample for a given flux and a given year.
         </help>
         <parameters>
-            flux; year
+            FLUX : one flow
+            YEAR : one year
         </parameters>
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
         <id>
-            plotSampleMultiple
+            samplePlotFlux
         </id>
         <textmenu>
-            Plot sample for several fluxes and components
+            Plot sample flux : one flux
         </textmenu>
         <submenu>
             sample
@@ -329,7 +287,57 @@
             sampled
         </condition>
         <rplots>
-            ggResult(SAMPLE, c(FLUXESCOMPONENTS),TRUE)
+            ggSeries(SAMPLE,FLUX,TRUE)
+        </rplots>
+        <help>
+            Plot sample for a given flux and a given year.
+        </help>
+        <parameters>
+            FLUX : one flow
+            YEAR : one year
+        </parameters>
+    </rcommand>
+    <!--  +++++++++++++++++++++++++++++ -->
+    <rcommand>
+        <id>
+            samplePlotComponents
+        </id>
+        <textmenu>
+            Plot sample biomass : one component
+        </textmenu>
+        <submenu>
+            sample
+        </submenu>
+        <condition>
+            sampled
+        </condition>
+        <rplots>
+            ggSeries(SAMPLE,COMPONENT,TRUE)
+        </rplots>
+        <help>
+            Plot sample for a given component and a given year.
+        </help>
+        <parameters>
+            FLUX : one flow
+            YEAR : one year
+        </parameters>
+    </rcommand>
+    <!--  +++++++++++++++++++++++++++++ -->
+    <rcommand>
+        <id>
+            sampleMultiple
+        </id>
+        <textmenu>
+            Plot sample : several fluxes or components
+        </textmenu>
+        <submenu>
+            sample
+        </submenu>
+        <condition>
+            sampled
+        </condition>
+        <rplots>
+            ggSeries(SAMPLE, c(FLUXESCOMPONENTS),TRUE)
         </rplots>
         <help>
             Plot sample for several fluxes and components
@@ -339,55 +347,6 @@
         </parameters>
 
     </rcommand>
-    <!--  +++++++++++++++++++++++++++++ -->
-    <!--  +++++++++++++++++++++++++++++ -->
-    <rcommand>
-        <id>
-            biomassTimeSeries
-        </id>
-        <textmenu>
-            Biomass time-series
-        </textmenu>
-        <submenu>
-            sample
-        </submenu>
-        <condition>
-            sampled
-        </condition>
-        <rplots>
-            ggResult(SAMPLE,param = Component_names,plot_series = TRUE,ylab = 'Biomass') +
-            theme(legend.position = 'none') +
-            ggtitle('Biomass time-series')
-        </rplots>
-        <help>
-            Biomass time-series
-        </help>
-    </rcommand>
-    <!--  +++++++++++++++++++++++++++++ -->
-    <!--  +++++++++++++++++++++++++++++ -->
-    <rcommand>
-        <id>
-            fluxTimeSeries
-        </id>
-        <textmenu>
-            Flux Time Series
-        </textmenu>
-        <submenu>
-            sample
-        </submenu>
-        <condition>
-            sampled
-        </condition>
-        <rplots>
-            ggResult(SAMPLE,param = Flux_names,plot_series = TRUE,ylab = 'Flux') +
-            theme(legend.position = 'none') +
-            ggtitle('Fluxes time-series')
-        </rplots>
-        <help>
-            Flux Time Series
-        </help>
-    </rcommand>
-    <!--  +++++++++++++++++++++++++++++ -->
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
         <id>
@@ -405,21 +364,8 @@
         <contextchange>
             plotsPrepared
         </contextchange>
-        <rcompute>
-            Bio &lt;- SAMPLE_long %>%
-            filter(Var %in% Component_names) %>%
-            mutate(Year = as.numeric(Year),Var = factor(Var,levels=Component_names))
-        </rcompute>
         <rplots>
-            ggplot(data =  Bio, aes(x=Var,y=value))+
-            geom_violin(trim=TRUE,scale='width',aes(fill=Var))+
-            theme_bw()+
-            theme(axis.text.x = element_text(angle = 30, hjust = 1),plot.margin = margin(0.5, 0, 0, 2, 'cm')) +
-            scale_y_continuous(trans='log10')+
-            xlab('Component') +
-            ylab('Biomass') +
-            theme(legend.position = 'none') +
-            ggtitle('Biomass distributions (log)')
+            ggViolin(SAMPLE,c(COMPONENTS),year=YEAR,TRUE)
         </rplots>
         <help>
             Violin plots of biomass distributions
@@ -440,20 +386,8 @@
         <condition>
             sampled
         </condition>
-        <rcompute>
-            Flow &lt;- SAMPLE_long %>%
-            filter(Var %in% Flux_names) %>%
-            mutate(Year = as.numeric(Year),Var = factor(Var,levels=Flux_names))
-        </rcompute>
         <rplots>
-            ggplot(data =  Flow, aes(x=Var,y=value))+
-            geom_violin(trim=TRUE,scale='width',fill='darkcyan')+
-            theme_bw()+
-            theme(axis.text.x = element_text(angle = 30, hjust = 1),plot.margin = margin(0.5, 0, 0, 2, 'cm')) +
-            scale_y_continuous(trans='log10') +
-            xlab('Component') +
-            ylab('Flux') +
-            ggtitle('Flux distributions (log)')
+            ggViolin(SAMPLE,c(FLUXES),year=YEAR,TRUE)
         </rplots>
         <help>
             Violin plots of flux distributions
@@ -474,92 +408,20 @@
         <condition>
             sampled
         </condition>
-        <rcompute>
-            SumFlows &lt;- Flow %>%
-            rename(Flow=value) %>%
-            left_join(SAMPLE$CaNmod$fluxes_def,by = c('Var'='Flux')) %>%
-            rename(prey = From, predator = To) %>%
-            filter(Trophic ==1) %>%
-            mutate(prey = factor(prey,levels=POLYTOPE$components_param$Component),predator = factor(predator,levels=Component_names)) %>%
-            group_by(Sample_id,Year,predator) %>%
-            summarise(sum_flows=sum(Flow))
-            Diet &lt;- Flow %>%
-            rename(Flow=value) %>%
-            left_join(SAMPLE$CaNmod$fluxes_def,by = c('Var'='Flux')) %>%
-            rename(prey = From, predator = To) %>%
-            filter(Trophic ==1) %>%
-            mutate(prey = factor(prey,levels=POLYTOPE$components_param$Component),predator = factor(predator,levels=Component_names)) %>%
-            left_join(SumFlows, by = c('Sample_id','Year','predator')) %>%
-            mutate(prop_in_diet = Flow/sum_flows)
-        </rcompute>
         <rplots>
-            ggplot(data = Diet, aes(x=prey,y=prop_in_diet)) +
-            geom_violin(trim=TRUE,scale='width',fill='darkcyan') +
-            theme_bw() +
-            theme(axis.text.x = element_text(angle = 30, hjust = 1),plot.margin = margin(0.5, 0, 0, 2, 'cm')) +
-            facet_wrap(vars(predator), ncol =ceiling(length(unique(Diet$predator))^0.5)) +
-            xlab('Prey') +
-            ylab('% in diet') +
-            ggtitle('proportions in diet')
+            ggDiet(SAMPLE, COMPONENT)
         </rplots>
         <help>
             Diet fractions
         </help>
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
-    <rcommand>
-        <id>
-            dietFractionsPredator
-        </id>
-        <textmenu>
-            Diet fractions (by predator)
-        </textmenu>
-        <submenu>
-            sample
-        </submenu>
-        <condition>
-            sampled
-        </condition>
-        <rcompute>
-            SumFlows &lt;- Flow %>%
-            rename(Flow=value) %>%
-            left_join(SAMPLE$CaNmod$fluxes_def,by = c('Var'='Flux')) %>%
-            rename(prey = From, predator = To) %>%
-            filter(Trophic ==1) %>%
-            mutate(prey = factor(prey,levels=POLYTOPE$components_param$Component),predator = factor(predator,levels=Component_names)) %>%
-            group_by(Sample_id,Year,predator) %>%
-            summarise(sum_flows=sum(Flow))
-            Diet &lt;- Flow %>%
-            rename(Flow=value) %>%
-            left_join(SAMPLE$CaNmod$fluxes_def,by = c('Var'='Flux')) %>%
-            rename(prey = From, predator = To) %>%
-            filter(Trophic ==1) %>%
-            mutate(prey = factor(prey,levels=POLYTOPE$components_param$Component),predator = factor(predator,levels=Component_names)) %>%
-            left_join(SumFlows, by = c('Sample_id','Year','predator')) %>%
-            mutate(prop_in_diet = Flow/sum_flows)
-            Diet2 &lt;- Diet %>%
-            group_by(predator,prey) %>%
-            summarise(prop_in_diet = mean(prop_in_diet)) %>%
-            ungroup()
-        </rcompute>
-        <rplots>
-            ggplot(data = Diet2, aes(x=predator,y=prop_in_diet,fill=prey)) +
-            geom_bar(position='stack', stat='identity',width=.98,color='black') +
-            theme(legend.position = 'bottom') +
-            ggtitle('Diet - summary')
-        </rplots>
-        <help>
-            Diet fractions (by predator)
-        </help>
-    </rcommand>
-    <!--  +++++++++++++++++++++++++++++ -->
-    <!--  +++++++++++++++++++++++++++++ -->
     <rcommand >
         <id>
             growthRatesBiomasses
         </id>
         <textmenu>
-            Growth rates vs. biomasses
+            Growth rates vs. biomasses (one component)
         </textmenu>
         <submenu>
             sample
@@ -567,64 +429,40 @@
         <condition>
             sampled
         </condition>
-        <rcompute>
-            Growth_wide &lt;- SAMPLE_wide %>%
-            select(c(Sample_id,Component_names)) %>%
-            mutate(Sample_id = 10^as.numeric(Sample_id)) %>%
-            log10(.) %>%
-            as.matrix(.) %>%
-            diff(.,lag=1) %>%
-            10^. %>%
-            as_tibble
-            Bio_wide &lt;- SAMPLE_wide %>%
-            slice(-nrow(SAMPLE_wide)) %>%
-            select(Component_names) %>%
-            mutate(Sample_id = Growth_wide$Sample_id)
-            Growth_long &lt;- Growth_wide %>%
-            filter(Sample_id == 1) %>%
-            pivot_longer(col = -Sample_id,
-            names_to = 'Component',
-            values_to = 'Growth')
-            Bio_long &lt;- Bio_wide %>%
-            filter(Sample_id == 1) %>%
-            pivot_longer(col = -Sample_id,
-            names_to = 'Component',
-            values_to = 'Biomass') %>%
-            mutate(Growth = Growth_long$Growth)
-            Bio_long$Component&lt;-factor(Bio_long$Component,levels=Component_names) # trick to get the flows in the right order
-            Inertia &lt;- SAMPLE$CaNmod$components_param %>%
-            filter(Component%in%Component_names) %>%
-            mutate(inertia_low = exp(-Inertia), inertia_high = exp(Inertia)) %>%
-            as_tibble %>%
-            mutate(Component = factor(Component,levels=Component_names))
-        </rcompute>
         <rplot>
-            Bio_long %>%
-            slice(sample(1:dim(Bio_long)[1],min(10000,dim(Bio_long)[1]))) %>%
-            ggplot(aes(x=Biomass,y=Growth,col=Component)) +
-            geom_point(size=.1, alpha = 0.5) +
-            stat_smooth(method = 'gam', colour = 'chocolate4') +
-            geom_hline(yintercept = 1, colour = 'black', linetype = 'dashed') +
-            geom_hline(data= Inertia, aes(yintercept=inertia_low), colour = 'firebrick3', linetype = 'dashed') +
-            geom_hline(data= Inertia, aes(yintercept=inertia_high), colour = 'firebrick3', linetype = 'dashed') +
-            facet_wrap(vars(Component), ncol =ceiling(length(Component_names)^0.5), scales = 'free') +
-            scale_x_continuous(trans='log10') +
-            scale_y_continuous(trans='log10') +
-            theme(legend.position = 'none') +
-            ggtitle('Growth (B(t+1)/B(t)) vs. Biomass')
+            ggGrowth(SAMPLE, COMPONENT)
         </rplot>
         <help>
-            Growth rates vs. biomasses...
+            Plots biomass growth as a function of biomass
+        </help>
+    </rcommand>    <!--  +++++++++++++++++++++++++++++ -->
+    <rcommand >
+        <id>
+            growthRatesBiomassesTC
+        </id>
+        <textmenu>
+            Growth rates vs. biomasses (all components)
+        </textmenu>
+        <submenu>
+            sample
+        </submenu>
+        <condition>
+            sampled
+        </condition>
+        <rplot>
+            ggGrowth(SAMPLE)
+        </rplot>
+        <help>
+            Plots biomass growth as a function of biomass
         </help>
     </rcommand>
-    <!--  +++++++++++++++++++++++++++++ -->
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand >
         <id>
             trophicFunctionalRelationships
         </id>
         <textmenu>
-            Trophic functional relationships
+            Trophic functional relationships (all components)
         </textmenu>
         <submenu>
             sample
@@ -635,42 +473,19 @@
         <contextchange>
             plotsPrepared
         </contextchange>
-        <rcompute>
-            TFR &lt;- Flow %>%
-            rename(Flow=value) %>%
-            left_join(SAMPLE$CaNmod$fluxes_def,by = c('Var'='Flux')) %>%
-            rename(prey = From, predator = To) %>%
-            mutate(prey = factor(prey,levels=Component_names),predator = factor(predator,levels=Component_names)) %>%
-            inner_join(Bio,by = c('prey'='Var','Year'='Year','Sample_id' = 'Sample_id')) %>%
-            rename(Bio_prey = value) %>%
-            inner_join(Bio,by = c('predator'='Var','Year'='Year','Sample_id' = 'Sample_id')) %>%
-            rename(Bio_predator = value) %>%
-            mutate(Bio_ratio = Bio_prey/Bio_predator)
-        </rcompute>
         <rplots>
-            TFR %>%
-            slice(sample(1:dim(TFR)[1],min(50000,dim(TFR)[1]))) %>%
-            ggplot(aes(x=Bio_prey,y=Flow,col=prey)) +
-            geom_point(size=.1, alpha = 0.25) +
-            stat_smooth(method = 'gam', colour = 'chocolate4') +
-            facet_grid(predator~prey,scales = 'free') +
-            xlab('Biomass prey') +
-            ylab('Flux to predator') +
-            theme(legend.position = 'none') +
-            ggtitle('trophic functional relationships')
+            ggTrophicRelation(SAMPLE)
         </rplots>
         <help>
-            Trophic functional relationships....
+            Plots fluxes from prey to predators
         </help>
-    </rcommand>
-    <!--  +++++++++++++++++++++++++++++ -->
-    <!--  +++++++++++++++++++++++++++++ -->
-    <rcommand>
+    </rcommand>    <!--  +++++++++++++++++++++++++++++ -->
+    <rcommand >
         <id>
-            satiation
+            trophicFunctionalRelationships
         </id>
         <textmenu>
-            Satiation
+            Trophic functional relationships (one component)
         </textmenu>
         <submenu>
             sample
@@ -678,70 +493,57 @@
         <condition>
             sampled
         </condition>
-        <rcompute>
-            TFR &lt;- Flow %>%
-            rename(Flow=value) %>%
-            left_join(SAMPLE$CaNmod$fluxes_def,by = c('Var'='Flux')) %>%
-            rename(prey = From, predator = To) %>%
-            mutate(prey = factor(prey,levels=Component_names),predator = factor(predator,levels=Component_names)) %>%
-            inner_join(Bio,by = c('prey'='Var','Year'='Year','Sample_id' = 'Sample_id')) %>%
-            rename(Bio_prey = value) %>%
-            inner_join(Bio,by = c('predator'='Var','Year'='Year','Sample_id' = 'Sample_id')) %>%
-            rename(Bio_predator = value) %>%
-            mutate(Bio_ratio = Bio_prey/Bio_predator)
-            Feeding &lt;- TFR %>%
-            group_by(Sample_id,Year,predator) %>%
-            summarise(Bio_predator = first(Bio_predator),Flow_tot = sum(Flow)) %>%
-            ungroup()
-            Satiation &lt;- SAMPLE$CaNmod$components_param %>%
-            filter(Component%in%unique(Feeding$predator)) %>%
-            as_tibble %>%
-            mutate(predator = factor(Component,levels=Component_names), intercept =0) %>%
-            select(predator,Satiation, intercept)
-        </rcompute>
+        <contextchange>
+            plotsPrepared
+        </contextchange>
         <rplots>
-            Feeding %>%
-            slice(sample(1:dim(Feeding)[1],min(10000,dim(Feeding)[1]))) %>%
-            ggplot(aes(x=Bio_predator,y=Flow_tot)) +
-            geom_point(size=.1, alpha = 0.5) +
-            geom_hline(yintercept = 0, colour = 'firebrick3', linetype = 'dashed') +
-            geom_abline(data = Satiation, aes(slope=Satiation,intercept=intercept), colour = 'firebrick3', linetype = 'dashed') +
-            facet_wrap(~predator,ncol = ceiling(length(Component_names)^0.5),scales = 'free') +
-            xlab('Predator biomass') +
-            ylab('Total flux to predator') +
-            theme(legend.position = 'none') +
-            ggtitle('Satiation')
+            ggTrophicRelation(SAMPLE,COMPONENT)
         </rplots>
         <help>
-            Satiation plots ...
+            Plots fluxes from prey to predators
         </help>
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
         <id>
-            speciesMultipanelScatterplot
+            satiation
         </id>
         <textmenu>
-            Species multipanel scatterplot
+            Satiation (one component)
         </textmenu>
         <submenu>
             sample
         </submenu>
         <condition>
-            built
+            sampled
         </condition>
-        resultsR &lt;- findingIncompatibleConstrCaNmod(POLYTOPE)
         <rplots>
-            SAMPLE_wide %>%
-            select(SAMPLE$CaNmod$components_param$Component[POLYTOPE$components_param$Inside==1]) %>%
-            slice(sample(1:dim(SAMPLE_wide)[1],min(500,dim(SAMPLE_wide)[1]))) %>%
-            ggpairs(lower=list(continuous = wrap('smooth',method='loess',size=0.1,alpha=0.5))) +
-            ggtitle('Species pair-plot')
+            ggSatiation(SAMPLE, COMPONENT)
         </rplots>
         <help>
-            Species multipanel scatterplot
+            Plots incoming trophic fluxes versus biomass
         </help>
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
-
+    <rcommand>
+        <id>
+            satiation
+        </id>
+        <textmenu>
+            Satiation (all components)
+        </textmenu>
+        <submenu>
+            sample
+        </submenu>
+        <condition>
+            sampled
+        </condition>
+        <rplots>
+            ggSatiation(SAMPLE)
+        </rplots>
+        <help>
+            Plots satiation
+        </help>
+    </rcommand>
+    <!--  +++++++++++++++++++++++++++++ -->
 </rcommands>
