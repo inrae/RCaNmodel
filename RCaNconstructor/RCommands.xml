@@ -12,7 +12,7 @@
 <!-- dans le texte d'une formule, la présence en majuscule d'un des mots clé suivants -->
 <!-- FILENAME sera remplace par le nom du fichier .xlsx -->
 <!-- POLYTOPE et SAMPLE sont les noms du polytope et de l'échanntillon en cours -->
-<!-- SIZE, NCHAIN, THIN, YEAR, YEARS, FLUX, FLUXES, COMPONENT, COMPONENTS, FLUXESCOMPONENTS, TWOFLUXESONEYEAR, -->
+<!-- SIZE, NCHAIN, THIN, YEAR, YEARS, FLUX, FLUXES, COMPONENT, COMPONENTS, FLUXESCOMPONENTS -->
 <!-- sont les parametres des functions -->
 <!-- un dialogue apparait pour permettre de les définir -->
 <!-- syntaxe xml : dans tout le texte le signe '<-' est remplacé par '&lt;-'    -->
