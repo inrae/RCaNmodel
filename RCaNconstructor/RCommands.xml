@@ -42,7 +42,7 @@
             resultR &lt;- 'R session is started'
         </rcompute>
         <help>
-            This command starts a R session and loads all necessary libraries
+            This command launches a R session and loads all necessary libraries
         </help>
         <!--  CHECKED -->
     </rcommand>
@@ -78,10 +78,10 @@
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
         <id>
-            plotPolytope
+            plotPolytope2D
         </id>
         <textmenu>
-            Plot polytope
+            Plot polytope in two selected dimensions
         </textmenu>
         <submenu>
             polytope
@@ -90,11 +90,36 @@
             built
         </condition>
         <rplots>
-            plotPolytope2D(POLYTOPE, c(FLUXES))
+            plotPolytope2D(POLYTOPE, FLUX[YEAR]FLUX[YEAR])
         </rplots>
         <help>
-            This command gives a the plot of the polytope acording to the ... representation.
-            Documentation is given in ...
+            Plot the projection of the polytope on the plane defined by two dimensions.
+        </help>
+        <parameter>
+            FLUX[YEAR]FLUX[YEAR]
+        </parameter>
+        <!--  CHECKED -->
+    </rcommand>
+
+    <!--  +++++++++++++++++++++++++++++ -->
+    <rcommand>
+        <id>
+            plotNetwork
+        </id>
+        <textmenu>
+            Plot network
+        </textmenu>
+        <submenu>
+            polytope
+        </submenu>
+        <condition>
+            built
+        </condition>
+        <rplots>
+            ggNetwork(POLYTOPE)
+        </rplots>
+        <help>
+            This command gives the plot of the flow foodweb (package ggplot, ggraph)
         </help>
         <!--  CHECKED -->
     </rcommand>
@@ -113,17 +138,11 @@
             built
         </condition>
         <rcompute>
-            resultR &lt;-  checkPolytopeStatus(POLYTOPE)
+            status &lt;-  checkPolytopeStatus(POLYTOPE)
+            resultR &lt;-  status
         </rcompute>
         <help>
-            Let n be the number of trophic flows. Let t be the number of time steps.
-            The set of constraints define a convex subset of a n t-dimensional space.
-            This subset is a convex polytope. Constraints correspond to faces of this polytope.
-            Each point inside the polytope corresponds to a possible trajectory of the trophic system.
-            The idea of Chance and Necessity model is to uniformly sample within such a polytope.
-            This corresponds to explore the whole space of possible trajectories.
-            Nevertheless, the polytope should not be empty (otherwise, there is no solution) and  should be bounded (otherwise there could be infinite flows).
-            This commands allows check that the polytope is ok,
+             This commands checks that the polytope is bounded and not empty.
         </help>
         <!--  CHECKED -->
     </rcommand>
@@ -142,10 +161,12 @@
             built
         </condition>
         <rcompute>
-            resultsR &lt;- getAllBoundsParam(POLYTOPE)
+            bounds &lt;- getAllBoundsParam(POLYTOPE)
+            resultR &lt;- bounds
         </rcompute>
         <help>
-            If the polytope is not bounded, you should add additional constraints on not bounded parameter. To see which parameter is not bounded, you can use the function getAllBoundsParamCaNmod. An Inf in the upperbound column would correspond to a non bounded parameter, otherwise you have lower and upperbounds of each parameter
+            This command allows to identify dimensions along wich polytope is not empty.
+            If the polytope is not bounded, you should add additional constraints.
         </help>
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
@@ -154,7 +175,7 @@
             bound
         </id>
         <textmenu>
-            Bound of polytope in one dimension
+            Bound of polytope (one dimension)
         </textmenu>
         <submenu>
             polytope
@@ -163,11 +184,15 @@
             built
         </condition>
         <rcompute>
-            resultsR &lt;- getBoundParam(POLYTOPE, p='FLUX[YEAR]')
+            bound &lt;- getBoundParam(POLYTOPE, p=FLUX[YEAR])
+            resultR &lt;- bound
         </rcompute>
         <help>
-            Since this function can be time consuming, we provide a version that focus on a parameter of interest, here for example the first parameter:
+            Since bounds function can be time consuming, we provide a version that focus on a parameter of interest, here for example the first parameter:
         </help>
+        <parameter>
+            FLUX[YEAR]
+        </parameter>
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
@@ -184,10 +209,11 @@
             built
         </condition>
         <rcompute>
-            resultsR &lt;- findingIncompatibleConstr(POLYTOPE)
+            incomp &lt;- findingIncompatibleConstr(POLYTOPE)
+            resultR &lt;- incomp
         </rcompute>
         <help>
-            Finding incompatible constraints.
+            This command allows finding incompatible constraints when the polytope is empty.
         </help>
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
@@ -209,6 +235,7 @@
         </contextchange>
         <rcompute>
             SAMPLE &lt;- sampleCaN(POLYTOPE, SIZE, nchain = NCHAIN, ncore = 2, thin = THIN)
+            resultR &lt;- 'Polytope is sampled'
         </rcompute>
         <help>
             This commands allows sampling the polytope.  The aim of this step is to achieve a uniform sampling within the convex poltyope. To do that, we use the routines from the former cpgsR package. Since the sampling is based on a mcmc algorithm, it can be a good idea to run several independent chains; the library allows you to run several chain in parallel using multicore facility provided by package parallel and doParallel. For example, here is the solution to run 2 chains in parrallel with 1000 samples in each chain:
@@ -221,6 +248,11 @@
             This commands returns an object, named SAMPLE, that contains the model description and a  mcmc.list object so that we can use all the diagnostics tools provided in the package coda, such traceplot, summary or gelman and rubin tests or autocorrelograms.
             According to the number of trophic fluxes and the number of time steps, it may last a lot: some minutes, some tenths of minutes.
         </help>
+        <parameter>
+            SIZE
+            NCHAIN
+            THIN
+        </parameter>
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
@@ -236,16 +268,18 @@
         <condition>
             sampled
         </condition>
-        <rplots>
-            gelman.diag(SAMPLE$mcmc[,'FLUX[YEAR]'])
-        </rplots>
+        <rcompute>
+            gelman &lt;- gelman.diag(SAMPLE$mcmc[,FLUX[YEAR]])
+            resultR &lt;- gelman
+        </rcompute>
         <help>
-            Gelman diagnostic for a given flux and a given year. Does not work.
+            Gelman diagnostic for a given flux and a given year (package coda).
         </help>
-        <parameters>
-            FLUX : one flow
-            YEAR : one year
-        </parameters>
+        <parameter>
+            <parameter>
+                FLUX[YEAR]
+            </parameter>
+        </parameter>
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
@@ -262,65 +296,14 @@
             sampled
         </condition>
         <rplots>
-            acfplot(SAMPLE$mcmc[,'FLUX[YEAR]'])
+            acfplot(SAMPLE$mcmc[,FLUX[YEAR]])
         </rplots>
         <help>
-            Plot autocorrelation in sample for a given flux and a given year.
+            Plot autocorrelation in sample for a given flux and a given year (package coda).
         </help>
-        <parameters>
-            FLUX : one flow
-            YEAR : one year
-        </parameters>
-    </rcommand>
-    <!--  +++++++++++++++++++++++++++++ -->
-    <rcommand>
-        <id>
-            samplePlotFlux
-        </id>
-        <textmenu>
-            Plot sample flux : one flux
-        </textmenu>
-        <submenu>
-            sample
-        </submenu>
-        <condition>
-            sampled
-        </condition>
-        <rplots>
-            ggSeries(SAMPLE,FLUX,TRUE)
-        </rplots>
-        <help>
-            Plot sample for a given flux and a given year.
-        </help>
-        <parameters>
-            FLUX : one flow
-            YEAR : one year
-        </parameters>
-    </rcommand>
-    <!--  +++++++++++++++++++++++++++++ -->
-    <rcommand>
-        <id>
-            samplePlotComponents
-        </id>
-        <textmenu>
-            Plot sample biomass : one component
-        </textmenu>
-        <submenu>
-            sample
-        </submenu>
-        <condition>
-            sampled
-        </condition>
-        <rplots>
-            ggSeries(SAMPLE,COMPONENT,TRUE)
-        </rplots>
-        <help>
-            Plot sample for a given component and a given year.
-        </help>
-        <parameters>
-            FLUX : one flow
-            YEAR : one year
-        </parameters>
+        <parameter>
+            FLUX[YEAR]
+        </parameter>
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
@@ -328,7 +311,7 @@
             sampleMultiple
         </id>
         <textmenu>
-            Plot sample : several fluxes or components
+            Plot sample (several fluxes or components)
         </textmenu>
         <submenu>
             sample
@@ -337,14 +320,14 @@
             sampled
         </condition>
         <rplots>
-            ggSeries(SAMPLE, c(FLUXESCOMPONENTS),TRUE)
+            ggSeries(SAMPLE, FLUXESCOMPONENTS,TRUE)
         </rplots>
         <help>
-            Plot sample for several fluxes and components
+            Plot sample for several fluxes and components (package ggplot2)
         </help>
-        <parameters>
-            FLUXESCOMPONENTS : several flows and several components.
-        </parameters>
+        <parameter>
+            FLUXESCOMPONENTS
+        </parameter>
 
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
@@ -365,11 +348,14 @@
             plotsPrepared
         </contextchange>
         <rplots>
-            ggViolin(SAMPLE,c(COMPONENTS),year=YEAR,TRUE)
+            ggViolin(SAMPLE, COMPONENTSYEAR,TRUE)
         </rplots>
         <help>
-            Violin plots of biomass distributions
+            Violin plots of biomass distributions (package ggplot2)
         </help>
+        <parameter>
+            COMPONENTSYEAR
+        </parameter>
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <!--  +++++++++++++++++++++++++++++ -->
@@ -387,20 +373,23 @@
             sampled
         </condition>
         <rplots>
-            ggViolin(SAMPLE,c(FLUXES),year=YEAR,TRUE)
+            ggViolin(SAMPLE, FLUXESYEAR,TRUE)
         </rplots>
         <help>
-            Violin plots of flux distributions
+            Violin plots of flux distributions (package ggplot2)
         </help>
+        <parameter>
+            FLUXESYEAR
+        </parameter>
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
         <id>
-            dietFractions
+            dietFractionsSC
         </id>
         <textmenu>
-            Diet fractions
+            Diet fractions (several components)
         </textmenu>
         <submenu>
             sample
@@ -409,39 +398,22 @@
             sampled
         </condition>
         <rplots>
-            ggDiet(SAMPLE, COMPONENT)
+            ggDiet(SAMPLE, COMPONENTS)
         </rplots>
         <help>
-            Diet fractions
+            A barplot of diet fractions (package ggplot2)
         </help>
+        <parameter>
+            COMPONENTS
+        </parameter>
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
-    <rcommand >
-        <id>
-            growthRatesBiomasses
-        </id>
-        <textmenu>
-            Growth rates vs. biomasses (one component)
-        </textmenu>
-        <submenu>
-            sample
-        </submenu>
-        <condition>
-            sampled
-        </condition>
-        <rplot>
-            ggGrowth(SAMPLE, COMPONENT)
-        </rplot>
-        <help>
-            Plots biomass growth as a function of biomass
-        </help>
-    </rcommand>    <!--  +++++++++++++++++++++++++++++ -->
     <rcommand >
         <id>
             growthRatesBiomassesTC
         </id>
         <textmenu>
-            Growth rates vs. biomasses (all components)
+            Growth / Biomasses (all components)
         </textmenu>
         <submenu>
             sample
@@ -449,17 +421,41 @@
         <condition>
             sampled
         </condition>
-        <rplot>
+        <rplots>
             ggGrowth(SAMPLE)
-        </rplot>
+        </rplots>
         <help>
-            Plots biomass growth as a function of biomass
+            Plots biomass growth as a function of biomass. Provides a distribution over iterations and years (package ggplot2).
         </help>
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand >
         <id>
-            trophicFunctionalRelationships
+            growthRatesBiomassesSC
+        </id>
+        <textmenu>
+            Growth / Biomasses (several components)
+        </textmenu>
+        <submenu>
+            sample
+        </submenu>
+        <condition>
+            sampled
+        </condition>
+        <rplots>
+            ggGrowth(SAMPLE, COMPONENTS)
+        </rplots>
+        <help>
+            Plots biomass growth as a function of biomass. Provides a distribution over iterations and years (package ggplot2).
+        </help>
+        <parameter>
+            COMPONENTS
+        </parameter>
+    </rcommand>
+    <!--  +++++++++++++++++++++++++++++ -->
+    <rcommand >
+        <id>
+            trophicFunctionalRelationshipsTC
         </id>
         <textmenu>
             Trophic functional relationships (all components)
@@ -477,15 +473,15 @@
             ggTrophicRelation(SAMPLE)
         </rplots>
         <help>
-            Plots fluxes from prey to predators
+            Plots fluxes from prey to predators (package ggplot2).
         </help>
     </rcommand>    <!--  +++++++++++++++++++++++++++++ -->
     <rcommand >
         <id>
-            trophicFunctionalRelationships
+            trophicFunctionalRelationshipsSC
         </id>
         <textmenu>
-            Trophic functional relationships (one component)
+            Trophic functional relationships (several components)
         </textmenu>
         <submenu>
             sample
@@ -497,37 +493,20 @@
             plotsPrepared
         </contextchange>
         <rplots>
-            ggTrophicRelation(SAMPLE,COMPONENT)
+            ggTrophicRelation(SAMPLE,COMPONENTS)
         </rplots>
         <help>
-            Plots fluxes from prey to predators
+            Plots fluxes from prey to predators (package ggplot2).
         </help>
+        <parameter>
+            COMPONENTS
+        </parameter>
     </rcommand>
+
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
         <id>
-            satiation
-        </id>
-        <textmenu>
-            Satiation (one component)
-        </textmenu>
-        <submenu>
-            sample
-        </submenu>
-        <condition>
-            sampled
-        </condition>
-        <rplots>
-            ggSatiation(SAMPLE, COMPONENT)
-        </rplots>
-        <help>
-            Plots incoming trophic fluxes versus biomass
-        </help>
-    </rcommand>
-    <!--  +++++++++++++++++++++++++++++ -->
-    <rcommand>
-        <id>
-            satiation
+            satiationTC
         </id>
         <textmenu>
             Satiation (all components)
@@ -542,8 +521,167 @@
             ggSatiation(SAMPLE)
         </rplots>
         <help>
-            Plots satiation
+            Plots incoming trophic fluxes versus biomass (package ggplot2).
+         </help>
+    </rcommand>
+    <!--  +++++++++++++++++++++++++++++ -->
+    <rcommand>
+        <id>
+            satiationSC
+        </id>
+        <textmenu>
+            Satiation (several components)
+        </textmenu>
+        <submenu>
+            sample
+        </submenu>
+        <condition>
+            sampled
+        </condition>
+        <rplots>
+            ggSatiation(SAMPLE, COMPONENTS)
+        </rplots>
+        <help>
+            Plots incoming trophic fluxes versus biomass (package ggplot2).
         </help>
+        <parameter>
+            COMPONENTS
+        </parameter>
+    </rcommand>
+    <!--  +++++++++++++++++++++++++++++ -->
+    <rcommand>
+        <id>
+            bottleneck
+        </id>
+        <textmenu>
+            Bottleneck (all components)
+        </textmenu>
+        <submenu>
+            sample
+        </submenu>
+        <condition>
+            sampled
+        </condition>
+        <rplots>
+            ggBottleneck(SAMPLE)
+        </rplots>
+        <help>
+            Displays whether species were closed to satiation or if their predators were closed to inertia (package ggplot2).
+        </help>
+      </rcommand>
+    <!--  +++++++++++++++++++++++++++++ -->
+    <rcommand>
+        <id>
+            bottleneck
+        </id>
+        <textmenu>
+            Bottleneck (several components)
+        </textmenu>
+        <submenu>
+            sample
+        </submenu>
+        <condition>
+            sampled
+        </condition>
+        <rplots>
+            ggBottleneck(SAMPLE, COMPONENTS)
+        </rplots>
+        <help>
+            Displays whether species were closed to satiation or if their predators were closed to inertia (package ggplot2).
+      </help>
+        <parameter>
+            COMPONENTS
+        </parameter>
+    </rcommand>
+    <!--  +++++++++++++++++++++++++++++ -->
+    <rcommand>
+        <id>
+            satiatInertia
+        </id>
+        <textmenu>
+            Satiation/Inertia (all components)
+        </textmenu>
+        <submenu>
+            sample
+        </submenu>
+        <condition>
+            sampled
+        </condition>
+        <rplots>
+            ggSatiatInertia(SAMPLE)
+        </rplots>
+        <help>
+            Displays whether species were closed to satiation or inertia bounds (package ggplot2).
+        </help>
+    </rcommand>
+    <!--  +++++++++++++++++++++++++++++ -->
+    <rcommand>
+        <id>
+            satiatInertiaSC
+        </id>
+        <textmenu>
+            Satiation/Inertia (several components)
+        </textmenu>
+        <submenu>
+            sample
+        </submenu>
+        <condition>
+            sampled
+        </condition>
+        <rplots>
+            ggSatiatInertia(SAMPLE, COMPONENTS)
+        </rplots>
+        <help>
+            Displays whether species were closed to satiation or inertia bounds (package ggplot2).
+        </help>
+        <parameter>
+            COMPONENTS
+        </parameter>
+    </rcommand>
+    <!--  +++++++++++++++++++++++++++++ -->
+    <rcommand>
+        <id>
+            pairsBiomassTC
+        </id>
+        <textmenu>
+            Pairs of biomass (all components)
+        </textmenu>
+        <submenu>
+            sample
+        </submenu>
+        <condition>
+            sampled
+        </condition>
+        <rplots>
+            ggPairsBiomass(SAMPLE)
+        </rplots>
+        <help>
+            Plots pairs plot of biomass among species and provided Kendall correlation tau (package ggplot2).
+        </help>
+     </rcommand>
+    <!--  +++++++++++++++++++++++++++++ -->
+    <rcommand>
+        <id>
+            pairsBiomass
+        </id>
+        <textmenu>
+            Pairs of biomass (several components)
+        </textmenu>
+        <submenu>
+            sample
+        </submenu>
+        <condition>
+            sampled
+        </condition>
+        <rplots>
+            ggPairsBiomass(SAMPLE, COMPONENTS)
+        </rplots>
+        <help>
+            Plots pairs plot of biomass among species and provided Kendall correlation tau (package ggplot2).
+        </help>
+        <parameter>
+            COMPONENTS
+        </parameter>
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
 </rcommands>
