@@ -47,8 +47,8 @@ Parameters, observations and constraints have been gathered in an Excel file wit
 
 <<label=data>>=
 setwd('/Users/christianmullon/gitC/article_supporting')
-NAMEFILE <- 'BarentsSeaReconstructions_01_02_21.xlsx'
-# NAMEFILE <- 'CaN_template_miniS.xlsx'
+# NAMEFILE <- 'BarentsSeaReconstructions_01_02_21.xlsx'
+NAMEFILE <- 'CaN_template_miniS.xlsx'
 @
 
 \clearpage
