@@ -141,6 +141,9 @@
             status &lt;-  checkPolytopeStatus(POLYTOPE)
             resultR &lt;-  status
         </rcompute>
+        <table>
+            yes
+        </table>
         <help>
              This commands checks that the polytope is bounded and not empty.
         </help>
@@ -164,6 +167,9 @@
             bounds &lt;- getAllBoundsParam(POLYTOPE)
             resultR &lt;- bounds
         </rcompute>
+        <table>
+            yes
+        </table>
         <help>
             This command allows to identify dimensions along wich polytope is not empty.
             If the polytope is not bounded, you should add additional constraints.
@@ -187,6 +193,9 @@
             bound &lt;- getBoundParam(POLYTOPE, p=FLUX[YEAR])
             resultR &lt;- bound
         </rcompute>
+        <table>
+            yes
+        </table>
         <help>
             Since bounds function can be time consuming, we provide a version that focus on a parameter of interest, here for example the first parameter:
         </help>
@@ -212,6 +221,9 @@
             incomp &lt;- findingIncompatibleConstr(POLYTOPE)
             resultR &lt;- incomp
         </rcompute>
+        <table>
+            yes
+        </table>
         <help>
             This command allows finding incompatible constraints when the polytope is empty.
         </help>
@@ -272,6 +284,9 @@
             gelman &lt;- gelman.diag(SAMPLE$mcmc[,FLUX[YEAR]])
             resultR &lt;- gelman
         </rcompute>
+        <table>
+            yes
+        </table>
         <help>
             Gelman diagnostic for a given flux and a given year (package coda).
         </help>
@@ -549,7 +564,7 @@
         </parameter>
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
-    <rcommand>
+    <!-- <rcommand>
         <id>
             bottleneck
         </id>
@@ -569,8 +584,9 @@
             Displays whether species were closed to satiation or if their predators were closed to inertia (package ggplot2).
         </help>
       </rcommand>
+      -->
     <!--  +++++++++++++++++++++++++++++ -->
-    <rcommand>
+    <!-- <rcommand>
         <id>
             bottleneck
         </id>
@@ -593,6 +609,7 @@
             COMPONENTS
         </parameter>
     </rcommand>
+    -->
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
         <id>
