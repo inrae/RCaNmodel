@@ -20,9 +20,9 @@
 
 \section{Introduction}
 \begin{enumerate}
-\item Goals: an example of a RCaN study.
+\item Goals: an example of a RCaN study : a sequence of RCaN-commands, their input, their output and their interpretation.
 \item The case study: the Barents sea (main text).
-\item The RCaN file has been previously built. It is joined.
+\item The RCaN file has been previously built. It is attached.
 \item All following commands in joined R script.
 \item A first run with all main steps.
 \item A second run after removing some constraints
@@ -46,8 +46,9 @@ library(xlsx) # to import excel files
 Parameters, observations and constraints have been gathered in an Excel file with a specific structure. 
 
 <<label=data>>=
-NAMEFILE <- '/Users/christianmullon/Desktop/Ocean/BarentsSeaReconstructions_01_02_21.xlsx'
-# NAMEFILE <- '/Users/christianmullon/Desktop/Ocean/CaN_template_mini.xlsx'
+setwd('/Users/christianmullon/gitC/article_supporting')
+# NAMEFILE <- 'BarentsSeaReconstructions_01_02_21.xlsx'
+NAMEFILE <- 'CaN_template_miniS.xlsx'
 @
 
 \clearpage
@@ -70,7 +71,7 @@ print(xtable(FLUXES,label="Fluxes", caption = "Fluxes"))
 
 <<label=fluxes, eval=TRUE, results=tex, echo=FALSE>>=
 OBSERVATIONS <- read.xlsx(NAMEFILE, 5) 
-print(xtable(OBSERVATIONS[1:10,1:5],label="Observations",caption = "Observations"))
+print(xtable(OBSERVATIONS[1:10,1:5], label = "Observations", caption = "Observations"))
 @
 
 
@@ -78,7 +79,7 @@ print(xtable(OBSERVATIONS[1:10,1:5],label="Observations",caption = "Observations
 
 <<label=fluxes, eval=TRUE, results=tex, echo=FALSE>>=
 CONSTRAINTS <- read.xlsx(NAMEFILE, 4) 
-print(xtable(CONSTRAINTS[1:7,1:2],label="Constraints",caption="Constraints"))
+print(xtable(CONSTRAINTS[1:7,1:2], label = "Constraints", caption="Constraints"))
 @
 
 \clearpage
@@ -117,16 +118,16 @@ checkPolytopeStatus(POLYTOPE)
 Limits of the Barents' sea polytope in all dimensions are obtained with getAllBoundsParam:
 
 <<label=bounds>>=
-BOUNDS <- getAllBoundsParam(POLYTOPE)
+BOUNDS <- getAllBoundsParam(POLYTOPE, progressBar = FALSE)
 summary(BOUNDS)
 @
 
-Function plotPolytope2DCaNmod allows seeing the polytope in the plane defined by two parameters. In its first two dimensions, for the second 1990, the Barents sea polytope dimensions appears as. 
+Function plotPolytope2D allows seeing the polytope in the plane defined by two parameters. In its first two dimensions, for the second 1990, the Barents sea polytope dimensions appears as. 
 
 <<fig=true>>=
 fluxX <- paste(FLUXES[1,1],'[1990]',sep="")
 fluxY <- paste(FLUXES[2,1],'[1990]',sep="")
-plotPolytope2D(POLYTOPE, c(fluxX, fluxY))
+plotPolytope2D(POLYTOPE, c(fluxX, fluxY), progressBar=FALSE)
 @
 
 \clearpage
@@ -150,12 +151,14 @@ end-begin
 
 \subsection{Convergence}
 
+Using coda. 
+
 <<label=nchain>>=
 nchain(SAMPLE$mcmc)
 # summary(SAMPLE$mcmc)
 @
 
-Gelman diagnostics
+Gelman diagnostics. Gelman and Rubin (1992) propose a general approach to monitoring convergence of MCMC output in which $ m > 1$ parallel chains are run with starting values that are overdispersed relative to the posterior distribution. Convergence is diagnosed when the chains have `forgotten' their initial values, and the output from all chains is indistinguishable. The gelman.diag diagnostic is applied to a single variable from the chain. It is based a comparison of within-chain and between-chain variances, and is similar to a classical analysis of variance.
 
 <<label=gelman>>=
 fluxY <- paste(FLUXES[2,1],'[1990]',sep="")
@@ -172,7 +175,6 @@ thin(thinned_SAMPLE)
 acfplot(thinned_SAMPLE[,fluxZ])
 @
 
-
 \clearpage
 
 \subsection{Dynamics}
@@ -182,6 +184,7 @@ For several variables or flux, plots of sampled dynamics.
 fluxX <- FLUXES[1,1]
 fluxY <- FLUXES[2,1]
 compA <- COMPONENTS[2,1] 
+compB <- COMPONENTS[3,1] 
 c(fluxX,fluxY,compA)
 @
 
@@ -189,7 +192,6 @@ c(fluxX,fluxY,compA)
 g <- ggSeries(SAMPLE, c(fluxX,fluxY,compA), TRUE)
 g + scale_y_log10() + guides(color = FALSE, fill = FALSE)
 @
-
 
 \clearpage
 
@@ -206,7 +208,64 @@ ggViolin(SAMPLE,c(fluxX,fluxY,compA),year=1990,TRUE)
 \subsection{Diet relationships}
 
 <<fig=true>>=
-ggDiet(SAMPLE, compA)
+ggDiet(SAMPLE, compB)
+@
+
+\subsection{Growth}
+
+<<fig=true>>=
+ggGrowth(SAMPLE, compB)
+@
+
+\subsection{Trophic relation}
+
+<<fig=true>>=
+ggTrophicRelation(SAMPLE)
+# ggTrophicRelation(SAMPLE, compB)
+@
+
+\subsection{Satiation}
+
+<<fig=true>>=
+ggSatiation(SAMPLE, compB)
+@
+
+\section{Try and errors}
+
+\subsection{Activating and desactivating constraint}
+
+<<toggle>>=
+# disactivate constraints C02
+constA = CONSTRAINTS[2,1]
+constA
+POLYTOPEA <- toggleConstraint(POLYTOPE, constA)
+# disactivate constraints C02 for year 1991
+@
+
+<<checknew>>=
+checkPolytopeStatus(POLYTOPEA)
+@
+
+\subsection{Building and analyzing sample}
+
+<<label=sampleNew>>=
+begin = Sys.time()
+SAMPLEA <- sampleCaN(POLYTOPEA, 
+                      N=100,thin=100, 
+                      nchain=2,
+                      ncore=2)
+end=Sys.time()
+end-begin
+@
+
+<<fig=true>>=
+fluxX <- FLUXES[1,1]
+fluxY <- FLUXES[2,1]
+compA <- COMPONENTS[2,1] 
+compB <- COMPONENTS[3,1] 
+c(fluxX,fluxY,compA)
+g <- ggSeries(SAMPLEA, c(fluxX,fluxY,compA), TRUE)
+g + scale_y_log10() + guides(color = FALSE, fill = FALSE)
 @
 
 \end{document}
