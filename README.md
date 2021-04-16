@@ -11,7 +11,7 @@ Once these packages are installed, the process is easy using the library devools
     > require(devtools)
     > devtools::install_git("https://gitlab.irstea.fr/hilaire.drouineau/can.git", subdir="RCaN")
     
-    Don't forget to replace myusername with your Irstea Gitlab username and provide your password.
+   
     
 ### Usage
 A vignette is provided with the package to explain how it should be used.
