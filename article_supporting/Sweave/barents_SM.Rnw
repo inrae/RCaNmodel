@@ -1,0 +1,472 @@
+\documentclass{article}
+
+\usepackage[utf8x]{inputenc} 
+\usepackage{authblk}
+
+\title{ \bf{RCaN \\ \vspace{1cm} Supplementary Information \vspace{1cm}} }                 
+\author[1]{Hilaire Drouineau}
+\affil[1]{INRAE, Bordeaux, France}
+\author[2]{Benjamin Planque}
+\affil[2]{HI, Tromsoe, Norway}
+\author[3]{Christian Mullon}
+\affil[3]{IRD, MARBEC, Sete, France}
+
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+
+\maketitle
+
+\section{Introduction}
+In this Supplementary Information document, we present an example of a RCaN study. That is a concrete ecological question on a real ecosystem and then a sequence of RCaN-commands: their input, their output and their interpretation. The case study is that the Barents sea that has been presented in the main text. The RCaN file has been previously built, using the RCaN constructor; it is attached to this supplementary information. All following commands give rise to R-Markdown file that is also attached. 
+
+It is organized as follows: 
+\begin{enumerate}
+\item We give a short glance at the RCaN-file.
+\item Then we run main steps of the method after the construction of the RCaN file: build polytope, analyze polytope, compute sample, analyze sample. 
+\item Then after synthesizing the analysis of sample, we improve the set of constraints, and give the results of a second run after removing some constraints
+\item Finally, we make comparisons between both runs and their interpretation
+\end{enumerate}
+
+\clearpage 
+
+\section{Preliminary: R Environment}
+
+Firstly RCaN has to be downloaded. This is done once for all and the installation instructions are given in the ReadMe file.
+
+Before running RCaN commands; a few libraries are to be loaded.
+
+<<libraries>>=
+library(RCaN) #the main package
+library(ggplot2) #to draw results
+library(coda) #to explore mcmc 
+library(dplyr) #to manipulate data frame
+library(xtable) #to create latex tables
+library(xlsx) # to import excel files
+library(cowplot)
+@
+
+\clearpage
+
+\section{The RCaN file}
+Parameters, observations and constraints have been gathered in an Excel file with a specific structure. 
+
+<<label=data>>=
+setwd('/Users/christianmullon/gitC/article_supporting/Sweave')
+NAMEFILE <- 'BarentsSeaReconstructions_20210302.xlsx'
+# NAMEFILE <- 'CaN_template_miniS.xlsx'
+@
+
+\clearpage
+
+\subsection{Components}
+How the list of components has been established? From witch knowledge? By whom?
+
+<<label=components, eval=TRUE, results=tex, echo=FALSE>>=
+COMPONENTS <- read.xlsx(NAMEFILE, 2) 
+print(xtable(COMPONENTS[,1:5],label="Components", caption = "Components"))
+@
+
+\clearpage
+
+\subsection{Fluxes}
+
+How the network has been designed? From which knowledge? By whom?
+
+<<label=fluxes, eval=TRUE, results=tex, echo=FALSE>>=
+FLUXES <- read.xlsx(NAMEFILE, 3) 
+print(xtable(FLUXES,label="Fluxes", caption = "Fluxes"))
+@
+
+$nf$ is the number of fluxes.
+
+\clearpage
+
+\subsection{Observations}
+
+
+How observations have been collected? From which inquiries? By whom?
+
+<<label=fluxes, eval=TRUE, results=tex, echo=FALSE>>=
+OBSERVATIONS <- read.xlsx(NAMEFILE, 5) 
+print(xtable(OBSERVATIONS[1:20,1:5], label = "Observations", caption = "Observations"))
+@
+
+$nt$ is the number of time steps. It is the number of observation years.
+
+\clearpage
+
+
+\subsection{Constraints}
+
+How constraints have been designed? From which knowledge? By whom?
+
+<<label=fluxes, eval=TRUE, results=tex, echo=FALSE>>=
+CONSTRAINTS <- read.xlsx(NAMEFILE, 4) 
+print(xtable(CONSTRAINTS[1:20,1:2], label = "Constraints", caption="Constraints"))
+@
+
+\clearpage
+
+\section{Building the polytope}
+
+This is the first step. The polytope is defined by two pairs of a matrix and and a vector. $F$ being the vector of all flows at all timesteps, first one $(A,b)$ is an equality $ A.F = b$, second one $(C,v)$ is an eqality  $ C.F \le v$. This RCaN commands computes once for all thes matrices and vectors from the constrainst and the observations.
+<<label=build>>=
+system.time(POLYTOPE <- buildCaN(NAMEFILE))
+summary(POLYTOPE)
+@
+
+\subsection{Structure of the polytope}
+The polytope is defined inside a space with a very high number of dimensions. For the Barents sea example, we have:
+
+<<label=dims>>=
+dim(POLYTOPE$A) 
+length(POLYTOPE$b)
+dim(POLYTOPE$C)
+length(POLYTOPE$v)
+@
+
+In a general way: if $dim(C) = (x_C, y_C)$, $dim(A) = (x_A, y_A)$, $length(b) = l_b$, $  length(v) = l_v$, then :
+\begin{enumerate}
+\item $ y_A = y_C $ is the dimension of the underlying space. $ x_A = l_b $ is the number of equality constraints; the proper dimension of the polytope is $ y_A - x_A$; 
+\item $y_C = y_A$ is the number of inequality constraints; this is the number of faces of the polytope.
+\end{enumerate}
+\clearpage
+
+\subsection{Checking the polytope}
+
+As it is defined in the RCaN file for the Barents' sea, the polytope is non-empty and bounded:
+
+<<label=check>>=
+checkPolytopeStatus(POLYTOPE)
+@
+
+\subsection{Bounds of the polytope}
+Limits of the Barents' sea polytope in all dimensions are obtained with getAllBoundsParam. This is a time consuming command. Results are a vector with $nf \times nt$ components.
+
+<<label=bounds>>=
+# system.time(BOUNDS <- getAllBoundsParam(POLYTOPE, progressBar = FALSE))
+# head(BOUNDS,10)
+@
+
+\subsection{Slices the polytope}
+
+Function plotPolytope2D allows seeing the polytope in the plane defined by two parameters. In its first two dimensions, for the second 1990, the Barents sea polytope dimensions appears as. 
+
+\begin{figure}
+\begin{center}
+<<fig=true>>=
+nX1 <- FLUXES[5,1]
+nY1 <- FLUXES[8,1]
+fluxX1 <- paste(nX1,'[1990]',sep="")
+fluxY1 <- paste(nY1,'[1990]',sep="")
+g1 <- plotPolytope2D(POLYTOPE, c(fluxX1, fluxY1), progressBar=FALSE)
+nX2 <- FLUXES[3,1]
+nY2 <- FLUXES[12,1]
+fluxX2 <- paste(nX2,'[1990]',sep="")
+fluxY2 <- paste(nY2,'[1990]',sep="")
+g2 <- plotPolytope2D(POLYTOPE, c(fluxX2, fluxY2), progressBar=FALSE)
+plot_grid(g1, g2)
+@
+\end{center}
+\caption{Figure 1}
+\label{Fig1}
+\end{figure}
+
+\clearpage
+
+\section{Sampling the polytope}
+
+\subsection{Sampling}
+
+The most important step of the method is the sampling of the polytope, that is the building many random possible trajectories. This is accomplished with the following RCaN command: 
+<<label=sample>>=
+system.time(SAMPLE <- sampleCaN(POLYTOPE, N=100, thin=100, nchain=2, ncore=2))
+@
+
+
+\clearpage
+
+\subsection{Convergence of the sample chains}
+
+To check the mixing of the Monte Carlo Marko chain algorithm that is used to build the sample, we use commands from the coda library, for example nchain (dimensions of MCMC objects), pcramer (Cramer-von Mises distribution), etc. 
+
+<<label=nchain>>=
+# nchain(SAMPLE$mcmc)
+# summary(SAMPLE$mcmc)
+@
+
+Gelman and Rubin (1992) propose a general approach to monitoring convergence of MCMC output in which $ m > 1$ parallel chains are run with starting values that are overdispersed relative to the posterior distribution. Convergence is diagnosed when the chains have 'forgotten' their initial values, and the output from all chains is indistinguishable. The gelman.diag diagnostic is applied to a single variable from the chain. It is based a comparison of within-chain and between-chain variances, and is similar to a classical analysis of variance.
+
+<<label=gelman>>=
+fluxZ1 <- paste(FLUXES[3,1],'[1990]',sep="")
+fluxZ2 <- paste(FLUXES[17,1],'[1990]',sep="")
+fluxZ3 <- paste(FLUXES[22,1],'[1990]',sep="")
+fluxZ4 <- paste(FLUXES[13,1],'[1990]',sep="")
+gelman.diag(SAMPLE$mcmc[,fluxZ1])
+gelman.diag(SAMPLE$mcmc[,fluxZ2])
+gelman.diag(SAMPLE$mcmc[,fluxZ3])
+gelman.diag(SAMPLE$mcmc[,fluxZ4])
+@
+
+
+\clearpage
+
+The autocorrelation function of the polytope sampling chains is illustrative of the independence of successive samples. If the samples are not serially correlated (which is desired) the autocorrelation should remain around zero (except for the first value which is always 1).
+
+\begin{figure}
+\begin{center}
+<<fig=true>>=
+fluxZ1 <- paste(FLUXES[3,1],'[1990]',sep="")
+fluxZ2 <- paste(FLUXES[17,1],'[1990]',sep="")
+fluxZ3 <- paste(FLUXES[22,1],'[1990]',sep="")
+fluxZ4 <- paste(FLUXES[13,1],'[1990]',sep="")
+g1 <- acfplot(SAMPLE$mcmc[,fluxZ1])
+g2 <- acfplot(SAMPLE$mcmc[,fluxZ2])
+g3 <- acfplot(SAMPLE$mcmc[,fluxZ3])
+g4 <- acfplot(SAMPLE$mcmc[,fluxZ4])
+plot_grid(g1, g2, g3, g4, ncol = 2, nrow = 2,
+         labels = c('fluxZ1', 'fluxZ2', 'fluxZ3', 'fluxZ4'), align="hv")
+@
+\end{center}
+\caption{Figure 2}
+\label{Fig2}
+\end{figure}
+
+
+\clearpage
+
+\subsection{Food-web dynamics. Components}
+
+Temporal dynamics. The function 'ggSeries' plots the time series of individual or collections of components and/or fluxes. By default, 3 randomly picked samples are plotted (plain, dashed and dotted lines) together with the envelopes containing 100\%, 95\% and 50\% of the samples. The example below is for 2 fluxes (Primary production to omnivorous and herbivorous zooplankton) and one component (herbivorous zooplankton).
+
+
+\begin{figure}
+\begin{center}
+<<fig=true>>=
+g <- ggSeries(SAMPLE, POLYTOPE$species, TRUE)
+g + scale_y_log10() + guides(color = FALSE, fill = FALSE)
+@
+\end{center}
+\caption{Figure 8}
+\label{Fig8}
+\end{figure}
+
+\clearpage 
+
+\subsection{Food-web dynamics. Fluxes}
+
+\begin{figure}
+\begin{center}
+<<fig=true>>=
+g <- ggSeries(SAMPLE, POLYTOPE$flow, TRUE)
+g + scale_y_log10() + guides(color = FALSE, fill = FALSE)
+@
+\end{center}
+\caption{Figure 9}
+\label{Fig9}
+\end{figure}
+
+
+\clearpage
+
+\subsection{Distribution. Components}
+
+Distribution of biomass and fluxes. The function 'ggViolin'  plots the empirical distribution of the sampled biomass or fluxes, for a given year. Below is an illustration of the violin plots for the biomass of all components in the year 1990. 
+
+\begin{figure}
+\begin{center}
+<<fig=true>>=
+ggViolin(SAMPLE,POLYTOPE$species,year=1990,TRUE) + xlab('Component') + ylab('Biomass')
+@
+\end{center}
+\caption{Figure 10}
+\label{Fig10}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+<<fig=true>>=
+ggViolin(SAMPLE,POLYTOPE$species,year=1990,TRUE) + xlab('Component') + ylab('Biomass')
+@
+\end{center}
+\caption{Figure 12}
+\label{Fig12}
+\end{figure}
+
+\clearpage
+
+\subsection{Distribution. Fluxes}
+\begin{figure}
+\begin{center}
+<<fig=true>>=
+ggViolin(SAMPLE,POLYTOPE$flow,year=1990,TRUE) + xlab('Component') + ylab('Biomass')
+@
+\end{center}
+\caption{Figure 11}
+\label{Fig11}
+\end{figure}
+
+
+\clearpage
+
+\subsection{Diets}
+
+Diet composition. The function 'ggDiet'  plots the mean proportions of prey eaten by specific predator(s). Below is an example of the diet fractions for all the components over the entire sampling period.
+
+\begin{figure}
+\begin{center}
+<<fig=true>>=
+ggDiet(SAMPLE, POLYTOPE$species) + ylab('prey proportion in the diet')
+@
+\end{center}
+\caption{Figure 13}
+\label{Fig13}
+\end{figure}
+
+\clearpage
+\subsection{Growth}
+
+Growth versus biomass. The function 'ggGrowth'  plots the growth rate (measured as the ratio of biomass at time $ t+1 $ over the biomass at time $ t $) as a function of the biomass (at time $ t $). This figure illustrate how density-dependence of single components can emerge from the food-web dynamics. The upper and lower red-dotted lines visualise the minimum and maximum growth rates set by the inertia constraints for each component. Below is an example of growth vs. biomass for all components over the entire sampling period.
+
+
+\begin{figure}
+\begin{center}
+<<fig=true>>=
+ggGrowth(SAMPLE, POLYTOPE$species)
+@
+\end{center}
+\caption{Figure 14}
+\label{Fig141}
+\end{figure}
+
+\clearpage
+\subsection{Trophic functional relationships}
+
+The function 'ggTrophicRelation'  plots the empirical relationships between the biomass of a prey and the quantity of that prey consumed by a predator. Below is an example of trophic functional relationships between benthos, pleagic fish and demersal fish over the entire sampling period.
+
+\begin{figure}
+\begin{center}
+<<fig=true>>=
+ggTrophicRelation(SAMPLE, POLYTOPE$species[3:5])
+@
+\end{center}
+\caption{Figure 14}
+\label{Fig14}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+<<fig=true>>=
+ggTrophicRelation(SAMPLE, POLYTOPE$species)
+@
+\end{center}
+\caption{Figure 15}
+\label{Fig15}
+\end{figure}
+
+\clearpage
+\subsection{Satiation}
+
+The function 'ggSatiation' plots the total biomass of prey eaten by a predator, as a function of the biomass of the predator. In addition the plot includes an indication (upper red dotted line) of the maximum possible consumption rate, derived from the satiation parameter of the predator species. An example is illustrated below for all model components and over the entire sampling period.
+
+
+\begin{figure}
+\begin{center}
+<<fig=true>>=
+ggSatiation(SAMPLE, POLYTOPE$species)
+@
+\end{center}
+\caption{Figure 16}
+\label{Fig16}
+\end{figure}
+
+\clearpage
+\subsection{Feeding and Growth}
+
+The function 'ggSatiatInertia' is used to explore the relationships between population growth and feeding. The plot shows standardised total consumption(0 = no feeding, 1 = feeding to satiation) as a function of standardised population growth/mortality (-1 = maximum mortality, 0 = no change in biomass, 1 = maximum growth). the total biomass of prey eaten by a predator, as a function of the biomass of the predator. A positive relationship between growth and satiation is indicative of bottom up control. An example is illustrated below for all model components and over the entire sampling period.
+
+
+\begin{figure}
+\begin{center}
+<<fig=true>>=
+ggSatiatInertia(SAMPLE, POLYTOPE$species)
+@
+\end{center}
+\caption{Figure 17}
+\label{Fig17}
+\end{figure}
+
+\clearpage
+\subsection{Pair plots}
+
+The function 'ggPairsBiomass' is used to explore the relationships between the biomass of different food-web components. The plot shows the individual component density function in the diagonal, the scatterplots of one species against the other in the lower triangle and the Kendall correlation coefficient in the upper triangle. An example is illustrated below for all model components and over the entire sampling period.
+
+
+\begin{figure}
+\begin{center}
+<<fig=true>>=
+ggPairsBiomass(SAMPLE,logscale=FALSE)
+@
+\end{center}
+\caption{Figure 19}
+\label{Fig19}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+<<fig=true>>=
+ggPairsBiomass(SAMPLE,POLYTOPE$species[c(5,6)],logscale=FALSE)
+@
+\end{center}
+\caption{Figure 18}
+\label{Fig18}
+\end{figure}
+
+\clearpage
+
+\section{Try and errors}
+
+\subsection{Activating and desactivating constraint}
+
+<<toggle>>=
+# disactivate constraints C08 : Max pelagic catches
+constA <- CONSTRAINTS[8,1]
+constA
+POLYTOPEA <- toggleConstraint(POLYTOPE, constA)
+@
+
+<<checknew>>=
+checkPolytopeStatus(POLYTOPEA)
+@
+
+\subsection{Building and analyzing sample}
+
+<<label=sampleNew>>=
+system.time(SAMPLEA <- sampleCaN(POLYTOPEA, N=100, thin=100, nchain=2, ncore=2))
+@
+
+\clearpage
+
+\begin{figure}
+\begin{center}
+<<fig=true>>=
+fluxX <- FLUXES[1,1]
+fluxY <- FLUXES[2,1]
+compA <- COMPONENTS[2,1] 
+compB <- COMPONENTS[3,1] 
+c(fluxX,fluxY,compA)
+g <- ggSeries(SAMPLEA, POLYTOPEA$species, TRUE)
+g + scale_y_log10() + guides(color = FALSE, fill = FALSE)
+@
+\end{center}
+\caption{Figure 21}
+\label{Fig21}
+\end{figure}
+
+\clearpage
+
+\section{Iterpreting differences}
+
+\end{document}
