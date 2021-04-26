@@ -4,11 +4,13 @@
 #' @param mysampleCaNmod result sent by \link{sampleCaN}
 #' @param species the species to plot (if null, default, all species)
 #' @param years years to be plotted (default all)
+#' @param frac fraction of points to be plot (default all)
 #' @return plots in a grid.arrange
 #' @importFrom magrittr %>%
 #' @importFrom tidyr pivot_longer
 #' @importFrom rlang !! sym
 #' @importFrom dplyr filter
+#' @importFrom dplyr slice
 #' @importFrom dplyr rename
 #' @importFrom dplyr mutate
 #' @importFrom dplyr sample_n
@@ -48,7 +50,10 @@
 #' @export
 
 
-ggBottleneck <- function(mysampleCaNmod, species = NULL, years = NULL){
+ggBottleneck <- function(mysampleCaNmod,
+                         species = NULL,
+                         years = NULL,
+                         frac = 1){
   if (is.null(years))
     years <- mysampleCaNmod$CaNmod$series$Year
   if (is.null(species))
@@ -160,6 +165,8 @@ ggBottleneck <- function(mysampleCaNmod, species = NULL, years = NULL){
     sub_data <- satiation_tab %>%
       filter(species == s)
     if (nrow(na.omit(sub_data)) > 0){
+      sub_data <- sub_data %>%
+        slice(seq(1, n(),by = round(n() / (frac * n()))))
       ggplot(sub_data,
              aes_string(x = "satiation_std", y = "satiation_std_pred")) +
         geom_point(shape=".",col="grey") +

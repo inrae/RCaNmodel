@@ -6,7 +6,13 @@
 plots pairs plot of biomass among species and provided Kendall correlation
 tau}
 \usage{
-ggPairsBiomass(mysampleCaNmod, species = NULL, years = NULL, logscale = TRUE)
+ggPairsBiomass(
+  mysampleCaNmod,
+  species = NULL,
+  years = NULL,
+  frac = 1,
+  logscale = TRUE
+)
 }
 \arguments{
 \item{mysampleCaNmod}{result sent by \link{sampleCaN}}
@@ -15,6 +21,8 @@ ggPairsBiomass(mysampleCaNmod, species = NULL, years = NULL, logscale = TRUE)
 by default, all species}
 
 \item{years}{years to be plotted (default all)}
+
+\item{frac}{fraction of points to be plot (default all)}
 
 \item{logscale}{should biomass be log10 transformed (default yes)}
 }

@@ -5,7 +5,7 @@
 \title{ggTrophicRelation
 plots fluxes from prey to predators}
 \usage{
-ggTrophicRelation(mysampleCaNmod, species = NULL, years = NULL)
+ggTrophicRelation(mysampleCaNmod, species = NULL, years = NULL, frac = 1)
 }
 \arguments{
 \item{mysampleCaNmod}{result sent by \link{sampleCaN}}
@@ -14,6 +14,8 @@ ggTrophicRelation(mysampleCaNmod, species = NULL, years = NULL)
 by default, all species}
 
 \item{years}{years to be plotted (default all)}
+
+\item{frac}{fraction of points to be plot (default all)}
 }
 \value{
 a ggplot

@@ -6,7 +6,7 @@
 display whether species were closed to satiation or if their predators
 were closed to inertia}
 \usage{
-ggBottleneck(mysampleCaNmod, species = NULL, years = NULL)
+ggBottleneck(mysampleCaNmod, species = NULL, years = NULL, frac = 1)
 }
 \arguments{
 \item{mysampleCaNmod}{result sent by \link{sampleCaN}}
@@ -14,6 +14,8 @@ ggBottleneck(mysampleCaNmod, species = NULL, years = NULL)
 \item{species}{the species to plot (if null, default, all species)}
 
 \item{years}{years to be plotted (default all)}
+
+\item{frac}{fraction of points to be plot (default all)}
 }
 \value{
 plots in a grid.arrange

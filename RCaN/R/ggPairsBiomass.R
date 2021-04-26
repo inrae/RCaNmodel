@@ -5,6 +5,7 @@
 #' @param species the name (or a vector of name) of the species of interest
 #' by default, all species
 #' @param years years to be plotted (default all)
+#' @param frac fraction of points to be plot (default all)
 #' @param logscale should biomass be log10 transformed (default yes)
 #' @return a ggplot
 #' @details distribution of fluxes or biomass for a specific year
@@ -24,6 +25,7 @@
 #' @importFrom ggplot2 geom_hline
 #' @importFrom dplyr left_join
 #' @importFrom dplyr rename
+#' @importFrom dplyr slice
 #' @importFrom dplyr select
 #' @importFrom dplyr filter
 #' @importFrom dplyr summarize
@@ -40,6 +42,7 @@
 ggPairsBiomass <- function(mysampleCaNmod,
                      species = NULL,
                      years = NULL,
+                     frac = 1,
                      logscale = TRUE) {
   if (is.null(years))
     years <- mysampleCaNmod$CaNmod$series$Year
@@ -70,7 +73,8 @@ ggPairsBiomass <- function(mysampleCaNmod,
                             levels = species)
   biomass <- pivot_wider(biomass,
                          names_from = !!sym("species"),
-                         values_from = !!sym("b"))
+                         values_from = !!sym("b")) %>%
+    slice(seq(1, n(), by=round(n() / (frac * n()))))
   g <- ggpairs(biomass,
                columns = 3:ncol(biomass),
                lower = list(continuous = wrap("smooth",

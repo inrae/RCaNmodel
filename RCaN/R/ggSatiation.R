@@ -4,6 +4,7 @@
 #' @param species the name (or a vector of name) of the species of interest
 #' by default, all species
 #' @param years years to be plotted (default all)
+#' @param frac fraction of points to be plot (default all)
 #' @return a ggplot
 #' @details distribution of fluxes or biomass for a specific year
 #'
@@ -22,6 +23,7 @@
 #' @importFrom ggplot2 geom_hline
 #' @importFrom ggplot2 geom_abline
 #' @importFrom dplyr left_join
+#' @importFrom dplyr slice
 #' @importFrom dplyr rename
 #' @importFrom dplyr select
 #' @importFrom dplyr filter
@@ -37,7 +39,8 @@
 #'
 ggSatiation <- function(mysampleCaNmod,
                      species = NULL,
-                     years = NULL) {
+                     years = NULL,
+                     frac = 1) {
   if (is.null(years))
     years <- mysampleCaNmod$CaNmod$series$Year
   if (is.null(species))
@@ -72,7 +75,8 @@ ggSatiation <- function(mysampleCaNmod,
              !!sym("Year"),
              !!sym("predator")) %>%
     summarize("consumption" = sum(!!sym("value"))) %>%
-    left_join(biomass)
+    left_join(biomass) %>%
+    slice(seq(1, n(),by = round(n() / (frac * n()))))
 
   fluxes$predator <- factor(fluxes$predator,
                             levels = species)

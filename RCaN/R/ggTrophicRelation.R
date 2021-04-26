@@ -4,6 +4,7 @@
 #' @param species the name (or a vector of name) of the species of interest
 #' by default, all species
 #' @param years years to be plotted (default all)
+#' @param frac fraction of points to be plot (default all)
 #' @return a ggplot
 #' @details distribution of fluxes or biomass for a specific year
 #'
@@ -23,6 +24,7 @@
 #' @importFrom dplyr left_join
 #' @importFrom dplyr rename
 #' @importFrom dplyr select
+#' @importFrom dplyr slice
 #' @importFrom dplyr filter
 #' @importFrom dplyr summarize
 #' @importFrom dplyr group_by
@@ -36,7 +38,8 @@
 #'
 ggTrophicRelation <- function(mysampleCaNmod,
                      species = NULL,
-                     years = NULL) {
+                     years = NULL,
+                     frac = 1) {
   if (is.null(years))
     years <- mysampleCaNmod$CaNmod$series$Year
   if (is.null(species))
@@ -81,6 +84,9 @@ ggTrophicRelation <- function(mysampleCaNmod,
                             levels = species)
   biomass$prey <- factor(biomass$prey,
                              levels = species)
+  biomass <- biomass %>%
+    na.omit() %>%
+    slice(seq(1, n(),by = round(n() / (frac * n()))))
 
 
 
