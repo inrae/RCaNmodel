@@ -495,7 +495,9 @@
             Potential assimilation efficiency (gamma)
         </menu>
         <text>
-            Potential assimilation efficiency (gamma): the proportion of the biomass ingested by a predator that is effectively assimilated. The value of the parameter is between zero (no assimilation) and one (complete assimilation). The product of the potential assimilation efficiency by the digestibility correction factor is the absorption efficiency (the proportion of prey biomass digested and absorbed).
+            Potential assimilation efficiency (gamma): the proportion of the biomass ingested by a predator that is effectively assimilated. T
+            he value of the parameter is between zero (no assimilation) and one (complete assimilation).
+            The product of the potential assimilation efficiency by the digestibility correction factor is the absorption efficiency (the proportion of prey biomass digested and absorbed).
         </text>
         <image>
             No
@@ -514,7 +516,9 @@
             Digestibility correction factor (kappa)
         </menu>
         <text>
-            Digestibility correction factor (kappa): a correction factor that accounts for variations in energy content of a prey. The value of the parameter is between zero (no energy content) and one. The product of the potential assimilation efficiency by the digestibility correction factor is the absorption efficiency (the proportion of prey biomass digested and absorbed).
+            Digestibility correction factor (kappa): a correction factor that accounts for variations in energy content of a prey.
+            The value of the parameter is between zero (no energy content) and one.
+            The product of the potential assimilation efficiency by the digestibility correction factor is the absorption efficiency (the proportion of prey biomass digested and absorbed).
         </text>
         <image>
             No
@@ -532,7 +536,9 @@
             Inertia (alpha)
         </menu>
         <text>
-            Inertia (alpha): a parameter that bounds biomass variations between a maximum growth rate and a maximum mortality rate. The coefficient is strictly positive. The upper bound of biomass variation is given by exp(alpha) and the minimum bound rate is given by exp(-alpha). A value of 0.25 indicates that over 1 time unit (a year) the biomass of a species can reach at most exp(0.25) \[TildeTilde] 128% and at least exp(-0.25) \[TildeTilde] 78%  of the original biomass.
+            Inertia (alpha): a parameter that bounds biomass variations between a maximum growth rate and a maximum mortality rate.
+            The coefficient is strictly positive. The upper bound of biomass variation is given by exp(alpha) and the minimum bound rate is given by exp(-alpha).
+            A value of 0.25 indicates that over 1 time unit (a year) the biomass of a species can reach at most exp(0.25) =  128% and at least exp(-0.25) = 78%  of the original biomass.
         </text>
         <image>
             No
@@ -550,7 +556,9 @@
             Other losses (mu)
         </menu>
         <text>
-            Other losses (mu): a mortality coefficient that account for losses, i.e. metabolic losses and other mortality not explicitly accounted for in the model. The losses are expressed in the form exp(-mu). The coefficient is strictly positive. A value of 2 indicates that over 1 time unit (a year) metabolic losses and other mortality losses will represent 1-exp(-2) \[TildeTilde] 86% of the original biomass (equivalent to 0.55% daily losses).
+            Other losses (mu): a mortality coefficient that account for losses, i.e. metabolic losses and other mortality not explicitly accounted for in the model.
+            The losses are expressed in the form exp(-mu). The coefficient is strictly positive.
+            A value of 2 indicates that over 1 time unit (a year) metabolic losses and other mortality losses will represent 1-exp(-2) = 86% of the original biomass (equivalent to 0.55% daily losses).
         </text>
         <image>
             No
@@ -568,7 +576,9 @@
             Refuge biomass (beta)
         </menu>
         <text>
-            Refuge biomass (beta): the absolute minimum biomass that a species group can reach. This parameter is mostly used for practical calculation and can be set to very low values. Typically 1% of the parameter estimated biomass of a species group, or less.
+            Refuge biomass (beta): the absolute minimum biomass that a species group can reach.
+            This parameter is mostly used for practical calculation and can be set to very low values.
+            Typically 1% of the parameter estimated biomass of a species group, or less.
         </text>
         <image>
             No
@@ -586,7 +596,9 @@
             Satiation (sigma)
         </menu>
         <text>
-            Satiation (sigma): the maximum consumption rate per unit biomass of the predator. The coefficient is strictly positive. A coefficient of 10 indicates that a species group can eat up to 10 times it body weight in the course of \[OpenCurlyQuote] time unit (a year, this is equivalent to a maximum daily consumption rate of 2.7%).
+            Satiation (sigma): the maximum consumption rate per unit biomass of the predator.
+            The coefficient is strictly positive.
+            A coefficient of 10 indicates that a species group can eat up to 10 times it body weight in the course of \[OpenCurlyQuote] time unit (a year, this is equivalent to a maximum daily consumption rate of 2.7%).
         </text>
         <image>
             No
