@@ -5,8 +5,15 @@
 \title{presolveLPMod
 simplify the lp problem using lpsolveAPI}
 \usage{
-presolveLPMod(A, b, C = NULL, v = NULL, lower = NULL, upper = NULL,
-  sense = "max")
+presolveLPMod(
+  A,
+  b,
+  C = NULL,
+  v = NULL,
+  lower = NULL,
+  upper = NULL,
+  sense = "max"
+)
 }
 \arguments{
 \item{A}{a matrix of inequality constraints A x <=b}

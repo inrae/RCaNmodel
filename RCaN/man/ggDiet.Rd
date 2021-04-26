@@ -6,12 +6,14 @@
 provides a ggplot of diet, barplot provides an average diet while violin plot
 provides a distribution over iterations and years}
 \usage{
-ggDiet(mysampleCaNmod, species, barplot = TRUE)
+ggDiet(mysampleCaNmod, species, years = NULL, barplot = TRUE)
 }
 \arguments{
 \item{mysampleCaNmod}{result sent by \link{sampleCaN}}
 
 \item{species}{the name (or a vector of name) of the species of interest}
+
+\item{years}{years to be plotted (default all)}
 
 \item{barplot}{if TRUE a barplot (default), else a violin plot}
 }

@@ -5,8 +5,16 @@
 \title{defineLPMod
 Specify an lp_model (mainly for internal use)}
 \usage{
-defineLPMod(A, b, C = NULL, v = NULL, lower = NULL, upper = NULL,
-  maximum = TRUE, ob = NULL)
+defineLPMod(
+  A,
+  b,
+  C = NULL,
+  v = NULL,
+  lower = NULL,
+  upper = NULL,
+  maximum = TRUE,
+  ob = NULL
+)
 }
 \arguments{
 \item{A}{a matrix of inequality constraints A x <=b}

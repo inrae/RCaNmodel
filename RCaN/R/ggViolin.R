@@ -4,7 +4,7 @@
 #' @param mysampleCaNmod result sent by \link{sampleCaN}
 #' @param param the name (or a vector of name) of a parameter (either a flux or
 #' a biomass)
-#' @param year the year
+#' @param years years to be plotted (default all)
 #' @param logscale flag to indicate to use a log scale (default TRUE)
 #' @param xlab default Component Flux
 #' @param ylab default Distribution
@@ -33,20 +33,20 @@
 #'
 ggViolin <- function(mysampleCaNmod,
                      param,
-                     year,
+                     years = NULL,
                      logscale=TRUE,
                      xlab = "Component/Flux",
                      ylab = "Distribution") {
-  if (length(year) != 1)
-    stop("a single year should be provided")
+  if (is.null(years))
+    years <- mysampleCaNmod$CaNmod$series$Year
   if (class(mysampleCaNmod) != "sampleCaNmod")
     stop("you should provide a sampleCaNmod object")
   mat_res <- as.matrix(mysampleCaNmod$mcmc)
-  mat_res <- mat_res[, colnames(mat_res) %in% paste(param,
+  mat_res <- mat_res[, colnames(mat_res) %in% paste0(rep(param,
+                                                         each = length(years)),
                                                     "[",
-                                                    year,
-                                                    "]",
-                                                    sep = ""),
+                                                    years,
+                                                    "]"),
                      drop = FALSE]
   mat_res <- as.data.frame(mat_res) %>%
     pivot_longer(cols = everything(),

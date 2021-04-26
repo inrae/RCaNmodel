@@ -6,8 +6,14 @@
 provides a violin plot of the distribution of flux or biomass
 for specific years}
 \usage{
-ggViolin(mysampleCaNmod, param, year, logscale = TRUE,
-  xlab = "Component/Flux", ylab = "Distribution")
+ggViolin(
+  mysampleCaNmod,
+  param,
+  years = NULL,
+  logscale = TRUE,
+  xlab = "Component/Flux",
+  ylab = "Distribution"
+)
 }
 \arguments{
 \item{mysampleCaNmod}{result sent by \link{sampleCaN}}
@@ -15,7 +21,7 @@ ggViolin(mysampleCaNmod, param, year, logscale = TRUE,
 \item{param}{the name (or a vector of name) of a parameter (either a flux or
 a biomass)}
 
-\item{year}{the year}
+\item{years}{years to be plotted (default all)}
 
 \item{logscale}{flag to indicate to use a log scale (default TRUE)}
 

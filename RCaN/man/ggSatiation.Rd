@@ -5,13 +5,15 @@
 \title{ggSatiation
 plots incoming trophic fluxes versus biomass}
 \usage{
-ggSatiation(mysampleCaNmod, species = NULL)
+ggSatiation(mysampleCaNmod, species = NULL, years = NULL)
 }
 \arguments{
 \item{mysampleCaNmod}{result sent by \link{sampleCaN}}
 
 \item{species}{the name (or a vector of name) of the species of interest
 by default, all species}
+
+\item{years}{years to be plotted (default all)}
 }
 \value{
 a ggplot

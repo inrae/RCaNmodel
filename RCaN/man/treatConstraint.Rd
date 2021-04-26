@@ -4,8 +4,7 @@
 \alias{treatConstraint}
 \title{treatConstraint}
 \usage{
-treatConstraint(myconstraint, symbolic_enviro, yr = NULL,
-  name_constr = NULL)
+treatConstraint(myconstraint, symbolic_enviro, yr = NULL, name_constr = NULL)
 }
 \arguments{
 \item{myconstraint}{a string corresponding to a constraint}

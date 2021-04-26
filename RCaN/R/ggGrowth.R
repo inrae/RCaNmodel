@@ -4,6 +4,7 @@
 #' @param mysampleCaNmod result sent by \link{sampleCaN}
 #' @param species the name (or a vector of name) of the species of interest
 #' by default, all species
+#' @param years years to be plotted (default all)
 #' @return a ggplot
 #' @details distribution of fluxes or biomass for a specific year
 #'
@@ -35,7 +36,10 @@
 #' @export
 #'
 ggGrowth <- function(mysampleCaNmod,
-                     species = NULL) {
+                     species = NULL,
+                     years = NULL) {
+  if (is.null(years))
+    years <- mysampleCaNmod$CaNmod$series$Year
   if (is.null(species))
     species <- mysampleCaNmod$CaNmod$species
   if (!all(species %in% mysampleCaNmod$CaNmod$species))
@@ -52,6 +56,7 @@ ggGrowth <- function(mysampleCaNmod,
     filter(!!sym("Var") %in% species) %>%
     rename("b" = "value") %>%
     mutate("Year" = as.numeric(!!sym("Year"))) %>%
+    filter(!!sym("Year") %in% years) %>%
     mutate("next_year" = !!sym("Year") + 1)
   biomass <- biomass %>%
     left_join(select(biomass, -!!sym("next_year")),
