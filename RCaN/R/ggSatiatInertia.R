@@ -2,6 +2,7 @@
 #' display whether species were closed to satiation or inertia bounds
 #' @param mysampleCaNmod result sent by \link{sampleCaN}
 #' @param species the species to plot (if null, default, all species)
+#' @param years years to be plotted (default all)
 #' @return plots in a grid.arrange
 #' @importFrom magrittr %>%
 #' @importFrom tidyr pivot_longer
@@ -47,7 +48,9 @@
 
 
 
-ggSatiatInertia <- function(mysampleCaNmod, species = NULL){
+ggSatiatInertia <- function(mysampleCaNmod, species = NULL, years = NULL){
+  if (is.null(years))
+    years <- mysampleCaNmod$CaNmod$series$Year
   if (is.null(species))
     species <- mysampleCaNmod$CaNmod$species
   if (!all(species %in% mysampleCaNmod$CaNmod$species))
@@ -64,6 +67,7 @@ ggSatiatInertia <- function(mysampleCaNmod, species = NULL){
     filter(!!sym("Var") %in% species) %>%
     rename("b" = "value") %>%
     mutate("Year" = as.numeric(!!sym("Year"))) %>%
+    filter(!!sym("Year") %in% years) %>%
     rename("predator" = "Var") %>%
     mutate("next_year" = !!sym("Year") + 1)
 
@@ -75,6 +79,7 @@ ggSatiatInertia <- function(mysampleCaNmod, species = NULL){
     filter(!!sym("Var") %in% trophic_flows) %>%
     rename("Flux" = "Var") %>%
     mutate("Year" = as.numeric(!!sym("Year"))) %>%
+    filter(!!sym("Year") %in% years) %>%
     left_join(mysampleCaNmod$CaNmod$fluxes_def) %>%
     rename("predator" = !!sym("To"),
            "prey" = !!sym("From")) %>%
@@ -135,6 +140,7 @@ ggSatiatInertia <- function(mysampleCaNmod, species = NULL){
     filter(! (!!sym("Var") %in% trophic_flows)) %>%
     rename("Flux" = "Var") %>%
     mutate("Year" = as.numeric(!!sym("Year"))) %>%
+    filter(!!sym("Year") %in% years) %>%
     left_join(mysampleCaNmod$CaNmod$fluxes_def) %>%
     group_by(!!sym("Year"), !!sym("To")) %>%
     summarize(immig = sum(!!sym("value"))) %>%

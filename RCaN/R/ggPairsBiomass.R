@@ -4,6 +4,7 @@
 #' @param mysampleCaNmod result sent by \link{sampleCaN}
 #' @param species the name (or a vector of name) of the species of interest
 #' by default, all species
+#' @param years years to be plotted (default all)
 #' @param logscale should biomass be log10 transformed (default yes)
 #' @return a ggplot
 #' @details distribution of fluxes or biomass for a specific year
@@ -38,7 +39,10 @@
 #'
 ggPairsBiomass <- function(mysampleCaNmod,
                      species = NULL,
+                     years = NULL,
                      logscale = TRUE) {
+  if (is.null(years))
+    years <- mysampleCaNmod$CaNmod$series$Year
   if (!is.logical(logscale))
     stop("logscale should be a logical")
   if (is.null(species))
@@ -57,6 +61,7 @@ ggPairsBiomass <- function(mysampleCaNmod,
     filter(!!sym("Var") %in% species) %>%
     rename("b" = "value") %>%
     mutate("Year" = as.numeric(!!sym("Year"))) %>%
+    filter(!!sym("Year") %in% years) %>%
     rename("species" = "Var")
   if (logscale)
     biomass$b <- log10(biomass$b)

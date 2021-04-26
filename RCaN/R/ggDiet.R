@@ -4,6 +4,7 @@
 #' provides a distribution over iterations and years
 #' @param mysampleCaNmod result sent by \link{sampleCaN}
 #' @param species the name (or a vector of name) of the species of interest
+#' @param years years to be plotted (default all)
 #' @param barplot if TRUE a barplot (default), else a violin plot
 #' @return a ggplot
 #' @details distribution of fluxes or biomass for a specific year
@@ -36,7 +37,10 @@
 #'
 ggDiet <- function(mysampleCaNmod,
                    species,
+                   years = NULL,
                    barplot = TRUE) {
+  if (is.null(years))
+    years <- mysampleCaNmod$CaNmod$series$Year
   if (!all(species %in% mysampleCaNmod$CaNmod$species))
     stop("some species are not recognized")
   if (!is.logical(barplot))
@@ -57,7 +61,8 @@ ggDiet <- function(mysampleCaNmod,
                  names_to = c("Var","Year"),
                  names_pattern = "(.*)\\[(.*)\\]",
                  values_to = "val") %>%
-    left_join(fluxes, by = c("Var" = "Flux"))
+    left_join(fluxes, by = c("Var" = "Flux")) %>%
+    filter(!!sym("Year") %in% years)
   mat_res <- mat_res %>%
     select(-!!sym("Var"))%>%
     group_by(!!sym("To"), !!sym("iter"), !!sym("Year")) %>%

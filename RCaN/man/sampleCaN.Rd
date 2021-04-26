@@ -4,8 +4,15 @@
 \alias{sampleCaN}
 \title{sampleCaN}
 \usage{
-sampleCaN(myCaNmod, N, nchain = 1, ncore = 1, thin = 1,
-  method = "gibbs", lastF = FALSE)
+sampleCaN(
+  myCaNmod,
+  N,
+  nchain = 1,
+  ncore = 1,
+  thin = 1,
+  method = "gibbs",
+  lastF = FALSE
+)
 }
 \arguments{
 \item{myCaNmod}{a CaNmod object with following elements}

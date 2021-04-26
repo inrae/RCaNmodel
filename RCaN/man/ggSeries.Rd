@@ -4,8 +4,7 @@
 \alias{ggSeries}
 \title{ggSeries}
 \usage{
-ggSeries(mysampleCaNmod, param, plot_series = TRUE,
-  ylab = "Biomass/Flux")
+ggSeries(mysampleCaNmod, param, plot_series = TRUE, ylab = "Biomass/Flux")
 }
 \arguments{
 \item{mysampleCaNmod}{result sent by \link{sampleCaN}}

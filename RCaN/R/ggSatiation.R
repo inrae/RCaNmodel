@@ -3,6 +3,7 @@
 #' @param mysampleCaNmod result sent by \link{sampleCaN}
 #' @param species the name (or a vector of name) of the species of interest
 #' by default, all species
+#' @param years years to be plotted (default all)
 #' @return a ggplot
 #' @details distribution of fluxes or biomass for a specific year
 #'
@@ -35,7 +36,10 @@
 #' @export
 #'
 ggSatiation <- function(mysampleCaNmod,
-                     species = NULL) {
+                     species = NULL,
+                     years = NULL) {
+  if (is.null(years))
+    years <- mysampleCaNmod$CaNmod$series$Year
   if (is.null(species))
     species <- mysampleCaNmod$CaNmod$species
   if (!all(species %in% mysampleCaNmod$CaNmod$species))
@@ -52,6 +56,7 @@ ggSatiation <- function(mysampleCaNmod,
     filter(!!sym("Var") %in% species) %>%
     rename("b" = "value") %>%
     mutate("Year" = as.numeric(!!sym("Year"))) %>%
+    filter(!!sym("Year") %in% years) %>%
     rename("predator" = "Var")
   trophic_flows <- mysampleCaNmod$CaNmod$fluxes_def$Flux[
     mysampleCaNmod$CaNmod$fluxes_def$Trophic == 1]
@@ -59,6 +64,7 @@ ggSatiation <- function(mysampleCaNmod,
     filter(!!sym("Var") %in% trophic_flows) %>%
     rename("Flux" = "Var") %>%
     mutate("Year" = as.numeric(!!sym("Year"))) %>%
+    filter(!!sym("Year") %in% years) %>%
     left_join(mysampleCaNmod$CaNmod$fluxes_def) %>%
     rename("predator" = !!sym("To"),
            "prey" = !!sym("From")) %>%
