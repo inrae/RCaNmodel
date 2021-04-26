@@ -3,6 +3,7 @@
 #' @param mysampleCaNmod result sent by \link{sampleCaN}
 #' @param species the species to plot (if null, default, all species)
 #' @param years years to be plotted (default all)
+#' @param frac fraction of points to be plot (default all)
 #' @return plots in a grid.arrange
 #' @importFrom magrittr %>%
 #' @importFrom tidyr pivot_longer
@@ -12,6 +13,7 @@
 #' @importFrom dplyr mutate
 #' @importFrom dplyr sample_n
 #' @importFrom dplyr left_join
+#' @importFrom dplyr slice
 #' @importFrom dplyr group_by
 #' @importFrom dplyr summarize
 #' @importFrom dplyr select
@@ -48,7 +50,10 @@
 
 
 
-ggSatiatInertia <- function(mysampleCaNmod, species = NULL, years = NULL){
+ggSatiatInertia <- function(mysampleCaNmod,
+                            species = NULL,
+                            years = NULL,
+                            frac = 1){
   if (is.null(years))
     years <- mysampleCaNmod$CaNmod$series$Year
   if (is.null(species))
@@ -172,8 +177,9 @@ ggSatiatInertia <- function(mysampleCaNmod, species = NULL, years = NULL){
 
   list_plot <- lapply(species,function(s){
     sub_data <- full_tab %>%
-      filter(species == s)
-    ggplot(sub_data, aes_string(x = "growth_std", y = "satiation_std")) +
+      filter(species == s) %>%
+      slice(seq(1, n(),by = round(n() / (frac * n()))))
+    ggplot(sub_data, aes_string(y = "growth_std", x = "satiation_std")) +
       geom_point(shape=".",col="grey") +
       #geom_density_2d_filled(alpha = .5) +
       stat_density_2d(geom = "polygon", contour = TRUE,
@@ -182,8 +188,8 @@ ggSatiatInertia <- function(mysampleCaNmod, species = NULL, years = NULL){
                       bins = 10, alpha = .5)+
       scale_fill_viridis_c()+
       guides(colour = FALSE, alpha = FALSE, fill = FALSE) +
-      geom_vline(aes_string(xintercept = 0), lty = 2) +
-      ggtitle(s) + xlim(-1,1)+ylim(0,1) + theme_bw()
+      geom_hline(aes_string(yintercept = 0), lty = 2) +
+      ggtitle(s) + ylim(-1,1)+xlim(0,1) + theme_bw()
   })
 
 

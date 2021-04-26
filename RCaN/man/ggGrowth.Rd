@@ -6,7 +6,7 @@
 plots biomass growth as a function of biomass
 provides a distribution over iterations and years}
 \usage{
-ggGrowth(mysampleCaNmod, species = NULL, years = NULL)
+ggGrowth(mysampleCaNmod, species = NULL, years = NULL, frac = 1)
 }
 \arguments{
 \item{mysampleCaNmod}{result sent by \link{sampleCaN}}
@@ -15,6 +15,8 @@ ggGrowth(mysampleCaNmod, species = NULL, years = NULL)
 by default, all species}
 
 \item{years}{years to be plotted (default all)}
+
+\item{frac}{fraction of points to be plot (default all)}
 }
 \value{
 a ggplot
