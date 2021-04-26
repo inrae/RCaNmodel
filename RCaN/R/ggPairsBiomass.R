@@ -26,6 +26,7 @@
 #' @importFrom dplyr left_join
 #' @importFrom dplyr rename
 #' @importFrom dplyr slice
+#' @importFrom dplyr n
 #' @importFrom dplyr select
 #' @importFrom dplyr filter
 #' @importFrom dplyr summarize

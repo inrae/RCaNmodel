@@ -24,6 +24,7 @@
 #' @importFrom ggplot2 geom_abline
 #' @importFrom dplyr left_join
 #' @importFrom dplyr slice
+#' @importFrom dplyr n
 #' @importFrom dplyr rename
 #' @importFrom dplyr select
 #' @importFrom dplyr filter
