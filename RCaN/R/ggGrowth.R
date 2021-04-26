@@ -27,6 +27,7 @@
 #' @importFrom dplyr select
 #' @importFrom dplyr filter
 #' @importFrom dplyr slice
+#' @importFrom dplyr n
 #' @importFrom dplyr summarize
 #' @importFrom dplyr group_by
 #' @importFrom dplyr mutate

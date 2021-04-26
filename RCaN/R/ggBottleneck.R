@@ -11,6 +11,7 @@
 #' @importFrom rlang !! sym
 #' @importFrom dplyr filter
 #' @importFrom dplyr slice
+#' @importFrom dplyr n
 #' @importFrom dplyr rename
 #' @importFrom dplyr mutate
 #' @importFrom dplyr sample_n

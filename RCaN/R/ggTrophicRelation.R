@@ -25,6 +25,7 @@
 #' @importFrom dplyr rename
 #' @importFrom dplyr select
 #' @importFrom dplyr slice
+#' @importFrom dplyr n
 #' @importFrom dplyr filter
 #' @importFrom dplyr summarize
 #' @importFrom dplyr group_by

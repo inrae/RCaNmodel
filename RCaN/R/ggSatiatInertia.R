@@ -14,6 +14,7 @@
 #' @importFrom dplyr sample_n
 #' @importFrom dplyr left_join
 #' @importFrom dplyr slice
+#' @importFrom dplyr n
 #' @importFrom dplyr group_by
 #' @importFrom dplyr summarize
 #' @importFrom dplyr select
