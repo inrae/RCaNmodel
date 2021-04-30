@@ -5,4 +5,4 @@
 For RCaN installation, please look [here](RCaN/README.md)
 
 ## RCaNconstructor installation
-For RCaN installation, please look [here](RCaNconstructor/README.md)
+For RCaNconstructor installation, please look [here](RCaNconstructor/README.md)
