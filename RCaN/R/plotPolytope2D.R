@@ -30,6 +30,10 @@
 plotPolytope2D <- function(x,
                            params = c(1, 2),
                            progressBar = TRUE) {
+  if (!requireNamespace("ggplot2", quietly = TRUE)) {
+    stop("Package ggplot2 needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
   x <- reformatX(x)
   A <- x$A
   b <- x$b

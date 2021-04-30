@@ -12,14 +12,9 @@ License: BSD_3_clause + file LICENSE
 Imports: 
     Rcpp (>= 1.0.3),
     RcppEigen,
-    ggplot2,
     symengine,
     Matrix,
-    igraph,
     tidyr,
-    ggraph,
-    RColorBrewer,
-    gridExtra,
     coda,
     doParallel,
     doRNG,
@@ -34,13 +29,17 @@ Imports:
     lpSolveAPI,
     magrittr,
     rlang,
-    tidyselect,
-    GGally
+    tidyselect
 LinkingTo: Rcpp, RcppEigen, dqrng
 Suggests: 
+    igraph,
+    ggraph,
+    gridExtra,
+    ggplot2,
     knitr,
     rmarkdown,
-    MASS
+    MASS,
+    GGally
 VignetteBuilder: knitr
 RoxygenNote: 7.1.1
 Encoding: UTF-8

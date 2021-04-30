@@ -26,6 +26,21 @@
 #' @importFrom graphics plot
 #' @export
 ggNetwork <- function(myCaNmod) {
+  if (!requireNamespace("ggplot2", quietly = TRUE)) {
+    stop("Package ggplot2 needed for this function to work.
+         Please install it",
+         call. = FALSE)
+  }
+  if (!requireNamespace("ggraph", quietly = TRUE)) {
+    stop("Package ggraph needed for this function to work.
+         Please install it",
+         call. = FALSE)
+  }
+  if (!requireNamespace("igraph", quietly = TRUE)) {
+    stop("Package igraph needed for this function to work.
+         Please install it",
+         call. = FALSE)
+  }
   # need to order the links table so that it matches the order of the components
   edge_graph <-
     myCaNmod$fluxes_def[, c("From", "To", "Trophic", "Flux")]

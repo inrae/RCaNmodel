@@ -37,6 +37,10 @@ ggViolin <- function(mysampleCaNmod,
                      logscale=TRUE,
                      xlab = "Component/Flux",
                      ylab = "Distribution") {
+  if (!requireNamespace("ggplot2", quietly = TRUE)) {
+    stop("Package ggplot2 needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
   if (is.null(years))
     years <- mysampleCaNmod$CaNmod$series$Year
   if (class(mysampleCaNmod) != "sampleCaNmod")
