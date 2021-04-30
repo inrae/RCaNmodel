@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.cm</groupId>
@@ -14,6 +15,20 @@
         <maven.build.timestamp.format>yy.w.ukkmm</maven.build.timestamp.format>
         <app.version>1.0</app.version>
         <jvm.modules>javafx.media,javafx.controls,javafx.fxml,java.logging</jvm.modules>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <maven.compiler.source>16</maven.compiler.source>
+        <maven.compiler.target>16</maven.compiler.target>
+
+        <!-- Used to set both the path to find the JavaFX modules and also the versions for Maven dependencies -->
+        <javafx.version>16</javafx.version>
+
+        <!-- Replace this UUID with a custom one for your project. This ID is used by the Windows installer system
+        to know that an installer is intended to replace/upgrade an earlier version. The easiest thing to do is
+        grab a unique UUID via https://www.uuidgenerator.net -->
+        <windows.upgrade.uuid>aaaaaaaa-0000-aaaa-aaaa-aaaaaaaaaaaa</windows.upgrade.uuid>
+        <!-- This is used to set many user-visible fields in the Windows Installer. See win-jpackage.txt -->
+        <windows.vendor> </windows.vendor>
     </properties>
     <dependencies>
 		 <dependency>
