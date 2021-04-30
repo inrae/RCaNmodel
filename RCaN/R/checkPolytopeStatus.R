@@ -5,9 +5,6 @@
 #' a vector b (A.x<=b) and optionnally a matrix C and a vector v (C.x=v)
 #' @return print a message to tell if the polygon is ok or not
 #'
-#' @importFrom ggplot2 ggplot
-#' @importFrom ggplot2 aes_string
-#' @importFrom ggplot2 geom_polygon
 #' @importFrom ROI ROI_solve
 #' @examples
 #' n <- 20

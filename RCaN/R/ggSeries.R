@@ -35,6 +35,10 @@ ggSeries <- function(mysampleCaNmod,
                      param,
                      plot_series=TRUE,
                      ylab="Biomass/Flux") {
+  if (!requireNamespace("ggplot2", quietly = TRUE)) {
+    stop("Package ggplot2 needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
   if (class(mysampleCaNmod) != "sampleCaNmod")
     stop("you should provide a sampleCaNmod object")
   mat_res <- as.matrix(mysampleCaNmod$mcmc)

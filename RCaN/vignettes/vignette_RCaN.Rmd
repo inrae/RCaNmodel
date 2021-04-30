@@ -107,6 +107,7 @@ Everything should be all right if your template was well created. The function r
 ```{r}
 require(ggplot2)
 require(ggraph)
+require(igraph)
 g<-ggNetwork(myCaNmod)
 print(g)
 ```
@@ -184,7 +185,7 @@ The package provides a function that draw a ggplot of time series of biomass or 
 ```{r}
 herbzoo<-ggSeries(res,"HerbZooplankton", TRUE)
 f01<-ggSeries(res,"F01", TRUE)
-library(gridExtra)
+require(gridExtra)
 grid.arrange(f01,herbzoo,nrow=1)
 
 #same graph with two series in same plot
