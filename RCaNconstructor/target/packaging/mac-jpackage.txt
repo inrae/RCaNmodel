@@ -1,0 +1,9 @@
+--name RCaNconstructor
+--icon /home/hilaire.drouineau/Bureau/Ocean/Ocean/app-icon.icns
+--dest /home/hilaire.drouineau/Bureau/Ocean/Ocean/target
+--main-jar Ocean-1.0.jar
+--main-class fr.cm.menus.Start
+--input /home/hilaire.drouineau/Bureau/Ocean/Ocean/target/dependency
+--app-version 1.0
+--runtime-image /home/hilaire.drouineau/Bureau/Ocean/Ocean/target/jvm-image
+--temp /home/hilaire.drouineau/Bureau/Ocean/Ocean/target/installer-work
