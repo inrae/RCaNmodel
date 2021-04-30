@@ -6,9 +6,9 @@ There are two way for installing RCaNconstructor.
 
 ### Binaries
 We provide binaries for different platforms that can be used to facilitate the installation:
-* [linux deb](binaries/rcanconstructor.deb)
-* [mac os](binaries/rcanconstructor.dmg)
-* [windows](binaries/rcanconstructor.exe)
+* [linux deb](binaries/rcanconstructor_1.0-1_amd64.deb)
+* [mac os](binaries/RCaNconstructor.dmg)
+* [windows](binaries/RCaNconstructor-21.17.51715.msi)
 
 
 ### From source
