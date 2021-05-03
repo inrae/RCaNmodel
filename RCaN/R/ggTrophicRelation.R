@@ -18,6 +18,7 @@
 #' @importFrom dplyr sample_n
 #' @importFrom ggplot2 geom_point
 #' @importFrom ggplot2 aes_string
+#' @importFrom ggplot2 stat_density_2d
 #' @importFrom ggplot2 scale_y_continuous scale_x_continuous
 #' @importFrom ggplot2 stat_smooth
 #' @importFrom ggplot2 geom_hline
@@ -101,6 +102,12 @@ ggTrophicRelation <- function(mysampleCaNmod,
     stat_smooth(method = "gam", colour = "chocolate4") +
     facet_grid(predator ~  prey,
                scales = "free") +
+    stat_density_2d(geom = "polygon", contour = TRUE,
+                    aes(fill = after_stat(!!sym("level"))),
+                    colour = NA,
+                    bins = 10, alpha = .5) +
+    scale_fill_viridis_c() +
+    guides(colour = FALSE, alpha = FALSE, fill = FALSE) +
     xlab('Biomass prey') +
     ylab('Flux to predator') +
     theme(legend.position = "none") +

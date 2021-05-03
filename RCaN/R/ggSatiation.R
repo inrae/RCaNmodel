@@ -17,6 +17,7 @@
 #' @importFrom ggplot2 ggplot
 #' @importFrom dplyr sample_n
 #' @importFrom ggplot2 geom_point
+#' @importFrom ggplot2 stat_density_2d
 #' @importFrom ggplot2 aes_string
 #' @importFrom ggplot2 scale_y_continuous scale_x_continuous
 #' @importFrom ggplot2 stat_smooth
@@ -108,6 +109,12 @@ ggSatiation <- function(mysampleCaNmod,
     facet_wrap(~predator,
                ncol = ceiling(length(species)^0.5),
                scales = "free") +
+    stat_density_2d(geom = "polygon", contour = TRUE,
+                    aes(fill = after_stat(!!sym("level"))),
+                    colour = NA,
+                    bins = 10, alpha = .5)+
+    scale_fill_viridis_c()+
+    guides(colour = FALSE, alpha = FALSE, fill = FALSE) +
     xlab('Predator biomass') +
     ylab('Total flux to predator') +
     theme(legend.position = "none") +
