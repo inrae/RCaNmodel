@@ -20,6 +20,7 @@
 #' @importFrom ggplot2 geom_point
 #' @importFrom ggplot2 aes_string
 #' @importFrom ggplot2 scale_y_continuous scale_x_continuous
+#' @importFrom ggplot2 stat_density_2d
 #' @importFrom ggplot2 stat_smooth
 #' @importFrom ggplot2 geom_hline
 #' @importFrom dplyr left_join
@@ -101,6 +102,12 @@ ggGrowth <- function(mysampleCaNmod,
     ggtitle('Growth (B(t+1)/B(t)) vs. Biomass')+
     xlab("biomass") +
     ylab("growth") +
+    stat_density_2d(geom = "polygon", contour = TRUE,
+                    aes(fill = after_stat(!!sym("level"))),
+                    colour = NA,
+                    bins = 10, alpha = .5)+
+    scale_fill_viridis_c()+
+    guides(colour = FALSE, alpha = FALSE, fill = FALSE) +
     theme_bw() +
     theme(legend.position = "none")
   return(g)
