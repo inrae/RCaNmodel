@@ -7,6 +7,7 @@
 #' @param years years to be plotted (default all)
 #' @param frac fraction of points to be plot (default all)
 #' @param logscale should biomass be log10 transformed (default yes)
+#' @param ... other arguments sent to
 #' @return a ggplot
 #' @details distribution of fluxes or biomass for a specific year
 #'
@@ -44,7 +45,8 @@ ggPairsBiomass <- function(mysampleCaNmod,
                      species = NULL,
                      years = NULL,
                      frac = 1,
-                     logscale = TRUE) {
+                     logscale = TRUE,
+                     ...) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("Package ggplot2 needed for this function to work. Please install it.",
          call. = FALSE)
@@ -91,7 +93,8 @@ ggPairsBiomass <- function(mysampleCaNmod,
                                               size = 0.1,
                                               alpha = 0.5)),
                upper = list(continuous = wrap("cor",
-                                              method = "kendall"))) +
+                                              method = "kendall")),
+               ...) +
     ggtitle(ifelse(logscale,
                    'Species pair-plot (log10 scale)',
                    'Species pair-plot')) +
