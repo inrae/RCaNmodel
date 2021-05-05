@@ -29,17 +29,17 @@ Imports:
     lpSolveAPI,
     magrittr,
     rlang,
-    tidyselect
-LinkingTo: Rcpp, RcppEigen, dqrng
-Suggests: 
+    tidyselect,
     igraph,
     ggraph,
+    GGally,
+    ggplot2
+LinkingTo: Rcpp, RcppEigen, dqrng
+Suggests: 
     gridExtra,
-    ggplot2,
     knitr,
     rmarkdown,
-    MASS,
-    GGally
+    MASS
 VignetteBuilder: knitr
 RoxygenNote: 7.1.1
 Encoding: UTF-8

@@ -4,7 +4,7 @@
 #' @param species the species to plot (if null, default, all species)
 #' @param years years to be plotted (default all)
 #' @param frac fraction of points to be plot (default all)
-#' @return plots in a grid.arrange
+#' @return a ggplot
 #' @importFrom magrittr %>%
 #' @importFrom tidyr pivot_longer
 #' @importFrom rlang !! sym
@@ -28,11 +28,10 @@
 #' @importFrom ggplot2 xlim
 #' @importFrom ggplot2 ylim
 #' @importFrom ggplot2 geom_point
-#' @importFrom ggplot2 stat_density_2d
+#' @importFrom ggplot2 geom_density_2d_filled
 #' @importFrom ggplot2 guides
 #' @importFrom ggplot2 theme_bw
-#' @importFrom ggplot2 scale_fill_viridis_c
-#' @importFrom gridExtra grid.arrange
+#' @importFrom ggplot2 scale_fill_viridis_d
 #'
 #' @details
 #' for each species, a point stands for a time step and an iteration of the
@@ -60,11 +59,7 @@ ggSatiatInertia <- function(mysampleCaNmod,
          Please install it",
          call. = FALSE)
   }
-  if (!requireNamespace("ggplot2", quietly = TRUE)) {
-    stop("Package gridExtra needed for this function to work.
-         Please install it",
-         call. = FALSE)
-  }
+
   if (is.null(years))
     years <- mysampleCaNmod$CaNmod$series$Year
   if (is.null(species))
@@ -184,26 +179,22 @@ ggSatiatInertia <- function(mysampleCaNmod,
            !!sym("growth_std"))
 
 
-  full_tab <- merge(inertia_tab, satiation_tab)
-
-  list_plot <- lapply(species,function(s){
-    sub_data <- full_tab %>%
-      filter(species == s) %>%
+  full_tab <- merge(inertia_tab, satiation_tab) %>%
       slice(seq(1, n(),by = round(n() / (frac * n()))))
-    ggplot(sub_data, aes_string(y = "growth_std", x = "satiation_std")) +
+
+
+    ggplot(full_tab, aes_string(y = "growth_std", x = "satiation_std")) +
       geom_point(shape=".",col="grey") +
       #geom_density_2d_filled(alpha = .5) +
-      stat_density_2d(geom = "polygon", contour = TRUE,
-                      aes(fill = after_stat(!!sym("level"))),
-                      colour = NA,
-                      bins = 10, alpha = .5)+
-      scale_fill_viridis_c()+
+      geom_density_2d_filled(contour_var = "ndensity",
+                             alpha = .5,
+                             colour = NA,
+                             breaks = seq(0.1, 1.0, length.out = 10)) +
+      scale_fill_viridis_d() +
+      facet_wrap(~ species, ncol = ceiling(length(species)^0.5),
+                 scales = "free") +
       guides(colour = FALSE, alpha = FALSE, fill = FALSE) +
       geom_hline(aes_string(yintercept = 0), lty = 2) +
-      ggtitle(s) + ylim(-1,1)+xlim(0,1) + theme_bw()
-  })
+      ylim(-1,1)+xlim(0,1) + theme_bw()
 
-
-  grid.arrange(grobs = list_plot,
-               nrow=ceiling(sqrt(length(list_plot))))
 }

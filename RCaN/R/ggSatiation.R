@@ -15,9 +15,8 @@
 #' ggSatiation(res)
 #'
 #' @importFrom ggplot2 ggplot
-#' @importFrom dplyr sample_n
 #' @importFrom ggplot2 geom_point
-#' @importFrom ggplot2 stat_density_2d
+#' @importFrom ggplot2 geom_density_2d_filled
 #' @importFrom ggplot2 aes_string
 #' @importFrom ggplot2 scale_y_continuous scale_x_continuous
 #' @importFrom ggplot2 stat_smooth
@@ -56,7 +55,7 @@ ggSatiation <- function(mysampleCaNmod,
   species <- factor(species, levels = species)
   myCaNmodFit_long <- as.data.frame(as.matrix(mysampleCaNmod$mcmc)) %>%
     mutate("Sample_id" = 1:nrow(as.matrix(mysampleCaNmod$mcmc))) %>%
-    sample_n(min(1000, nrow(as.matrix(mysampleCaNmod$mcmc))), replace = FALSE) %>%
+    slice(seq(1, n(),by = round(n() / (frac * n())))) %>%
     pivot_longer(cols = -!!sym("Sample_id"),
                  names_to = c("Var","Year"),
                  names_pattern = "(.*)\\[(.*)\\]",
@@ -81,9 +80,7 @@ ggSatiation <- function(mysampleCaNmod,
              !!sym("Year"),
              !!sym("predator")) %>%
     summarize("consumption" = sum(!!sym("value"))) %>%
-    left_join(biomass) %>%
-    slice(seq(1, n(),by = round(n() / (frac * n()))))
-
+    left_join(biomass)
   fluxes$predator <- factor(fluxes$predator,
                             levels = species)
 
@@ -106,15 +103,15 @@ ggSatiation <- function(mysampleCaNmod,
                            intercept = "intercept"),
                 colour = "firebrick3",
                 linetype = "dashed") +
+    geom_density_2d_filled(contour_var = "ndensity",
+                           alpha = .5,
+                           colour = NA,
+                           breaks = seq(0.1, 1.0, length.out = 10)) +
+    scale_fill_viridis_d() +
+    guides(colour = FALSE, alpha = FALSE, fill = FALSE) +
     facet_wrap(~predator,
                ncol = ceiling(length(species)^0.5),
                scales = "free") +
-    stat_density_2d(geom = "polygon", contour = TRUE,
-                    aes(fill = after_stat(!!sym("level"))),
-                    colour = NA,
-                    bins = 10, alpha = .5)+
-    scale_fill_viridis_c()+
-    guides(colour = FALSE, alpha = FALSE, fill = FALSE) +
     xlab('Predator biomass') +
     ylab('Total flux to predator') +
     theme(legend.position = "none") +
