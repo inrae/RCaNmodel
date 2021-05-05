@@ -16,11 +16,10 @@
 #' ggGrowth(res)
 #'
 #' @importFrom ggplot2 ggplot
-#' @importFrom dplyr sample_n
 #' @importFrom ggplot2 geom_point
 #' @importFrom ggplot2 aes_string
 #' @importFrom ggplot2 scale_y_continuous scale_x_continuous
-#' @importFrom ggplot2 stat_density_2d
+#' @importFrom ggplot2 geom_density_2d_filled
 #' @importFrom ggplot2 stat_smooth
 #' @importFrom ggplot2 geom_hline
 #' @importFrom dplyr left_join
@@ -56,7 +55,7 @@ ggGrowth <- function(mysampleCaNmod,
 
   myCaNmodFit_long <- as.data.frame(as.matrix(mysampleCaNmod$mcmc)) %>%
     mutate("Sample_id" = 1:nrow(as.matrix(mysampleCaNmod$mcmc))) %>%
-    sample_n(min(1000, nrow(as.matrix(mysampleCaNmod$mcmc))), replace = FALSE) %>%
+    slice(seq(1, n(), by = round(n() / (frac * n())))) %>%
     pivot_longer(cols = -!!sym("Sample_id"),
                  names_to = c("Var","Year"),
                  names_pattern = "(.*)\\[(.*)\\]",
@@ -84,29 +83,27 @@ ggGrowth <- function(mysampleCaNmod,
 
   biomass$species <- factor(biomass$species,
                             levels = species)
-  biomass <- biomass %>%
-    slice(seq(1, n(), by = round(n() / (frac * n()))))
   g <- ggplot(na.omit(biomass),
-              aes_string(x = "b_curr", y = "growth", col = "species")) +
+              aes_string(x = "b_curr", y = "growth")) +
     geom_point(size=.1, alpha = 0.5) +
     stat_smooth(method = "gam", colour = "chocolate4") +
     geom_hline(yintercept = 1, colour = 'black', linetype = "dashed") +
     geom_hline(data = Inertia, aes_string(yintercept = "inertia_low"),
                colour = "firebrick3", linetype = "dashed") +
     geom_hline(data = Inertia, aes_string(yintercept = "inertia_high"),
-               colour = "firebrick3", linetype = "dashed") +
-    facet_wrap(~ species, ncol = ceiling(length(species)^0.5),
-               scales = "free") +
+               colour = "firebrick3", linetype = "dashed")  +
     scale_x_continuous(trans = 'log10') +
     scale_y_continuous(trans = 'log10')  +
     ggtitle('Growth (B(t+1)/B(t)) vs. Biomass')+
     xlab("biomass") +
     ylab("growth") +
-    stat_density_2d(geom = "polygon", contour = TRUE,
-                    aes(fill = after_stat(!!sym("level"))),
-                    colour = NA,
-                    bins = 10, alpha = .5)+
-    scale_fill_viridis_c()+
+    geom_density_2d_filled(contour_var = "ndensity",
+                           alpha = .5,
+                           colour = NA,
+                           breaks = seq(0.1, 1.0, length.out = 10)) +
+    scale_fill_viridis_d() +
+    facet_wrap(~ species, ncol = ceiling(length(species)^0.5),
+               scales = "free") +
     guides(colour = FALSE, alpha = FALSE, fill = FALSE) +
     theme_bw() +
     theme(legend.position = "none")

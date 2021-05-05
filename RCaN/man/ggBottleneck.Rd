@@ -18,7 +18,7 @@ ggBottleneck(mysampleCaNmod, species = NULL, years = NULL, frac = 1)
 \item{frac}{fraction of points to be plot (default all)}
 }
 \value{
-plots in a grid.arrange
+a ggplot
 }
 \description{
 ggBottleneck
