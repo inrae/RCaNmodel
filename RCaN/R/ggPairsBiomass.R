@@ -18,7 +18,6 @@
 #' ggPairsBiomass(res)
 #'
 #' @importFrom ggplot2 ggplot
-#' @importFrom dplyr sample_n
 #' @importFrom GGally ggpairs
 #' @importFrom GGally wrap
 #' @importFrom ggplot2 scale_y_continuous scale_x_continuous
@@ -66,7 +65,7 @@ ggPairsBiomass <- function(mysampleCaNmod,
 
   myCaNmodFit_long <- as.data.frame(as.matrix(mysampleCaNmod$mcmc)) %>%
     mutate("Sample_id" = 1:nrow(as.matrix(mysampleCaNmod$mcmc))) %>%
-    sample_n(min(1000, nrow(as.matrix(mysampleCaNmod$mcmc))), replace = FALSE) %>%
+    slice(seq(1, n(), by=round(n() / (frac * n())))) %>%
     pivot_longer(cols = -!!sym("Sample_id"),
                  names_to = c("Var","Year"),
                  names_pattern = "(.*)\\[(.*)\\]",

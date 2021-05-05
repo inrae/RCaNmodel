@@ -15,7 +15,6 @@
 #' ggTrophicRelation(res)
 #'
 #' @importFrom ggplot2 ggplot
-#' @importFrom dplyr sample_n
 #' @importFrom ggplot2 geom_point
 #' @importFrom ggplot2 aes_string
 #' @importFrom ggplot2 stat_density_2d
@@ -54,6 +53,7 @@ ggTrophicRelation <- function(mysampleCaNmod,
     stop("some species are not recognized")
   species <- factor(species, levels = species)
   myCaNmodFit_long <- as.data.frame(as.matrix(mysampleCaNmod$mcmc)) %>%
+    slice(seq(1, n(),by = round(n() / (frac * n())))) %>%
     mutate("Sample_id" = 1:nrow(as.matrix(mysampleCaNmod$mcmc))) %>%
     sample_n(min(1000, nrow(as.matrix(mysampleCaNmod$mcmc))), replace = FALSE) %>%
     pivot_longer(cols = -!!sym("Sample_id"),
@@ -91,8 +91,7 @@ ggTrophicRelation <- function(mysampleCaNmod,
   biomass$prey <- factor(biomass$prey,
                              levels = species)
   biomass <- biomass %>%
-    na.omit() %>%
-    slice(seq(1, n(),by = round(n() / (frac * n()))))
+    na.omit()
 
 
 
@@ -100,13 +99,13 @@ ggTrophicRelation <- function(mysampleCaNmod,
               aes_string(x = "b", y = "consumption")) +
     geom_point(size=.1, alpha = 0.5) +
     stat_smooth(method = "gam", colour = "chocolate4") +
+    geom_density_2d_filled(contour_var = "ndensity",
+                           alpha = .5,
+                           colour = NA,
+                           breaks = seq(0.1, 1.0, length.out = 10)) +
+    scale_fill_viridis_d() +
     facet_grid(predator ~  prey,
                scales = "free") +
-    stat_density_2d(geom = "polygon", contour = TRUE,
-                    aes(fill = after_stat(!!sym("level"))),
-                    colour = NA,
-                    bins = 10, alpha = .5) +
-    scale_fill_viridis_c() +
     guides(colour = FALSE, alpha = FALSE, fill = FALSE) +
     xlab('Biomass prey') +
     ylab('Flux to predator') +

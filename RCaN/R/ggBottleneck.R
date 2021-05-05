@@ -5,7 +5,7 @@
 #' @param species the species to plot (if null, default, all species)
 #' @param years years to be plotted (default all)
 #' @param frac fraction of points to be plot (default all)
-#' @return plots in a grid.arrange
+#' @return a ggplot
 #' @importFrom magrittr %>%
 #' @importFrom tidyr pivot_longer
 #' @importFrom rlang !! sym
@@ -14,7 +14,6 @@
 #' @importFrom dplyr n
 #' @importFrom dplyr rename
 #' @importFrom dplyr mutate
-#' @importFrom dplyr sample_n
 #' @importFrom dplyr left_join
 #' @importFrom dplyr group_by
 #' @importFrom dplyr summarize
@@ -25,15 +24,13 @@
 #' @importFrom ggplot2 after_stat
 #' @importFrom ggplot2 guides
 #' @importFrom ggplot2 geom_vline
-#' @importFrom ggplot2 ggtitle
 #' @importFrom ggplot2 xlim
 #' @importFrom ggplot2 ylim
 #' @importFrom ggplot2 geom_point
 #' @importFrom ggplot2 stat_density_2d
 #' @importFrom ggplot2 guides
 #' @importFrom ggplot2 theme_bw
-#' @importFrom ggplot2 scale_fill_viridis_c
-#' @importFrom gridExtra grid.arrange
+#' @importFrom ggplot2 scale_fill_viridis_d
 #'
 #' @details
 #' the idea of this plot is to show whether a species has enough food and is or
@@ -55,11 +52,7 @@ ggBottleneck <- function(mysampleCaNmod,
                          species = NULL,
                          years = NULL,
                          frac = 1){
-  if (!requireNamespace("gridExtra", quietly = TRUE)) {
-    stop("Package  gridExtra needed for this function to work.
-         Please install it",
-         call. = FALSE)
-  }
+
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("Package ggplot2 needed for this function to work.
          Please install it",
@@ -76,12 +69,11 @@ ggBottleneck <- function(mysampleCaNmod,
 
   myCaNmodFit_long <- as.data.frame(as.matrix(mysampleCaNmod$mcmc)) %>%
     mutate("Sample_id" = 1:nrow(as.matrix(mysampleCaNmod$mcmc))) %>%
-    sample_n(min(1000,
-                 nrow(as.matrix(mysampleCaNmod$mcmc))), replace = FALSE) %>%
+    slice(seq(1, n(),by = round(n() / (frac * n())))) %>%
     pivot_longer(cols = -!!sym("Sample_id"),
                  names_to = c("Var","Year"),
                  names_pattern = "(.*)\\[(.*)\\]",
-                   values_to = 'value')
+                 values_to = 'value')
 
   #table with biomass at time t and t+1
   biomass <- myCaNmodFit_long %>%
@@ -114,7 +106,7 @@ ggBottleneck <- function(mysampleCaNmod,
     left_join(biomass)
 
   fluxes_to$predator <- factor(fluxes_to$predator,
-                            levels = species)
+                               levels = species)
 
 
 
@@ -172,31 +164,19 @@ ggBottleneck <- function(mysampleCaNmod,
            -!!sym("intercept")) %>%
     left_join(fluxes_from)
 
-  list_plot <- lapply(species,function(s){
-    sub_data <- satiation_tab %>%
-      filter(species == s)
-    if (nrow(na.omit(sub_data)) > 0){
-      sub_data <- sub_data %>%
-        slice(seq(1, n(),by = round(n() / (frac * n()))))
-      ggplot(sub_data,
-             aes_string(x = "satiation_std", y = "satiation_std_pred")) +
-        geom_point(shape=".",col="grey") +
-        #geom_density_2d_filled(alpha = .5) +
-        stat_density_2d(geom = "polygon", contour = TRUE,
-                        aes(fill = after_stat(!!sym("level"))), colour = NA,
-                        bins = 10, alpha = .5)+
-        scale_fill_viridis_c()+
-        guides(colour = FALSE, alpha = FALSE, fill = FALSE) +
-        ggtitle(s) + xlim(0,1)+ylim(0,1) + theme_bw()+
-        xlab("") + ylab("")
-    } else{
-      return(ggplot()+ggtitle(s))
-    }
-  })
 
-
-  grid.arrange(grobs = list_plot,
-               nrow=ceiling(sqrt(length(list_plot))),
-               bottom = "standardised satiation",
-               left = "standardised satiation of predators")
+  ggplot(satiation_tab,
+         aes_string(x = "satiation_std", y = "satiation_std_pred")) +
+    geom_point(shape=".",col="grey") +
+    #geom_density_2d_filled(alpha = .5) +
+    geom_density_2d_filled(contour_var = "ndensity",
+                           alpha = .5,
+                           colour = NA,
+                           breaks = seq(0.1, 1.0, length.out = 10)) +
+    scale_fill_viridis_d() +
+    facet_wrap(~ species, ncol = ceiling(length(species)^0.5),
+               scales = "free") +
+    guides(colour = FALSE, alpha = FALSE, fill = FALSE) +
+    xlim(0,1)+ylim(0,1) + theme_bw()+
+    xlab("") + ylab("")
 }

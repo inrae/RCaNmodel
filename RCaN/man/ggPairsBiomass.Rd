@@ -11,7 +11,8 @@ ggPairsBiomass(
   species = NULL,
   years = NULL,
   frac = 1,
-  logscale = TRUE
+  logscale = TRUE,
+  ...
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ by default, all species}
 \item{frac}{fraction of points to be plot (default all)}
 
 \item{logscale}{should biomass be log10 transformed (default yes)}
+
+\item{...}{other arguments sent to}
 }
 \value{
 a ggplot
