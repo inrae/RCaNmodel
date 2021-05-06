@@ -10,6 +10,7 @@ We provide binaries for different platforms that can be used to facilitate the i
 * [mac os](binaries/RCaNconstructor.dmg)
 * [windows](binaries/RCaNconstructor-21.17.51715.msi)
 
+For windows, you need to be administrator of the machine to install the software. Depending on your OS configuration, you might need to open a consol prompt as an administrator and then enter to the command `msiexec /i path\to\RCaNconstructor-21.17.51715.msi install` 
 
 ### From source
 To build RCaNconstructor from source, the easiest solution is to use maven to manage all dependencies.
