@@ -117,6 +117,7 @@ ggBottleneck <- function(mysampleCaNmod,
   #table with satiation parameters
   Satiation <- mysampleCaNmod$CaNmod$components_param %>%
     filter(!!sym("Component") %in% species) %>%
+    filter(!!sym("Inside") == 1) %>%
     mutate("predator" = factor(!!sym("Component"),
                                levels=species),
            "intercept" = 0 ) %>%
@@ -138,7 +139,7 @@ ggBottleneck <- function(mysampleCaNmod,
              !!sym("Sample_id")) %>%
     summarize(sum_in_flux_from = sum(!!sym("value"))) %>%
     left_join(biomass) %>%
-    left_join(Satiation %>%
+    inner_join(Satiation %>%
                 mutate("predator" = as.character(!!sym("predator")))) %>%
     mutate(sum_max_in_flux = !!sym("b") * !!sym("Satiation")) %>%
     left_join(mysampleCaNmod$CaNmod$fluxes_def[
