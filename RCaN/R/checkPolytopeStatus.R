@@ -45,13 +45,23 @@ checkPolytopeStatus <- function(x) {
   nbparam <- ncol(A)
   lp_model <- defineLPMod(A, b, C, v, maximum = FALSE)
   res <- ROI_solve(lp_model, solver = "lpsolve",
-                   control = list(presolve <- c("rows",
+                   control = list(presolve = c("rows",
                                                 "lindep",
                                                 "rowdominate",
-                                                "mergerows")))
+                                                "mergerows"),
+                                  scaling = c("extreme",
+                                              "equilibrate",
+                                              "integers")))
   if (res$status$msg$code == 0) {
     lp_model <- defineLPMod(A, b, C, v, maximum = TRUE)
-    res <- ROI_solve(lp_model, solver = "lpsolve")
+    res <- ROI_solve(lp_model, solver = "lpsolve",
+                     control = list(presolve = c("rows",
+                                                  "lindep",
+                                                  "rowdominate",
+                                                  "mergerows"),
+                                    scaling = c("extreme",
+                                                "equilibrate",
+                                                "integers")))
   }
   if (res$status$msg$code == 0) {
     print("polytope ok")
