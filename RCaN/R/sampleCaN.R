@@ -78,7 +78,7 @@ sampleCaN <- function(myCaNmod,
                               maximum = FALSE,
                               ob = runif(ncol(myCaNmod$A)))
       res <- ROI_solve(lp_model, solver = "lpsolve",
-                       control = list(presolve <- c("rows",
+                       control = list(presolve = c("rows",
                                                     "lindep",
                                                     "rowdominate",
                                                     "mergerows")))

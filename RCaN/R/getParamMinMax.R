@@ -40,7 +40,11 @@ getParamMinMax <- function(x, p, presolved, maximum) {
       ob[p] <- 1
       lp_model <- defineLPMod(A2, b2, C2, v2, lower, upper,
                               maximum = maximum, ob = ob)
-      res <- ROI_solve(lp_model, solver = "lpsolve")
+      res <- ROI_solve(lp_model,
+                       solver = "lpsolve",
+                       scaling = c("extreme",
+                                   "equilibrate",
+                                   "integers"))
       if (res$status$code != 0)
         res <- ROI_solve(lp_model, solver = "glpk",
                          control=list(tm_limit = 1000))
