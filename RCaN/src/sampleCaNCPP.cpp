@@ -4,6 +4,7 @@
 #include <Eigen/Sparse>
 #include <limits>
 #include <dqrng.h>
+#include <dqrng_RcppExports.h>
 // [[Rcpp::depends(RcppEigen)]]
 // [[Rcpp::depends(dqrng)]]
 using namespace Rcpp;
