@@ -118,6 +118,8 @@ ggTopDownBottomUp <- function(mysampleCaNmod, species = NULL, frac = 1){
   cortable <- biomass %>%
     inner_join(fluxFrom) %>%
     inner_join(fluxTo) %>%
+    mutate(feeding = !!sym("feeding") / !!sym("value_curr"),
+           predation = !!sym("predation") / !!sym("value_curr")) %>%
     group_by(!!sym("Species"),
              !!sym("Sample_id")) %>%
     summarize(R1 = cor(!!sym("feeding"), !!sym("growth")),
@@ -138,6 +140,7 @@ ggTopDownBottomUp <- function(mysampleCaNmod, species = NULL, frac = 1){
     xlim(-1,1) +
     xlab("Correlation") +
     ylab("Density") +
-    facet_wrap(~ Species) +
+    facet_wrap(~ Species,
+               scales = "free") +
     theme_bw()
 }
