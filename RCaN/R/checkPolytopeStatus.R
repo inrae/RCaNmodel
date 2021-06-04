@@ -45,7 +45,7 @@ checkPolytopeStatus <- function(x) {
   nbparam <- ncol(A)
   lp_model <- defineLPMod(A, b, C, v, maximum = FALSE)
   res <- ROI_solve(lp_model, solver = "lpsolve",
-                   control = list(presolve = c("rows",
+                   control = list(presolve <- c("rows",
                                                 "lindep",
                                                 "rowdominate",
                                                 "mergerows"),
@@ -55,7 +55,7 @@ checkPolytopeStatus <- function(x) {
   if (res$status$msg$code == 0) {
     lp_model <- defineLPMod(A, b, C, v, maximum = TRUE)
     res <- ROI_solve(lp_model, solver = "lpsolve",
-                     control = list(presolve = c("rows",
+                     control = list(presolve <- c("rows",
                                                   "lindep",
                                                   "rowdominate",
                                                   "mergerows"),
