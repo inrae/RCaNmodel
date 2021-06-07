@@ -392,29 +392,21 @@ ggDiet(samples, CaNmod$species) +
   ylab('prey proportion in the diet')
 ```
 
+## Growth and density-dependence
 
-## Growth
-
-We want to analyze density-dependence effects in the trajectories.
-
-To that purpose, we use the function *ggGrowth*. It  plots the growth rate (measured as the ratio of biomass at time $ t+1 $ over the biomass at time $ t $) as a function of the biomass (at time $ t $). This figure illustrate how density-dependence of single components can emerge from the food-web dynamics. The upper and lower red-dotted lines visualise the minimum and maximum growth rates set by the inertia constraints for each component.
-
-For all components over the entire sampling period, we get:
-
+Density-dependence usually reflects how growth is related to population size In RCaN trajectories this can be expressed as growth in biomass in relation to biomass. The RCaN function *ggGrowth* plots the growth rate (measured as the ratio of biomass at time $ t+1 $ over the biomass at time $ t $) as a function of the biomass (at time $ t $). Plotting density-dependence for all species is done as follows: 
 ```{r label=growth, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
 ggGrowth(samples, CaNmod$species)
 ```
-
-We observe: To be written
+This illustrates how density-dependence of the food-web components can emerge from the food-web dynamics. The upper and lower red-dotted lines visualise the minimum and maximum growth rates set by the inertia constraints for each component. The thick lines are smoothers which highlight the possible underlying relationship between growth and biomass.
 
 ## Trophic functional relationships
 
+The RCaN function *ggTrophicRelation*  plots the empirical relationships between the biomass of a prey and the quantity of that prey consumed by a predator. Above, we see that the predation of benthos by demersal fishes does not increases with the biomass of benthos, suggesting that benthos is not a limiting factor in the diet of demersal fishes.
 
 ```{r label=trophicRelationship,echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
 ggTrophicRelation(samples, CaNmod$species[3:5])
 ```
-The function *ggTrophicRelation*  plots the empirical relationships between the biomass of a prey and the quantity of that prey consumed by a predator. Above, we see that the predation of benthos by demersal fishes does not increases with the biomass of benthos, suggesting that benthos is not a limiting factor in the diet of demersal fishes.
-
 
 ## Satiation
 
