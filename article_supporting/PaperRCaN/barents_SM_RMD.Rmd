@@ -188,7 +188,7 @@ Checking the polytope is an important step. Users can adopt different strategy: 
 
 ### First step: checking the polytope status
 
-The R command 'checkPolytopeStatus' returns the current status of the polytope. In the Barents Sea example, the polytope is 'OK' which means that it is non-empty and bounded. In other words, there is a limited set of possible trajectories.
+The R command *checkPolytopeStatus* returns the current status of the polytope. In the Barents Sea example, the polytope is 'OK' which means that it is non-empty and bounded. In other words, there is a limited set of possible trajectories.
 
 
 ```{r label=rmppcheck, echo=TRUE, warning=FALSE}
@@ -197,8 +197,8 @@ checkPolytopeStatus(CaNmod)
 
 In some situations, the function may return 'empty polytope' or 'unbounded polytope'. It might then be necessary to add/activate new constraints or remove/disactivate existing constraints.)
 
-### Toggling constraints and detecting incompatible constraints
-Constraints can be activated/deactivate in the RCaN-file, using the 'active' switch in the 'Constraints' worksheet. In addition, it is possible to activate/deactivate constraints directly within R, once the RCaN file has been loaded. We illustrate this below, using the command 'toggleConstraint':
+### Toggling constraints 
+Constraints can be activated/deactivate in the RCaN-file, using the 'active' switch in the 'Constraints' worksheet. In addition, it is possible to activate/deactivate constraints directly within R, once the RCaN file has been loaded. We illustrate this below, using the command *toggleConstraint*:
 
 ```{r label=rmpp, echo=TRUE, output.lines=1:10}
 CaNmod <- toggleConstraint(CaNmod,
@@ -219,24 +219,27 @@ CaNmod <- toggleConstraint(CaNmod,
 
 ### Finding incompatible constraints
 
-Here the polytope is ok (not empty), but we artificially add an incompatible constraint to illustrate the opposite situation.
+We artificially add new constraint which is incompatible with the existing ones to illustrate a situation where the polytope is empty.
 
 ```{r label=addincompatible, output.lines=1:10}
 CaNmod<-toggleConstraint(CaNmod, "C35")
 ```
-If you look at the section \@ref(constraints), you will see that constraint C35 is totally incompatible with constraints C21. As a consequence, we now get 
+From section \@ref(constraints), we can see that constraint C35 is not incompatible with constraints C21, i.e. the two can not be fulfilled simultaneously. As a consequence, checking the polytope status returns 'empty polytope': 
 
 ```{r label=checkincompatible, warning=FALSE}
 checkPolytopeStatus(CaNmod)
 ```
-Unsurprisingly, the polytope is detected as empty. We can now try to detect which constraints raise problems:
+The RCaN function 'findingIncompatibleConstr' is then useful to identify which constraints are incompatible:
 
 ```{r inconstistent, output.lines=1:10}
 incomp <- findingIncompatibleConstr(CaNmod)
 ```
 
-The routine informs you that the constraint C35 raises problem (see ###polytope is ok when following constraints are relaxed) and that it is incompatible with constraints C16 and C17 ("####Those constraints seem incompatible with:").
-Let's now disactivate the problematic contraint to follow up.
+The function returns that constraint C35 is problematic (see ###polytope is ok when following constraints are relaxed) and that it is incompatible with constraints C16 and C17 ("####Those constraints seem incompatible with:").
+
+In such situation, it is necessary to relax some of the above constraints (C35, C16, C17) to obtain a non-empty polytope. The choice of the constraint to relax is left to the modeller, based on domain knowledge.
+
+In the following, we revert to a model version in which constraint C35 is inactive and the polytope is OK:
 
 ```{r label=disactincompatible, output.lines=1:10}
 CaNmod<-toggleConstraint(CaNmod, "C35")
@@ -244,31 +247,30 @@ CaNmod<-toggleConstraint(CaNmod, "C35")
 
 
 ## Bounds of the polytope
-We want to have a first overview of the polytope. One way is computing its limits in all dimensions and they are a lot using the function *getAllBoundsParam*. Result is a dataframe with a row per parameter. It is a time consuming command so here we restict the analysis to a single parameter with the function *getBoundParam*. 
+To obtain a first overview of the polytope, it is useful to compute its limits in all dimensions. This can be achieved with the RCaN function *getAllBoundsParam*. The output is a dataframe with a row per parameter/dimension. It is time consuming to compute all bounds, and one alternative is to compute the bounds for a small set of dimensions only. This can be done using the function *getBoundParam*. This is illustrated below for the two dimensions corresponding to the flux from Omnivorous Zooplankton to Birds in 2017 and 2018: 
 
 ```{r label=boundsC}
-getBoundParam(CaNmod, which(colnames(CaNmod$A)=="Ozoo_Birds[2018]"))
 getBoundParam(CaNmod, which(colnames(CaNmod$A)=="Ozoo_Birds[2017]"))
-
+getBoundParam(CaNmod, which(colnames(CaNmod$A)=="Ozoo_Birds[2018]"))
 ```
 
-## Slices of the polytope
+## 2D-slices of the polytope
 
-2-dimensional pictures of the polytope is obtained as follow: 
+2-dimensional pictures of the polytope are useful to visualise how the bounds of different fluxes are jointly constrained. These are obtained using the RCaN function *plotPolytope2D*: 
 
 ```{r label=fig1, out.width='100%'}
 start_time <- Sys.time()
-fluxX1 <- paste('PP_Ozoo','[1990]',sep="")
-fluxY1 <- paste('Hzoo_Ozoo','[1990]',sep="")
+fluxX1 <- 'PP_Ozoo[1990]'
+fluxY1 <- 'Hzoo_Ozoo[1990]'
 plotPolytope2D(CaNmod, c(fluxX1, fluxY1), progressBar=FALSE)
-fluxX2 <- paste('Hzoo_PelF','[1990]',sep="")
-fluxY2 <- paste('PelF_PelF','[1990]',sep="")
+fluxX2 <- 'Hzoo_PelF[1990]'
+fluxY2 <- 'PelF_PelF[1990]'
 plotPolytope2D(CaNmod, c(fluxX2, fluxY2), progressBar=FALSE)
-fluxX3 <- paste('Hzoo_PelF','[1990]',sep="")
-fluxY3 <- paste('Hzoo_PelF','[1991]',sep="")
+fluxX3 <- 'Hzoo_PelF[1990]'
+fluxY3 <- 'Hzoo_PelF[1991]'
 plotPolytope2D(CaNmod, c(fluxX3, fluxY3), progressBar=FALSE)
-fluxX4 <- paste('Hzoo_PelF','[1990]',sep="")
-fluxY4 <- paste('PelF_Fisheries','[1991]',sep="")
+fluxX4 <- 'Hzoo_PelF[1990]'
+fluxY4 <- 'PelF_Fisheries[1991]'
 plotPolytope2D(CaNmod, c(fluxX4, fluxY4), progressBar=FALSE)
 end_time <- Sys.time()
 end_time - start_time
@@ -276,41 +278,38 @@ end_time - start_time
 
 ## Doing the same with RCaNConstructor
 
-
-
 ```{r ,fig.align='center', echo=FALSE,  out.width='20%'}
 knitr::include_graphics("Network.png")
 ```
 
 * RCaN - Polytope - Build polytope
 * RCaN - Views - Constraints : edit the Active parameter, add or remvove constraints
-* RCaN - Polytope - Analyze polytope - Plot polytope in two selected dimensions
 * RCaN - Polytope - Analyze polytope - Plot network
 * RCaN - Polytope - Analyze polytope - Diagnostic polytope
 * RCaN - Polytope - Analyze polytope - Find incompatible constraints
-
+* RCaN - Polytope - Analyze polytope - Plot polytope in two selected dimensions
 
 # Sampling the polytope
 
 ## Sampling
 
-The sampling of the polytope, that is the building many random possible trajectories, is accomplished with the RCaN command (see Vignette), where 
-* N is
-* thin is 
-* nchains is
-* ncore is
+The RCaN function *sampleCaN* is used to sample of the polytope, i.e. to sample several random possible trajectories of the food-web dynamics. The output of this command is a mcmc object (defined in package coda). The function parameters include:
+* N: the number of samples
+* thin: the thinning, i.e. the number of samples that are left out from the output
+* nchains: the number of sampling chains
+* ncore: the number of CPU cores used
+* method: one of gibbs (default) or hitandrun
+
+
+With N=100, thin=10, and nchain=2 the *sampleCaN* function will sample two chains of 1,000 values and return one output every 10, that is a total of 200 valid samples
 
 ```{r label=sample}
-system.time(samples <- sampleCaN(CaNmod, N=100, thin=1, nchain=2, ncore=2))
+system.time(samples <- sampleCaN(CaNmod, N=100, thin=10, nchain=2, ncore=2))
 ```
-
-The output of this command is a mcmc object (defined in package coda).
 
 ## Convergence of the sample chains
 
-We want to check the mixing of the Monte Carlo Marko chain algorithm that is used to build the sample. 
-
-For that purpose, we use commands from the [coda](https://cran.r-project.org/web/packages/coda/index.html) library. 
+Check the mixing of the Monte Carlo Marko chain algorithm that is used to build the sample can be achieved with commands from the [coda](https://cran.r-project.org/web/packages/coda/index.html) library. 
 
 ```{r label=nchain}
 summ <- summary(samples$mcmc)
@@ -323,58 +322,52 @@ datatable( cbind.data.frame(summ$statistics, summ$quantiles) %>%
 
 ### Gelman diagnostic 
 
-Gelman and Rubin (1992) propose a general approach to monitoring convergence of MCMC output in which $ m > 1$ parallel chains are run with starting values that are overdispersed relative to the posterior distribution. Convergence is diagnosed when the chains have 'forgotten' their initial values, and the output from all chains is indistinguishable. The gelman.diag diagnostic is applied to a single variable from the chain. It is based a comparison of within-chain and between-chain variances, and is similar to a classical analysis of variance.
+Gelman and Rubin (1992) proposed a general approach to asses the convergence of MCMC outputs in which $ m > 1$ parallel chains are run with starting values that are overdispersed relative to the posterior distribution. Convergence is diagnosed when the chains have 'forgotten' their initial values, and the output from all chains is indistinguishable. The gelman.diag diagnostic is applied to a single variable from the chain. It is based a comparison of within-chain and between-chain variances, and is similar to a classical analysis of variance.
 
 ```{r label=gelman, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
-fluxZ1 <- paste('PP_Benthos','[1990]',sep="")
-fluxZ2 <- paste('Ozoo_Birds','[1990]',sep="")
-fluxZ3 <- paste('DemF_Fisheries','[1990]',sep="")
-fluxZ4 <- paste('PelF_DemF','[1990]',sep="")
+fluxZ1 <- 'PP_Benthos[1990]'
+fluxZ2 <- 'Ozoo_Birds[1990]'
+fluxZ3 <- 'DemF_Fisheries[1990]'
+fluxZ4 <- 'PelF_DemF[1990]'
 gelman.diag(samples$mcmc[,c(fluxZ1,fluxZ2,fluxZ3,fluxZ4)], multivariate = FALSE)
 ```
 
-The Gelman diagnostic compares the variance intrachain to the variance interchain. Theoretically a statistics below 1.05 suggests an appropriate convergence.
+Theoretically a statistics below 1.05 suggests an appropriate convergence.
 
 ### Autocorrelation function 
 
-The *acfplot* function shows the autocorrelation of sampling chains. It is illustrative of the independence of successive samples. If the samples are not serially correlated (which is desired) the autocorrelation should remain around zero (except for the first value which is always 1). Otherwise, it might be worthwhile thinning the chains.
+The *acfplot* function from the coda library shows the autocorrelation function of sampling chains. It is illustrative of the independence of successive samples. If the samples are not serially correlated (which is desired) the autocorrelation should remain around zero (except for the first value which is always 1). Otherwise, it might be worthwhile to increase the thinning during RCaN sampling and/or to discard the first samples.
 
 ```{r label=acf, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
-fluxZ1 <- paste('PP_Benthos','[1990]',sep="")
-fluxZ2 <- paste('Ozoo_Birds','[1990]',sep="")
-acfplot(samples$mcmc[,fluxZ1], ylim=c(-0.1,0.8), main= fluxZ1)
+fluxZ1 <- 'PP_Benthos[1990]'
+fluxZ2 <- 'Ozoo_Birds[1990]'
+acfplot(samples$mcmc[,fluxZ1], ylim=c(-0.1,0.8), main=fluxZ1)
 acfplot(samples$mcmc[,fluxZ2], ylim=c(-0.1,0.8), main=fluxZ2)
 ```
 
-Here we see that for both two considered parameters, the autocorrelation among iterations is very limited suggesting that the thinning is appropriate and burnin is appropriate. Otherwise, it might be worthwile increasing the thinning, the number of samples and to discard first samples.
+# Visualisation of the model results
 
+## Food-web dynamics 1: Components
 
-## Food-web dynamics. Components
-
-We want to observe the variability of the sampled trajectories. 
-
-To that purpose, we use the function *ggSeries*. It plots the time series of individual or collections of components and/or fluxes. By default, 3 randomly picked samples are plotted (plain, dashed and dotted lines) together with the envelopes containing 100\%, 95\% and 50\% of the samples. 
+The graphical representation of the possible dynamics of the food-web is a important output of the model. The RCaN function *ggSeries* produces standardised plots of the time-series of components and/or fluxes. By default, for each component, 3 randomly picked samples/trajectories are plotted (plain, dashed and dotted lines) together with the envelopes containing 100\%, 95\% and 50\% of the sampled trajectories. 
 
 For components, we get:
 
 ```{r label=dynamicsComponents, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
-g <- ggSeries(samples, CaNmod$species, TRUE)
-g + scale_y_log10() + guides(color=FALSE, fill=FALSE)
+ggSeries(samples, CaNmod$species, TRUE) +
+theme(legend.position = "none") 
 ```
 
-Here we observe different situations among species: for PelF and DemF, time series provide enough information to constrain the trajectories of biomasses. On the other hand, marine mammal and Birds are less constrained and are not limited by their satiation nor their inertia, leading to large variations among trajectories.
+In this example we observe different situations for the different species: for pelagic fish (PelF) and demersal fish (DemF) the constraints imposed in relation to the observational data-series constrain the trajectories of biomass which are all situated within a narrow band. On the other hand, there is little information provided to constriain directly the trajectories of marine mammal and Birds which leads to large variability between the different samples.
 
+## Food-web dynamics 2: Fluxes
 
-## Food-web dynamics. Fluxes
-
-For fluxes, we get:
+The dynamics of fluxes can be plotted in a similar fashion:
 
 ```{r label=dynamicsFluxes, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
-g <- ggSeries(samples, CaNmod$flow, TRUE)
-g + scale_y_log10(n.breaks=3) + scale_x_continuous(breaks=c(1990,2010)) + guides(color=FALSE, fill=FALSE)
+ggSeries(samples, CaNmod$flow, TRUE) +
+theme(legend.position = "none") 
 ```
-
-
 
 ## Distribution of values. Components
 
