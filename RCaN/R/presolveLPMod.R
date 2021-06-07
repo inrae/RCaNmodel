@@ -10,7 +10,7 @@
 #' @param lower minimal bounds for paramaters, by default set to zero
 #' @param upper maximal bounds for parameters, by default Inifinty
 #' @param sense min or max (maximisation of minimation)
-#' @return a vector corresponding to the centroid of the polytope
+#' @return a list with various elements about the presolved lp model
 #'
 #' @importFrom lpSolveAPI make.lp
 #' @importFrom lpSolveAPI set.bounds
@@ -25,7 +25,12 @@
 #' @importFrom lpSolveAPI get.constr.type
 #' @importFrom lpSolveAPI set.objfn
 #' @importFrom lpSolveAPI get.primal.solution
-
+#' @importFrom lpSolveAPI write.lp
+#' @importFrom ROI OP
+#' @importFrom ROI L_constraint
+#' @importFrom ROI V_bound
+#' @importFrom ROI L_objective
+#'
 
 presolveLPMod <-
   function(A,
@@ -37,6 +42,7 @@ presolveLPMod <-
            sense = "max") {
     if (! sense %in% c("min", "max"))
       stop("error in presolve, sense should be min or max")
+    maximum <- sense == "max"
     nbparam <- ncol(A)
     presolve <- c("rows",
                   "lindep",
@@ -91,11 +97,30 @@ presolveLPMod <-
       fixed <- sol[! colnames(A) %in% colnames(lhs)]
       names(fixed) <- colnames(A)[! colnames(A) %in% colnames(lhs)]
     }
+
+    bounds <- V_bound(ui = seq_len(ncol(lhs)),
+                      li = seq_len(ncol(lhs)),
+                      ub = bounds$upper,
+                      lb = bounds$lower,
+                      ud = Inf, ld = 0, nobj = ncol(lhs))
+
+    if (all(lower == 0) & all(upper == Inf)){
+      OP <- OP(constraints = L_constraint(lhs,dir,rhs),
+               maximum = maximum,
+               objective = L_objective(rep(1, ncol(lhs))))
+    } else {
+      OP <- OP(bounds = bounds,
+               constraints = L_constraint(lhs,dir,rhs),
+               maximum = maximum,
+               objective = L_objective(rep(1, ncol(lhs))))
+    }
     return (list(lhs = lhs,
                  dir = dir,
                  rhs = rhs,
                  lower = lower,
                  upper = upper,
-                 fixed = fixed))
+                 fixed = fixed,
+                 lp_model = lp_model,
+                 OP = OP))
   }
 

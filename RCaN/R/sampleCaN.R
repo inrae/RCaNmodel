@@ -21,7 +21,6 @@
 #'  package = "RCaN"))
 #' res <- sampleCaN(myCaNmod, 100)
 #'
-#' @importFrom ROI ROI_solve
 #' @importFrom parallel detectCores
 #' @importFrom parallel makeCluster
 #' @importFrom parallel clusterEvalQ
@@ -78,7 +77,7 @@ sampleCaN <- function(myCaNmod,
                               maximum = FALSE,
                               ob = runif(ncol(myCaNmod$A)))
       res <- ROI_solve(lp_model, solver = "lpsolve",
-                       control = list(presolve <- c("rows",
+                       control = list(presolve = c("rows",
                                                     "lindep",
                                                     "rowdominate",
                                                     "mergerows"),

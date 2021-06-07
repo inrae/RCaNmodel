@@ -6,17 +6,12 @@
 Computes the minum value bounds for a parameter p of a polytope defined
 by+A.x<=b and C.x=v or by the polytope of the CaNmod object}
 \usage{
-getParamMinMax(x, p, presolved, maximum)
+getParamMinMax(OP, p)
 }
 \arguments{
-\item{x}{either a CaNmod object or a named list with at least a matrix A and
-a vector b (A.x<=b) and optionally a matrix C and a vector v (C.x=v)}
+\item{OP}{an OP object}
 
-\item{p}{the index of the parameter for which the bounds should be computed}
-
-\item{presolved}{an object returned by \link{presolveLPMod}}
-
-\item{maximum}{should ob be maximized}
+\item{p}{index of the parameter}
 }
 \value{
 a vector with lower bounds and upper bounds

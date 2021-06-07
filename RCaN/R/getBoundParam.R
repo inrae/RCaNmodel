@@ -5,8 +5,10 @@
 #' a vector b (A.x<=b) and optionally a matrix C and a vector v (C.x=v)
 #' @param p the index of the parameter for which the bounds should be computed
 #'
-#' @importFrom ROI ROI_solve
 #'
+#' @importFrom ROI L_objective
+#' @importFrom ROI objective
+#' @importFrom lpSolveAPI write.lp
 #' @return a vector with lower bounds and upper bounds
 #' @examples
 #' n <- 20
@@ -27,27 +29,39 @@ getBoundParam <- function(x, p) {
   C <- x$C
   v <- x$v
 
+
+  nbparam <- ncol(A)
   if (is.null(colnames(A))) {
     colnames(A) <- paste("col", seq_len(ncol(A)), sep = "")
   }
-
   if (is.null(colnames(C)) & !is.null(C))
     colnames(C) <- colnames(A)
 
-  nbparam <- ncol(A)
-  if (is.null(C)) {
-    C <- matrix(0, 0, nbparam)
-    v <- numeric(0)
-  }
+  presolvedmin <- presolveLPMod(A, b, C, v, sense = "min")
+  presolvedmax <- presolveLPMod(A, b, C, v, sense = "max")
 
 
+  res <- sapply(c("min", "max"), function(s){
+    if (s == "min"){
+      presolved <- presolvedmin
+    } else {
+      presolved <- presolvedmax
+    }
+    if (colnames(A)[p] %in% colnames(presolved$lhs)){
+      ip <- match(colnames(A)[p], colnames(presolved$lhs))
+      ob <- rep(0, ncol(presolved$lhs))
+      ob[ip] <- 1
+      ROI::objective(presolved$OP) <- L_objective(rep(1, ncol(presolved$lhs)))
+      set.objfn(presolved$lp_model, ob)
+      write.lp(presolved$lp_model,
+                           paste0(tempdir(), "/lp_mod.lp"),
+                           "lp",
+                           c(FALSE, FALSE))
+      getParamMinMax(presolved$OP, ip)
+    } else {
+      presolved$fixed[colnames(A)[p]]
+    }
+  })
 
-  presolvedmin<- presolveLPMod(A, b, C, v, sense = "min")
-  presolvedmax<- presolveLPMod(A, b, C, v, sense = "max")
-  x <- list(A = A, b = b, C = C, v = v)
-
-
-  res <- c(getParamMinMax(x, p, presolvedmin, FALSE),
-           getParamMinMax(x, p, presolvedmax, TRUE))
   return (res)
 }
