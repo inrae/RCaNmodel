@@ -402,45 +402,49 @@ This illustrates how density-dependence of the food-web components can emerge fr
 
 ## Trophic functional relationships
 
-The RCaN function *ggTrophicRelation*  plots the empirical relationships between the biomass of a prey and the quantity of that prey consumed by a predator. Above, we see that the predation of benthos by demersal fishes does not increases with the biomass of benthos, suggesting that benthos is not a limiting factor in the diet of demersal fishes.
+The RCaN function *ggTrophicRelation*  plots the empirical trophic functional relationships (TFRs) between the biomass of a prey and the quantity of that prey consumed by a predator. Below is the command for plotting the TFR between benthos, pelagic fishes and demersal fishes in the Barents Sea example.
 
 ```{r label=trophicRelationship,echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
 ggTrophicRelation(samples, CaNmod$species[3:5])
 ```
+Above, we see that the predation of benthos by demersal fishes does not increases with the biomass of benthos, suggesting that benthos is not a limiting factor in the diet of demersal fishes.
+
 
 ## Satiation
+
+The function *ggSatiation* plots the total biomass of prey eaten by a predator, as a function of the biomass of the predator. In addition the plot includes an indication (upper red dotted line) of the maximum possible consumption rate, derived from the satiation parameter of the predator species. An example is illustrated below for all model components and over the entire sampling period. It shows that marine mammals never reach their satiation. On the other hand, demersal fish are often closed to satiation, suggesting that they are not food limited.
 
 ```{r label=satiation, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
 ggSatiation(samples, CaNmod$species)
 ```
 
-The function *ggSatiation* plots the total biomass of prey eaten by a predator, as a function of the biomass of the predator. In addition the plot includes an indication (upper red dotted line) of the maximum possible consumption rate, derived from the satiation parameter of the predator species. An example is illustrated below for all model components and over the entire sampling period. It shows that marine mamammals never reach their satiation. On the other hand, demersal fishes are often closed to satiation, suggesting that they are not food limited.
-
 ## Feeding and Growth
+
+The RCaN function *ggSatiatInertia* is used to explore the relationships between population growth and feeding. The plot shows standardized total consumption(0=no feeding, 1=feeding to satiation) as a function of standardized population growth/mortality (-1 = maximum mortality, 0 = no change in biomass, 1 = maximum growth). A positive relationship between growth and satiation is indicative of bottom up control.
 
 ```{r label=feedingGrowth, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
 ggSatiatInertia(samples, CaNmod$species)
 ```
 
-The function *ggSatiatInertia* is used to explore the relationships between population growth and feeding. The plot shows standardized total consumption(0=no feeding, 1=feeding to satiation) as a function of standardized population growth/mortality (-1 = maximum mortality, 0 = no change in biomass, 1 = maximum growth). A positive relationship between growth and satiation is indicative of bottom up control.
+## Pair-plots
 
-## Pair plots
-
-For two components:
+The function *ggPairsBiomass* is used to explore the relationships between the biomass of different food-web components/species. The plot shows the individual component density function in the diagonal, the scatterplots of one species against the other in the lower triangle and the Kendall correlation coefficient in the upper triangle. An example is illustrated below for three model components and over the entire sampling period. The function parameter *frac* indicates the fraction of the samples which will be plotted. This is useful for large sample size which can lead to overloaded figures. 
 
 ```{r label=plotPairs, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
-g <- ggPairsBiomass(samples,c("Benthos","PelF","DemF"),logscale=FALSE, frac = .25) #we only 25% of the point since the function is long
-g +  scale_y_continuous(n.breaks=3)+ scale_x_continuous(breaks=c(1990,2010))
+ggPairsBiomass(samples,c("Benthos","PelF","DemF"),logscale=FALSE, frac = .25) + #we only 25% of the point since the function is long
+  scale_y_continuous(n.breaks=3)+ scale_x_continuous(breaks=c(1990,2010))
 ```
 
-The function *ggPairsBiomass* is used to explore the relationships between the biomass of different food-web components. The plot shows the individual component density function in the diagonal, the scatterplots of one species against the other in the lower triangle and the Kendall correlation coefficient in the upper triangle. An example is illustrated below for all model components and over the entire sampling period.
 
-## Control Bottom Up
+## Top-Down and Bottom-Up controls
+
+One important aspect of food-web dynamics is the presence of possible trophic controls (Bottom-up or Top-Down). We define here bottom-up as a situation in which the growth of a species/component is positively correlated to the consumption by this species. Similarly, Top-down control is defined as a situation in which the growth of a species/component is negatively correlated to the predation/fishing on this species. The RCaN function *ggTopDownBottomUp* plots the density function of the correlation coefficients between growth and consumption/predation:
+
 ```{r label=bottomup, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
-g <- ggTopDownBottomUp(samples) #we only 25% of the point since the function is long
-g
+ggTopDownBottomUp(samples) 
 ```
-This function display the correlation between the growth of the species with both (1) its total ingestion of prey per unit of biomass (in red) and (2) the how much it is predated per unit of biomass (in blue). A red density plot tending to 1 indicates that growth is correlated to feeding, and therefore a bottom up control. Conversely, a blue density plot tending to minus one indicates that growth is negatively correlated to the predation and suggests a top down control. It is possible to select which fluxes are accounted for in this diagram (for example to exclude non trophic fluxes):
+
+This function display the correlation between the growth of the species with both (1) its total ingestion of prey per unit of biomass (in red) and (2) the how much it is predated per unit of biomass (in green). A red density plot tending to 1 indicates that growth is correlated to feeding, and therefore a bottom up control. Conversely, a green density plot tending towards minus one indicates that growth is negatively correlated to the predation and suggests a top down control. It is possible to select which fluxes are accounted for in this diagram (for example to exclude non-trophic fluxes):
 
 ```{r label=bottomupres, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
 # we restrict the analysis to Ozoo and DemF and limit to the predation by
@@ -470,3 +474,4 @@ knitr::include_graphics("Network.png")
 
 
 # References
+
