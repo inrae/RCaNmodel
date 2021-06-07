@@ -8,6 +8,9 @@
 #'
 #' @importFrom utils setTxtProgressBar
 #' @importFrom utils txtProgressBar
+#' @importFrom ROI objective
+#' @importFrom ROI L_objective
+#' @importFrom lpSolveAPI write.lp
 #'
 #' @return a datafame with first column corresponding to colnames(A), and
 #' corresponding lower bounds (column 2) and upper bounds (column 3)
@@ -41,15 +44,35 @@ getAllBoundsParam <- function(x,
   presolvedmin <- presolveLPMod(A, b, C, v, sense = "min")
   presolvedmax <- presolveLPMod(A, b, C, v, sense = "max")
 
-  x <- list(A = A, b = b, C = C, v = v)
+
+
 
   if (progressBar)
     pb <- txtProgressBar(min = 0, max = nbparam, style = 3)
   bounds <- sapply(1:nbparam, function(p) {
     if (progressBar)
       setTxtProgressBar(pb, p)
-    c(getParamMinMax(x, p, presolvedmin, FALSE),
-      getParamMinMax(x, p, presolvedmax, TRUE))
+    sapply(c("min", "max"), function(s){
+      if (s == "min"){
+        presolved <- presolvedmin
+      } else {
+        presolved <- presolvedmax
+      }
+      if (colnames(A)[p] %in% colnames(presolved$lhs)){
+        ip <- match(colnames(A)[p], colnames(presolved$lhs))
+        ob <- rep(0, ncol(presolved$lhs))
+        ob[ip] <- 1
+        ROI::objective(presolved$OP) <- L_objective(rep(1, ncol(presolved$lhs)))
+        set.objfn(presolved$lp_model, ob)
+        lpSolveAPI::write.lp(presolved$lp_model,
+                 paste0(tempdir(), "/lp_mod.lp"),
+                 "lp",
+                 c(FALSE, FALSE))
+        getParamMinMax(presolved$OP, ip)
+      } else {
+        presolved$fixed[colnames(A)[p]]
+      }
+    })
   })
   data.frame(
     param = colnames(A),

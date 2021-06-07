@@ -58,16 +58,16 @@ plotPolytope2D <- function(x,
   seqx1 <- seq(bounds_param1[1], bounds_param1[2], length.out = 50)
   if (progressBar)
     pb <- txtProgressBar(min = 0, max = 50, style = 3)
-  polygon <- lapply(seqx1, function(x) {
+  polygon <- lapply(seqx1, function(xi) {
     if (progressBar)
-      setTxtProgressBar(pb, which(seqx1 == x))
-    cbind(rep(x, 2),
+      setTxtProgressBar(pb, which(seqx1 == xi))
+    cbind(rep(xi, 2),
           getBoundParam(list(A = A,
                              b = b,
                              C = rbind(C, ifelse((1:nbparam) ==
                                                    params[1], 1, 0
                                                  )),
-                             v = c(v, x)),
+                             v = c(v, xi)),
                         params[2]))
   })
   polygon <-
