@@ -347,7 +347,7 @@ acfplot(samples$mcmc[,fluxZ2], ylim=c(-0.1,0.8), main=fluxZ2)
 
 # Visualisation of the model results
 
-## Food-web dynamics 1: Components
+## Temporal dynamics of componentns and fluxes
 
 The graphical representation of the possible dynamics of the food-web is a important output of the model. The RCaN function *ggSeries* produces standardised plots of the time-series of components and/or fluxes. By default, for each component, 3 randomly picked samples/trajectories are plotted (plain, dashed and dotted lines) together with the envelopes containing 100\%, 95\% and 50\% of the sampled trajectories. 
 
@@ -355,55 +355,41 @@ For components, we get:
 
 ```{r label=dynamicsComponents, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
 ggSeries(samples, CaNmod$species, TRUE) +
-theme(legend.position = "none") 
+  theme(legend.position = "none") 
 ```
 
 In this example we observe different situations for the different species: for pelagic fish (PelF) and demersal fish (DemF) the constraints imposed in relation to the observational data-series constrain the trajectories of biomass which are all situated within a narrow band. On the other hand, there is little information provided to constriain directly the trajectories of marine mammal and Birds which leads to large variability between the different samples.
-
-## Food-web dynamics 2: Fluxes
 
 The dynamics of fluxes can be plotted in a similar fashion:
 
 ```{r label=dynamicsFluxes, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
 ggSeries(samples, CaNmod$flow, TRUE) +
-theme(legend.position = "none") 
+  theme(legend.position = "none") 
 ```
 
-## Distribution of values. Components
+## Empirical distributions of biomass and fluxes 
 
-We want a descriptive function of the distributions of values for elements of the network at a given year.
-
-To that purpose, we use the function *ggViolin*.   
-
-For components, in 1990, we get:
+Exploring the distribution of biomass and fluxes across samples and across years is also a useful output of the model. The RCaN function *ggViolin* produces standardised violin plots of these distributions. By default, these are presented on a log scale which allows for comparison between biomass or fluxes that can span several orders of magnitude. For example, the distribution of species biomass for the year 1990 is obtained as follows:
 
 ```{r label=distribComp90, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
-g <- ggViolin(samples,CaNmod$species,year=1990,TRUE) 
-g + xlab('Component') + ylab('Biomass')
+ggViolin(samples,CaNmod$species,year=1990,TRUE) + 
+  xlab('Component') + ylab('Biomass')
 ```
-This graph confirms the previous observations: large distributions for some species (Hzoo, Birds) but show that, despite differences can still be detected among species.
-
-## Distribution of values
-
-For fluxes in 1990, we get:
+The violin plots of all fluxes in 1990 are produced as follows::
 
 ```{r label=distribFlux90, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
-g <- ggViolin(samples,CaNmod$flow,year=1990,TRUE) 
-g + xlab('Component') + ylab('Biomass') + theme(axis.text.x=element_text(angle=90))
+ggViolin(samples,CaNmod$flow,year=1990,TRUE) + 
+  xlab('Component') + ylab('Biomass') +
+  theme(axis.text.x=element_text(angle=90))
 ```
-
-
-Fluxes correspond to the sampled parameters of a CaN model. We see here that some fluxes are totally determined by the constraints (Fisheries data), but that most of them display large distributions. However, it still possible to detect differences among fluxes and this still leads to differences among biomasses.
 
 ## Diet composition
 
-The diet matrix is a key parameters of a trophic model such as ecopath. Here, diet is non deterministic, as such, it is intersting to explore the result. A convenient way is to use the *ggDiet* function that display the average diet of predators.
-
-For all predators, we get:
+The diet matrix is a key parameter of many trophic models, such as e.g. Ecopath (@Christensen2004). In CaN models, diet is non deterministic, in the sense that trophic fluxes are constrained but not determined by biomass. Diets are thus emerging from the model and it is interesting to explore the diets of individual species. A convenient way is to use the RCaN function *ggDiet* to draw the average diet for each predators:
 
 ```{r label=diet, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
-g <- ggDiet(samples, CaNmod$species) 
-g + ylab('prey proportion in the diet')
+ggDiet(samples, CaNmod$species) + 
+  ylab('prey proportion in the diet')
 ```
 
 
