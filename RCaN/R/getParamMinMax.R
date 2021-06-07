@@ -36,8 +36,9 @@ getParamMinMax <- function(x, p, presolved, maximum) {
 
   if (colnames(A)[p] %in% colnames(A2)){
     while (!all(solved) & ntry < 3) {
+      ip <- match(colnames(A)[p], colnames(A2))
       ob <- rep(0, ncol(A2))
-      ob[p] <- 1
+      ob[ip] <- 1
       lp_model <- defineLPMod(A2, b2, C2, v2, lower, upper,
                               maximum = maximum, ob = ob)
       res <- ROI_solve(lp_model,
@@ -51,7 +52,7 @@ getParamMinMax <- function(x, p, presolved, maximum) {
                          control=list(tm_limit = 1000))
 
       if (res$status$code == 0) {
-        bound <- res$solution[p]
+        bound <- res$solution[ip]
         solved[1] <- TRUE
       } else  {
         bound <- NA
