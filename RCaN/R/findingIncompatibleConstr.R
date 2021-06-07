@@ -11,7 +11,6 @@
 #'  relaxed and that
 #' A is incompatible with B and that D is incompatible with both E and F
 #'
-#' @importFrom ROI ROI_solve
 #'
 #' @examples
 #' n <- 20
