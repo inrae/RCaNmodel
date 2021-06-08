@@ -1,5 +1,5 @@
 #' defineLPMod
-#' Specify an lp_model (mainly for internal use) and writes an lp model file
+#' Specify a ROI (mainly for internal use)
 #'
 #' @param A a matrix of inequality constraints A x <=b
 #' @param b a vector A x <=b
@@ -18,12 +18,7 @@
 #' @importFrom ROI L_constraint
 #' @importFrom ROI V_bound
 #' @importFrom ROI L_objective
-#' @importFrom lpSolveAPI make.lp
-#' @importFrom lpSolveAPI set.bounds
-#' @importFrom lpSolveAPI set.rhs
-#' @importFrom lpSolveAPI set.constr.type
-#' @importFrom lpSolveAPI lp.control
-#' @importFrom lpSolveAPI write.lp
+
 
 
 defineLPMod <-
@@ -33,7 +28,7 @@ defineLPMod <-
            v = NULL,
            lower = NULL,
            upper = NULL,
-           maximum=TRUE,
+           maximum = TRUE,
            ob = NULL) {
     sense <- ifelse(maximum, "max", "min")
     nbparam <- ncol(A)
@@ -54,17 +49,6 @@ defineLPMod <-
     if (is.null(colnames(A))) {
       colnames(A) <- paste("param", seq_len(ncol(A)))
     }
-    lp_model <- make.lp(nrow(A) + nrow(C), nbparam)
-    set.bounds(lp_model, lower = lower, upper = upper)
-    for (p in 1:nbparam) {
-      set.column(lp_model, p, c(A[, p], C[, p]))
-    }
-    set.rhs(lp_model, c(b, v))
-    set.constr.type(lp_model, c(rep("<=", nrow(A)), rep("=", nrow(C))))
-    dimnames(lp_model) <- list(c(rownames(A), rownames(C)), colnames(A))
-
-    lp.control(lp_model, sense = sense)
-    set.objfn(lp_model, ob)
 
 
     dir <- c(rep("<=", nrow(A)),rep("==", nrow(C)))
@@ -78,17 +62,23 @@ defineLPMod <-
 
     if (all(lower == 0) & all(upper == Inf)){
       OP <- OP(constraints = L_constraint(lfs,dir,rhs),
-                 maximum = maximum,
-                 objective = L_objective(ob))
+               maximum = maximum,
+               objective = L_objective(ob))
     } else {
       OP <- OP(bounds = bounds,
-                 constraints = L_constraint(lfs,dir,rhs),
-                 maximum = maximum,
-                 objective = L_objective(ob))
+               constraints = L_constraint(lfs,dir,rhs),
+               maximum = maximum,
+               objective = L_objective(ob))
     }
-    write.lp(lp_model,
-              paste0(tempdir(), "/lp_mod.lp"),
-              "lp",
-              c(FALSE,FALSE))
+    OP$lp_model <- defineLPSolveMod(A,
+                                    b,
+                                    C = C,
+                                    v = v,
+                                    lower = lower,
+                                    upper = upper,
+                                    maximum = maximum,
+                                    ob = ob)
     return (OP)
   }
+
+
