@@ -12,13 +12,18 @@ getParamMinMax <- function(OP, p) {
   ntry <- 0
 
     while (ntry < 3) {
-      res <- ROI_solve(OP,
-                       solver = "lpsolve",
-                       control = list(
-                         scaling = c("extreme",
-                                     "equilibrate",
-                                     "integers")))
-      if (res$status$code != 0)
+      if (requireNamespace("ROI.plugin.clp", quietly = TRUE)){
+        res <- ROI_solve(OP, solver = "clp", control = list(amount = 0))
+      } else {
+        res <- ROI_solve(OP,
+                         solver = "lpsolve",
+                         control = list(
+                           scaling = c("extreme",
+                                       "equilibrate",
+                                       "integers")))
+      }
+      if (res$status$code != 0 &
+          requireNamespace("ROI.plugin.clp", quietly = TRUE))
         res <- ROI_solve(OP, solver = "glpk",
                          control=list(tm_limit = 1000))
 

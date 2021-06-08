@@ -76,14 +76,18 @@ sampleCaN <- function(myCaNmod,
       lp_model <- defineLPMod(myCaNmod$A, myCaNmod$b, myCaNmod$C, myCaNmod$v,
                               maximum = FALSE,
                               ob = runif(ncol(myCaNmod$A)))
-      res <- ROI_solve(lp_model, solver = "lpsolve",
-                       control = list(presolve = c("rows",
-                                                    "lindep",
-                                                    "rowdominate",
-                                                    "mergerows"),
-                                      scaling = c("extreme",
-                                                  "equilibrate",
-                                                  "integers")))
+      if (requireNamespace("ROI.plugin.clp", quietly = TRUE)){
+        res <- ROI_solve(lp_model, solver = "clp", control = list(amount = 0))
+      } else {
+        res <- ROI_solve(lp_model, solver = "lpsolve",
+                         control = list(presolve = c("rows",
+                                                     "lindep",
+                                                     "rowdominate",
+                                                     "mergerows"),
+                                        scaling = c("extreme",
+                                                    "equilibrate",
+                                                    "integers")))
+      }
       x0 <- res$solution
 
       if (res$status$code == 0)
