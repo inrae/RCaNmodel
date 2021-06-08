@@ -43,17 +43,24 @@ checkPolytopeStatus <- function(x) {
 
   nbparam <- ncol(A)
   lp_model <- defineLPMod(A, b, C, v, maximum = FALSE)
-  res <- ROI_solve(lp_model, solver = "lpsolve",
-                   control = list(presolve = c("rows",
-                                                "lindep",
-                                                "rowdominate",
-                                                "mergerows"),
-                                  scaling = c("extreme",
-                                              "equilibrate",
-                                              "integers")))
+  if (requireNamespace("ROI.plugin.clp", quietly = TRUE)){
+    res <- ROI_solve(lp_model, solver = "clp", control = list(amount = 0))
+  } else {
+    res <- ROI_solve(lp_model, solver = "lpsolve",
+                     control = list(presolve = c("rows",
+                                                 "lindep",
+                                                 "rowdominate",
+                                                 "mergerows"),
+                                    scaling = c("extreme",
+                                                "equilibrate",
+                                                "integers")))
+  }
   if (res$status$msg$code == 0) {
     lp_model <- defineLPMod(A, b, C, v, maximum = TRUE)
-    res <- ROI_solve(lp_model, solver = "lpsolve",
+    if (requireNamespace("ROI.plugin.clp", quietly = TRUE)){
+      res <- ROI_solve(lp_model, solver = "clp", control = list(amount = 0))
+    } else {
+      res <- ROI_solve(lp_model, solver = "lpsolve",
                      control = list(presolve = c("rows",
                                                   "lindep",
                                                   "rowdominate",
@@ -61,6 +68,7 @@ checkPolytopeStatus <- function(x) {
                                     scaling = c("extreme",
                                                 "equilibrate",
                                                 "integers")))
+    }
   }
   if (res$status$msg$code == 0) {
     print("polytope ok")
