@@ -21,7 +21,7 @@ ROI_solve <-
     if (solver != "lpsolve"){
       res <- ROI::ROI_solve(x, solver, control)
     } else {
-      lp_model <- lpSolveAPI::read.lp(paste0(tempdir(), "/lp_mod.lp"))
+      lp_model <- x$lp_model
       dims <- dim.lpExtPtr(lp_model)
       lp.control(lp_model, control)
       conv <- solve.lpExtPtr(lp_model)

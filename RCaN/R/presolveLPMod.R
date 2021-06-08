@@ -99,40 +99,25 @@ presolveLPMod <-
     }
 
 
+
+    A2 <- lhs[dir == "<=", ]
+    b2 <- rhs[dir == "<="]
+    C2 <- lhs[dir == "=", ]
+    v2 <- rhs[dir == "="]
     if (nrow(lhs) > 0){
-      A2 <- lhs[dir == "<=", ]
-      b2 <- rhs[dir == "<="]
-      C2 <- lhs[dir == "=", ]
-      v2 <- rhs[dir == "="]
       OP <- defineLPMod(A2, b2, C2, v2, bounds$lower, bounds$upper,
                         maximum = maximum, ob = rep(1, ncol(lhs)))
-      lp_model <- read.lp(paste0(tempdir(), "/lp_mod.lp"))
-      res <- list(lhs = lhs,
-           dir = dir,
-           rhs = rhs,
-           lower = lower,
-           upper = upper,
-           fixed = fixed,
-           lp_model = lp_model,
-           OP = OP)
     } else {
-    #   A2 <- matrix(0, 0, 0) #model totally solved by presolve
-    #   OP <- defineLPMod(A2, numeric(),
-    #                     lower = bounds$lower, upper = bounds$upper,
-    #                     maximum = maximum, ob = rep(1,  ncol(lhs)))
-      res <- list(lhs =lhs,
-                  dir = dir,
-                  rhs = rhs,
-                  lower = lower,
-                  upper = upper,
-                  fixed = fixed,
-                  lp_model = NULL,
-                  OP = NULL)
+      OP <- NULL
     }
-
-
-    lp_model <- read.lp(paste0(tempdir(), "/lp_mod.lp"))
-
+    res <- list(A = A2,
+                b = b2,
+                C = C2,
+                v = v2,
+                lower = lower,
+                upper = upper,
+                fixed = fixed,
+                OP = OP)
     return (res)
   }
 

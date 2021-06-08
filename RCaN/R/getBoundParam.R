@@ -43,20 +43,27 @@ getBoundParam <- function(x, p) {
 
   res <- sapply(c("min", "max"), function(s){
     if (s == "min"){
+      maximum <- FALSE
       presolved <- presolvedmin
     } else {
+      maximum <- TRUE
       presolved <- presolvedmax
     }
-    if (colnames(A)[p] %in% colnames(presolved$lhs)){
-      ip <- match(colnames(A)[p], colnames(presolved$lhs))
-      ob <- rep(0, ncol(presolved$lhs))
+    if (!colnames(A)[p] %in% names(presolved$fixed)){
+      ip <- match(colnames(A)[p], colnames(presolved$A))
+      ob <- rep(0, ncol(presolved$A))
       ob[ip] <- 1
       ROI::objective(presolved$OP) <- L_objective(ob)
-      set.objfn(presolved$lp_model, ob)
-      write.lp(presolved$lp_model,
-                           paste0(tempdir(), "/lp_mod.lp"),
-                           "lp",
-                           c(FALSE, FALSE))
+      presolved$OP$lp_model <- defineLPSolveMod(presolved$A,
+                                                presolved$b,
+                                                presolved$C,
+                                                presolved$v,
+                                                presolved$lower,
+                                                presolved$upper,
+                                                maximum,
+                                                ob)
+      set.objfn(presolved$OP$lp_model, ob)
+
       getParamMinMax(presolved$OP, ip)
     } else {
       presolved$fixed[colnames(A)[p]]
