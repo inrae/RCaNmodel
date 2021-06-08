@@ -3,7 +3,7 @@
 \name{defineLPMod}
 \alias{defineLPMod}
 \title{defineLPMod
-Specify an lp_model (mainly for internal use) and writes an lp model file}
+Specify a ROI (mainly for internal use)}
 \usage{
 defineLPMod(
   A,
@@ -40,5 +40,5 @@ returns an OP object
 }
 \description{
 defineLPMod
-Specify an lp_model (mainly for internal use) and writes an lp model file
+Specify a ROI (mainly for internal use)
 }
