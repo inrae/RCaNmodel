@@ -25,7 +25,7 @@
 #' @importFrom lpSolveAPI get.constr.type
 #' @importFrom lpSolveAPI set.objfn
 #' @importFrom lpSolveAPI get.primal.solution
-#' @importFrom lpSolveAPI write.lp
+#' @importFrom lpSolveAPI read.lp
 #' @importFrom ROI OP
 #' @importFrom ROI L_constraint
 #' @importFrom ROI V_bound
@@ -98,29 +98,41 @@ presolveLPMod <-
       names(fixed) <- colnames(A)[! colnames(A) %in% colnames(lhs)]
     }
 
-    bounds <- V_bound(ui = seq_len(ncol(lhs)),
-                      li = seq_len(ncol(lhs)),
-                      ub = bounds$upper,
-                      lb = bounds$lower,
-                      ud = Inf, ld = 0, nobj = ncol(lhs))
 
-    if (all(lower == 0) & all(upper == Inf)){
-      OP <- OP(constraints = L_constraint(lhs,dir,rhs),
-               maximum = maximum,
-               objective = L_objective(rep(1, ncol(lhs))))
+    if (nrow(lhs) > 0){
+      A2 <- lhs[dir == "<=", ]
+      b2 <- rhs[dir == "<="]
+      C2 <- lhs[dir == "=", ]
+      v2 <- rhs[dir == "="]
+      OP <- defineLPMod(A2, b2, C2, v2, bounds$lower, bounds$upper,
+                        maximum = maximum, ob = rep(1, ncol(lhs)))
+      lp_model <- read.lp(paste0(tempdir(), "/lp_mod.lp"))
+      res <- list(lhs = lhs,
+           dir = dir,
+           rhs = rhs,
+           lower = lower,
+           upper = upper,
+           fixed = fixed,
+           lp_model = lp_model,
+           OP = OP)
     } else {
-      OP <- OP(bounds = bounds,
-               constraints = L_constraint(lhs,dir,rhs),
-               maximum = maximum,
-               objective = L_objective(rep(1, ncol(lhs))))
+    #   A2 <- matrix(0, 0, 0) #model totally solved by presolve
+    #   OP <- defineLPMod(A2, numeric(),
+    #                     lower = bounds$lower, upper = bounds$upper,
+    #                     maximum = maximum, ob = rep(1,  ncol(lhs)))
+      res <- list(lhs =lhs,
+                  dir = dir,
+                  rhs = rhs,
+                  lower = lower,
+                  upper = upper,
+                  fixed = fixed,
+                  lp_model = NULL,
+                  OP = NULL)
     }
-    return (list(lhs = lhs,
-                 dir = dir,
-                 rhs = rhs,
-                 lower = lower,
-                 upper = upper,
-                 fixed = fixed,
-                 lp_model = lp_model,
-                 OP = OP))
+
+
+    lp_model <- read.lp(paste0(tempdir(), "/lp_mod.lp"))
+
+    return (res)
   }
 

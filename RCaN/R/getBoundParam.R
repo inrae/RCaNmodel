@@ -51,7 +51,7 @@ getBoundParam <- function(x, p) {
       ip <- match(colnames(A)[p], colnames(presolved$lhs))
       ob <- rep(0, ncol(presolved$lhs))
       ob[ip] <- 1
-      ROI::objective(presolved$OP) <- L_objective(rep(1, ncol(presolved$lhs)))
+      ROI::objective(presolved$OP) <- L_objective(ob)
       set.objfn(presolved$lp_model, ob)
       write.lp(presolved$lp_model,
                            paste0(tempdir(), "/lp_mod.lp"),
