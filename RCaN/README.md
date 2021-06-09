@@ -9,7 +9,7 @@ All RCaN dependencies are available on cran so there is no specific requirements
 Once these packages are installed, the process is easy using the library devools. On a R console:
 
     > require(devtools)
-    > devtools::install_git("https://gitlab.irstea.fr/hilaire.drouineau/can.git", subdir="RCaN")
+    > devtools::install_github("https://github.com/inrae/RCaN.git", subdir="RCaN")
     
    
     
