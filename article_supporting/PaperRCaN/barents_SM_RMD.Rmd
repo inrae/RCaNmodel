@@ -50,7 +50,7 @@ The network is illustrated in  figure \@ref(fig:network-figure).
 knitr::include_graphics("ReseauTrophiquePNG.png")
 ```
 
-The RCaN-file, constructed wit RCaNconstructor, is attached to this supplementary information. The R-Markdown file, used to generate this supplementary material, is also attached. 
+The RCaN-file, constructed with RCaNconstructor and the R-Markdown file, used to generate this supplementary material can be found on [github](https://github.com/inrae/RCaN/blob/master/article_supporting/PaperRCaN). 
 
 We first provide information for the installation of RCaN and RCaNconstructor. 
 We then provide a short description of the content of the Barents Sea RCaN-file.
