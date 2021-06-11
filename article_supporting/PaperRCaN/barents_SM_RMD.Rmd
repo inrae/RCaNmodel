@@ -4,6 +4,8 @@ title: 'Supplementary Information I : An application of CaN modelling to the Bar
 author: "Drouineau, Planque, Mullon"
 date: "5/2/2021"
 output: 
+  bookdown::pdf_document2:
+      fig_caption: TRUE
   bookdown::html_document2:
       fig_caption: TRUE
 fig_width: 8
@@ -17,6 +19,7 @@ require(DT)
 require(dplyr)
 require(coda)
 require(ggplot2)
+library(kableExtra)
 
 hook_output <- knit_hooks$get("output")
 knit_hooks$set(output = function(x, options) {
@@ -50,7 +53,7 @@ The network is illustrated in  figure \@ref(fig:network-figure).
 knitr::include_graphics("ReseauTrophiquePNG.png")
 ```
 
-The RCaN-file, constructed with RCaNconstructor and the R-Markdown file, used to generate this supplementary material can be found on [github](https://github.com/inrae/RCaN/blob/master/article_supporting/PaperRCaN). 
+The RCaN-file, constructed with RCaNconstructor and the R-Markdown file, used to generate this supplementary material can be found on [github](https://github.com/inrae/RCaN/blob/master/article_supporting/PaperRCaN). In that folder, an hmtl version of this document is also available, pn which tables are more complete and interactive tables.
 
 We first provide information for the installation of RCaN and RCaNconstructor. 
 We then provide a short description of the content of the Barents Sea RCaN-file.
@@ -108,7 +111,8 @@ Components correspond to the tropho-species in the systems (figure \@ref(fig:net
 The above information is stored in the dataframe 'components_param' in the CaNmod object:
 
 ```{r label=components, echo=TRUE}
-datatable(CaNmod$components_param[c(1:8)], caption='Components')
+kable(CaNmod$components_param[c(1:8)], caption='Components') %>%
+  kable_styling(latex_options = c("striped", "scale_down"))
 ```
 In the Barents Sea example, the food-web has `r nrow(CaNmod$components_param)` components, `r sum(CaNmod$components_param$Inside)` of which are within the model domain.
 
@@ -118,7 +122,8 @@ In the Barents Sea example, the food-web has `r nrow(CaNmod$components_param)` c
 Fluxes correspond to the transfer of biomass between food-web components (i.e., arrows in  figure \@ref(fig:network-figure)). They are specified in the "Fluxes" worksheet of the RCaN-file, identified by a name (column Flux), a source component (column From) and a sink component (column To) and a flag that indicates whether the flux is trophic or not (column Trophic). Non-trophic fluxes are typically import/export to/from the model domain and fisheries. The fluxes information is stored in the dataframe 'flux_def' in the CaNmod object. 
 
 ```{r label=fluxes, echo=TRUE}
-datatable(CaNmod$fluxes_def, caption='Fluxes')
+kable(CaNmod$fluxes_def, caption='Fluxes') %>%
+  kable_styling(latex_options = c("striped", "scale_down"))
 ```
 In the Barents Sea example, the food-web includes `r nrow(CaNmod$fluxes_def)` fluxes, `r sum(CaNmod$fluxes_def$Trophic)` of which corresponding to trophic fluxes.
 
@@ -127,7 +132,8 @@ In the Barents Sea example, the food-web includes `r nrow(CaNmod$fluxes_def)` fl
 Observational time-series in the Barents Sea are derived from monitoring programs, mainly for plankton and fish species. In this example, the original data compiled by the ICES Working Group on the Integrated Ecosystem Assessment for the Barents Sea (@WGIBAR2020) have been altered to comply with data access restrictions (not all data is publicly available). They are stored in the "Input time-series" sheet in the RCaN-file. Each row indicate a time-step (year) and each column correspond to a particular data-series. The first row is a header with the name of each date-series. The observational data-series information is stored in the dataframe 'series' in the CaNmod object:
 
 ```{r label=observations, echo=TRUE}
-datatable(CaNmod$series,caption="Observations")
+kable(CaNmod$series,caption="Observations")%>%
+  kable_styling(latex_options = c("striped", "scale_down"))
 ```
 In the Barents Sea example, there are `r ncol(CaNmod$series)` time series of observations with a maximum length of `r nrow(CaNmod$series)` years.
 
@@ -137,7 +143,8 @@ Explicit constraints that relate food-web components, fluxes and observations ca
 
 
 ```{r label=constraints, echo=TRUE}
-datatable(CaNmod$constraints[,1:5],caption='Constraints defined by user')
+kable(CaNmod$constraints[,1:5],caption='Constraints defined by user') %>%
+  kable_styling(latex_options = c("striped", "scale_down"))
 ```
 
 In the Barents Sea example, the model includes `r nrow(CaNmod$constraints)` constraints, `r sum(CaNmod$constraints$Active)` of them are active.
@@ -202,7 +209,9 @@ Constraints can be activated/deactivate in the RCaN-file, using the 'active' swi
 
 ```{r label=rmpp, echo=TRUE, output.lines=1:10}
 CaNmod <- toggleConstraint(CaNmod,
-                        c("C01","C02","C03","C04","C05","C06","C07","C08","C09","C10","C11","C12","C15","C16","C19","C21"))
+                        c("C01","C02","C03","C04","C05","C06",
+                          "C07","C08","C09","C10","C11","C12",
+                          "C15","C16","C19","C21"))
 ```
 In this example, we removed constraints C01 to C12 and C15, C16, C19 and C21, which bound the input (primary production), the output of the system (fisheries) and the maximum biomass of top predators (birds and marine mammals).
 
@@ -214,7 +223,9 @@ We therefore reactivate the constraint with the 'toggleConstraint' command.
 
 ```{r label=reactpp, echo=TRUE, output.lines=1:10}
 CaNmod <- toggleConstraint(CaNmod,
-                        c("C01","C02","C03","C04","C05","C06","C07","C08","C09","C10","C11","C12","C15","C16","C19","C21"))
+                        c("C01","C02","C03","C04","C05","C06",
+                          "C07","C08","C09","C10","C11","C12",
+                          "C15","C16","C19","C21"))
 ```
 
 ### Finding incompatible constraints
@@ -232,6 +243,7 @@ checkPolytopeStatus(CaNmod)
 The RCaN function 'findingIncompatibleConstr' is then useful to identify which constraints are incompatible:
 
 ```{r inconstistent, output.lines=1:10}
+options(width = 60)
 incomp <- findingIncompatibleConstr(CaNmod)
 ```
 
@@ -313,11 +325,13 @@ Check the mixing of the Monte Carlo Marko chain algorithm that is used to build 
 
 ```{r label=nchain}
 summ <- summary(samples$mcmc)
-
-datatable( cbind.data.frame(summ$statistics, summ$quantiles) %>%
+n = 31
+kable( head(cbind.data.frame(summ$statistics, summ$quantiles) %>%
              select('Mean', 'SD', '2.5%', '50%', '97.5%'),
-           options = list(pageLength = 31)) %>%
-  formatRound(attr(.$x,"colnames"))
+        n=n),
+  caption=paste("summary of", n, "parameter distributions"),
+          digits=0) %>%
+  kable_styling(latex_options = c("striped", "scale_down"))
 ```
 
 ### Gelman diagnostic 
@@ -431,7 +445,8 @@ ggSatiatInertia(samples, CaNmod$species)
 The function *ggPairsBiomass* is used to explore the relationships between the biomass of different food-web components/species. The plot shows the individual component density function in the diagonal, the scatterplots of one species against the other in the lower triangle and the Kendall correlation coefficient in the upper triangle. An example is illustrated below for three model components and over the entire sampling period. The function parameter *frac* indicates the fraction of the samples which will be plotted. This is useful for large sample size which can lead to overloaded figures. 
 
 ```{r label=plotPairs, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
-ggPairsBiomass(samples,c("Benthos","PelF","DemF"),logscale=FALSE, frac = .25) + #we only 25% of the point since the function is long
+ggPairsBiomass(samples,c("Benthos","PelF","DemF"),
+               logscale=FALSE, frac = .25) + #we only 25% of the point 
   scale_y_continuous(n.breaks=3)+ scale_x_continuous(breaks=c(1990,2010))
 ```
 
