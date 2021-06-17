@@ -77,7 +77,7 @@ findingIncompatibleConstr <- function(x) {
                           ob = c(rep(1, nbparam), rep(1000, nbineq + 2 * nbeq)),
                           maximum = FALSE)
   res <- ROI_solve(lp_model, solver = "lpsolve",
-                   control = list(presolve <- c("rows",
+                   control = list(presolve = c("rows",
                                                 "lindep",
                                                 "rowdominate",
                                                 "mergerows")))
