@@ -23,7 +23,9 @@ ROI_solve <-
     } else {
       lp_model <- x$lp_model
       dims <- dim.lpExtPtr(lp_model)
-      lp.control(lp_model, control)
+      valide_names <- names(lp.control(lp_model))
+      do.call(lp.control,
+              c(lp_model, control[names(control) %in% valide_names]))
       conv <- solve.lpExtPtr(lp_model)
       x0 <-
         get.primal.solution(lp_model,
