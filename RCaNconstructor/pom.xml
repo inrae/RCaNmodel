@@ -37,7 +37,7 @@
         <maven.compiler.target>17</maven.compiler.target>
 
         <!-- Used to set both the path to find the JavaFX modules and also the versions for Maven dependencies -->
-        <javafx.version>17.0.2</javafx.version>
+        <javafx.version>16</javafx.version>
         
         <!-- Replace this UUID with a custom one for your project. This ID is used by the Windows installer system
         to know that an installer is intended to replace/upgrade an earlier version. The easiest thing to do is
