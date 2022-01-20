@@ -2,7 +2,7 @@ package fr.cm.parameters;
 
 public enum Units {
 
-    MT("MT", "Million tons") , TT("TT","Thousands tons"), T("T","Tons"),TSQ("TSQ","Tons/Square meter"),NU("NU","No unit");
+    MT("MT", "Millions tons") , TT("TT","Thousands tons"), T("T","Tons"),TSQ("TSQ","Tons/Square meter"),NU("NU","No unit");
 
     private String code;
     private String text;

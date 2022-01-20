@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.cm</groupId>
-    <artifactId>Ocean</artifactId>
+    <artifactId>RCaNconstructor</artifactId>
     <version>1.0</version>
 
     <!-- This description text is included in the Windows installer by default, see win-jpackage.txt -->
@@ -12,7 +12,7 @@
 
     <properties>
         <!-- Set this to the class with the main method for your application -->
-        <main-class>fr.cm.menus.Start</main-class>
+        <main-class>fr.cm.RCaNMain.Start</main-class>
         <!-- Change your app's name to something interesting... but you might want to avoid spaces
         just to safe for compatibility across operating systems. -->
         <app.name>RCaNconstructor</app.name>
@@ -28,16 +28,17 @@
         <!-- Reminder: javafx.web (the embedded browser component) is not included in this project by default due
         to GitHub template size restrictions. You can download the full SDK from https://openjfx.io -->
         <jvm.modules>javafx.media,javafx.controls,javafx.fxml,java.logging</jvm.modules>
-
+        
+        
         <!-- Set the project to UTF-8, avoiding warnings in the build logs -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <maven.compiler.source>16</maven.compiler.source>
-        <maven.compiler.target>16</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
 
         <!-- Used to set both the path to find the JavaFX modules and also the versions for Maven dependencies -->
-        <javafx.version>16</javafx.version>
-
+        <javafx.version>17.0.2</javafx.version>
+        
         <!-- Replace this UUID with a custom one for your project. This ID is used by the Windows installer system
         to know that an installer is intended to replace/upgrade an earlier version. The easiest thing to do is
         grab a unique UUID via https://www.uuidgenerator.net -->
@@ -60,6 +61,9 @@
             <version>2.4</version>
         </dependency>
         <!-- Javafx -->
+        <!-- This downloads the platform specific JavaFX libraries used by the project. -->
+        <!-- For the final installable, the JavaFX dependencies are provided via modules, but by including these here
+         they work nicely with with IDEs and other Maven plugins (e.g. the javafx:run). -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
@@ -88,7 +92,7 @@
         <dependency>
             <groupId>com.github.jbytecode</groupId>
             <artifactId>RCaller</artifactId>
-            <version>3.0.2</version>
+            <version>4.0.2</version>
             <classifier>jar-with-dependencies</classifier>
         </dependency>
          <dependency>
@@ -100,6 +104,15 @@
     </dependencies>
 
     <build>
+        <extensions>
+            <!-- Used to inject the OS and architecture values in a consistent manner -->
+            <!-- https://github.com/trustin/os-maven-plugin -->
+            <extension>
+                <groupId>kr.motd.maven</groupId>
+                <artifactId>os-maven-plugin</artifactId>
+                <version>1.7.0</version>
+            </extension>
+        </extensions>
         <resources>
             <resource>
                 <!-- Here we are processing the platform-specific jpackage command files, adding in Maven
@@ -156,7 +169,7 @@
                 <!-- Plugin to make working with JavaFX nicer. See https://github.com/openjfx/javafx-maven-plugin -->
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
-                <version>0.0.5</version>
+                <version>0.0.8</version>
                 <configuration>
                     <mainClass>${main-class}</mainClass>
                 </configuration>
@@ -195,6 +208,7 @@
                     are found the /src/packaging directory. These files are copied into the target directory by
                     the Maven resources plugin, which does the filtering to replace the original values with
                     the actual Maven properties.
+
                     https://github.com/wiverson/jtoolprovider-plugin/blob/main/java-tool-doc.md
                     -->
                     <execution>
@@ -205,11 +219,22 @@
                         </goals>
                         <configuration>
                             <toolName>jpackage</toolName>
+                            <writeOutputToLog>true</writeOutputToLog>
+                            <writeErrorsToLog>true</writeErrorsToLog>
+                            <failOnError>true</failOnError>
                             <removeDirectories>${project.build.directory}/installer-work</removeDirectories>
                             <args>@${project.build.directory}/packaging/${platform}-jpackage.txt</args>
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
             </plugin>
         </plugins>
         <pluginManagement>
@@ -227,7 +252,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.1.2</version>
+                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -242,7 +267,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.1.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -357,3 +382,4 @@
         </profile>
     </profiles>
 </project>
+

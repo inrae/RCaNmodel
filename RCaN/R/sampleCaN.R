@@ -21,7 +21,6 @@
 #'  package = "RCaN"))
 #' res <- sampleCaN(myCaNmod, 100)
 #'
-#' @importFrom ROI ROI_solve
 #' @importFrom parallel detectCores
 #' @importFrom parallel makeCluster
 #' @importFrom parallel clusterEvalQ
@@ -37,12 +36,12 @@
 #' @importFrom foreach %do%
 #' @importFrom stats runif
 sampleCaN <- function(myCaNmod,
-                        N,
-                        nchain = 1,
-                        ncore = 1,
-                        thin = 1,
-                        method="gibbs",
-                        lastF = FALSE) {
+                      N,
+                      nchain = 1,
+                      ncore = 1,
+                      thin = 1,
+                      method="gibbs",
+                      lastF = FALSE) {
   if (! method %in% c("gibbs","hitandrun"))
     stop("method should be either gibbs or hitandrun")
   ncore <- min(min(detectCores() - 1, ncore), nchain)
@@ -78,13 +77,17 @@ sampleCaN <- function(myCaNmod,
                               maximum = FALSE,
                               ob = runif(ncol(myCaNmod$A)))
       res <- ROI_solve(lp_model, solver = "lpsolve",
-                       control = list(presolve <- c("rows",
-                                                    "lindep",
-                                                    "rowdominate",
-                                                    "mergerows"),
+                       control = list(presolve = c("rows",
+                                                   "lindep",
+                                                   "rowdominate",
+                                                   "mergerows"),
                                       scaling = c("extreme",
                                                   "equilibrate",
                                                   "integers")))
+      if (requireNamespace("ROI.plugin.clp", quietly = TRUE)
+          & res$status$code == 5){
+        res <- ROI_solve(lp_model, solver = "clp", control = list(amount = 0))
+      }
       x0 <- res$solution
 
       if (res$status$code == 0)
@@ -113,15 +116,15 @@ sampleCaN <- function(myCaNmod,
     colnames(res$F) <- colnames(myCaNmod$A)[-seq_len(length(myCaNmod$species))]
 
     if (!lastF) {#we removed last time step
-        lastid <- which(colnames(res$F) %in% paste(myCaNmod$fluxes_def$Flux,
-                                                   "[",
-                                                   max(myCaNmod$series$Year),
-                                                   "]",
-                                                   sep = ""))
-        if (length(lastid) > 0)
-          res$F <- res$F[, - lastid]
+      lastid <- which(colnames(res$F) %in% paste(myCaNmod$fluxes_def$Flux,
+                                                 "[",
+                                                 max(myCaNmod$series$Year),
+                                                 "]",
+                                                 sep = ""))
+      if (length(lastid) > 0)
+        res$F <- res$F[, - lastid]
     }
-      colnames(res$B) <- rownames(myCaNmod$L)
+    colnames(res$B) <- rownames(myCaNmod$L)
     mcmc(cbind(res$F, res$B), 1, nrow(res$F), 1)
   }
 
@@ -130,7 +133,7 @@ sampleCaN <- function(myCaNmod,
     stopImplicitCluster()
   }
   sampleCaNmod <- list(CaNmod = myCaNmod,
-                    mcmc = mcmc.list(res))
+                       mcmc = mcmc.list(res))
   class(sampleCaNmod) <- "sampleCaNmod"
   return(sampleCaNmod)
 

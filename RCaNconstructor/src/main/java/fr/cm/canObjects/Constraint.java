@@ -15,31 +15,18 @@ public class Constraint {
     final SimpleStringProperty comment = new SimpleStringProperty();
     boolean active;
 
-    public Constraint(String name, String formula, String years, boolean act, String comment) {
+    public Constraint(String name, String formula, String years,
+                      boolean act, String comment) {
         this.years.set(years);
         this.name.set(name);
-        this.formula.set(formula);
+        this.formula.set(formula.replace(" ",""));
         this.comment.set(comment);
         active = act;
     }
-
-    /*
-    public void update (String name, String formula, String years, boolean act, String comment) {
-        this.years.set(years);
-        this.name.set(name);
-        this.formula.set(formula);
-        this.comment.set(comment);
-        active = act;
-    }
-    */
 
     public String getName(){ return(name.get()); }
 
     public String getFormula() { return (formula.get()); }
-
-    public SimpleStringProperty commentProperty() {
-        return comment;
-    }
 
     public boolean involve(Flux flux) { return (getFormula().contains(flux.getName())); }
 
@@ -57,5 +44,4 @@ public class Constraint {
 
     public void setName(String name) { this.name.set(name);}
 
-    // public void setFormula(String formula) { this.formula.set(formula); }
 }

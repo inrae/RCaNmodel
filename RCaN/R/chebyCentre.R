@@ -13,8 +13,6 @@
 #'
 #' @return a vector corresponding to the centroid of the polytope
 #'
-#' @importFrom ROI ROI_solve
-#' @import ROI.plugin.lpsolve
 #' @examples
 #' n <- 20
 #' A1 <- -diag(n)
@@ -45,11 +43,16 @@ chebyCentre <- function(A, b) {
                         b,
                         maximum = FALSE,
                         ob = f)
-  res <- ROI_solve(lp_mod, solver="lpsolve",
-                   control = list(presolve <- c("rows",
-                                                "lindep",
-                                                "rowdominate",
-                                                "mergerows")))
+  res <- ROI_solve(lp_mod, solver = "lpsolve",
+                   control = list(presolve = c("rows",
+                                               "lindep",
+                                               "rowdominate",
+                                               "mergerows")))
+  if (res$status$msg$code != 0 &
+      requireNamespace("ROI.plugin.clp", quietly = TRUE)){
+    res <- ROI_solve(lp_mod, solver = "clp", control = list(amount = 0))
+  }
+
   x <- res$solution
 
   return(x[-p - 1])
