@@ -5,7 +5,6 @@
 #' a vector b (A.x<=b) and optionnally a matrix C and a vector v (C.x=v)
 #' @return print a message to tell if the polygon is ok or not
 #'
-#' @importFrom ROI ROI_solve
 #' @examples
 #' n <- 20
 #' A1 <- -diag(n)
@@ -45,23 +44,34 @@ checkPolytopeStatus <- function(x) {
   nbparam <- ncol(A)
   lp_model <- defineLPMod(A, b, C, v, maximum = FALSE)
   res <- ROI_solve(lp_model, solver = "lpsolve",
-                   control = list(presolve <- c("rows",
-                                                "lindep",
-                                                "rowdominate",
-                                                "mergerows"),
+                   control = list(presolve = c("rows",
+                                               "lindep",
+                                               "rowdominate",
+                                               "mergerows"),
                                   scaling = c("extreme",
                                               "equilibrate",
                                               "integers")))
+  if (res$status$msg$code == 5 &
+      requireNamespace("ROI.plugin.clp", quietly = TRUE)){
+    res2 <- ROI_solve(lp_model, solver = "clp", control = list(amount = 0))
+    if (res2$status$msg$code ==0) res <- res2
+  }
   if (res$status$msg$code == 0) {
     lp_model <- defineLPMod(A, b, C, v, maximum = TRUE)
     res <- ROI_solve(lp_model, solver = "lpsolve",
-                     control = list(presolve <- c("rows",
-                                                  "lindep",
-                                                  "rowdominate",
-                                                  "mergerows"),
+                     control = list(presolve = c("rows",
+                                                 "lindep",
+                                                 "rowdominate",
+                                                 "mergerows"),
                                     scaling = c("extreme",
                                                 "equilibrate",
                                                 "integers")))
+    if (res$status$msg$code == 5 &
+        requireNamespace("ROI.plugin.clp", quietly = TRUE)){
+      res2 <- ROI_solve(lp_model, solver = "clp", control = list(amount = 0))
+      if (res2$status$msg$code ==0) res <- res2
+    }
+
   }
   if (res$status$msg$code == 0) {
     print("polytope ok")

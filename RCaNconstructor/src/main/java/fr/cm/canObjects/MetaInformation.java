@@ -22,6 +22,7 @@ public class MetaInformation {
 
     static List<MetaElement> elements;
 
+    // --------------------------------------------
     public static void init() {
         elements = new ArrayList<>();
         String fileName = "project/Project.txt";

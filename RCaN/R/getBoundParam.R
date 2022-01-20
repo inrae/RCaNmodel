@@ -5,8 +5,10 @@
 #' a vector b (A.x<=b) and optionally a matrix C and a vector v (C.x=v)
 #' @param p the index of the parameter for which the bounds should be computed
 #'
-#' @importFrom ROI ROI_solve
 #'
+#' @importFrom ROI L_objective
+#' @importFrom ROI objective
+#' @importFrom lpSolveAPI write.lp
 #' @return a vector with lower bounds and upper bounds
 #' @examples
 #' n <- 20
@@ -27,27 +29,46 @@ getBoundParam <- function(x, p) {
   C <- x$C
   v <- x$v
 
+
+  nbparam <- ncol(A)
   if (is.null(colnames(A))) {
     colnames(A) <- paste("col", seq_len(ncol(A)), sep = "")
   }
-
   if (is.null(colnames(C)) & !is.null(C))
     colnames(C) <- colnames(A)
 
-  nbparam <- ncol(A)
-  if (is.null(C)) {
-    C <- matrix(0, 0, nbparam)
-    v <- numeric(0)
-  }
+  presolvedmin <- presolveLPMod(A, b, C, v, sense = "min")
+  presolvedmax <- presolveLPMod(A, b, C, v, sense = "max")
 
 
+  res <- sapply(c("min", "max"), function(s){
+    if (s == "min"){
+      maximum <- FALSE
+      presolved <- presolvedmin
+    } else {
+      maximum <- TRUE
+      presolved <- presolvedmax
+    }
+    if (!colnames(A)[p] %in% names(presolved$fixed)){
+      ip <- match(colnames(A)[p], colnames(presolved$A))
+      ob <- rep(0, ncol(presolved$A))
+      ob[ip] <- 1
+      ROI::objective(presolved$OP) <- L_objective(ob)
+      presolved$OP$lp_model <- defineLPSolveMod(presolved$A,
+                                                presolved$b,
+                                                presolved$C,
+                                                presolved$v,
+                                                presolved$lower,
+                                                presolved$upper,
+                                                maximum,
+                                                ob)
+      set.objfn(presolved$OP$lp_model, ob)
 
-  presolvedmin<- presolveLPMod(A, b, C, v, sense = "min")
-  presolvedmax<- presolveLPMod(A, b, C, v, sense = "max")
-  x <- list(A = A, b = b, C = C, v = v)
+      getParamMinMax(presolved$OP, ip)
+    } else {
+      presolved$fixed[colnames(A)[p]]
+    }
+  })
 
-
-  res <- c(getParamMinMax(x, p, presolvedmin, FALSE),
-           getParamMinMax(x, p, presolvedmax, TRUE))
   return (res)
 }

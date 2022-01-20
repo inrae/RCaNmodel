@@ -1,5 +1,5 @@
 #' defineLPMod
-#' Specify an lp_model (mainly for internal use)
+#' Specify a ROI (mainly for internal use)
 #'
 #' @param A a matrix of inequality constraints A x <=b
 #' @param b a vector A x <=b
@@ -18,7 +18,7 @@
 #' @importFrom ROI L_constraint
 #' @importFrom ROI V_bound
 #' @importFrom ROI L_objective
-#'
+
 
 
 defineLPMod <-
@@ -28,8 +28,9 @@ defineLPMod <-
            v = NULL,
            lower = NULL,
            upper = NULL,
-           maximum=TRUE,
+           maximum = TRUE,
            ob = NULL) {
+    sense <- ifelse(maximum, "max", "min")
     nbparam <- ncol(A)
     if (is.null(lower)) lower <- rep(0, ncol(A))
     if (is.null(upper)) upper <- rep(Inf, ncol(A))
@@ -38,24 +39,46 @@ defineLPMod <-
       C <- matrix(0, 0, nbparam)
       v <- numeric(0)
     }
+
+    if (is.null(rownames(A)) & nrow(A) > 0) {
+      rownames(A) <- paste("ineq", seq_len(nrow(A)))
+    }
+    if (is.null(rownames(C)) & nrow(C) > 0) {
+      rownames(C) <- paste("eq", seq_len(nrow(C)))
+    }
+    if (is.null(colnames(A))) {
+      colnames(A) <- paste("param", seq_len(ncol(A)))
+    }
+
+
     dir <- c(rep("<=", nrow(A)),rep("==", nrow(C)))
     rhs <- c(b,v)
     lfs <- as.matrix(rbind(A,C))
     bounds <- V_bound(ui = seq_len(nbparam),
                       li = seq_len(nbparam),
-                      ub=upper,
-                      lb=lower,
+                      ub = upper,
+                      lb = lower,
                       ud = Inf, ld = 0, nobj = nbparam)
+
     if (all(lower == 0) & all(upper == Inf)){
-      return (OP(constraints = L_constraint(lfs,dir,rhs),
-                 maximum = maximum,
-                 objective = L_objective(ob)))
+      OP <- OP(constraints = L_constraint(lfs,dir,rhs),
+               maximum = maximum,
+               objective = L_objective(ob))
     } else {
-      return (OP(bounds = bounds,
-                 constraints = L_constraint(lfs,dir,rhs),
-                 maximum = maximum,
-                 objective = L_objective(ob)))
+      OP <- OP(bounds = bounds,
+               constraints = L_constraint(lfs,dir,rhs),
+               maximum = maximum,
+               objective = L_objective(ob))
     }
-
-
+    OP$lp_model <- defineLPSolveMod(A,
+                                    b,
+                                    C = C,
+                                    v = v,
+                                    lower = lower,
+                                    upper = upper,
+                                    maximum = maximum,
+                                    ob = ob)
+    return (OP)
   }
+
+

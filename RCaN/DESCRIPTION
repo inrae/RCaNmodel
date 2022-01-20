@@ -25,13 +25,10 @@ Imports:
     dqrng,
     writexl,
     ROI.plugin.lpsolve,
-    ROI.plugin.glpk,
     lpSolveAPI,
     magrittr,
     rlang,
     tidyselect,
-    igraph,
-    ggraph,
     GGally,
     ggplot2
 LinkingTo: Rcpp, RcppEigen, dqrng
@@ -39,7 +36,11 @@ Suggests:
     gridExtra,
     knitr,
     rmarkdown,
-    MASS
+    ROI.plugin.glpk,
+    ROI.plugin.clp,
+    MASS,
+    ggraph,
+    igraph
 VignetteBuilder: knitr
 RoxygenNote: 7.1.1
 Encoding: UTF-8
