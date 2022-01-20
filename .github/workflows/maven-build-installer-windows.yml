@@ -43,4 +43,4 @@ jobs:
         automatic_release_tag: "Windows-latest"
         prerelease: true
         title: "Windows Development Build"
-        files: ./target/*.msi
+        files: ./RCaNconstructor/target/*.msi
