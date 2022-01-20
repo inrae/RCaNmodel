@@ -8,39 +8,59 @@ import java.util.List;
 
 public class Formula {
 
+    List<String> tokens = new ArrayList<>();
+
+    // --------------------------------------------
     public static List<String> nombres = new ArrayList<>(Arrays.asList(
             ".", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",":"
     ));
-    public static List<String> OperatorsArithmetiques = new ArrayList<>(Arrays.asList(
+    // --------------------------------------------
+    public static List<String> operatorsArithmetiques = new ArrayList<>(Arrays.asList(
             "+", "-", "*", "/"
     ));
 
+    // --------------------------------------------
     public static List<String> operatorsUnaires =  new ArrayList<>(Arrays.asList(
             "sum", "mean"
     ));
 
+    // --------------------------------------------
     public static List<String> operatorsComparaison = new ArrayList<>(Arrays.asList(
             "<=", ">=","="
     ));
 
+    // --------------------------------------------
     public static List<String> symbolsAndOperators = new ArrayList<>(Arrays.asList(
             "(", ")","[", "]", "+", "-", "*", "/", "<=", ">=","=","sum", "mean"));
 
+    // --------------------------------------------
     public static List<String> symbolsAndOperatorsD = new ArrayList<>(Arrays.asList(
             "(", ")", "[", "]", "+", "-", "*", "/", "&", "#","=","!", "?"));
 
-    List<String> tokens = new ArrayList<>();
+    // --------------------------------------------
     List<String> operatorsBinaires = new ArrayList<>();
     boolean previousTokenIsNumeric;
     int pos;
 
+    // --------------------------------------------
     public Formula() {
-        operatorsBinaires.addAll(OperatorsArithmetiques);
+        operatorsBinaires.addAll(operatorsArithmetiques);
         operatorsBinaires.addAll(operatorsComparaison);
         previousTokenIsNumeric = false;
         pos = -1;
     }
 
+    // --------------------------------------------
+    public Formula(Constraint constraint) {
+        String formulaString = constraint.getFormula();
+        operatorsBinaires.addAll(operatorsArithmetiques);
+        operatorsBinaires.addAll(operatorsComparaison);
+        fromStringToTokens(formulaString);
+        previousTokenIsNumeric = false;
+        pos = tokens.size()-1;
+    }
+
+    // --------------------------------------------
     String codeOp(String st){
         return(st.replace("<=","&")
                 .replace(">=","#")
@@ -49,6 +69,7 @@ public class Formula {
         );
     }
 
+    // --------------------------------------------
     String decodeOp(String st){
         return(st.replace("&","<=")
                 .replace("#",">=")
@@ -57,16 +78,8 @@ public class Formula {
         );
     }
 
-    public Formula(Constraint constraint) {
-        String formulaString = constraint.getFormula();
-        operatorsBinaires.addAll(OperatorsArithmetiques);
-        operatorsBinaires.addAll(operatorsComparaison);
-        fromStringToTokens(formulaString);
-        previousTokenIsNumeric = false;
-        pos = tokens.size()-1;
-    }
-    
-    public String getFormula() {
+    // --------------------------------------------
+    public String fromTokensToString() {
         StringBuilder sb = new StringBuilder();
         for (String token : tokens) {
             sb.append(token).append(" ");
@@ -74,9 +87,8 @@ public class Formula {
         return (sb.toString());
     }
 
-
+    // --------------------------------------------
     public void append(String token) {
-
         if (nombres.contains(token) && previousTokenIsNumeric) {
             String newToken = tokens.get(pos) + token;
             tokens.set(pos, newToken);
@@ -91,28 +103,22 @@ public class Formula {
             tokens.add(pos, token);
             previousTokenIsNumeric = false;
         }
-
     }
 
+    // --------------------------------------------
     public void removeAt(int p) {
         tokens.remove(p);
         pos = Math.max(0, p - 1);
     }
 
-    public int getPos() { return pos; }
-
-    public void setPos(int pos) { this.pos = Math.min(pos, tokens.size() - 1); }
-
-    public int getNbTokens() { return (tokens.size()); }
-
-    public String getToken(int t) { return (tokens.get(t)); }
-
+    // --------------------------------------------
     public void clear() {
         previousTokenIsNumeric = false;
         tokens.clear();
         pos = -1;
     }
 
+    // --------------------------------------------
     public void fromStringToTokens(String formulaString){
         boolean nameEnCours = false;
         boolean valueEnCours = false;
@@ -124,7 +130,6 @@ public class Formula {
         String value = "";
         while (it.current() != CharacterIterator.DONE) {
             Character ct = it.current();
-
             String t = String.valueOf(ct);
             if(symbolsAndOperatorsD.contains(t)) {
                 if (nameEnCours) {
@@ -171,18 +176,9 @@ public class Formula {
         }
     }
 
-    void printTokens(List<String> tokens) {
-        if (false) {
-            for (String token : tokens) {
-                System.out.print("  " + token);
-            }
-            System.out.println("  ");
-        }
-    }
     // ----------------------------------------------------------------------------------
     public String check() {
         // il ne doit y avoir qu un seul operateur de comparaison
-        printTokens(tokens);
         int nq = 0;
         for (String token : tokens) {
             if (operatorsComparaison.contains(token)) {
@@ -204,7 +200,6 @@ public class Formula {
                 newTokens.add(s);
             }
         }
-        printTokens(newTokens);
         // on vérifie la validité de la formule par élimination successive des bloc corrects
         // un bloc correct est obtenu a partir des transformations
         // ok [ok] -> ok
@@ -232,7 +227,6 @@ public class Formula {
                     }
                 }
             }
-            printTokens(newTokens);
             tokensOld = newTokens;
             // ok [ ok ] -> ok
             newTokens = new ArrayList<>();
@@ -251,7 +245,6 @@ public class Formula {
                     }
                 }
             }
-            printTokens(newTokens);
             tokensOld = newTokens;
             // operateur unaire  ok  -> ok
             newTokens = new ArrayList<>();
@@ -270,7 +263,6 @@ public class Formula {
                     }
                 }
             }
-            printTokens(newTokens);
             tokensOld = newTokens;
             // ok operateurBinaire ok  -> ok
             newTokens = new ArrayList<>();
@@ -286,8 +278,7 @@ public class Formula {
                     }
                 }
             }
-            printTokens(newTokens);
-            tokensOld = newTokens;
+             tokensOld = newTokens;
             // - ok  -> ok (- en première position)
             newTokens = new ArrayList<>();
             for (int t = 0; t < tokensOld.size(); t++) {
@@ -297,8 +288,7 @@ public class Formula {
                     newTokens.add(tokensOld.get(t));
                 }
             }
-            printTokens(newTokens);
-            tokensOld = newTokens;
+             tokensOld = newTokens;
 
             int nf = tokensOld.size();
             changes = !(nf == nd);
@@ -308,6 +298,14 @@ public class Formula {
         }
         return ("Ok");
     }
+    // ----------------------------------------------------------------------------------
+    public int getPos() { return pos; }
+
+    public void setPos(int pos) { this.pos = Math.min(pos, tokens.size() - 1); }
+
+    public int getNbTokens() { return (tokens.size()); }
+
+    public String getToken(int t) { return (tokens.get(t)); }
     // ----------------------------------------------------------------------------------
 
 }

@@ -5,8 +5,8 @@
  */
 package fr.cm.canObjects;
 
-import fr.cm.menus.Context;
-import fr.cm.parameters.Colors;
+import fr.cm.RCaNMain.Context;
+import fr.cm.parameters.ColorsAndFormats;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
@@ -15,6 +15,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
+import javafx.scene.Group;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -27,8 +28,8 @@ import javafx.scene.shape.PathElement;
  *
  * @author christianmullon
  */
-public class Flux extends javafx.scene.Group {
-
+public class Flux extends Group {
+    // Group : javafx class pour les objets graphiques
     final Component in;
     final Component out;
     Color col;
@@ -38,12 +39,14 @@ public class Flux extends javafx.scene.Group {
     boolean typeTrophic;
 
 
+    // --------------------------------------------
     public Flux(String i, String o, boolean t) {
-        in = ListsManager.whichComponent(i);
-        out = ListsManager.whichComponent(o);
+        in = ProjectListsManager.whichComponent(i);
+        out = ProjectListsManager.whichComponent(o);
         typeTrophic = t;
     }
 
+    // --------------------------------------------
     public Flux(Component i, Component o, boolean t) {
         this.in = i;
         this.out = o;
@@ -60,44 +63,40 @@ public class Flux extends javafx.scene.Group {
             getChildren().add(circle);
         } else {
             path = new Path();
-
             MoveTo start = new MoveTo();
             start.xProperty().bind(in.getCircle().centerXProperty());
             start.yProperty().bind(in.getCircle().centerYProperty());
-
             LineTo end = new LineTo();
             end.xProperty().bind(out.getCircle().centerXProperty());
             end.yProperty().bind(out.getCircle().centerYProperty());
-
             path.getElements().add(start);
             path.getElements().add(end);
-
             arrow = getArrow();
-
             getChildren().add(path);
             getChildren().add(arrow);
-
             setOnMouseClicked(mouseDoubleClickeOnLineEventHandler);
         }
         setCursor(Cursor.CROSSHAIR);
         fillColor();
     }
 
+    // --------------------------------------------
     public boolean isTypeTrophic() {
          return typeTrophic;
     }
 
+    // --------------------------------------------
     public void setTypeTrophic(boolean type) {
         typeTrophic = type;
         fillColor();
     }
 
-
+    // --------------------------------------------
     private void fillColor() {
         if (typeTrophic) {
-            col = Colors.linkTrophic;
+            col = ColorsAndFormats.linkTrophic;
         } else {
-            col = Colors.linkNonTrophic;
+            col = ColorsAndFormats.linkNonTrophic;
         }
         if (in == out) {
             circle.setStroke(col);
@@ -112,6 +111,7 @@ public class Flux extends javafx.scene.Group {
         }
     }
 
+    // --------------------------------------------
     public String getName() { return (in.getName()+"_"+out.getName()); }
 
     public String getInName() { return (in.getName()); }
@@ -126,6 +126,7 @@ public class Flux extends javafx.scene.Group {
 
     public static final IntegerProperty ARROW_LENGTH = new SimpleIntegerProperty(20);
 
+    // --------------------------------------------
     private Path getArrow() {
         ObservableList<PathElement> list = this.path.getElements();
         // extremite
@@ -171,28 +172,24 @@ public class Flux extends javafx.scene.Group {
         return temp;
     }
 
+    // --------------------------------------------
     private static class ArcTanBinding extends DoubleBinding {
-
         private final DoubleProperty x, y;
-
         public ArcTanBinding(DoubleProperty x, DoubleProperty y) {
             this.x = x;
             this.y = y;
             super.bind(this.x);
             super.bind(this.y);
         }
-
         @Override
         protected double computeValue() {
-
             return Math.atan2(this.x.get(), this.y.get());
         }
     }
 
+    // --------------------------------------------
     private static class SinBinding extends DoubleBinding {
-
         private final DoubleBinding theta;
-
         public SinBinding(DoubleBinding theta) {
             this.theta = theta;
             super.bind(this.theta);
@@ -200,24 +197,20 @@ public class Flux extends javafx.scene.Group {
 
         @Override
         protected double computeValue() {
-
             return Math.sin(this.theta.get());
         }
     }
-
+    // --------------------------------------------
     private static class CosBinding extends DoubleBinding {
-
         private final DoubleBinding theta;
-
         public CosBinding(DoubleBinding theta) {
             this.theta = theta;
             super.bind(this.theta);
         }
-
         @Override
         protected double computeValue() {
-
             return Math.cos(this.theta.get());
         }
     }
+    // --------------------------------------------
 }

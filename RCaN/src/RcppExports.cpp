@@ -9,6 +9,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // cpgs
 Eigen::MatrixXd cpgs(const int N, const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const Eigen::VectorXd& x0, const int thin, const bool gibbs, const int seed, const int stream);
 static SEXP _RCaN_cpgs_try(SEXP NSEXP, SEXP ASEXP, SEXP bSEXP, SEXP x0SEXP, SEXP thinSEXP, SEXP gibbsSEXP, SEXP seedSEXP, SEXP streamSEXP) {

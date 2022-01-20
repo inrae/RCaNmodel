@@ -33,7 +33,7 @@ absence of such constraints}
 \item{sense}{min or max (maximisation of minimation)}
 }
 \value{
-a vector corresponding to the centroid of the polytope
+a list with various elements about the presolved lp model
 }
 \description{
 presolveLPMod

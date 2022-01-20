@@ -53,12 +53,14 @@ The network is illustrated in  figure \@ref(fig:network-figure).
 knitr::include_graphics("ReseauTrophiquePNG.png")
 ```
 
-The RCaN-file, constructed with RCaNconstructor and the R-Markdown file, used to generate this supplementary material can be found on [github](https://github.com/inrae/RCaN/blob/master/article_supporting/PaperRCaN). In that folder, an hmtl version of this document is also available, pn which tables are more complete and interactive tables.
+
+The RCaN-file, constructed wit RCaNconstructor, is attached to this supplementary information. The R-Markdown file, used to generate this supplementary material, is also attached. 
 
 We first provide information for the installation of RCaN and RCaNconstructor. 
 We then provide a short description of the content of the Barents Sea RCaN-file.
 Finally, we go through the main steps of the modelling which follow the RCaN file construction: (a) build the polytope, (b) check the polytope status, (c) revise the model by adding and removing constraints, (d) sample the polytope, (d) analyze the samples. 
 
+# Installing RCaN and RCaNconstructor
 
 # Installing RCaN and RCaNconstructor
 
@@ -209,9 +211,7 @@ Constraints can be activated/deactivate in the RCaN-file, using the 'active' swi
 
 ```{r label=rmpp, echo=TRUE, output.lines=1:10}
 CaNmod <- toggleConstraint(CaNmod,
-                        c("C01","C02","C03","C04","C05","C06",
-                          "C07","C08","C09","C10","C11","C12",
-                          "C15","C16","C19","C21"))
+                        c("C01","C02","C03","C04","C05","C06","C07","C08","C09","C10","C11","C12","C15","C16","C19","C21"))
 ```
 In this example, we removed constraints C01 to C12 and C15, C16, C19 and C21, which bound the input (primary production), the output of the system (fisheries) and the maximum biomass of top predators (birds and marine mammals).
 
@@ -360,9 +360,6 @@ acfplot(samples$mcmc[,fluxZ2], ylim=c(-0.1,0.8), main=fluxZ2)
 ```
 
 # Visualisation of the model results
-
-## Temporal dynamics of componentns and fluxes
-
 The graphical representation of the possible dynamics of the food-web is a important output of the model. The RCaN function *ggSeries* produces standardised plots of the time-series of components and/or fluxes. By default, for each component, 3 randomly picked samples/trajectories are plotted (plain, dashed and dotted lines) together with the envelopes containing 100\%, 95\% and 50\% of the sampled trajectories. 
 
 For components, we get:
@@ -445,8 +442,7 @@ ggSatiatInertia(samples, CaNmod$species)
 The function *ggPairsBiomass* is used to explore the relationships between the biomass of different food-web components/species. The plot shows the individual component density function in the diagonal, the scatterplots of one species against the other in the lower triangle and the Kendall correlation coefficient in the upper triangle. An example is illustrated below for three model components and over the entire sampling period. The function parameter *frac* indicates the fraction of the samples which will be plotted. This is useful for large sample size which can lead to overloaded figures. 
 
 ```{r label=plotPairs, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
-ggPairsBiomass(samples,c("Benthos","PelF","DemF"),
-               logscale=FALSE, frac = .25) + #we only 25% of the point 
+ggPairsBiomass(samples,c("Benthos","PelF","DemF"),logscale=FALSE, frac = .25) + #we only 25% of the point since the function is long
   scale_y_continuous(n.breaks=3)+ scale_x_continuous(breaks=c(1990,2010))
 ```
 
