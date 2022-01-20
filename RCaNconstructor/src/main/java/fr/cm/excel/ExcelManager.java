@@ -1,11 +1,11 @@
 package fr.cm.excel;
 
 import fr.cm.canObjects.*;
-import fr.cm.dialogs.HelpDialog;
+import fr.cm.GUIdialogs.HelpDialog;
 import fr.cm.parameters.Strings;
 import org.apache.poi.ss.usermodel.*;
 
-import fr.cm.menus.Context;
+import fr.cm.RCaNMain.Context;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,9 +35,9 @@ public class ExcelManager {
             FileOutputStream outputStream = new FileOutputStream(fileName);
             workbook.write(outputStream);
         } catch (FileNotFoundException ex) {
-            HelpDialog.warning("File not found","Warning");
+            HelpDialog.warning("File not found","Warning", ex);
         } catch (IOException ex) {
-            HelpDialog.warning("IO problem","Warning");
+            HelpDialog.warning("IO problem","Warning", ex);
         }
     }
 
@@ -54,9 +54,9 @@ public class ExcelManager {
             getExcelObservations(workbook);
             getExcelFileWithObservation(workbook);
         } catch (FileNotFoundException ex) {
-            HelpDialog.warning("File not found","Warning");
+            HelpDialog.warning("File not found","Warning", ex);
         } catch (IOException ex) {
-            HelpDialog.warning("IO problem","Warning");
+            HelpDialog.warning("IO problem","Warning", ex);
         }
     }
 
@@ -92,6 +92,7 @@ public class ExcelManager {
         }
     }
 
+    // -------------------------------------------------------------------------
     public static void getExcelProject(Workbook workbook) {
         MetaInformation metaInformation = new MetaInformation();
         Sheet sheet = workbook.getSheet("INFO");
@@ -134,7 +135,7 @@ public class ExcelManager {
         cell = row.createCell(np + 3);
         cell.setCellValue("Y");
 
-        for (Component component : ListsManager.getListOfComponents()) {
+        for (Component component : ProjectListsManager.getListOfComponents()) {
             row = sheet.createRow(liP);
             liP++;
             cell = row.createCell(0);
@@ -155,6 +156,7 @@ public class ExcelManager {
         }
     }
 
+    // -------------------------------------------------------------------------
     private static void getExcelComponents(Workbook workbook) {
         int np = Strings.getNumberOfParameters();
         double[] parameters = new double[np];
@@ -201,7 +203,7 @@ public class ExcelManager {
                 y = 0.2 + 0.4 * Math.random();
             }
             Component component = new Component(nameComponent, parameters, typeComponent, x, y);
-            ListsManager.addComponent(component);
+            ProjectListsManager.addComponent(component);
         }
     }
 
@@ -222,7 +224,7 @@ public class ExcelManager {
         cell.setCellValue("To");
         cell = row.createCell(3);
         cell.setCellValue("Trophic");
-        for (Flux flux : ListsManager.getListOfFluxes()) {
+        for (Flux flux : ProjectListsManager.getListOfFluxes()) {
             row = sheet.createRow(liL);
             liL++;
             cell = row.createCell(0);
@@ -236,6 +238,7 @@ public class ExcelManager {
         }
     }
 
+    // -------------------------------------------------------------------------
     private static void getExcelLinks(Workbook workbook) {
         Sheet sheet = workbook.getSheet("Fluxes");
         Row row;
@@ -253,14 +256,14 @@ public class ExcelManager {
             cell = row.getCell(3);
             boolean stype = getBoolean(cell);
             Flux newFlux = new Flux(in, out, stype);
-            ListsManager.addLink(newFlux);
+            ProjectListsManager.addLink(newFlux);
         }
     }
 
     // ---------------------------------------------------------------------
     private static void saveExcelObservations(Workbook workbook) {
-        int first = Context.getMinYear();
-        int last = Context.getMaxYear();
+        int first = Context.getFirstYear();
+        int last = Context.getLastYear();
         int ny = last - first + 1;
 
         Sheet sheet;
@@ -272,7 +275,7 @@ public class ExcelManager {
         cell = row.createCell(0);
         cell.setCellValue("Year");
         o = 0;
-        for (Observation observation : ListsManager.getListOfObservations()) {
+        for (Observation observation : ProjectListsManager.getListOfObservations()) {
             o++;
             cell = row.createCell(o);
             cell.setCellValue(observation.getObsName());
@@ -283,7 +286,7 @@ public class ExcelManager {
             row = sheet.createRow(y + 1);
             cell = row.createCell(0);
             cell.setCellValue(y + first);
-            for (Observation observation : ListsManager.getListOfObservations()) {
+            for (Observation observation : ProjectListsManager.getListOfObservations()) {
                 o++;
                 double val = observation.getValues()[y];
                 if (val >= 0.0) {
@@ -292,6 +295,38 @@ public class ExcelManager {
                 }
             }
         }
+    }
+
+    static int getIntFromCell(Cell cell){
+        CellType cellType = cell.getCellType();
+        try {
+            if (cellType == CellType.NUMERIC) {
+                int stringCellValue = (int) cell.getNumericCellValue();
+                return stringCellValue;
+            } else if (cellType == CellType.STRING) {
+                int stringCellValue = Integer.parseInt(cell.getStringCellValue());
+                return stringCellValue;
+            }
+        } catch(Exception ex){
+            return(-1);
+        }
+        return(-1);
+    }
+
+    static double getDoubleFromCell(Cell cell){
+        try {
+            CellType cellType = cell.getCellType();
+            if (cellType == CellType.NUMERIC) {
+                double stringCellValue = cell.getNumericCellValue();
+                return stringCellValue;
+            } else if (cellType == CellType.STRING) {
+                double stringCellValue = Double.parseDouble(cell.getStringCellValue());
+                return stringCellValue;
+            }
+        } catch(Exception ex){
+            return(-1.0);
+        }
+        return(-1.0);
     }
 
     // -------------------------------------------------------------------------
@@ -319,14 +354,13 @@ public class ExcelManager {
             row = iteratorRow.next();
             cell = row.getCell(0);
             if(cell != null) {
-                String scell = cell.toString();
-                int val = (int) Double.parseDouble(scell);
+                int val = getIntFromCell(cell);
                 first = Math.min(first, val);
                 last = Math.max(last, val);
             }
         }
-        Context.setMaxYear(last);
-        Context.setMinYear(first);
+        Context.setLastYear(last);
+        Context.setFirstYear(first);
         int nbo = idObs.size();
         if(nbo>0) {
             int nby = last - first + 1;
@@ -335,26 +369,18 @@ public class ExcelManager {
                 row = sheet.getRow(y + 1);
                 for (int o = 0; o < nbo; o++) {
                     cell = row.getCell(o + 1);
-                    double val = -1.0;
-                    if (!(cell == null)) {
-                        String scell = cell.toString();
-                        if (!(scell == null)) {
-                            if (scell.length() > 0) {
-                                val = Double.parseDouble(scell);
-                            }
-                        }
-                    }
+                    double val = getDoubleFromCell(cell);
                     values[o][y] = val;
                 }
             }
             for (int o = 0; o < nbo; o++) {
                 Observation observation = new Observation(idObs.get(o), values[o]);
-                ListsManager.addObservation(observation);
+                ProjectListsManager.addObservation(observation);
             }
         }
     }
-    // ---------------------------------------------------------------------
 
+    // ---------------------------------------------------------------------
     private static void saveExcelConstraints(Workbook workbook) {
         Sheet sheet;
         Row row;
@@ -373,8 +399,8 @@ public class ExcelManager {
         cell = row.createCell(4);
         cell.setCellValue("Comment");
         lig++;
-        for (int c = 0; c < ListsManager.getListOfConstraints().size(); c++) {
-            Constraint constraint = ListsManager.getListOfConstraints().get(c);
+        for (int c = 0; c < ProjectListsManager.getListOfConstraints().size(); c++) {
+            Constraint constraint = ProjectListsManager.getListOfConstraints().get(c);
             row = sheet.createRow(lig);
             cell = row.createCell(0);
             cell.setCellValue(constraint.getName());
@@ -390,6 +416,7 @@ public class ExcelManager {
         }
     }
 
+    // -------------------------------------------------------------------------
     private static void getExcelConstraints(Workbook workbook) {
         Sheet sheet = workbook.getSheet("Constraints");
         Row row;
@@ -419,13 +446,14 @@ public class ExcelManager {
                     comment = cell.getStringCellValue();
                 }
                 Constraint constraint = new Constraint(name, formula, years, active, comment);
-                ListsManager.addConstraint(constraint);
+                ProjectListsManager.addConstraint(constraint);
             } catch (Exception e) {
                 // le champ active n'existe pas encore
             }
         }
     }
 
+    // -------------------------------------------------------------------------
     private static void saveExcelFileWithObservation(Workbook workbook) {
         Sheet sheet;
         Row row;
@@ -440,39 +468,33 @@ public class ExcelManager {
         cell = row.createCell(2);
         cell.setCellValue("Meta information");
         cell = row.createCell(3);
-        cell.setCellValue("First year");
+        cell.setCellValue("Owner");
         cell = row.createCell(4);
-        cell.setCellValue("Last year");
+        cell.setCellValue("First year");
         cell = row.createCell(5);
-        cell.setCellValue("First selected year");
+        cell.setCellValue("Last year");
         cell = row.createCell(6);
-        cell.setCellValue("Last selected yeay");
-        cell = row.createCell(7);
         cell.setCellValue("Selected columns");
         lig++;
-        for (int c = 0; c < ListsManager.getListOfExternalDataFiles().size(); c++) {
-            ExternalDataFile externalDataFile = ListsManager.getListOfExternalDataFiles().get(c);
+        for (int c = 0; c < ProjectListsManager.getListOfDataFiles().size(); c++) {
+            DataFile dataFile = ProjectListsManager.getListOfDataFiles().get(c);
             row = sheet.createRow(lig);
             cell = row.createCell(0);
-            cell.setCellValue(externalDataFile.getFileName());
+            cell.setCellValue(dataFile.getShortName());
             cell = row.createCell(1);
-            cell.setCellValue(externalDataFile.getFullFileName());
+            cell.setCellValue(dataFile.getFullFileName());
             cell = row.createCell(2);
-            cell.setCellValue(externalDataFile.getMetaInformationAboutDataFile());
+            cell.setCellValue(dataFile.getMetaInformationAboutDataFile());
             cell = row.createCell(3);
-            cell.setCellValue(externalDataFile.getFirstYear());
+            cell.setCellValue(dataFile.getOwner());
             cell = row.createCell(4);
-            cell.setCellValue(externalDataFile.getLastYear());
-            cell = row.createCell(5);
-            cell.setCellValue(externalDataFile.getfYear());
-            cell = row.createCell(6);
-            cell.setCellValue(externalDataFile.getlYear());
-            cell = row.createCell(7);
-            cell.setCellValue(externalDataFile.codeAddedObservations());
+            cell.setCellValue(dataFile.codeAddedObservations());
             lig++;
         }
     }
 
+
+    // -------------------------------------------------------------------------
     private static void getExcelFileWithObservation(Workbook workbook) {
         try {
             Sheet sheet = workbook.getSheet("FileWithObservation");
@@ -483,30 +505,32 @@ public class ExcelManager {
             while (iterator.hasNext()) {
                 row = iterator.next();
                 cell = row.getCell(0);
-                String fileName = cell.getStringCellValue();
+                String shortName = cell.getStringCellValue();
                 cell = row.getCell(1);
                 String fullFileName = cell.getStringCellValue();
                 cell = row.getCell(2);
                 String metaInformation = cell.getStringCellValue();
                 cell = row.getCell(3);
-                int firstYear = (int)cell.getNumericCellValue();
+                String owner = cell.getStringCellValue();
                 cell = row.getCell(4);
-                int lastYear = (int)cell.getNumericCellValue();
-                cell = row.getCell(5);
-                int fYear = (int)cell.getNumericCellValue();
-                cell = row.getCell(6);
-                int lYear = (int)cell.getNumericCellValue();
-                cell = row.getCell(7);
                 String listOfObservations = cell.getStringCellValue();
-                ExternalDataFile externalDataFile = new ExternalDataFile(fullFileName, metaInformation, listOfObservations,
-                        firstYear, lastYear, fYear, lYear);
-                ListsManager.addFileWithObservation(externalDataFile);
+                DataFile dataFile = new DataFile(
+                        shortName,
+                        fullFileName,
+                        metaInformation,
+                        owner,
+                        listOfObservations);
+                if(dataFile.isStillExisting()){
+                    ProjectListsManager.addDataFile(dataFile);
+                }
             }
         } catch (Exception e) {
-            // SomeDialogs.myAlert("File problem");
+            System.out.println("Probleme pour lire la liste des fichiers avec observations");
+            e.printStackTrace();
         }
     }
 
+    // -------------------------------------------------------------------------
     static boolean getBoolean(Cell cell){
         CellType type = cell.getCellType();
         boolean active = false;
@@ -525,6 +549,7 @@ public class ExcelManager {
         return(active);
     }
 
+    // -------------------------------------------------------------------------
     static int transformBoolean(boolean active){
         if(active) return(1);
         return(0);
