@@ -5,7 +5,7 @@
  */
 package fr.cm.canObjects;
 
-import fr.cm.menus.Context;
+import fr.cm.RCaNMain.Context;
 
 /**
  * @author christianmullon
@@ -14,74 +14,39 @@ public class Observation {
 
     private double[] values;
     String obsName;
-    String originalFile;
+    DataFile dataFile;
     String originalColumn;
     String unit;
+    int firstYear, lastYear;
 
-    public Observation(String obsName, double[] tValues) {
-        this.obsName = obsName;
-        this.values = tValues;
-        originalFile = "-";
-        originalColumn = "-";
-        unit = "MT";
-      }
-
-    public Observation(String obsName, double [] nValues, boolean y){
+    // --------------------------------------------
+    public Observation(String obsName, double [] nValues){
         this.obsName = obsName;
         int nv = nValues.length;
         values = new double[nv];
-        originalFile = "-";
+        dataFile = null;
         originalColumn = "-";
         unit = "MT";
         System.arraycopy(nValues,0,values,0,nv);
      }
 
-    public static Observation codeFromExternalFile(String codeObservation){
-        String[] codes = codeObservation.split(",");
-        if(codes.length>1){
-            String nObsName = codes[0];
-            Observation observation = ListsManager.getObservationByName(nObsName);
-            observation.setOriginalFile(codes[1]);
-            observation.setOriginalColumn(codes[2]);
-            observation.setUnit(codes[3]);
-            return(observation);
-        } else {
-            return(null);
-        }
-     }
-
-    public String codeInExternalFile(){
-         StringBuilder sb = new StringBuilder("");
-         Observation observation = ListsManager.getObservationByName(obsName);
-         if(observation == null) return(sb.toString());
-         else {
-             sb.append(obsName);
-             sb.append(",");
-             sb.append(originalFile);
-             sb.append(",");
-             sb.append(originalColumn);
-             sb.append(",");
-             sb.append(unit);
-         }
-         return(sb.toString());
-     }
-
-    public Observation(String fileName, String colName, double[] tValues, int ofirst, int olast) {
-        this.originalFile = fileName;
+    // --------------------------------------------
+    public Observation(DataFile dataFile, String colName, double[] tValues, int ofirst, int olast) {
+        this.dataFile = dataFile;
         this.originalColumn = colName;
         this.unit = "MT";
-        this.obsName = originalFile + "." + colName;
+        this.obsName = colName;
         int afirst = ofirst;
         int alast = olast;
-        if (ListsManager.getListOfObservations().size() > 0) {
-            afirst = Context.getMinYear();
-            alast = Context.getMaxYear();
+        if (ProjectListsManager.getListOfObservations().size() > 0) {
+            afirst = Context.getFirstYear();
+            alast = Context.getLastYear();
         }
         int first = Math.min(ofirst, afirst);
         int last = Math.max(olast, alast);
         int ny = last - first + 1;
-        Context.setMinYear(first);
-        Context.setMaxYear(last);
+        Context.setFirstYear(first);
+        Context.setLastYear(last);
         if (first == ofirst && last == olast) {
             this.setValues(tValues);
         } else {
@@ -94,11 +59,11 @@ public class Observation {
             }
             this.setValues(newValues);
         }
-        if(! ListsManager.containsObservation(obsName)) {
+        if(! ProjectListsManager.containsObservation(obsName)) {
             if ((first != afirst) || (last != alast)) {
                 double[] newValues = new double[ny];
-                for (int o = 0; o < ListsManager.getListOfObservations().size(); o++) {
-                    Observation observation = ListsManager.getListOfObservations().get(o);
+                for (int o = 0; o < ProjectListsManager.getListOfObservations().size(); o++) {
+                    Observation observation = ProjectListsManager.getListOfObservations().get(o);
                     double[] oldValues = observation.getValues();
                     for (int y = first; y <= last; y++) {
                         newValues[y - first] = -1;
@@ -107,20 +72,86 @@ public class Observation {
                         }
                     }
                     observation.setValues(newValues);
+                    observation.setFirstYear(first);
+                    observation.setLastYear(last);
                 }
             }
         }
     }
 
-    public void setOriginalFile(String originalFile) { this.originalFile = originalFile; }
+    // --------------------------------------------
+    public static Observation codeFromDataFile(String codeObservation){
+        String[] codes = codeObservation.split(",");
+        if(codes.length>1) {
+            String nObsName = codes[0];
+            Observation observation = ProjectListsManager.getObservationByName(nObsName);
+            observation.setOriginalFile(ProjectListsManager.getDataFileByName(codes[1]));
+            observation.setOriginalColumn(codes[2]);
+            observation.setUnit(codes[3]);
+            if (codes.length > 5) {
+                try {
+                    observation.setFirstYear(Integer.getInteger(codes[4]));
+                    observation.setLastYear(Integer.getInteger(codes[5]));
+                }
+                catch(Exception ex){
+                    observation.setFirstYear(Context.getFirstYear());
+                    observation.setLastYear(Context.getLastYear());
+                }
+            } else {
+            observation.setFirstYear(Context.getFirstYear());
+            observation.setLastYear(Context.getLastYear());
+            }
+            return(observation);
+        } else {
+            return(null);
+        }
+    }
+
+    // --------------------------------------------
+    public String codeInDataFile(){
+        StringBuilder sb = new StringBuilder("");
+        Observation observation = ProjectListsManager.getObservationByName(obsName);
+        if(observation == null) return(sb.toString());
+        else {
+            sb.append(obsName);
+            sb.append(",");
+
+            sb.append(dataFile.getShortName());
+            sb.append(",");
+            sb.append(originalColumn);
+            sb.append(",");
+            sb.append(unit);
+            sb.append(",");
+            sb.append(String.valueOf(firstYear));
+            sb.append(",");
+            sb.append(String.valueOf(lastYear));
+        }
+        return(sb.toString());
+    }
+
+    // --------------------------------------------
+    public DataFile getDataFile() {
+        return dataFile;
+    }
+
+    public String getDataFileName() {
+        if(dataFile == null) {
+            return ("?");
+        }
+        return dataFile.getShortName();
+    }
+
+    public String getOriginalColumn() {
+        return originalColumn;
+    }
+
+    public void setOriginalFile(DataFile dataFile) { this.dataFile = dataFile; }
 
     public String getObsName() { return obsName; }
 
     public void setObsName(String obsName) { this.obsName = obsName; }
 
     public void setOriginalColumn(String originalColumn) { this.originalColumn = originalColumn; }
-
-    public String getUnit() { return unit; }
 
     public void setUnit(String unit) { this.unit = unit; }
 
@@ -134,12 +165,48 @@ public class Observation {
         System.arraycopy(newValues, 0, values, 0, nv);
     }
 
+    public void redimValues(int fY, int lY) {
+        int nFy = Math.max(firstYear, fY);
+        int nLy = Math.min(lastYear, lY);
+        int nv = nLy - nFy + 1;
+        double[] nValues = new double[nv];
+        System.arraycopy(values, nFy-firstYear, nValues, 0, nv);
+        System.arraycopy(nValues, 0, values, 0, nv);
+        firstYear = fY;
+        lastYear = lY;
+    }
+
+    public int getFirstYear() {
+        if(firstYear < 1900 || firstYear > 2000){
+            firstYear = Context.getFirstYear();
+        }
+        return firstYear;
+    }
+
+    public void setFirstYear(int firstYear) {
+        this.firstYear = firstYear;
+    }
+
+    public int getLastYear() {
+        if(lastYear < 1900 || lastYear > 2000){
+            lastYear = Context.getLastYear();
+        }
+        return lastYear;
+    }
+
+    public void setLastYear(int lastYear) {
+        this.lastYear = lastYear;
+    }
+
+    // --------------------------------------------
     public String getMeta(){
         StringBuilder sb = new StringBuilder("");
         sb.append("Observation name : " + obsName + "\n");
-        sb.append("From file :  " + originalFile + "\n");
+        sb.append("From file :  " + dataFile.getShortName() + "\n");
         sb.append("Column :  " + originalColumn + "\n");
         return(sb.toString());
     }
+    // --------------------------------------------
+
 }
 

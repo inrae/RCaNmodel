@@ -19,17 +19,20 @@
 
 <rcommands>
     <rcommand>
-        <id>
+        <name>
             connect
-        </id>
+        </name>
         <submenu>
             general
         </submenu>
         <textmenu>
             Start R session and load libraries
         </textmenu>
+        <conditioncontextchange>
+            R session is started
+        </conditioncontextchange>
         <contextchange>
-            connected
+            Libraries loaded
         </contextchange>
         <rcompute>
             require(ggplot2)
@@ -43,15 +46,33 @@
             resultR &lt;- 'R session is started'
         </rcompute>
         <help>
-            This command launches a R session and loads all necessary libraries
+            This command starts a R session and loads all necessary libraries
+        </help>
+    </rcommand>
+    <!--  +++++++++++++++++++++++++++++ -->
+    <rcommand>
+        <name>
+            disconnect
+        </name>
+        <submenu>
+            general
+        </submenu>
+        <textmenu>
+            Stop R session
+        </textmenu>
+        <condition>
+            connected
+        </condition>
+        <help>
+            This command stops a R session.
         </help>
         <!--  CHECKED -->
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
-        <id>
+        <name>
             build
-        </id>
+        </name>
         <submenu>
             polytope
         </submenu>
@@ -61,12 +82,17 @@
         <condition>
             connected
         </condition>
+        <conditioncontextchange>
+            Polytope is built - polytope is ok
+        </conditioncontextchange>
         <contextchange>
             built
         </contextchange>
         <rcompute>
             POLYTOPE &lt;- buildCaN('FILENAME')
-            resultR &lt;- 'Polytope is built'
+            built &lt;- 'Polytope is built'
+            status &lt;-  checkPolytopeStatus(POLYTOPE)
+            resultR &lt;-  paste(built, status, sep=" - ")
         </rcompute>
         <help>
             This command builds the polytope.
@@ -78,9 +104,9 @@
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
-        <id>
+        <name>
             plotPolytope2D
-        </id>
+        </name>
         <textmenu>
             Plot polytope in two selected dimensions
         </textmenu>
@@ -104,9 +130,9 @@
 
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
-        <id>
+        <name>
             plotNetwork
-        </id>
+        </name>
         <textmenu>
             Plot network
         </textmenu>
@@ -126,9 +152,9 @@
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
-        <id>
+        <name>
             diagnosticPolytope
-        </id>
+        </name>
         <textmenu>
             Diagnostic polytope
         </textmenu>
@@ -152,9 +178,9 @@
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
-        <id>
+        <name>
             bounds
-        </id>
+        </name>
         <textmenu>
             Bounds of polytope
         </textmenu>
@@ -178,9 +204,9 @@
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
-        <id>
+        <name>
             bound
-        </id>
+        </name>
         <textmenu>
             Bound of polytope (one dimension)
         </textmenu>
@@ -206,9 +232,9 @@
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
-        <id>
+        <name>
             incompatible
-        </id>
+        </name>
         <textmenu>
             Incompatible constraints
         </textmenu>
@@ -231,9 +257,9 @@
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
-        <id>
+        <name>
             sample
-        </id>
+        </name>
         <textmenu>
             Sample polytope
         </textmenu>
@@ -243,6 +269,9 @@
         <condition>
             built
         </condition>
+        <conditioncontextchange>
+            Polytope is sampled
+        </conditioncontextchange>
         <contextchange>
             sampled
         </contextchange>
@@ -269,9 +298,9 @@
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
-        <id>
+        <name>
             gelmanDiag
-        </id>
+        </name>
         <textmenu>
             Gelman diagnostic
         </textmenu>
@@ -299,9 +328,9 @@
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
-        <id>
+        <name>
             autocorrelationPlot
-        </id>
+        </name>
         <textmenu>
             Plot autocorrelation of sample
         </textmenu>
@@ -323,9 +352,9 @@
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
-        <id>
+        <name>
             sampleMultiple
-        </id>
+        </name>
         <textmenu>
             Plot sample (several fluxes or components)
         </textmenu>
@@ -348,9 +377,9 @@
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
-        <id>
+        <name>
             violinBiomassDistributions
-        </id>
+        </name>
         <textmenu>
             Violin plots of biomass distributions
         </textmenu>
@@ -376,9 +405,9 @@
     <!--  +++++++++++++++++++++++++++++ -->
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
-        <id>
+        <name>
             ViolinFluxDistributions
-        </id>
+        </name>
         <textmenu>
             Violin plots of flux distributions
         </textmenu>
@@ -401,9 +430,9 @@
     <!--  +++++++++++++++++++++++++++++ -->
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
-        <id>
+        <name>
             dietFractionsSC
-        </id>
+        </name>
         <textmenu>
             Diet fractions (several components)
         </textmenu>
@@ -425,9 +454,9 @@
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand >
-        <id>
+        <name>
             growthRatesBiomassesTC
-        </id>
+        </name>
         <textmenu>
             Growth / Biomasses (all components)
         </textmenu>
@@ -446,9 +475,9 @@
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand >
-        <id>
+        <name>
             growthRatesBiomassesSC
-        </id>
+        </name>
         <textmenu>
             Growth / Biomasses (several components)
         </textmenu>
@@ -470,9 +499,9 @@
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand >
-        <id>
+        <name>
             trophicFunctionalRelationshipsTC
-        </id>
+        </name>
         <textmenu>
             Trophic functional relationships (all components)
         </textmenu>
@@ -493,9 +522,9 @@
         </help>
     </rcommand>    <!--  +++++++++++++++++++++++++++++ -->
     <rcommand >
-        <id>
+        <name>
             trophicFunctionalRelationshipsSC
-        </id>
+        </name>
         <textmenu>
             Trophic functional relationships (several components)
         </textmenu>
@@ -521,9 +550,9 @@
 
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
-        <id>
+        <name>
             satiationTC
-        </id>
+        </name>
         <textmenu>
             Satiation (all components)
         </textmenu>
@@ -542,9 +571,9 @@
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
-        <id>
+        <name>
             satiationSC
-        </id>
+        </name>
         <textmenu>
             Satiation (several components)
         </textmenu>
@@ -566,9 +595,9 @@
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <!-- <rcommand>
-        <id>
+        <name>
             bottleneck
-        </id>
+        </name>
         <textmenu>
             Bottleneck (all components)
         </textmenu>
@@ -588,9 +617,9 @@
       -->
     <!--  +++++++++++++++++++++++++++++ -->
     <!-- <rcommand>
-        <id>
+        <name>
             bottleneck
-        </id>
+        </name>
         <textmenu>
             Bottleneck (several components)
         </textmenu>
@@ -613,9 +642,9 @@
     -->
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
-        <id>
+        <name>
             satiatInertia
-        </id>
+        </name>
         <textmenu>
             Satiation/Inertia (all components)
         </textmenu>
@@ -634,9 +663,9 @@
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
-        <id>
+        <name>
             satiatInertiaSC
-        </id>
+        </name>
         <textmenu>
             Satiation/Inertia (several components)
         </textmenu>
@@ -658,9 +687,9 @@
     </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
-        <id>
+        <name>
             pairsBiomassTC
-        </id>
+        </name>
         <textmenu>
             Pairs of biomass (all components)
         </textmenu>
@@ -679,9 +708,9 @@
      </rcommand>
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
-        <id>
+        <name>
             pairsBiomass
-        </id>
+        </name>
         <textmenu>
             Pairs of biomass (several components)
         </textmenu>
@@ -702,9 +731,9 @@
         </parameter>
     </rcommand>    <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
-        <id>
+        <name>
             experimentA
-        </id>
+        </name>
         <textmenu>
             experiment
         </textmenu>
