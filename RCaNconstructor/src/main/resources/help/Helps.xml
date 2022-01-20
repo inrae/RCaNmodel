@@ -178,7 +178,7 @@
             "OtherLosses": input parameter for the the metabolic and other losses,
             "Inertia": the inertia parameter,
             "Satiation": the satiation parameter,
-            RefugeBiomass: the refuge biomass parameter.
+            "RefugeBiomass": the refuge biomass parameter.
 
             - Worksheet "Fluxes": includes the following columns:
             "Flux": name of the flux (usually in the from "prey_predator"),

@@ -18,6 +18,7 @@ public class MetaElement {
     boolean metaType;
     final StringProperty metaContentProperty = new SimpleStringProperty();
 
+    // --------------------------------------------
     public MetaElement(String elementR) {
         if(elementR.startsWith("<")){
             metaType = false;
@@ -34,6 +35,7 @@ public class MetaElement {
         }
     }
 
+    // --------------------------------------------
     public void print(){
         System.out.println("META : "+ metaType + " -- "+ metaName + " -- " +  getMetaContentProperty() + " -- " + metaHint);
     }

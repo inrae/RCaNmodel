@@ -5,8 +5,8 @@
  */
 package fr.cm.canObjects;
 
-import fr.cm.menus.Context;
-import fr.cm.parameters.Colors;
+import fr.cm.RCaNMain.Context;
+import fr.cm.parameters.ColorsAndFormats;
 import fr.cm.parameters.Strings;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
@@ -21,8 +21,9 @@ import javafx.scene.text.TextAlignment;
 /**
  * @author christianmullon
  */
-public class Component extends Group {
 
+public class Component extends Group {
+    // Group : javafx class pour les objets graphiques
     private String name;
     private boolean inside;
     private final int np;
@@ -33,6 +34,7 @@ public class Component extends Group {
 
     Color col;
 
+    // --------------------------------------------
     public Component() {
         super();
         this.name = "";
@@ -45,10 +47,10 @@ public class Component extends Group {
         this.y = 0.5;
         setPos();
     }
-
+    // --------------------------------------------
     public Component(String name, double[] param, boolean type, double x, double y) {
         super();
-        this.name = name.replace(" ","").replace("-","");
+        this.setName(name);
         this.inside = type;
         this.circle = new Circle();
         this.text = setText();
@@ -59,7 +61,7 @@ public class Component extends Group {
         parameters = new double[np];
         System.arraycopy(param,0,parameters,0,np);
     }
-
+    // --------------------------------------------
     public Text setText() {
         text = new Text();
         text.xProperty().bind(circle.centerXProperty());
@@ -67,14 +69,14 @@ public class Component extends Group {
         text.setText(name);
         text.setTextAlignment(TextAlignment.CENTER);
         text.setFont(Font.font("Verdana", 20));
-        text.setFill(Colors.names);
+        text.setFill(ColorsAndFormats.names);
         return text;
     }
-
+    // --------------------------------------------
     boolean insideRect(double mi, double ma){
         return(x >= mi && x <= ma && y >= mi && y <= ma);
     }
-
+    // --------------------------------------------
     void reposInsideOutside() {
         double alpha;
         double mi = Context.getInsideMin();
@@ -120,32 +122,32 @@ public class Component extends Group {
             }
         }
     }
-
+    // --------------------------------------------
     public void setPos() {
         reposInsideOutside();
-        circle.setCenterX(x * Context.getWidth());
-        circle.setCenterY(y * Context.getHeight());
+        circle.setCenterX(x * Context.getBackgroundWidth());
+        circle.setCenterY(y * Context.getBackgroundHeight());
     }
-
+    // --------------------------------------------
     public void setWH(double wx, double hy){
-        x = wx / Context.getWidth();
-        y = hy / Context.getHeight();
+        x = wx / Context.getBackgroundWidth();
+        y = hy / Context.getBackgroundHeight();
         setPos();
     }
-
+// --------------------------------------------
     public void setXY(double x, double y) {
         this.x = x;
         this.y = y;
         setPos();
     }
-
+    // --------------------------------------------
     public void setInside(boolean inside) {
         this.inside = inside;
         reposInsideOutside();
         setCol();
         setPos();
     }
-
+    // --------------------------------------------
     public void define(
             EventHandler<MouseEvent> mousePressedEventHandler,
             EventHandler<MouseEvent> mouseDraggedEventHandler,
@@ -160,46 +162,22 @@ public class Component extends Group {
         getChildren().add(circle);
         getChildren().add(text);
     }
-
+    // --------------------------------------------
+    public void setCol() {
+        if (inside) {
+            col = ColorsAndFormats.componentInside;
+        } else {
+            col = ColorsAndFormats.componentOutside;
+        }
+        circle.setFill(col);
+    }
+    // --------------------------------------------
     public Circle getCircle() {
         return (circle);
     }
 
     public boolean isInside() {
         return inside;
-    }
-
-    public void setCol() {
-        if (inside) {
-            col = Colors.componentInside;
-        } else {
-            col = Colors.componentOutside;
-        }
-        circle.setFill(col);
-    }
-
-    public void refill() {
-        circle.setFill(col);
-    }
-
-    public String getName() {
-
-        return (name);
-    }
-
-    public double[] getParameters() {
-
-        return (parameters);
-    }
-
-    public double getParameters(int p) {
-
-        return (parameters[p]);
-    }
-
-    public void setParameters(double[] param) {
-
-        System.arraycopy(param,0,parameters,0,np);
     }
 
     public void setParameters(int p, String newV) {
@@ -211,9 +189,20 @@ public class Component extends Group {
         }
     }
 
-    public void setName(String name) {
+    public void refill() {
+        circle.setFill(col);
+    }
 
-        this.name = name;
+    public String getName() { return (name); }
+
+    public double[] getParameters() { return (parameters); }
+
+    public double getParameters(int p) { return (parameters[p]); }
+
+    public void setParameters(double[] param) { System.arraycopy(param,0,parameters,0,np); }
+
+    public void setName(String name) {
+        this.name = name.replace(" ","").replace("-","");
     }
 
     public double getX() {
@@ -223,4 +212,6 @@ public class Component extends Group {
     public double getY() {
         return y;
     }
+    // --------------------------------------------
+
 }
