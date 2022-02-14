@@ -90,8 +90,9 @@ buildCaN <- function(x, trophic = TRUE) {
 
     if (! tophic)
       dynamics <- as.data.frame(
-        read_excel(x, sheet = "dynamics")
+        read_excel(x, sheet = "Dynamics")
       )
+    dynamics_equation <- dynamics$Equation
   } else {
     if (is.null(names(x)))
       stop("x should be a named list")
@@ -157,9 +158,9 @@ buildCaN <- function(x, trophic = TRUE) {
 
   if (!tophic) {
     for (i in seq_len(3)){
-      dynamics_equation <- as.character(dynamics[i, 1])
+      dyn_eq <- as.character(dynamics_equation[i])
       dynamics_word <-
-        unlist(sapply(dynamics_equation, function(x)
+        unlist(sapply(dyn_eq, function(x)
           strsplit(x, split = ",|exp|/|\\+|=|<|\\*|>|\\-|\\)|\\(|[[:space:]]")))
       dynamics_word <- dynamics_word[dynamics_word != ""] #empty words
       #remove double
