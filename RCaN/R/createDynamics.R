@@ -73,6 +73,23 @@ createDynamics <- function(dynamics_equation,
 
       for (id in seq_len(length(dynamics))){
         for (p in prop){
+          test = function (m) {
+            paste0(
+              "ifelse(",
+              fluxes[fluxes$To == sp,
+                     gsub("(ifelse\\(|,)" ,
+                          "",
+                          m)][id],
+              ","
+              )
+          }
+          dynamics[id] <- str_replace_all(dynamics[id],
+                                          paste0("ifelse\\((",
+                                                 paste0(names(fluxes),
+                                                        collapse = '|'),
+                                                 "),"),
+                                          test
+                                          )
           dynamics[id] <- str_replace_all(dynamics[id],
                                           paste0("(\\b|\\(|\\))",
                                                  p,
@@ -112,6 +129,24 @@ createDynamics <- function(dynamics_equation,
 
       for (id in seq_len(length(dynamics))){
         for (p in prop){
+          test = function (m) {
+            paste0(
+              "ifelse(",
+              fluxes[fluxes$From == sp,
+                     gsub("(ifelse\\(|,)" ,
+                          "",
+                          m)][id],
+              ","
+            )
+          }
+          dynamics[id] <- str_replace_all(dynamics[id],
+                                          paste0("ifelse\\((",
+                                                 paste0(names(fluxes),
+                                                        collapse = '|'),
+                                                 "),"),
+                                          test
+          )
+
           dynamics[id] <- str_replace_all(dynamics[id],
                                           paste0("(\\b|\\(|\\))",
                                                  p,
