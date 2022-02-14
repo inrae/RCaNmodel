@@ -159,9 +159,14 @@ buildCaN <- function(x, trophic = TRUE) {
   if (!tophic) {
     for (i in seq_len(3)){
       dyn_eq <- as.character(dynamics_equation[i])
+      dyn_eq <- gsub(paste0("(",
+                            paste0(names(fluxes_def), collapse = "|"),
+                            ")"),
+                     "",
+                     dyn_eq)
       dynamics_word <-
         unlist(sapply(dyn_eq, function(x)
-          strsplit(x, split = ",|exp|/|\\+|=|<|\\*|>|\\-|\\)|\\(|[[:space:]]")))
+          strsplit(x, split = ",|ifelse|exp|/|\\+|=|<|\\*|>|\\-|\\)|\\(|[[:space:]]")))
       dynamics_word <- dynamics_word[dynamics_word != ""] #empty words
       #remove double
       dynamics_word <- dynamics_word[!grepl(".*?([0-9]+).*", dynamics_word)]
