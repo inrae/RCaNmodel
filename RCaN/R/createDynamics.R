@@ -171,13 +171,3 @@ createDynamics <- function(dynamics_equation,
   return(list(H = H,
               N = N))
 }
-
-
-
-
-
-
-
-return (list(H = H,
-             N = N))
-}
