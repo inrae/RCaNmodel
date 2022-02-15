@@ -30,6 +30,7 @@ createDynamics <- function(dynamics_equation,
 
 
   #create symbolic variables
+  Component = S("Component")
   for (sp in species)
     assign(sp,
            S(sp))
@@ -48,129 +49,50 @@ createDynamics <- function(dynamics_equation,
 
   #build matrix
   for (sp in species){
-    #contribution of component
-    equation <- gsub("Component",
-                     sp,
-                     dynamics_equation[1])
     for (p in prop){
-      equation <- str_replace_all(equation,
-                                  paste0("(\\b|\\(|\\))",
-                                         p,
-                                         "(\\b|\\(|\\))"),
-                                  function (m) gsub(p,
-                                                    paste0(p,"['", sp, "']"),
-                                                    m))
+      assign(p, components[components$Component == sp, p])
     }
+    #contribution of component
+    equation <- eval(parse(text = dynamics_equation[1]))
 
 
     #contribution of inflows
     if (grepl("Inflow", dynamics_equation[2])){
-      dynamics <- dynamics_equation[2]
-      dynamics <- gsub("sum", "", dynamics)
-      dynamics <- str_replace_all(dynamics,
-                                  "Inflow",
-                                  fluxes$Flux[fluxes$To == sp])
-
-      for (id in seq_len(length(dynamics))){
-        for (p in prop){
-          test = function (m) {
-            paste0(
-              "ifelse(",
-              fluxes[fluxes$To == sp,
-                     gsub("(ifelse\\(|,)" ,
-                          "",
-                          m)][id],
-              ","
-              )
-          }
-          dynamics[id] <- str_replace_all(dynamics[id],
-                                          paste0("ifelse\\((",
-                                                 paste0(names(fluxes),
-                                                        collapse = '|'),
-                                                 "),"),
-                                          test
-                                          )
-          dynamics[id] <- str_replace_all(dynamics[id],
-                                          paste0("(\\b|\\(|\\))",
-                                                 p,
-                                                 "(\\b|\\(|\\))"),
-                                          function (m) gsub(p,
-                                                            paste0(p,
-                                                                   "['",
-                                                                   sp, "']"),
-                                                            m))
-          source <- fluxes$From[fluxes$To == sp][id]
-          dynamics[id] <- str_replace_all(dynamics[id],
-                                          paste0("(\\b|\\(|\\))",
-                                                 p,
-                                                 "_source(\\b|\\(|\\))"),
-                                          function (m) gsub(paste0(p,
-                                                                   "_source"),
-                                                            paste0(
-                                                              p,
-                                                              "['",
-                                                              source,
-                                                              "']"),
-                                                            m)
-          )
-        }
+      Inflow <- eval(parse(text = paste0("Vector(",
+                                         paste0(fluxes$Flux[fluxes$To == sp],
+                                                collapse = ","),
+                                         ")")))
+      for (fprop in names(fluxes)[-(1:3)])
+        assign(fprop, as.logical(fluxes[fluxes$To == sp, fprop]))
+      for (p in prop){
+        assign(paste0(p, "_source"),
+               components[match(fluxes$From[fluxes$To == sp],
+                                components$Component),
+                          p])
       }
-      dynamics <- paste(dynamics, collapse ="+")
-      equation <- paste(equation, dynamics, sep = "+")
+      dynamics <- dynamics_equation[2]
+      equation <- equation + eval(parse(text = dynamics))
     }
 
     #contribution of outflows
-    if (grepl("Outflow", dynamics_equation[3])){
-      dynamics <- dynamics_equation[3]
-      dynamics <- gsub("sum", "", dynamics)
-      dynamics <- str_replace_all(dynamics,
-                                  "Outflow",
-                                  fluxes$Flux[fluxes$From == sp])
-
-      for (id in seq_len(length(dynamics))){
-        for (p in prop){
-          test = function (m) {
-            paste0(
-              "ifelse(",
-              fluxes[fluxes$From == sp,
-                     gsub("(ifelse\\(|,)" ,
-                          "",
-                          m)][id],
-              ","
-            )
-          }
-          dynamics[id] <- str_replace_all(dynamics[id],
-                                          paste0("ifelse\\((",
-                                                 paste0(names(fluxes),
-                                                        collapse = '|'),
-                                                 "),"),
-                                          test
-          )
-
-          dynamics[id] <- str_replace_all(dynamics[id],
-                                          paste0("(\\b|\\(|\\))",
-                                                 p,
-                                                 "(\\b|\\(|\\))"),
-                                          paste0(p, "['", sp, "']"))
-          sink <- fluxes$To[fluxes$From == sp][id]
-          dynamics[id] <- str_replace_all(dynamics[id],
-                                          paste0("(\\b|\\(|\\))",
-                                                 p,
-                                                 "_sink(\\b|\\(|\\))"),
-                                          function (m) gsub(p,
-                                                            paste0(
-                                                              p,
-                                                              "_sink['",
-                                                              sink,
-                                                              "']"),
-                                                            m))
-        }
+    if (grepl("Outflow", dynamics_equation[2])){
+      Outflow <- eval(parse(text = paste0("Vector(",
+                                          paste0(fluxes$Flux[fluxes$From == sp],
+                                                 collapse = ","),
+                                          ")")))
+      for (fprop in names(fluxes)[-(1:3)])
+        assign(fprop, as.logical(fluxes[fluxes$From == sp, fprop]))
+      for (p in prop){
+        assign(paste0(p, "_sink"),
+               components[match(fluxes$To[fluxes$From == sp],
+                                components$Component),
+                          p])
       }
-      dynamics <- paste(dynamics, collapse ="+")
-      equation <- paste(equation, dynamics, sep = "+")
+      dynamics <- dynamics_equation[3]
+      equation <- equation + eval(parse(text = dynamics))
     }
 
-    equation <- expand(eval(parse(text = equation)))
+    equation <- expand(equation)
 
     mycoeffs <- sapply(as.list(get_args(equation)), function(e) {
       if (get_type(e) == "RealDouble") {
@@ -190,16 +112,18 @@ createDynamics <- function(dynamics_equation,
         return(val)
       }
     })
-  H[sp, match(names(mycoeffs),
-              colnames(H),
-              nomatch = 0)] <- mycoeffs[match(names(mycoeffs),
-                                              colnames(H),
-                                              nomatch = 0)]
-  N[sp, match(names(mycoeffs),
-              colnames(N),
-              nomatch = 0)] <- mycoeffs[match(names(mycoeffs),
-                                              colnames(N),
-                                              nomatch = 0)]
+
+    names(mycoeffs)[names(mycoeffs) == "Component"] <- sp
+    H[sp, match(names(mycoeffs),
+                colnames(H),
+                nomatch = 0)] <- mycoeffs[match(names(mycoeffs),
+                                                colnames(H),
+                                                nomatch = 0)]
+    N[sp, match(names(mycoeffs),
+                colnames(N),
+                nomatch = 0)] <- mycoeffs[match(names(mycoeffs),
+                                                colnames(N),
+                                                nomatch = 0)]
   }
   H <- diag(nbspecies) - H #since Bt+1=(I-H)*Bt
 
