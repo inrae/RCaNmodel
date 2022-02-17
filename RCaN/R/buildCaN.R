@@ -88,7 +88,7 @@ buildCaN <- function(x, trophic = TRUE) {
       read_excel(x, sheet = "Constraints")
     )
 
-    if (! tophic)
+    if (! trophic)
       dynamics <- as.data.frame(
         read_excel(x, sheet = "Dynamics")
       )
@@ -156,7 +156,7 @@ buildCaN <- function(x, trophic = TRUE) {
 
   #dynamics
 
-  if (!tophic) {
+  if (!trophic) {
     for (i in seq_len(3)){
       dyn_eq <- as.character(dynamics_equation[i])
       dyn_eq <- gsub(paste0("(",
