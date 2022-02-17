@@ -2,7 +2,7 @@
 #'
 #' This is an internal function that builds all the required symbolic objects
 #' required for the computation of the model
-#' @param flow names of the flow
+#' @param fluxes_def fluxes_def
 #' @param species names of the species
 #' @param ntstep number of the time step
 #' @param H the H matrix of (I-H).B+N.F
@@ -23,7 +23,8 @@
 #' @importFrom dplyr pull
 
 generateSymbolicObjects <-
-  function(flow, species, ntstep, H, N, series) {
+  function(fluxes_def, species, ntstep, H, N, series) {
+    flow <- fluxes_def$Flux
     years <- series$Year
     nbspec <- length(species)
     Ie <- diag(nbspec) #diagonal_matrix
@@ -63,6 +64,7 @@ generateSymbolicObjects <-
       list_B <- c(list_B, eval(parse(text = paste("B", t, sep = "_"))))
     }
 
+
     assign("Fmat", do.call("cbind", list_F))
     colnames(Fmat) <- years
     assign("param",
@@ -72,6 +74,49 @@ generateSymbolicObjects <-
     assign("Bmat", do.call("cbind", list_B))
     colnames(Bmat) <- years
     param <- c(V(1), param) #we add an intercept
+
+
+    for (sp in species) {
+      isp <- which(sp == species)
+      inflow <- which(fluxes_def$To == sp)
+      outflow <- which(fluxes_def$From == sp)
+      intemp <- rep(0, length(years))
+      outtemp <- rep(0, length(years))
+      for (i in inflow)
+        intemp <- intemp + Fmat[i, ]
+      for (i in outflow)
+        outtemp <- outtemp + Fmat[i, ]
+      assign(paste0("Inflows", sp),
+             intemp)
+      assign(paste0("Outflows", sp),
+             outtemp)
+      assign(paste0("Ratio", sp),
+             c(Bmat[isp, -1] / Bmat[isp, -length(years)], NaN))
+      assign(paste0("RatioM", sp),
+             rev(c(rev(Bmat[isp, -1] / Bmat[isp, -length(years)]), NaN)))
+      assign(paste0("Delta", sp),
+             c(Bmat[isp, -1] - Bmat[isp, -length(years)], NaN))
+      assign(paste0("DeltaM", sp),
+             rev(c(rev(Bmat[isp, -1] - Bmat[isp, -length(years)]), NaN)))
+    }
+
+
+    for (f in flow) {
+      ifl <- which(flow == f)
+      assign(paste0("Ratio", f),
+             c(Fmat[ifl, -1] / Fmat[ifl, -length(years)], NaN))
+      assign(paste0("RatioM", f),
+             rev(c(rev(Fmat[ifl, -1] / Fmat[ifl, -length(years)]), NaN)))
+      assign(paste0("Delta", f),
+             c(Fmat[ifl, -1] - Fmat[ifl, -length(years)], NaN))
+      assign(paste0("DeltaM", f),
+             rev(c(rev(Fmat[ifl, -1] - Fmat[ifl, -length(years)]), NaN)))
+    }
+
+
+
+
+
 
     for (is in 1:nbspec) {
       assign(species[is], Bmat[is, ]) #vectors of biomass named by species name

@@ -267,7 +267,7 @@ buildCaN <- function(x, trophic = TRUE) {
   }
   #build symbolic objects in a specific environment
   symbolic_enviro <-
-    generateSymbolicObjects(flow,
+    generateSymbolicObjects(fluxes_def,
                             species,
                             ntstep,
                             H,
