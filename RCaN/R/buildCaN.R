@@ -88,11 +88,12 @@ buildCaN <- function(x, trophic = TRUE) {
       read_excel(x, sheet = "Constraints")
     )
 
-    if (! trophic)
+    if (! trophic) {
       dynamics <- as.data.frame(
         read_excel(x, sheet = "Dynamics")
       )
-    dynamics_equation <- dynamics$Equation
+      dynamics_equation <- dynamics$Equation
+    }
   } else {
     if (is.null(names(x)))
       stop("x should be a named list")
@@ -236,7 +237,7 @@ buildCaN <- function(x, trophic = TRUE) {
                constraints_word[not_recognized]))
 
   #build matrices H and N
-  if (tropic) {
+  if (trophic) {
     H <- diag(1 - exp(-components_param$OtherLosses[index_species]),
               nrow=length(index_species))
     N <- matrix(0, nbspecies, nbfluxes)
