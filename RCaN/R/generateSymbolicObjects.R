@@ -140,7 +140,13 @@ generateSymbolicObjects <-
       "f",
       "s",
       "t",
-      "is"
+      "isp",
+      "ifl",
+      "sp",
+      "inflow",
+      "outflow",
+      "intemp",
+      "outtemp"
     ))
     return(environment())
   }
