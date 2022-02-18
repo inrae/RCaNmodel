@@ -298,19 +298,19 @@ buildCaN <- function(x, trophic = TRUE) {
       rbind,
       lapply(
         components_param$Component[components_param$Component %in% species],
-        function(sp)
+        function(sp){
+          if (trophic) {
+            refuge <- components_param$RefugeBiomass[
+              components_param$Component == sp]
+            refuge <- ifelse(is.na(refuge), 0, refuge)
+          } else{
+            refuge <- 0
+          }
           treatConstraint(
-            paste(sp, ">=", ifelse((! trophic) |
-              is.na(
-                components_param$RefugeBiomass[
-                  components_param$Component == sp]),
-
-              0,
-              components_param$RefugeBiomass[components_param$Component == sp]
-            )),
+            paste(sp, ">=", refuge),
             symbolic_enviro,
             name_constr = paste("Biomass positiveness_refuge", sp, sep = "_")
-          ))
+          )})
     ))
 
   ####add satiation
