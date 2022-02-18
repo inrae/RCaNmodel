@@ -212,29 +212,6 @@ buildCaN <- function(x, trophic = TRUE) {
                            "(\\[[[:digit:]]*\\])",
                            sep = "|")
 
-  constraints_word <-
-    unlist(sapply(as.character(constraints$Constraint), function(x)
-      strsplit(x, split = ",|/|\\+|=|<|\\*|>|\\-|\\)|\\(|[[:space:]]")))
-  constraints_word <- gsub(pattern_indices,
-                           "",
-                           constraints_word)
-  not_recognized <-
-    which(
-      !constraints_word %in% c(
-        as.character(components),
-        flow,
-        data_series_name,
-        "mean",
-        "sum",
-        "na.rm",
-        "TRUE",
-        "FALSE",
-        ""
-      ) & suppressWarnings(is.na(as.numeric(constraints_word)))
-    )
-  if (length(not_recognized) > 0)
-    stop(paste("words not recognized in constraints:",
-               constraints_word[not_recognized]))
 
   #build matrices H and N
   if (trophic) {
@@ -274,6 +251,31 @@ buildCaN <- function(x, trophic = TRUE) {
                             N,
                             series)
 
+  constraints_word <-
+    unlist(sapply(as.character(constraints$Constraint), function(x)
+      strsplit(x, split = ",|/|\\+|=|<|\\*|>|\\-|\\)|\\(|[[:space:]]")))
+  constraints_word <- gsub(pattern_indices,
+                           "",
+                           constraints_word)
+  not_recognized <-
+    which(
+      !constraints_word %in% c(
+        ls(envir = symbolic_enviro),
+        as.character(components),
+        flow,
+        data_series_name,
+        "mean",
+        "exp",
+        "sum",
+        "na.rm",
+        "TRUE",
+        "FALSE",
+        ""
+      ) & suppressWarnings(is.na(as.numeric(constraints_word)))
+    )
+  if (length(not_recognized) > 0)
+    stop(paste("words not recognized in constraints:",
+               constraints_word[not_recognized]))
 
   #build A matrix and b corresponding to constraints A.x<=b
   nbparam <- length(symbolic_enviro$param)

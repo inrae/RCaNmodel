@@ -16,7 +16,7 @@
 createDynamics <- function(dynamics_equation,
                            components,
                            fluxes) {
-  species <- components$Component[which(components_param$Inside == 1)]
+  species <- components$Component[which(components$Inside == 1)]
   nbfluxes <- nrow(fluxes)
 
   H <- diag(1,
@@ -42,7 +42,7 @@ createDynamics <- function(dynamics_equation,
   prop <- prop[!prop %in% (c("Component", "Inside"))]
 
   for (p in prop){
-    parameters <- components_param[, p]
+    parameters <- components[, p]
     parameters <- setNames(parameters, components$Component)
     assign(p, parameters)
   }
@@ -92,7 +92,7 @@ createDynamics <- function(dynamics_equation,
       equation <- equation + eval(parse(text = dynamics))
     }
 
-    equation <- expand(equation)
+    equation <- symengine::expand(equation)
 
     mycoeffs <- sapply(as.list(get_args(equation)), function(e) {
       if (get_type(e) == "RealDouble") {
@@ -116,14 +116,10 @@ createDynamics <- function(dynamics_equation,
     names(mycoeffs)[names(mycoeffs) == "Component"] <- sp
     H[sp, match(names(mycoeffs),
                 colnames(H),
-                nomatch = 0)] <- mycoeffs[match(names(mycoeffs),
-                                                colnames(H),
-                                                nomatch = 0)]
+                nomatch = 0)] <- mycoeffs[names(mycoeffs) %in% colnames(H)]
     N[sp, match(names(mycoeffs),
                 colnames(N),
-                nomatch = 0)] <- mycoeffs[match(names(mycoeffs),
-                                                colnames(N),
-                                                nomatch = 0)]
+                nomatch = 0)] <- mycoeffs[names(mycoeffs) %in% colnames(N)]
   }
   H <- diag(nbspecies) - H #since Bt+1=(I-H)*Bt
 
