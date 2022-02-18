@@ -75,7 +75,7 @@ createDynamics <- function(dynamics_equation,
     }
 
     #contribution of outflows
-    if (grepl("Outflow", dynamics_equation[2])){
+    if (grepl("Outflow", dynamics_equation[3])){
       Outflow <- eval(parse(text = paste0("Vector(",
                                           paste0(fluxes$Flux[fluxes$From == sp],
                                                  collapse = ","),
@@ -94,24 +94,41 @@ createDynamics <- function(dynamics_equation,
 
     equation <- symengine::expand(equation)
 
-    mycoeffs <- sapply(as.list(get_args(equation)), function(e) {
-      if (get_type(e) == "RealDouble") {
-        return(c("1" = as.numeric(e)))
-      } else if (get_type(e) == "Symbol") {
-        val <- 1
-        names(val) <- get_str(e)
-        return(val)
-      } else if (get_type(e) == "NaN") {
-        return(c("1" = NA))
-      } else {
-        val <- as.list(get_args(e))[[1]]
-        val <- ifelse(get_type(val) == "NaN",
-                      NA,
-                      as.numeric(val))
-        names(val) <- get_str(as.list(get_args(e))[[2]])
-        return(val)
+    if (get_type(equation) != "Add") {
+      if (get_type(equation) == "Symbol") {
+        mycoeffs <- 1
+        names(mycoeffs) <- get_str(equation)
+      } else if (get_type(equation) == "Mul") {
+        mycoeffs <- as.numeric(as.list(get_args(equation))[[1]])
+        names(mycoeffs) <- get_str(as.list(get_args(equation))[[2]])
+      } else if (get_type(equation) == "NaN") {
+        mycoeffs <- NA
+        names(mycoeffs) <- "1"
+      }else{
+        mycoeffs <- as.numeric(equation)
+        names(mycoeffs) <- "1"
       }
-    })
+    } else {
+
+      mycoeffs <- sapply(as.list(get_args(equation)), function(e) {
+        if (get_type(e) == "RealDouble") {
+          return(c("1" = as.numeric(e)))
+        } else if (get_type(e) == "Symbol") {
+          val <- 1
+          names(val) <- get_str(e)
+          return(val)
+        } else if (get_type(e) == "NaN") {
+          return(c("1" = NA))
+        } else {
+          val <- as.list(get_args(e))[[1]]
+          val <- ifelse(get_type(val) == "NaN",
+                        NA,
+                        as.numeric(val))
+          names(val) <- get_str(as.list(get_args(e))[[2]])
+          return(val)
+        }
+      })
+    }
 
     names(mycoeffs)[names(mycoeffs) == "Component"] <- sp
     H[sp, match(names(mycoeffs),
