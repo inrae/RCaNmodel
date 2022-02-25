@@ -101,6 +101,26 @@ generateSymbolicObjects <-
     }
 
 
+    for (sp in species) {
+      for (p in names(fluxes_def)[-(1:3)]){
+        isp <- which(sp == species)
+        inflow <- which(fluxes_def$To == sp & fluxes_def[, p])
+        outflow <- which(fluxes_def$From == sp & fluxes_def[, p])
+        intemp <- rep(0, length(years))
+        outtemp <- rep(0, length(years))
+        for (i in inflow)
+          intemp <- intemp + Fmat[i, ]
+        for (i in outflow)
+          outtemp <- outtemp + Fmat[i, ]
+        assign(paste0(p, "Inflows", sp),
+               intemp)
+        assign(paste0(p, "Outflows", sp),
+               outtemp)
+      }
+    }
+
+
+
     for (f in flow) {
       ifl <- which(flow == f)
       assign(paste0("Ratio", f),
