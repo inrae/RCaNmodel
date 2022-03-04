@@ -61,8 +61,10 @@
 #' @importFrom Matrix Matrix
 #' @importFrom stats na.omit
 #' @importFrom readxl read_excel
+#' @importFrom readxl excel_sheets
 #'
 buildCaN <- function(x, trophic = TRUE) {
+  aliases <- NULL
   if (! class(x) %in% c("character", "list")){
     stop("x should either be the path to an RCaN file or a named list")
   }
@@ -88,6 +90,12 @@ buildCaN <- function(x, trophic = TRUE) {
       read_excel(x, sheet = "Constraints")
     )
 
+    if ("Aliases" %in% excel_sheets(x)) {
+      aliases <-  as.data.frame(
+        read_excel(x, sheet = "Aliases")
+      )
+    }
+
     if (! trophic) {
       dynamics <- as.data.frame(
         read_excel(x, sheet = "Dynamics")
@@ -101,9 +109,10 @@ buildCaN <- function(x, trophic = TRUE) {
                                    "dynamics",
                                  "constraints",
                                  "fluxes_def",
-                                 "series")))
+                                 "series",
+                                 "aliases")))
         stop("names of x should be components_param, dynamics, constraints,
-             fluxes_def, series")
+             fluxes_def, series", "aliases")
     constraints <- x$constraints
     fluxes_def <- x$fluxes_def
     series <- x$series
@@ -249,7 +258,8 @@ buildCaN <- function(x, trophic = TRUE) {
                             ntstep,
                             H,
                             N,
-                            series)
+                            series,
+                            aliases)
 
   constraints_word <-
     unlist(sapply(as.character(constraints$Constraint), function(x)

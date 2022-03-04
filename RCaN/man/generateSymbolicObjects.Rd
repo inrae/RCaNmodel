@@ -4,10 +4,10 @@
 \alias{generateSymbolicObjects}
 \title{generateSymbolicObjects}
 \usage{
-generateSymbolicObjects(flow, species, ntstep, H, N, series)
+generateSymbolicObjects(fluxes_def, species, ntstep, H, N, series, aliases)
 }
 \arguments{
-\item{flow}{names of the flow}
+\item{fluxes_def}{fluxes_def}
 
 \item{species}{names of the species}
 
@@ -18,6 +18,8 @@ generateSymbolicObjects(flow, species, ntstep, H, N, series)
 \item{N}{the N matrix of (I-H).B+N.F}
 
 \item{series}{the names of the series}
+
+\item{aliases}{table of alias (default = NULL)}
 }
 \value{
 en environment storing all symbolic elements including among others
