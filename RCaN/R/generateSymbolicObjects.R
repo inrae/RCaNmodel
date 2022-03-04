@@ -8,6 +8,7 @@
 #' @param H the H matrix of (I-H).B+N.F
 #' @param N the N matrix of (I-H).B+N.F
 #' @param series the names of the series
+#' @param aliases table of alias (default = NULL)
 #'
 #' @return en environment storing all symbolic elements including among others
 #' \itemize{
@@ -23,7 +24,7 @@
 #' @importFrom dplyr pull
 
 generateSymbolicObjects <-
-  function(fluxes_def, species, ntstep, H, N, series) {
+  function(fluxes_def, species, ntstep, H, N, series, aliases) {
     flow <- fluxes_def$Flux
     years <- series$Year
     nbspec <- length(species)
@@ -90,14 +91,18 @@ generateSymbolicObjects <-
              intemp)
       assign(paste0("Outflows", sp),
              outtemp)
-      assign(paste0("Ratio", sp),
-             c(Bmat[isp, -1] / Bmat[isp, -length(years)], NaN))
-      assign(paste0("RatioM", sp),
-             rev(c(rev(Bmat[isp, -1] / Bmat[isp, -length(years)]), NaN)))
-      assign(paste0("Delta", sp),
-             c(Bmat[isp, -1] - Bmat[isp, -length(years)], NaN))
-      assign(paste0("DeltaM", sp),
-             rev(c(rev(Bmat[isp, -1] - Bmat[isp, -length(years)]), NaN)))
+      generateDerivedSymbolicObjects(paste0("Inflows", sp),
+                                     environment(),
+                                     ratio = TRUE,
+                                     ratioM = TRUE,
+                                     delta = TRUE,
+                                     deltaM = TRUE)
+      generateDerivedSymbolicObjects(paste0("Outflows", sp),
+                                     environment(),
+                                     ratio = TRUE,
+                                     ratioM = TRUE,
+                                     delta = TRUE,
+                                     deltaM = TRUE)
     }
 
 
@@ -114,42 +119,87 @@ generateSymbolicObjects <-
           outtemp <- outtemp + Fmat[i, ]
         assign(paste0(p, "Inflows", sp),
                intemp)
+        generateDerivedSymbolicObjects(paste0(p, "Inflows", sp),
+                                       environment(),
+                                       M = TRUE,
+                                       P = TRUE,
+                                       ratio = TRUE,
+                                       ratioM = TRUE,
+                                       delta = TRUE,
+                                       deltaM = TRUE)
+
         assign(paste0(p, "Outflows", sp),
                outtemp)
+        generateDerivedSymbolicObjects(paste0(p, "Outflows", sp),
+                                       environment(),
+                                       M = TRUE,
+                                       P = TRUE,
+                                       ratio = TRUE,
+                                       ratioM = TRUE,
+                                       delta = TRUE,
+                                       deltaM = TRUE)
       }
     }
 
 
 
-    for (f in flow) {
-      ifl <- which(flow == f)
-      assign(paste0("Ratio", f),
-             c(Fmat[ifl, -1] / Fmat[ifl, -length(years)], NaN))
-      assign(paste0("RatioM", f),
-             rev(c(rev(Fmat[ifl, -1] / Fmat[ifl, -length(years)]), NaN)))
-      assign(paste0("Delta", f),
-             c(Fmat[ifl, -1] - Fmat[ifl, -length(years)], NaN))
-      assign(paste0("DeltaM", f),
-             rev(c(rev(Fmat[ifl, -1] - Fmat[ifl, -length(years)]), NaN)))
-    }
 
 
 
 
 
 
-    for (is in 1:nbspec) {
+    for (is in seq_len(nbspec)) {
       assign(species[is], Bmat[is, ]) #vectors of biomass named by species name
+      generateDerivedSymbolicObjects(species[is],
+                                     environment(),
+                                     M = TRUE,
+                                     P = TRUE,
+                                     ratio = TRUE,
+                                     ratioM = TRUE,
+                                     delta = TRUE,
+                                     deltaM = TRUE)
     }
 
     for (f in seq_len(length(flow))) {
       assign(flow[f], Fmat[f, ]) #vectors of flow named by flow name
+      generateDerivedSymbolicObjects(flow[f],
+                                     environment(),
+                                     M = TRUE,
+                                     P = TRUE,
+                                     ratio = TRUE,
+                                     ratioM = TRUE,
+                                     delta = TRUE,
+                                     deltaM = TRUE)
     }
 
     for (s in names(series)[-1]) {
       ser <- pull(series, s)
       ser[is.na(ser)] <- NaN
       assign(s, Vector(ser))
+      generateDerivedSymbolicObjects(s,
+                                     environment(),
+                                     M = TRUE,
+                                     P = TRUE,
+                                     ratio = TRUE,
+                                     ratioM = TRUE,
+                                     delta = TRUE,
+                                     deltaM = TRUE)
+    }
+    if (!is.null(aliases)){
+      for (i in seq_len(nrow(aliases))){
+        assign(aliases[i, 1],
+               aliases[i, 2])
+        generateDerivedSymbolicObjects(aliases[i, 1],
+                                       environment(),
+                                       M = TRUE,
+                                       P = TRUE,
+                                       ratio = TRUE,
+                                       ratioM = TRUE,
+                                       delta = TRUE,
+                                       deltaM = TRUE)
+
+      }
     }
     rm(list = c(
       "H",
