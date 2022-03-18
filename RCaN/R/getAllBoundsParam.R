@@ -8,6 +8,7 @@
 #'
 #' @importFrom utils setTxtProgressBar
 #' @importFrom utils txtProgressBar
+#' @importFrom lpSolveAPI delete.lp
 #' @importFrom ROI objective
 #' @importFrom ROI L_objective
 #'
@@ -48,7 +49,7 @@ getAllBoundsParam <- function(x,
 
   if (progressBar)
     pb <- txtProgressBar(min = 0, max = nbparam, style = 3)
-  bounds <- sapply(1:nbparam, function(p) {
+  bounds <- sapply(seq_len(nbparam), function(p) {
     if (progressBar)
       setTxtProgressBar(pb, p)
     sapply(c("min", "max"), function(s){
@@ -74,12 +75,15 @@ getAllBoundsParam <- function(x,
                                                   maximum,
                                                   ob)
         set.objfn(presolved$OP$lp_model, ob)
-        getParamMinMax(presolved$OP, ip)
+        rbes <- getParamMinMax(presolved$OP, ip)
+        delete.lp(presolved$OP$lp_model)
       } else {
-        presolved$fixed[colnames(A)[p]]
+        rbes <- presolved$fixed[colnames(A)[p]]
       }
+      rbes
     })
   })
+
   data.frame(
     param = colnames(A),
     lowerbound = bounds[1, ],

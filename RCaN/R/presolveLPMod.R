@@ -26,6 +26,7 @@
 #' @importFrom lpSolveAPI set.objfn
 #' @importFrom lpSolveAPI get.primal.solution
 #' @importFrom lpSolveAPI read.lp
+#' @importFrom lpSolveAPI delete.lp
 #' @importFrom ROI OP
 #' @importFrom ROI L_constraint
 #' @importFrom ROI V_bound
@@ -118,6 +119,7 @@ presolveLPMod <-
                 upper = upper,
                 fixed = fixed,
                 OP = OP)
+    delete.lp(lp_model)
     return (res)
   }
 
