@@ -189,7 +189,7 @@ generateSymbolicObjects <-
     if (!is.null(aliases)){
       for (i in seq_len(nrow(aliases))){
         assign(aliases[i, 1],
-               aliases[i, 2])
+               eval(parse(text = aliases[i, 2])))
         generateDerivedSymbolicObjects(aliases[i, 1],
                                        environment(),
                                        M = TRUE,
@@ -211,7 +211,6 @@ generateSymbolicObjects <-
       "s",
       "t",
       "isp",
-      "ifl",
       "sp",
       "inflow",
       "outflow",

@@ -11,6 +11,7 @@
 #'  relaxed and that
 #' A is incompatible with B and that D is incompatible with both E and F
 #'
+#' @importFrom lpSolveAPI delete.lp
 #'
 #' @examples
 #' n <- 20
@@ -86,6 +87,9 @@ findingIncompatibleConstr <- function(x) {
     res <- ROI_solve(lp_model, solver = "clp", control = list(amount = 0))
   }
 
+  delete.lp(lp_model$lp_model)
+
+
   solutions <- res$solution
   problematic <-
     param_name[which(solutions > 0 & (seq_len(length(solutions))) > (nbparam))]
@@ -133,6 +137,8 @@ findingIncompatibleConstr <- function(x) {
           res$status$code == 5){
         res <- ROI_solve(lp_model, solver = "clp", control = list(amount = 0))
       }
+      delete.lp(lp_model$lp_model)
+
       solutions <- res$solution
       c(gsub("^\\s*\\w*", "", problematic[p]),
         gsub("^\\s*\\w*", "",
