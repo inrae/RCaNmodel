@@ -35,7 +35,6 @@
 #' @importFrom foreach %do%
 #' @importFrom foreach %do%
 #' @importFrom stats runif
-#' @importFrom lpSolveAPI delete.lp
 sampleCaN <- function(myCaNmod,
                       N,
                       nchain = 1,
@@ -93,7 +92,6 @@ sampleCaN <- function(myCaNmod,
 
       if (res$status$code == 0)
         find_init <- TRUE
-      delete.lp(lp_model$lp_model)
       nbiter <- nbiter + 1
     }
     if (!find_init)
