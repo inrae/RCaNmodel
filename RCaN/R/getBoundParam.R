@@ -9,7 +9,6 @@
 #' @importFrom ROI L_objective
 #' @importFrom ROI objective
 #' @importFrom lpSolveAPI write.lp
-#' @importFrom lpSolveAPI delete.lp
 #' @return a vector with lower bounds and upper bounds
 #' @examples
 #' n <- 20
@@ -64,12 +63,11 @@ getBoundParam <- function(x, p) {
                                                 maximum,
                                                 ob)
       set.objfn(presolved$OP$lp_model, ob)
-      rbes <- getParamMinMax(presolved$OP, ip)
-      delete.lp(presolved$OP$lp_model)
+
+      getParamMinMax(presolved$OP, ip)
     } else {
-      rbes <- presolved$fixed[colnames(A)[p]]
+      presolved$fixed[colnames(A)[p]]
     }
-    rbes
   })
 
   return (res)
