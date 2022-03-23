@@ -7,13 +7,16 @@
 #'
 #' @return same as \code{\link[ROI]{ROI_solve}}
 #'
+#' @importFrom lpSolveAPI read.lp
 #' @importFrom lpSolveAPI lp.control
 #' @importFrom lpSolveAPI solve.lpExtPtr
 #' @importFrom lpSolveAPI get.primal.solution
 #' @importFrom lpSolveAPI dim.lpExtPtr
 #' @importFrom lpSolveAPI get.objective
+#' @importFrom lpSolveAPI delete.lp
+#' @importFrom lpSolveAPI set.objfn
 #' @importFrom ROI ROI_plugin_canonicalize_solution
-#'
+#' @importFrom stats terms
 
 
 ROI_solve <-
@@ -21,11 +24,15 @@ ROI_solve <-
     if (solver != "lpsolve"){
       res <- ROI::ROI_solve(x, solver, control)
     } else {
-      lp_model <- x$lp_model
+      lp_model <- read.lp(x$lp_model, type = "mps")
+      ob <- as.vector(terms(objective(x))$L[1,])
       dims <- dim.lpExtPtr(lp_model)
-      valide_names <- names(lp.control(lp_model))
+      set.objfn(lp_model, ob)
+      sense <- ifelse(x$maximum, "max", "min")
+      lp.control(lp_model, sense = sense)
+      #valide_names <- names(lp.control(lp_model))
       do.call(lp.control,
-              c(lp_model, control[names(control) %in% valide_names]))
+              c(lp_model, control))
       conv <- solve.lpExtPtr(lp_model)
       x0 <-
         get.primal.solution(lp_model,
@@ -36,6 +43,7 @@ ROI_solve <-
                                                optimum  = optimum,
                                                status   = conv,
                                                solver   = solver)
+      delete.lp(lp_model)
     }
     return(res)
   }

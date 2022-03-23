@@ -56,6 +56,8 @@ checkPolytopeStatus <- function(x) {
     res2 <- ROI_solve(lp_model, solver = "clp", control = list(amount = 0))
     if (res2$status$msg$code ==0) res <- res2
   }
+  file.remove(lp_model$lp_model)
+
   if (res$status$msg$code == 0) {
     lp_model <- defineLPMod(A, b, C, v, maximum = TRUE)
     res <- ROI_solve(lp_model, solver = "lpsolve",
@@ -71,6 +73,8 @@ checkPolytopeStatus <- function(x) {
       res2 <- ROI_solve(lp_model, solver = "clp", control = list(amount = 0))
       if (res2$status$msg$code ==0) res <- res2
     }
+    file.remove(lp_model$lp_model)
+
 
   }
   if (res$status$msg$code == 0) {

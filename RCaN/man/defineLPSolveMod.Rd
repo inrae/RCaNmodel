@@ -36,7 +36,7 @@ absence of such constraints}
 \item{ob}{the coefficient of the ojective function (default all 1)}
 }
 \value{
-returns an OP object
+returns the path to a temporary file describing the lp
 }
 \description{
 defineLPSolveMod
