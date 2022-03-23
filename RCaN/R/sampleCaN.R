@@ -77,10 +77,10 @@ sampleCaN <- function(myCaNmod,
                               maximum = FALSE,
                               ob = runif(ncol(myCaNmod$A)))
       res <- ROI_solve(lp_model, solver = "lpsolve",
-                       control = list(presolve = c("rows",
-                                                   "lindep",
-                                                   "rowdominate",
-                                                   "mergerows"),
+                       list(presolve = c("rows",
+                                         "lindep",
+                                         "rowdominate",
+                                         "mergerows"),
                                       scaling = c("extreme",
                                                   "equilibrate",
                                                   "integers")))
@@ -96,6 +96,8 @@ sampleCaN <- function(myCaNmod,
     }
     if (!find_init)
       stop("unable to find any suitable solutions after 100 tries")
+    file.remove(lp_model$lp_model)
+
     res <-
       sampleCaNCPP(
         N,

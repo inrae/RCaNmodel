@@ -52,6 +52,7 @@ chebyCentre <- function(A, b) {
       requireNamespace("ROI.plugin.clp", quietly = TRUE)){
     res <- ROI_solve(lp_mod, solver = "clp", control = list(amount = 0))
   }
+  file.remove(lp_mod$lp_model)
 
   x <- res$solution
 
