@@ -12,15 +12,13 @@
 #' @param maximum tells whether the objective function is maximised or not
 #' @param ob the coefficient of the ojective function (default all 1)
 #'
-#' @return returns the path to a temporary file describing the lp
+#' @return returns an OP object
 #'
 #' @importFrom lpSolveAPI make.lp
 #' @importFrom lpSolveAPI set.bounds
 #' @importFrom lpSolveAPI set.rhs
 #' @importFrom lpSolveAPI set.constr.type
 #' @importFrom lpSolveAPI lp.control
-#' @importFrom lpSolveAPI delete.lp
-#' @importFrom lpSolveAPI write.lp
 
 
 defineLPSolveMod <-
@@ -62,8 +60,5 @@ defineLPSolveMod <-
 
     lp.control(lp_model, sense = sense)
     set.objfn(lp_model, ob)
-    file <- paste0(tempfile(), ".mps")
-    write.lp(lp_model, filename = file, type = "mps", use.names	= c(FALSE, FALSE))
-    delete.lp(lp_model)
-    return (file)
+    return (lp_model)
   }

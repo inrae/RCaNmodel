@@ -25,7 +25,7 @@
 #' @importFrom lpSolveAPI get.constr.type
 #' @importFrom lpSolveAPI set.objfn
 #' @importFrom lpSolveAPI get.primal.solution
-#' @importFrom lpSolveAPI delete.lp
+#' @importFrom lpSolveAPI read.lp
 #' @importFrom ROI OP
 #' @importFrom ROI L_constraint
 #' @importFrom ROI V_bound
@@ -104,7 +104,6 @@ presolveLPMod <-
     b2 <- rhs[dir == "<="]
     C2 <- lhs[dir == "=", ]
     v2 <- rhs[dir == "="]
-    delete.lp(lp_model)
     if (nrow(lhs) > 0){
       OP <- defineLPMod(A2, b2, C2, v2, bounds$lower, bounds$upper,
                         maximum = maximum, ob = rep(1, ncol(lhs)))
