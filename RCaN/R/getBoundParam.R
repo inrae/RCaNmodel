@@ -54,26 +54,21 @@ getBoundParam <- function(x, p) {
       ob <- rep(0, ncol(presolved$A))
       ob[ip] <- 1
       ROI::objective(presolved$OP) <- L_objective(ob)
-      # presolved$OP$lp_model <- defineLPSolveMod(presolved$A,
-      #                                           presolved$b,
-      #                                           presolved$C,
-      #                                           presolved$v,
-      #                                           presolved$lower,
-      #                                           presolved$upper,
-      #                                           maximum,
-      #                                           ob)
-      # set.objfn(presolved$OP$lp_model, ob)
+      presolved$OP$lp_model <- defineLPSolveMod(presolved$A,
+                                                presolved$b,
+                                                presolved$C,
+                                                presolved$v,
+                                                presolved$lower,
+                                                presolved$upper,
+                                                maximum,
+                                                ob)
+      set.objfn(presolved$OP$lp_model, ob)
 
       getParamMinMax(presolved$OP, ip)
     } else {
       presolved$fixed[colnames(A)[p]]
     }
   })
-
-  if (! is.null(presolvedmax$OP))
-    file.remove(presolvedmax$OP$lp_model)
-  if (! is.null(presolvedmin$OP))
-    file.remove(presolvedmin$OP$lp_model)
 
   return (res)
 }
