@@ -83,9 +83,11 @@ presolveLPMod <-
     lhs <- matrix(0,length(rhs), dim(lp_model)[2])
     dimnames(lhs) <- dimnames(lp_model)
     names(rhs) <- dimnames(lp_model)[[1]]
-    for (i in seq_len(dim(lp_model)[2]))
-      lhs[get.column(lp_model,i)$nzrow[get.column(lp_model,i)$nzrow!=0], i] <-
-      get.column(lp_model,i)$column[get.column(lp_model,i)$nzrow!=0]
+    for (i in seq_len(dim(lp_model)[2])){
+      column <- get.column(lp_model,i)
+      lhs[column$nzrow[column$nzrow!=0], i] <-
+        column$column[column$nzrow!=0]
+    }
     bounds <- get.bounds(lp_model)
     lower <- bounds$lower
     if (all(lower == 0)) lower <- NULL
