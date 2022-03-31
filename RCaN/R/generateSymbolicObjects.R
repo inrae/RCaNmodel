@@ -211,7 +211,6 @@ generateSymbolicObjects <-
       "s",
       "t",
       "isp",
-      "ifl",
       "sp",
       "inflow",
       "outflow",
