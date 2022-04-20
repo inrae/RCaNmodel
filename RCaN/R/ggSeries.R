@@ -33,8 +33,8 @@
 #'
 ggSeries <- function(mysampleCaNmod,
                      param,
-                     plot_series=TRUE,
-                     ylab="Biomass/Flux") {
+                     plot_series = TRUE,
+                     ylab = "Biomass/Flux") {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("Package ggplot2 needed for this function to work. Please install it.",
          call. = FALSE)
@@ -42,6 +42,10 @@ ggSeries <- function(mysampleCaNmod,
   if (class(mysampleCaNmod) != "sampleCaNmod")
     stop("you should provide a sampleCaNmod object")
   mat_res <- as.matrix(mysampleCaNmod$mcmc)
+
+  # take some random lines that can be drawn consistently among series
+  selectedsamples <- sample(seq_len(nrow(mat_res)), size = 3)
+
   quantiles <- do.call("rbind.data.frame", lapply(param, function(p) {
     columns <- which(startsWith(colnames(mat_res), paste(p, "[", sep = "")))
     if (length(columns) == 0)
@@ -89,7 +93,6 @@ ggSeries <- function(mysampleCaNmod,
       columns <- which(startsWith(colnames(mat_res), paste(p, "[", sep = "")))
       if (length(columns) == 0)
         stop("param not recognized")
-      selectedsamples <- sample(seq_len(nrow(mat_res)), size = 3)
       fewseries <-
         data.frame(t(apply(
           mat_res[selectedsamples, columns], 2, identity
