@@ -5,8 +5,8 @@
 #' description, including all the underlying equations
 #' @param x either the path to a RCaN input file or a named list with
 #' 4 elements (components_param, fluxes_def, series, constraints)
-#' @param trophic tells whether the model is a standard RCaN trophic model
-#' (default = TRUE)
+#' @param generic tells whether the model is a standard RCaN trophic model
+#' (FALSE, default) or a generic model (TRUE)
 #'
 #' @return a CaNmod object with following elements
 #' \itemize{
@@ -63,7 +63,7 @@
 #' @importFrom readxl read_excel
 #' @importFrom readxl excel_sheets
 #'
-buildCaN <- function(x, trophic = TRUE) {
+buildCaN <- function(x, generic = FALSE) {
   aliases <- NULL
   if (! class(x) %in% c("character", "list")){
     stop("x should either be the path to an RCaN file or a named list")
@@ -96,7 +96,7 @@ buildCaN <- function(x, trophic = TRUE) {
       )
     }
 
-    if (! trophic) {
+    if (generic) {
       dynamics <- as.data.frame(
         read_excel(x, sheet = "Dynamics")
       )
@@ -116,7 +116,7 @@ buildCaN <- function(x, trophic = TRUE) {
     constraints <- x$constraints
     fluxes_def <- x$fluxes_def
     series <- x$series
-    if (trophic) dynamics <- x$dynamics
+    if (! generic) dynamics <- x$dynamics
     components_param <- x$components_param
   }
   #Components & input parameter
@@ -149,7 +149,7 @@ buildCaN <- function(x, trophic = TRUE) {
   fluxes_from <- match(fluxes_def$From, species)
   fluxes_to <- match(fluxes_def$To, species)
 
-  if (trophic) {
+  if (! generic) {
     if (!all(fluxes_def$Trophic %in% c(0, 1)))
       stop("In sheet fluxes, Trophic should be 0 or 1")
     is_trophic_flux <- fluxes_def$Trophic == 1
@@ -165,8 +165,8 @@ buildCaN <- function(x, trophic = TRUE) {
 
 
   #dynamics
-
-  if (!trophic) {
+  dyn_eq <- NULL
+  if (generic) {
     for (i in seq_len(3)){
       dyn_eq <- as.character(dynamics_equation[i])
       dyn_eq <- gsub(paste0("(",
@@ -223,43 +223,15 @@ buildCaN <- function(x, trophic = TRUE) {
 
 
   #build matrices H and N
-  if (trophic) {
-    H <- diag(1 - exp(-components_param$OtherLosses[index_species]),
-              nrow=length(index_species))
-    N <- matrix(0, nbspecies, nbfluxes)
-    N[cbind(fluxes_from, 1:nbfluxes)] <- -1 #this is an outgoing flow
-    N[na.omit(cbind(fluxes_to, 1:nbfluxes))] <-
-      na.omit(
-        N[cbind(fluxes_to, 1:nbfluxes)] + ifelse(
-          is_trophic_flux,
-          components_param$AssimilationE[match(fluxes_def$To, components)] *
-            components_param$Digestibility[match(fluxes_def$From, components)],
-          1
-        )
-      ) #if it is not a trophic flow, we do not take into account assimilation
-    # and digestibility
-    N <-
-      sweep(N, 1, STATS = diag(H) /
-              (components_param$OtherLosses[index_species,drop=FALSE]), "*")
-    rownames(N) <- species
-    colnames(N) <- flow
-    colnames(H) <- rownames(H) <- species
-  } else {
-    matrices <- createDynamics(dynamics_equation,
-                               components_param,
-                               fluxes_def)
-    H <- matrices$H
-    N <- matrices$N
-  }
+
   #build symbolic objects in a specific environment
   symbolic_enviro <-
-    generateSymbolicObjects(fluxes_def,
-                            species,
+    generateSymbolicObjects(components_param,
+                            fluxes_def,
                             ntstep,
-                            H,
-                            N,
                             series,
-                            aliases)
+                            aliases,
+                            dyn_eq)
 
   constraints_word <-
     unlist(sapply(as.character(constraints$Constraint), function(x)
@@ -309,7 +281,7 @@ buildCaN <- function(x, trophic = TRUE) {
       lapply(
         components_param$Component[components_param$Component %in% species],
         function(sp){
-          if (trophic) {
+          if (! generic) {
             refuge <- components_param$RefugeBiomass[
               components_param$Component == sp]
             refuge <- ifelse(is.na(refuge), 0, refuge)
@@ -324,7 +296,7 @@ buildCaN <- function(x, trophic = TRUE) {
     ))
 
   ####add satiation
-  if (trophic){
+  if (! generic){
     species_flow_to <-
       unique(as.character(fluxes_def$To[fluxes_def$To %in% species &
                                           is_trophic_flux]))
@@ -528,8 +500,9 @@ buildCaN <- function(x, trophic = TRUE) {
     ntstep = ntstep,
     data_series_name = data_series_name,
     constraints = constraints,
-    H = H,
-    N = N,
+    H = symbolic_enviro$H,
+    N = symbolic_enviro$N,
+    Nend = symbolic_enviro$Nend,
     A = A,
     AAll = AAll,
     C = C,

@@ -2,13 +2,13 @@
 #'
 #' This is an internal function that builds all the required symbolic objects
 #' required for the computation of the model
+#' @param components the components data frame
 #' @param fluxes_def fluxes_def
-#' @param species names of the species
 #' @param ntstep number of the time step
-#' @param H the H matrix of (I-H).B+N.F
-#' @param N the N matrix of (I-H).B+N.F
 #' @param series the names of the series
 #' @param aliases table of alias (default = NULL)
+#' @param dynamics_equation a string that specifies the dynamics equation (NULL
+#' if trophic model)
 #'
 #' @return en environment storing all symbolic elements including among others
 #' \itemize{
@@ -24,13 +24,18 @@
 #' @importFrom dplyr pull
 
 generateSymbolicObjects <-
-  function(fluxes_def, species, ntstep, H, N, series, aliases) {
+  function(components,
+           fluxes_def,
+           ntstep,
+           series,
+           aliases,
+           dynamics_equation = NULL) {
+    species <- components$Component[which(components$Inside == 1)]
     flow <- fluxes_def$Flux
     years <- series$Year
     nbspec <- length(species)
     Ie <- diag(nbspec) #diagonal_matrix
-    IE_H <- symengine::Matrix(Ie - H)
-    n <- symengine::Matrix(N)
+
     for (s in species)
       assign(paste(s, years[1], sep = "_"),
              S(paste(s, years[1], sep = "_"))) #initial biomass
@@ -47,6 +52,17 @@ generateSymbolicObjects <-
       )))) #symbolic vector F_0 (all fluxes for time step 0)
     list_F <- list(eval(parse(text = paste("F", years[1], sep = "_"))))
     list_B <- list(eval(parse(text = paste("B", years[1], sep = "_"))))
+
+    matrices <- createDynamics(dynamics_equation, components, fluxes_def)
+    H <- matrices$H
+    N <- matrices$N
+    Nend <- matrices$Nend
+
+    IE_H <- symengine::Matrix(Ie - H)
+    n <- symengine::Matrix(N)
+    nend <- symengine::Matrix(Nend)
+
+    #loop over time step
     for (t in years[-1]) {
       for (f in flow) {
         assign(paste(f, t, sep = "_"),
@@ -61,8 +77,22 @@ generateSymbolicObjects <-
       )))[, 1,drop=FALSE] + (n %*% eval(parse(
         text = paste("F", t - 1, sep = "_")
       )))[, 1]) # biomass at time t+1 is B_t+1=(Ie-H)%*%B_t+N%*%F_t
+
+      #biomass at the end of the time step
+      assign(paste("BEnd", t - 1, sep = "_"), (IE_H %*% eval(parse(
+        text = paste("B", t - 1, sep = "_")
+      )))[, 1,drop=FALSE] + (nend %*% eval(parse(
+        text = paste("F", t - 1, sep = "_")
+      )))[, 1]) # biomass at time t+1 is B_t+1=(Ie-H)%*%B_t+N%*%F_t
+
       list_F <- c(list_F, eval(parse(text = paste("F", t, sep = "_"))))
       list_B <- c(list_B, eval(parse(text = paste("B", t, sep = "_"))))
+      if ((t - 1) == years[1]){
+        list_BEnd <- eval(parse(text = paste("BEnd", t - 1, sep = "_")))
+      } else {
+        list_BEnd <- c(list_BEnd,
+                       eval(parse(text = paste("BEnd", t - 1, sep = "_"))))
+      }
     }
 
 
@@ -74,6 +104,10 @@ generateSymbolicObjects <-
                                     #on which we will sample
     assign("Bmat", do.call("cbind", list_B))
     colnames(Bmat) <- years
+
+    assign("BmatEnd", do.call("cbind", list_BEnd))
+    colnames(BmatEnd) <- years
+
     param <- c(V(1), param) #we add an intercept
 
 
@@ -151,7 +185,21 @@ generateSymbolicObjects <-
 
     for (is in seq_len(nbspec)) {
       assign(species[is], Bmat[is, ]) #vectors of biomass named by species name
+
+      #vectors of biomass named by species name at end of tstep
+      #we add a nan since the vector has no element for last time step
+      assign(paste0(species[is],
+                    "End"),
+             c(BmatEnd[is, ], NaN))
       generateDerivedSymbolicObjects(species[is],
+                                     environment(),
+                                     M = TRUE,
+                                     P = TRUE,
+                                     ratio = TRUE,
+                                     ratioM = TRUE,
+                                     delta = TRUE,
+                                     deltaM = TRUE)
+      generateDerivedSymbolicObjects(paste0(species[is], "End"),
                                      environment(),
                                      M = TRUE,
                                      P = TRUE,

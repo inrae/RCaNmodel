@@ -4,10 +4,11 @@
 \alias{createDynamics}
 \title{createDynamics}
 \usage{
-createDynamics(dynamics_equation, components, fluxes)
+createDynamics(dynamics_equation = NULL, components, fluxes)
 }
 \arguments{
-\item{dynamics_equation}{a string that specifies the dynamics equation}
+\item{dynamics_equation}{a string that specifies the dynamics equation (NULL
+if trophic model)}
 
 \item{components}{the components data frame}
 

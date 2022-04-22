@@ -4,14 +4,14 @@
 \alias{buildCaN}
 \title{buildCaN}
 \usage{
-buildCaN(x, trophic = TRUE)
+buildCaN(x, generic = FALSE)
 }
 \arguments{
 \item{x}{either the path to a RCaN input file or a named list with
 4 elements (components_param, fluxes_def, series, constraints)}
 
-\item{trophic}{tells whether the model is a standard RCaN trophic model
-(default = TRUE)}
+\item{generic}{tells whether the model is a standard RCaN trophic model
+(FALSE, default) or a generic model (TRUE)}
 }
 \value{
 a CaNmod object with following elements
