@@ -4,7 +4,9 @@
 #' using a list of dataframes instead of and returns the complete model
 #' description, including all the underlying equations
 #' @param x either the path to a RCaN input file or a named list with
-#' 4 elements (components_param, fluxes_def, series, constraints)
+#' at least 4 elements (components_param, fluxes_def, series, constraints). It
+#' can also includes an element dynamics if this is not a trophic model, and
+#' optionally aliases
 #' @param generic tells whether the model is a standard RCaN trophic model
 #' (FALSE, default) or a generic model (TRUE)
 #'
@@ -116,6 +118,7 @@ buildCaN <- function(x, generic = FALSE) {
     constraints <- x$constraints
     fluxes_def <- x$fluxes_def
     series <- x$series
+    if (exists(x$aliases)) aliases <- x$aliases
     if (! generic) dynamics <- x$dynamics
     components_param <- x$components_param
   }

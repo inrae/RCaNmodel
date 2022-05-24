@@ -8,7 +8,9 @@ buildCaN(x, generic = FALSE)
 }
 \arguments{
 \item{x}{either the path to a RCaN input file or a named list with
-4 elements (components_param, fluxes_def, series, constraints)}
+at least 4 elements (components_param, fluxes_def, series, constraints). It
+can also includes an element dynamics if this is not a trophic model, and
+optionally aliases}
 
 \item{generic}{tells whether the model is a standard RCaN trophic model
 (FALSE, default) or a generic model (TRUE)}
