@@ -31,13 +31,13 @@ ROI_solve <-
         get.primal.solution(lp_model,
                             orig = TRUE)[(dims[1] + 1):(dims[1] +
                                                           dims[2])]
-      if (any(x0) == 1.0e30){ #this is the infinite bound of lpsolve
+      if (any(x0 == 1.0e30)) { #this is the infinite bound of lpsolve
         conv <- 3
-        x0[which(x0) == 1.0e30] <- Inf
+        x0[which(x0 == 1.0e30)] <- Inf
       }
-      if (any(x0) == - 1.0e30){ #this is the infinite bound of lpsolve
+      if (any(x0 == - 1.0e30)){ #this is the infinite bound of lpsolve
         conv <- 3
-        x0[which(x0) == - 1.0e30] <- Inf
+        x0[which(x0 == - 1.0e30)] <- Inf
       }
       optimum <- get.objective(lp_model)
       res <- ROI_plugin_canonicalize_solution( solution = x0,
