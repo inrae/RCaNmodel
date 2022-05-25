@@ -16,6 +16,8 @@
 #'  \item{"species"}{the name of the species}
 #'  \item{"fluxes_def}{the table of fluxes definition}
 #'  \item{"ntstep"}{the number of time steps}
+#'  \item{"aliases"}{the aliases specified by the user}
+#'  \item{"dynamics"}{the dynamics equation for a generic model}
 #'  \item{"data_series_name"}{the names of the data series}a
 #'  \item{"constraints"}{the table of constraints description}
 #'  \item{"H"}{the H matrix from (I-H).B+N.F}
@@ -60,6 +62,11 @@
 #'                                series = series,
 #'                                constraints = constraints))
 #'
+#' #example with a template under the generic format
+#' file <- system.file("extdata",
+#'  "CaN_template_mini_generic.xlsx", package = "RCaN")
+#' myCaNmod_generic <- buildCaN(file, generic = TRUE)
+#'
 #' @importFrom Matrix Matrix
 #' @importFrom stats na.omit
 #' @importFrom readxl read_excel
@@ -97,6 +104,8 @@ buildCaN <- function(x, generic = FALSE) {
         read_excel(x, sheet = "Aliases")
       )
     }
+
+    dynamics <- NULL
 
     if (generic) {
       dynamics <- as.data.frame(
@@ -234,7 +243,7 @@ buildCaN <- function(x, generic = FALSE) {
                             ntstep,
                             series,
                             aliases,
-                            dyn_eq)
+                            dynamics_equation)
 
   constraints_word <-
     unlist(sapply(as.character(constraints$Constraint), function(x)
@@ -501,6 +510,8 @@ buildCaN <- function(x, generic = FALSE) {
     flow = flow,
     series = series,
     ntstep = ntstep,
+    aliases = aliases,
+    dynamics = dynamics,
     data_series_name = data_series_name,
     constraints = constraints,
     H = symbolic_enviro$H,
