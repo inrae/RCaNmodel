@@ -251,7 +251,6 @@ generateSymbolicObjects <-
     }
     rm(list = c(
       "H",
-      "N",
       "flow",
       "species",
       "series",
