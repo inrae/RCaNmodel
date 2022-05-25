@@ -106,6 +106,7 @@ buildCaN <- function(x, generic = FALSE) {
     }
 
     dynamics <- NULL
+    dynamics_equation <- NULL
 
     if (generic) {
       dynamics <- as.data.frame(
