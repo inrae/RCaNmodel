@@ -43,7 +43,7 @@ plotPolytope2D <- function(x,
   nbparam <- ncol(A)
   if (length(params) != 2)
     stop("only works for two params")
-  if (class(params) == "character") {
+  if (inherits(params, "character")) {
     old_params <- params
     params <- match(params, colnames(A))
     if (length(which(is.na(params))) > 0)

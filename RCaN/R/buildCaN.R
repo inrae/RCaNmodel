@@ -77,7 +77,7 @@ buildCaN <- function(x, generic = FALSE) {
   if (! class(x) %in% c("character", "list")){
     stop("x should either be the path to an RCaN file or a named list")
   }
-  if (class(x) == "character"){
+  if (inherits(x, "character")){
     if (!file.exists(x))
       stop("the specified file does not exit")
     components_param <- as.data.frame(
@@ -119,16 +119,16 @@ buildCaN <- function(x, generic = FALSE) {
       stop("x should be a named list")
     if (!all(sort(names(x)) %in% c("components_param",
                                    "dynamics",
-                                 "constraints",
-                                 "fluxes_def",
-                                 "series",
-                                 "aliases")))
-        stop("names of x should be components_param, dynamics, constraints,
+                                   "constraints",
+                                   "fluxes_def",
+                                   "series",
+                                   "aliases")))
+      stop("names of x should be components_param, dynamics, constraints,
              fluxes_def, series", "aliases")
     constraints <- x$constraints
     fluxes_def <- x$fluxes_def
     series <- x$series
-    if (exists(x$aliases)) aliases <- x$aliases
+    if ("aliases" %in% names(x)) aliases <- x$aliases
     if (! generic) dynamics <- x$dynamics
     components_param <- x$components_param
   }
@@ -287,136 +287,138 @@ buildCaN <- function(x, generic = FALSE) {
                        gsub( "_"," : ", colnames(A)[-1]),
                        sep = "_")
 
-  ####add refuge biomasses/biomass positiveness
-  A <-
-    rbind(A, do.call(
-      rbind,
-      lapply(
-        components_param$Component[components_param$Component %in% species],
-        function(sp){
-          if (! generic) {
-            refuge <- components_param$RefugeBiomass[
-              components_param$Component == sp]
-            refuge <- ifelse(is.na(refuge), 0, refuge)
-          } else{
-            refuge <- 0
-          }
-          treatConstraint(
-            paste(sp, ">=", refuge),
-            symbolic_enviro,
-            name_constr = paste("Biomass positiveness_refuge", sp, sep = "_")
-          )})
-    ))
-
-  ####add satiation
-  if (! generic){
-    species_flow_to <-
-      unique(as.character(fluxes_def$To[fluxes_def$To %in% species &
-                                          is_trophic_flux]))
+  if (! generic) {#add implicit constraints for non generic model
+    ####add refuge biomasses/biomass positiveness
     A <-
       rbind(A, do.call(
         rbind,
         lapply(
-          species_flow_to[!is.na(
-            components_param$Satiation[match(species_flow_to,
-                                             components_param$Component)])],
-          function(sp)
+          components_param$Component[components_param$Component %in% species],
+          function(sp){
+            if (! generic) {
+              refuge <- components_param$RefugeBiomass[
+                components_param$Component == sp]
+              refuge <- ifelse(is.na(refuge), 0, refuge)
+            } else{
+              refuge <- 0
+            }
             treatConstraint(
-              paste(
-                paste(fluxes_def$Flux[fluxes_def$To == sp &
-                                        is_trophic_flux], collapse = "+"),
-                "<=",
-                components_param$Satiation[components_param$Component == sp],
-                "*",
-                sp
-              ),
+              paste(sp, ">=", refuge),
               symbolic_enviro,
-              name_constr = paste("satiation", sp, sep = "_")
-            ))
+              name_constr = paste("Biomass positiveness_refuge", sp, sep = "_")
+            )})
       ))
-    ####add inertia
-    A <-
-      rbind(A,
-            do.call(
-              rbind,
-              lapply(
-                components_param$Component[components_param$Component %in%
-                                             species &
-                                             !is.na(components_param$Inertia)],
-                function(sp) {
-                  #increase
-                  emigrants <-
-                    as.character(fluxes_def$Flux)[
-                      as.character(fluxes_def$From) == sp &
-                        !fluxes_def$Trophic]
-                  treatConstraint(
-                    paste(
-                      sp,
-                      "[-1] >=",
-                      sp,
-                      "[1:(length(",
-                      sp,
-                      ")-1)]*exp(-",
-                      components_param$Inertia[
-                        components_param$Component == sp],
-                      ")",
-                      sep = ""
-                    ),
-                    symbolic_enviro,
-                    name_constr = paste("inertia_sup",
-                                        sp,
-                                        sep = "_")
-                  )
-                })))
-    A <-
-      rbind(A,
-            do.call(rbind,
-                    lapply(
-                      components_param$Component[
-                        components_param$Component %in% species &
-                          !is.na(components_param$Inertia)],
-                      function(sp) {
-                        mu <- components_param$Inertia[
-                          components_param$Component == sp]
-                        #decrease
-                        immigrants <-
-                          as.character(fluxes_def$Flux)[
-                            as.character(fluxes_def$To) == sp &
-                              !fluxes_def$Trophic]
-                        treatConstraint(
-                          paste(
-                            sp,
-                            "[-1] <=",
-                            sp,
-                            "[1:(length(",
-                            sp,
-                            ")-1)]*exp(", mu
-                            ,
-                            ")",
-                            ifelse(length(immigrants) >
-                                     0, paste(
-                                       "+", (1-exp(-mu))/mu, "* (",
-                                       paste(
-                                         immigrants,
-                                         collapse = "+",
-                                         "[1:(length(",
-                                         sp,
-                                         ")-1)]",
-                                         sep = ""
-                                       ), ")",
-                                       sep = ""
-                                     ), ""),
-                            #we do not take into account
-                            #imemigrants
-                            sep = ""
-                          ),
-                          symbolic_enviro,
-                          name_constr = paste("inertia_inf",
-                                              sp,
-                                              sep = "_")
-                        )
-                      })))
 
+    ####add satiation
+    if (! generic){
+      species_flow_to <-
+        unique(as.character(fluxes_def$To[fluxes_def$To %in% species &
+                                            is_trophic_flux]))
+      A <-
+        rbind(A, do.call(
+          rbind,
+          lapply(
+            species_flow_to[!is.na(
+              components_param$Satiation[match(species_flow_to,
+                                               components_param$Component)])],
+            function(sp)
+              treatConstraint(
+                paste(
+                  paste(fluxes_def$Flux[fluxes_def$To == sp &
+                                          is_trophic_flux], collapse = "+"),
+                  "<=",
+                  components_param$Satiation[components_param$Component == sp],
+                  "*",
+                  sp
+                ),
+                symbolic_enviro,
+                name_constr = paste("satiation", sp, sep = "_")
+              ))
+        ))
+      ####add inertia
+      A <-
+        rbind(A,
+              do.call(
+                rbind,
+                lapply(
+                  components_param$Component[components_param$Component %in%
+                                               species &
+                                               !is.na(components_param$Inertia)],
+                  function(sp) {
+                    #increase
+                    emigrants <-
+                      as.character(fluxes_def$Flux)[
+                        as.character(fluxes_def$From) == sp &
+                          !fluxes_def$Trophic]
+                    treatConstraint(
+                      paste(
+                        sp,
+                        "[-1] >=",
+                        sp,
+                        "[1:(length(",
+                        sp,
+                        ")-1)]*exp(-",
+                        components_param$Inertia[
+                          components_param$Component == sp],
+                        ")",
+                        sep = ""
+                      ),
+                      symbolic_enviro,
+                      name_constr = paste("inertia_sup",
+                                          sp,
+                                          sep = "_")
+                    )
+                  })))
+      A <-
+        rbind(A,
+              do.call(rbind,
+                      lapply(
+                        components_param$Component[
+                          components_param$Component %in% species &
+                            !is.na(components_param$Inertia)],
+                        function(sp) {
+                          mu <- components_param$Inertia[
+                            components_param$Component == sp]
+                          #decrease
+                          immigrants <-
+                            as.character(fluxes_def$Flux)[
+                              as.character(fluxes_def$To) == sp &
+                                !fluxes_def$Trophic]
+                          treatConstraint(
+                            paste(
+                              sp,
+                              "[-1] <=",
+                              sp,
+                              "[1:(length(",
+                              sp,
+                              ")-1)]*exp(", mu
+                              ,
+                              ")",
+                              ifelse(length(immigrants) >
+                                       0, paste(
+                                         "+", (1-exp(-mu))/mu, "* (",
+                                         paste(
+                                           immigrants,
+                                           collapse = "+",
+                                           "[1:(length(",
+                                           sp,
+                                           ")-1)]",
+                                           sep = ""
+                                         ), ")",
+                                         sep = ""
+                                       ), ""),
+                              #we do not take into account
+                              #imemigrants
+                              sep = ""
+                            ),
+                            symbolic_enviro,
+                            name_constr = paste("inertia_inf",
+                                                sp,
+                                                sep = "_")
+                          )
+                        })))
+
+    }
   }
   ####add constraint provided by user
   if (length(lessthan) + length(greaterthan) > 0) {
