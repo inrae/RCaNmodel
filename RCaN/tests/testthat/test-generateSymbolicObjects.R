@@ -5,7 +5,7 @@ file_generic <- system.file("extdata",
 
 
 myCaNmod <- buildCaN(file1)
-myCaNmod_generic <- buildCaN(file_generic)
+myCaNmod_generic <- buildCaN(file_generic, generic = TRUE)
 
 
 test_that("classes and dims of outputs objects are correct", {

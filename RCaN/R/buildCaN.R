@@ -117,6 +117,8 @@ buildCaN <- function(x, generic = FALSE) {
   } else {
     if (is.null(names(x)))
       stop("x should be a named list")
+    dynamics <- NULL
+    dynamics_equation <- NULL
     if (!all(sort(names(x)) %in% c("components_param",
                                    "dynamics",
                                    "constraints",
