@@ -38,7 +38,6 @@ createDynamics <- function(dynamics_equation = NULL,
   if (is.null(dynamics_equation)) {
     H <- diag(1 - exp(-components$OtherLosses[index_species]),
               nrow=length(index_species))
-    N <- matrix(0, nbspecies, nbfluxes)
     N[cbind(fluxes_from, 1:nbfluxes)] <- -1 #this is an outgoing flow
     N[na.omit(cbind(fluxes_to, 1:nbfluxes))] <-
       na.omit(
