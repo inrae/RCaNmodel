@@ -4,6 +4,7 @@
 #' @param species a named list with for each species of interest (names), a
 #' vector of predators to consider (if null, default, all species and all
 #' predators)
+#' @param years years to be plotted (default all)
 #' @param frac fraction of points to be plot (default all)
 #' @return a ggplot
 #' @importFrom magrittr %>%
@@ -47,7 +48,10 @@
 
 
 
-ggTopDownBottomUp <- function(mysampleCaNmod, species = NULL, frac = 1){
+ggTopDownBottomUp <- function(mysampleCaNmod,
+                              species = NULL,
+                              years = NULL,
+                              frac = 1){
   CanMod <- mysampleCaNmod$CaNmod
   if (is.null(species)){
       sp <- CanMod$species #all species
@@ -58,6 +62,8 @@ ggTopDownBottomUp <- function(mysampleCaNmod, species = NULL, frac = 1){
       names(species) <- sp
       species <- species[lengths(species) > 0]
   }
+  if (is.null(years))
+    years <- mysampleCaNmod$CaNmod$series$Year
   combinations <- do.call('rbind.data.frame',
                           lapply(seq_along(species), function(i){
                             data.frame(From = rep(names(species)[i],
@@ -122,6 +128,7 @@ ggTopDownBottomUp <- function(mysampleCaNmod, species = NULL, frac = 1){
            predation = !!sym("predation") / !!sym("value_curr")) %>%
     group_by(!!sym("Species"),
              !!sym("Sample_id")) %>%
+    filter(!!sym("Year") %in% years) %>%
     summarize(R1 = cor(!!sym("feeding"), !!sym("growth")),
               R2 = cor(!!sym("predation"), !!sym("growth"))) %>%
     pivot_longer(cols = any_of(c("R1","R2")),

@@ -5,7 +5,7 @@
 \title{ggTopDownBottomUp
 display a diagram to detect bottom up control}
 \usage{
-ggTopDownBottomUp(mysampleCaNmod, species = NULL, frac = 1)
+ggTopDownBottomUp(mysampleCaNmod, species = NULL, years = NULL, frac = 1)
 }
 \arguments{
 \item{mysampleCaNmod}{result sent by \link{sampleCaN}}
@@ -13,6 +13,8 @@ ggTopDownBottomUp(mysampleCaNmod, species = NULL, frac = 1)
 \item{species}{a named list with for each species of interest (names), a
 vector of predators to consider (if null, default, all species and all
 predators)}
+
+\item{years}{years to be plotted (default all)}
 
 \item{frac}{fraction of points to be plot (default all)}
 }
