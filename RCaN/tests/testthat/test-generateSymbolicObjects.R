@@ -7,6 +7,14 @@ file_generic <- system.file("extdata",
 myCaNmod <- buildCaN(file1)
 myCaNmod_generic <- buildCaN(file_generic, generic = TRUE)
 
+as.double_matrix <- function(x){
+  x2 <- matrix(ncol = ncol(x),
+               nrow = nrow(x))
+  for (i in seq_along(nrow(x))){
+    for (j in seq_along(ncol(x)))
+      x2[i, j] <- as.numeric(x[i, j])
+  }
+}
 
 test_that("classes and dims of outputs objects are correct", {
   symbo <- RCaN:::generateSymbolicObjects(myCaNmod$components_param,
@@ -57,7 +65,7 @@ test_that("generic and trophic are identical", {
                                           myCaNmod$series,
                                           myCaNmod$aliases,
                                           myCaNmod$dynamics$Equation)
-  expect_equal(symbo$IE_H, symbo2$IE_H)
+  expect_equal(as.double_matrix(symbo$IE_H), as.double_matrix(symbo2$IE_H))
   expect_equal(symbo$N, symbo2$N)
 
 })
