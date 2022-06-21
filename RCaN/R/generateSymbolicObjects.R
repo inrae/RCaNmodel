@@ -224,7 +224,7 @@ generateSymbolicObjects <-
     for (s in names(series)[-1]) {
       ser <- pull(series, s)
       ser[is.na(ser)] <- NaN
-      assign(s, Vector(ser))
+      assign(s, ser)
       generateDerivedSymbolicObjects(s,
                                      environment(),
                                      M = TRUE,
