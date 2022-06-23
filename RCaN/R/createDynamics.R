@@ -139,7 +139,7 @@ createDynamics <- function(dynamics_equation = NULL,
       } else {
 
         mycoeffs <- sapply(as.list(get_args(equation)), function(e) {
-          if (get_type(e) == "RealDouble") {
+          if (get_type(e) %in% c("RealDouble", "Symbol")) {
             return(c("1" = as.numeric(e)))
           } else if (get_type(e) == "Symbol") {
             val <- 1
