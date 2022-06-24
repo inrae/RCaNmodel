@@ -1,17 +1,21 @@
 #' sampleCaN
 #'
 #' sample the polytope corresponding to the CaNmod model
-#' @param myCaNmod a CaNmod object with following elements
+#' @param myCaNmod a CaNmod or a sampleCaNmod. In this latter case, adapative
+#' phase and discarding phases won't be necessary
 #' @param N the number of samples required
 #' @param nchain the number of mcmc chains
 #' @param ncore number of cores to use
 #' @param thin thinning interval
 #' @param method one of gibbs (default) or hitandrun
 #' @param lastF should flow for last year be simulated (default = FALSE)
-#' @return a sampleCaNmod object which contains two elements
+#' @return a sampleCaNmod object which contains three elements
 #' \itemize{
 #'  \item{"CaNmod"}{the CaNmod object descring the model}
 #'  \item{"mcmc"}{\code{\link[coda]{mcmc.list}}}
+#'  \item{"covMat"}{the estimate of the covariance matrix in the first chain
+#'  which can be used to samples new iterations without adaptation nor
+#'  discarding phase}
 #' }
 #'
 #' @export
@@ -42,6 +46,12 @@ sampleCaN <- function(myCaNmod,
                       thin = 1,
                       method="gibbs",
                       lastF = FALSE) {
+  if (inherits(myCaNmod, "sampleCaNmod")){
+    covMat <- myCaNmod$covMat
+    myCaNmod <- myCaNmod$CaNmod
+  } else{
+    covMat <- NULL
+  }
   if (! method %in% c("gibbs","hitandrun"))
     stop("method should be either gibbs or hitandrun")
   ncore <- min(min(detectCores() - 1, ncore), nchain)
@@ -108,9 +118,10 @@ sampleCaN <- function(myCaNmod,
         x0,
         method == "gibbs",
         i,
-        i
+        i,
+        covMat
       )
-    names(res) <- c("F", "B")
+    names(res) <- c("F", "B", "covMat")
     res$F <- res$F[, -seq_len(length(myCaNmod$species))]
     #we remove the first column which corresponds to initial biomasses
     colnames(res$F) <- colnames(myCaNmod$A)[-seq_len(length(myCaNmod$species))]
@@ -125,7 +136,8 @@ sampleCaN <- function(myCaNmod,
         res$F <- res$F[, - lastid]
     }
     colnames(res$B) <- rownames(myCaNmod$L)
-    mcmc(cbind(res$F, res$B), 1, nrow(res$F), 1)
+    list(samples = mcmc(cbind(res$F, res$B), 1, nrow(res$F), 1),
+         covMat = res$covMat)
   }
 
   if (ncore > 1) {
@@ -133,7 +145,8 @@ sampleCaN <- function(myCaNmod,
     stopImplicitCluster()
   }
   sampleCaNmod <- list(CaNmod = myCaNmod,
-                       mcmc = mcmc.list(res))
+                       mcmc = mcmc.list(lapply(res, function(r) r$samples)),
+                       covMat  = res[[1]]$covMat)
   class(sampleCaNmod) <- "sampleCaNmod"
   return(sampleCaNmod)
 
