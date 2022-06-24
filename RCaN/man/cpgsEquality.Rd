@@ -15,7 +15,8 @@ cpgsEquality(
   thin = 1L,
   gibbs = TRUE,
   seed = 1L,
-  stream = 1L
+  stream = 1L,
+  covMat = NULL
 )
 }
 \arguments{
@@ -38,9 +39,14 @@ cpgsEquality(
 \item{seed}{seed of the dqrng generator}
 
 \item{stream}{stream of the dqrng generator}
+
+\item{covMat}{prespecified covmatrix (avoid initialisation and discard) if
+prespecified (default null)}
 }
 \value{
-a matrix with one row per sample and one column per parameter
+a list with two elements: a matrix with one row per sample and one
+ column per parameter and a list with the covariance matrix used in the
+ algorithm that can be used to resample the model
 }
 \description{
 Complex Polytope Gibbs Sampling

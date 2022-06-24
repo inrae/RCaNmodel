@@ -5,7 +5,17 @@
 \title{Complex Polytope Gibbs Sampling
 This function draw uniform samples in a convex polytope with inequality constraints}
 \usage{
-cpgs(N, A, b, x0, thin = 1L, gibbs = TRUE, seed = 1L, stream = 1L)
+cpgs(
+  N,
+  A,
+  b,
+  x0,
+  thin = 1L,
+  gibbs = TRUE,
+  seed = 1L,
+  stream = 1L,
+  covMat = NULL
+)
 }
 \arguments{
 \item{N}{the number of samples to generate}
@@ -23,6 +33,9 @@ cpgs(N, A, b, x0, thin = 1L, gibbs = TRUE, seed = 1L, stream = 1L)
 \item{seed}{seed of the dqrng generator}
 
 \item{stream}{stream of the dqrng generator}
+
+\item{covMat}{prespecified covmatrix (avoid initialisation and discard) if
+prespecified (default null)}
 }
 \value{
 a matrix with one row per sample and one column per parameter

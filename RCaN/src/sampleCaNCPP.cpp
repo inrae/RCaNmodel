@@ -75,6 +75,8 @@ IntegerVector order_(const NumericVector & x) {
 //' @param gibbs if true, gibbs sampling, else hitandrun
 //' @param seed seed of the dqrng generator
 //' @param stream stream of the dqrng generator
+//' @param covMat prespecified covmatrix (avoid initialisation and discard) if
+//' prespecified (default null)
 //'
 //' @section Details:
 //' This function is based on an initial matlab code developped called CPRND
@@ -96,7 +98,14 @@ IntegerVector order_(const NumericVector & x) {
 // [[Rcpp::export]]
 
 
-Eigen::MatrixXd cpgs(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorXd &b,const Eigen::VectorXd &x0, const int thin=1, const bool gibbs=true, const int seed=1, const int stream=1) {
+List cpgs(const int N, const Eigen::MatrixXd &A ,
+                     const Eigen::VectorXd &b,
+                     const Eigen::VectorXd &x0,
+                     const int thin=1,
+                     const bool gibbs=true,
+                     const int seed=1,
+                     const int stream=1,
+                     Rcpp::Nullable<Eigen::MatrixXd> covMat = R_NilValue) {
   dqrng::dqRNGkind("Xoroshiro128+");
   dqrng::dqset_seed(IntegerVector::create(seed),
                     IntegerVector::create(stream));
@@ -154,6 +163,10 @@ Eigen::MatrixXd cpgs(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorX
   int isample=0; //number of sample
   int n=0; //total number of iterations
   int stage=0; //0 adapting phase, 1 discarding phase, 2 sampling
+  if (covMat.isNotNull()) {
+    stage = 2;
+    S = Rcpp::as< Map<MatrixXd> >(covMat);
+  }
   int runupmax= p*log2(p); //https://doi.org/10.1021/acs.jproteome.5b01029
   int sampleit=0; //total number of iteration during sampling, useful for thin
   int discardmax=runupmax;
@@ -287,7 +300,7 @@ Eigen::MatrixXd cpgs(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorX
     if (n % 100 == 0) Rcout<<"##iteration "<<n<<" stage "<<stage<<" crit "<<crit<<" cvHist "<<std::sqrt((critHist - critHist.mean()).square().sum()/(p-1))/critHist.mean()<<std::endl;
     ++n;
   }
-  return X;
+  return (List::create(Named("X") = X, Named("covMat") = S));
 }
 
 
@@ -309,13 +322,17 @@ using Eigen::FullPivLU;
 //' @param gibbs if true, gibbs sampling, else hitandrun
 //' @param seed seed of the dqrng generator
 //' @param stream stream of the dqrng generator
+//' @param covMat prespecified covmatrix (avoid initialisation and discard) if
+//' prespecified (default null)
 //'
 //' @section Details:
 //' This function is based on an initial matlab code developped called CPRND
 //' (https://ch.mathworks.com/matlabcentral/fileexchange/34208-uniform-distribution-over-a-convex-polytope)
 //' It generates samples within the complex polytope defined by \eqn{A \cdot x \leqslant   b}
 //'
-//' @return a matrix with one row per sample and one column per parameter
+//' @return a list with two elements: a matrix with one row per sample and one
+//'  column per parameter and a list with the covariance matrix used in the
+//'  algorithm that can be used to resample the model
 //' @examples
 //' n <- 20
 //' A1 <- -diag(n)
@@ -332,11 +349,12 @@ using Eigen::FullPivLU;
 // [[Rcpp::export]]
 
 
-Eigen::MatrixXd cpgsEquality(const int N, const Eigen::MatrixXd &A,
+List cpgsEquality(const int N, const Eigen::MatrixXd &A,
                              const Eigen::VectorXd &b, const Eigen::MatrixXd &C,
                              const Eigen::VectorXd &v, const Eigen::VectorXd &x0,
                              const int thin=1, const bool gibbs=true,
-                             const int seed=1, const int stream=1){
+                             const int seed=1, const int stream=1,
+                             Rcpp::Nullable<Eigen::MatrixXd> covMat = R_NilValue){
   int p=A.cols();
   int m=A.rows();
   int p2=C.cols();
@@ -358,11 +376,12 @@ Eigen::MatrixXd cpgsEquality(const int N, const Eigen::MatrixXd &A,
   VectorXd bbis=b-A*x0;
 
   VectorXd x0bis=VectorXd::Zero(Nt.cols());
-  MatrixXd x=cpgs(N, Abis, bbis, x0bis, thin, gibbs, seed, stream);
+  List x=cpgs(N, Abis, bbis, x0bis, thin, gibbs, seed, stream, covMat);
+  Eigen::MatrixXd xtmp(Rcpp::as<Eigen::MatrixXd>(x["X"]));
   for(int i=0;i<N;++i) {
-    X.row(i)=Nt*x.row(i).transpose()+x0;
+    X.row(i)=Nt*(xtmp.row(i).transpose())+x0;
   }
-  return X;
+  return (List::create(Named("X") = X, Named("covMat") = x["covMat"]));
 }
 
 
@@ -374,20 +393,23 @@ List sampleCaNCPP(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorXd &
                const Eigen::MatrixXd &C ,const Eigen::VectorXd &v,
                const Eigen::MatrixXd &L,
                const Eigen::VectorXd &x0, const int thin, const bool gibbs=true,
-               const int seed=1, const int stream=1) {
+               const int seed=1, const int stream=1,
+               Rcpp::Nullable<Eigen::MatrixXd> covMat = R_NilValue) {
   int p=A.cols();
   int m2=C.rows();
   MatrixXd F(N, p);
+  List x;
   MatrixXd B(N, L.rows());
   if(m2>0){ //there are equality constraints
-    F=cpgsEquality(N, A, b, C, v, x0, thin, gibbs, seed, stream);
+    x=cpgsEquality(N, A, b, C, v, x0, thin, gibbs, seed, stream, covMat);
   } else{
-    F=cpgs(N, A, b, x0, thin,gibbs, seed, stream);
+    x=cpgs(N, A, b, x0, thin,gibbs, seed, stream, covMat);
   }
+  Eigen::MatrixXd xtmp(Rcpp::as<Eigen::MatrixXd>(x["X"]));
   for (int i=0;i<N;++i){
-    B.row(i)=L*F.row(i).transpose();
+    B.row(i)=L*xtmp.row(i).transpose();
   }
-  return(List::create(F,B));
+  return(List::create(F,B, x["covMat"]));
 }
 
 

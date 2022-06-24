@@ -16,6 +16,8 @@ NULL
 #' @param gibbs if true, gibbs sampling, else hitandrun
 #' @param seed seed of the dqrng generator
 #' @param stream stream of the dqrng generator
+#' @param covMat prespecified covmatrix (avoid initialisation and discard) if
+#' prespecified (default null)
 #'
 #' @section Details:
 #' This function is based on an initial matlab code developped called CPRND
@@ -34,8 +36,8 @@ NULL
 #' X0 <- chebyCentre(A,b)
 #' x <- cpgs(1000,A,b,X0)
 #' @export
-cpgs <- function(N, A, b, x0, thin = 1L, gibbs = TRUE, seed = 1L, stream = 1L) {
-    .Call(`_RCaN_cpgs`, N, A, b, x0, thin, gibbs, seed, stream)
+cpgs <- function(N, A, b, x0, thin = 1L, gibbs = TRUE, seed = 1L, stream = 1L, covMat = NULL) {
+    .Call(`_RCaN_cpgs`, N, A, b, x0, thin, gibbs, seed, stream, covMat)
 }
 
 #' Complex Polytope Gibbs Sampling
@@ -51,13 +53,17 @@ cpgs <- function(N, A, b, x0, thin = 1L, gibbs = TRUE, seed = 1L, stream = 1L) {
 #' @param gibbs if true, gibbs sampling, else hitandrun
 #' @param seed seed of the dqrng generator
 #' @param stream stream of the dqrng generator
+#' @param covMat prespecified covmatrix (avoid initialisation and discard) if
+#' prespecified (default null)
 #'
 #' @section Details:
 #' This function is based on an initial matlab code developped called CPRND
 #' (https://ch.mathworks.com/matlabcentral/fileexchange/34208-uniform-distribution-over-a-convex-polytope)
 #' It generates samples within the complex polytope defined by \eqn{A \cdot x \leqslant   b}
 #'
-#' @return a matrix with one row per sample and one column per parameter
+#' @return a list with two elements: a matrix with one row per sample and one
+#'  column per parameter and a list with the covariance matrix used in the
+#'  algorithm that can be used to resample the model
 #' @examples
 #' n <- 20
 #' A1 <- -diag(n)
@@ -71,12 +77,12 @@ cpgs <- function(N, A, b, x0, thin = 1L, gibbs = TRUE, seed = 1L, stream = 1L) {
 #' X0 <- rep(0.1,n)
 #' x <- cpgsEquality(1000,A,b,C,v,X0)
 #' @export
-cpgsEquality <- function(N, A, b, C, v, x0, thin = 1L, gibbs = TRUE, seed = 1L, stream = 1L) {
-    .Call(`_RCaN_cpgsEquality`, N, A, b, C, v, x0, thin, gibbs, seed, stream)
+cpgsEquality <- function(N, A, b, C, v, x0, thin = 1L, gibbs = TRUE, seed = 1L, stream = 1L, covMat = NULL) {
+    .Call(`_RCaN_cpgsEquality`, N, A, b, C, v, x0, thin, gibbs, seed, stream, covMat)
 }
 
-sampleCaNCPP <- function(N, A, b, C, v, L, x0, thin, gibbs = TRUE, seed = 1L, stream = 1L) {
-    .Call(`_RCaN_sampleCaNCPP`, N, A, b, C, v, L, x0, thin, gibbs, seed, stream)
+sampleCaNCPP <- function(N, A, b, C, v, L, x0, thin, gibbs = TRUE, seed = 1L, stream = 1L, covMat = NULL) {
+    .Call(`_RCaN_sampleCaNCPP`, N, A, b, C, v, L, x0, thin, gibbs, seed, stream, covMat)
 }
 
 # Register entry points for exported C++ functions
