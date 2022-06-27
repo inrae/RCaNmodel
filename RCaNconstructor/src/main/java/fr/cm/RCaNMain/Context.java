@@ -1,9 +1,13 @@
 package fr.cm.RCaNMain;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import fr.cm.canObjects.Action;
+import fr.cm.canObjects.ProjectListsManager;
 import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
 
@@ -11,9 +15,6 @@ import javafx.stage.Screen;
  * @author christianmullon
  */
 public class Context {
-
-
-
 
     private static String fileName; // le nom du fichier projet
     private static String dirName; // le nom du répertoire du fichier projet
@@ -29,7 +30,6 @@ public class Context {
     private static boolean builtR;
     private static boolean sampledR;
 
-
     static double windowWidth = 1500.0;
     static double windowHeight = 1000.0;
 
@@ -44,7 +44,15 @@ public class Context {
 
     public static boolean isChanged() { return changed; }
 
-    public static void setChanged(boolean changed) { Context.changed = changed; }
+    public static void setChanged(boolean changed, String comment) {
+        Action action = new Action(comment);
+        Context.changed = changed;
+        ProjectListsManager.addAction(action);
+    }
+
+    public static void setChanged(boolean changed) {
+        Context.changed = changed;
+    }
 
     public static String getFileName() { return fileName; }
 
@@ -104,6 +112,11 @@ public class Context {
 
     public static double getRadiusInternalLink() { return radiusInternalLink; }
 
+    public static String getDate(){
+        Date date = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        return(formatter.format(date));
+    }
     // ----------------------------------------------------------------------------------
     public static List<String> getObservationsYears() {
         List<String> liste = new ArrayList<>();
