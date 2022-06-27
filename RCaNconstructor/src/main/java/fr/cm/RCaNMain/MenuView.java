@@ -13,6 +13,7 @@ import java.util.List;
 public class MenuView {
 
     static final MenuItem networkItem = new MenuItem("Network");
+    static final MenuItem actionsItem = new MenuItem("Actions");
     static final MenuItem groupsItem = new MenuItem("Components");
     static final MenuItem linksItem = new MenuItem("Fluxes");
     static final MenuItem constraintsItem = new MenuItem("Constraints");
@@ -25,7 +26,7 @@ public class MenuView {
 
     public MenuView(BorderPane borderPaneRacine) {
         this.borderPaneRacine = borderPaneRacine;
-        menuItems = Arrays.asList(networkItem, groupsItem, linksItem, observationsItem, constraintsItem, dataFileItem
+        menuItems = Arrays.asList(networkItem, groupsItem, linksItem, observationsItem, constraintsItem, dataFileItem, actionsItem
         );
         for (MenuItem menuItem : menuItems) {
             menuItem.setOnAction(ViewListener);
@@ -72,6 +73,10 @@ public class MenuView {
             case 5 :
                 DataFileTable dataFileTable = new DataFileTable();
                 borderPaneRacine.setCenter(dataFileTable);
+                break;
+            case 6 :
+                ActionTable actionTable = new ActionTable();
+                borderPaneRacine.setCenter(actionTable);
                 break;
             default:
         }

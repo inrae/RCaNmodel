@@ -16,6 +16,8 @@ public class ProjectListsManager {
     private static List<Constraint> listOfConstraints;
     private static List<Observation> listOfObservations;
     private static List<DataFile> listOfDataFiles;
+    private static List<Action> listOfActions;
+    private static MetaInformation metaInformation;
 
     private static NetworkView networkView;
 
@@ -23,12 +25,43 @@ public class ProjectListsManager {
 
     public static void init() {
         networkView = new NetworkView();
+        metaInformation = new MetaInformation();
         networkView.init();
         listOfComponents = new ArrayList<>();
         listOfFluxes = new ArrayList<>();
         listOfConstraints = new ArrayList<>();
         listOfObservations = new ArrayList<>();
         listOfDataFiles = new ArrayList<>();
+        listOfActions = new ArrayList<>();
+    }
+
+    // ------------------------------------------------------------------------------
+    // ACTIONS
+    public static void addAction(Action action){
+        listOfActions.add(action);
+    }
+
+    public static List<Action> getListOfActions() {
+        return listOfActions;
+    }
+
+    public static void initListOfActions() {
+        listOfActions = new ArrayList<>();
+    }
+
+    public static void setListOfActions(List<Action> listOfActions) {
+        ProjectListsManager.listOfActions = listOfActions;
+    }
+
+    // ------------------------------------------------------------------------------
+    // META INFORMATION
+
+    public static MetaInformation getMetaInformation() {
+        return metaInformation;
+    }
+
+    public static void setMetaInformation(MetaInformation metaInformation) {
+        ProjectListsManager.metaInformation = metaInformation;
     }
 
     // ------------------------------------------------------------------------------
@@ -41,15 +74,17 @@ public class ProjectListsManager {
     // COMPONENTS
     public static void addComponent(Component component) {
         if (containsComponent(component.getName())) {
-            HelpDialog.warning("Component already exists","Warning");
-        } else {
+            HelpDialog.warning("This component already exists","Warning");
+        } else  if(containsObservation(component.getName())){
+            HelpDialog.warning("An observation with this name already exists","Warning");
+        } else{
             component.define(
                     networkView.getMousePressedEventHandler(),
                     networkView.getMouseDraggedEventHandler(),
                     networkView.getMouseDoubleClickOnCircleEventHandler());
             listOfComponents.add(component);
         }
-        Context.setChanged(true);
+        Context.setChanged(true,"Added component: "+component.getName());
     }
     public static void removeComponent(Component component) {
         listOfConstraints.removeIf(constraint -> constraint.involve(component));
@@ -62,7 +97,7 @@ public class ProjectListsManager {
             }
         }
         listOfComponents.remove(component);
-        Context.setChanged(true);
+        Context.setChanged(true,"Removed component: "+component.getName());
     }
     public static boolean containsComponent(String groupName) {
         boolean contain = false;
@@ -129,7 +164,7 @@ public class ProjectListsManager {
         } else {
             flux.define(networkView.getMouseDoubleClickOnLineEventHandler());
             listOfFluxes.add(flux);
-            Context.setChanged(true);
+            Context.setChanged(true,"Added Flux: "+ flux.getName());
         }
     }
     public static List<String> getNamesOfLinks() {
@@ -151,7 +186,7 @@ public class ProjectListsManager {
     public static void removeLink(Flux flux) {
         listOfConstraints.removeIf(constraint -> constraint.involve(flux));
         listOfFluxes.remove(flux);
-        Context.setChanged(true);
+        Context.setChanged(true,"Removed Flux: "+ flux.getName());
     }
     public static void permuteListOfLinks(int rowA, int rowB) {
         Flux fluxA = listOfFluxes.get(rowA);
@@ -182,24 +217,27 @@ public class ProjectListsManager {
     public static void addObservation(Observation observation) {
         if(containsObservation(observation.getObsName())){
             HelpDialog.warning("Observation already exists","Warning");
+        } else if(containsComponent(observation.getObsName())){
+            HelpDialog.warning("A component with same name already exists","Warning");
         }
             else {
             listOfObservations.add(observation);
-             Context.setChanged(true);
+             Context.setChanged(true,"Added Observation: "+ observation.getObsName());
         }
     }
      public static void removeObservation(String observationName){
         for (Observation observation : listOfObservations)
             if (observationName.equals(observation.getObsName())) {
                 listOfObservations.remove(observation);
-                Context.setChanged(true);
+                Context.setChanged(true,"Removed Observation: "+ observation.getObsName());
                 break;
             }
     }
     public static void removeObservation(Observation observation){
         listOfObservations.remove(observation);
-        Context.setChanged(true);
-      }
+        Context.setChanged(true,"Removed Observation: "+ observation.getObsName());
+    }
+
    public static boolean containsObservation(String observationName) {
         boolean contain = false;
         for (Observation observation : listOfObservations)
@@ -237,16 +275,16 @@ public class ProjectListsManager {
     // CONSTRAINTS
     public static void addConstraint(Constraint constraint) {
         listOfConstraints.add(constraint);
-        Context.setChanged(true);
+        Context.setChanged(true,"Added Constraint: "+ constraint.getName());
     }
     public static void removeConstraints(Constraint constraint) {
         listOfConstraints.remove(constraint);
-        Context.setChanged(true);
+        Context.setChanged(true,"Removed Constraint: "+ constraint.getName());
     }
     public static void updateConstraint(Constraint oldC, Constraint newC) {
         int pos = listOfConstraints.indexOf(oldC);
         listOfConstraints.set(pos,newC);
-        Context.setChanged(true);
+        Context.setChanged(true,"Updated Constraint: "+ oldC.getName());
     }
     public static void upConstraint(Constraint constraint) {
         int numConstraint = listOfConstraints.indexOf(constraint);
@@ -284,7 +322,7 @@ public class ProjectListsManager {
         }
         if(! in) {
             listOfDataFiles.add(newDataFile);
-            Context.setChanged(true);
+            Context.setChanged(true,"Added Data File: "+ newDataFile.getShortName());
         }
         else {
             HelpDialog.warning("File has already been introduced","Warning");

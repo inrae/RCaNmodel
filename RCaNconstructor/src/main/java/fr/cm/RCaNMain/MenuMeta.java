@@ -12,8 +12,9 @@ import java.util.List;
 
 public class MenuMeta {
 
-    static final MenuItem projectItem = new MenuItem("Model description");
-    static final MenuItem saveMetaTxt = new MenuItem("Print meta information");
+    static final MenuItem projectPane = new MenuItem("Model description (pane)");
+    static final MenuItem projectTable = new MenuItem("Model description (table)");
+    static final MenuItem saveMetaTxt = new MenuItem("Save meta information in a text file");
 
     static List<MenuItem> menuItems = null;
 
@@ -21,7 +22,7 @@ public class MenuMeta {
 
     public MenuMeta(BorderPane borderPaneRacine) {
         this.borderPaneRacine = borderPaneRacine;
-        menuItems = Arrays.asList(projectItem, saveMetaTxt);
+        menuItems = Arrays.asList(projectPane, saveMetaTxt);
         for (MenuItem menuItem : menuItems) {
             menuItem.setOnAction(MetaListener);
         }
@@ -56,6 +57,10 @@ public class MenuMeta {
                 break;
             case 1:
                 new MetaInformationSaveDialog();
+                break;
+            case 2:
+                MetaInformationTable metaInformationTable = new MetaInformationTable();
+                borderPaneRacine.setCenter(metaInformationTable);
                 break;
             default:
         }

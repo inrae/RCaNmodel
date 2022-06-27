@@ -23,7 +23,7 @@ public class MetaInformation {
     static List<MetaElement> elements;
 
     // --------------------------------------------
-    public static void init() {
+    public MetaInformation() {
         elements = new ArrayList<>();
         String fileName = "project/Project.txt";
         InputStream inst = MetaInformation.class.getClassLoader().getResourceAsStream(fileName);
@@ -39,11 +39,11 @@ public class MetaInformation {
         }
     }
 
-    public static int getNc() {
+    public  int getNc() {
         return elements.size();
     }
 
-    public static List<MetaElement> getElements() {
+    public  List<MetaElement> getElements() {
         return elements;
     }
 

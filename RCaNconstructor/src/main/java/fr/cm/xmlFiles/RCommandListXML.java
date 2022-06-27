@@ -42,12 +42,10 @@ public class RCommandListXML {
                     String rplots = getByTag(node,"rplots");
                     String help = getByTag(node,"help");
                     String condition = getByTag(node,"condition");
-                    String contextchange = getByTag(node,"contextchange");
-                    String conditioncontextchange = getByTag(node,"conditioncontextchange");
                     String parameter = getByTag(node,"parameter");
                     String table = getByTag(node,"table");
                     RCommandXML rCommandXML = new RCommandXML(name, textmenu, submenu, rcompute,
-                            rplots, help, condition, contextchange, conditioncontextchange, parameter, table);
+                            rplots, help, condition,  parameter, table);
                     listOfRCommandXML.add(rCommandXML);
                 }
             }

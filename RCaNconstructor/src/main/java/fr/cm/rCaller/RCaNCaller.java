@@ -1,6 +1,5 @@
 package fr.cm.rCaller;
 
-import com.github.rcaller.exception.ExecutionException;
 import com.github.rcaller.graphics.SkyTheme;
 import com.github.rcaller.rstuff.*;
 import fr.cm.GUIdialogs.HelpDialog;
@@ -22,9 +21,8 @@ public class RCaNCaller {
     static String resultString = "";
     static RCommandXML rCommandXML = null;
 
-
     // ------------------------------------------------------------------------
-    public static void initR() {
+    public static void initRCaller() {
         if( ! initialized) {
             Context.initRCaN();
             caller = RCaller.create();
@@ -84,7 +82,7 @@ public class RCaNCaller {
     // ------------------------------------------------------------------------
     public static void makeRCommand(RCommandXML rCommandXML) {
         RCaNCaller.rCommandXML = rCommandXML;
-        initR();
+        initRCaller();
         plot = false;
         filePlot = null;
         resultString = "";
@@ -106,6 +104,7 @@ public class RCaNCaller {
                 }
                 code.endPlot();
                 caller.setRCode(code);
+                Context.setChanged(false, rCommandXML.actionCommandLine());
             }
          } catch (Exception ex) {
             new RCaNInterfaceDialog("R Interface ", "Problem with R command.", ex);
@@ -116,7 +115,12 @@ public class RCaNCaller {
         runOk = false;
         resultString = "";
         try{
-            caller.runAndReturnResultOnline("resultR");
+            if(plot){
+                caller.runAndReturnResultOnline("resultR");
+            }
+            else {
+                caller.runAndReturnResultOnline("resultR", true);
+            }
             runOk = true;
          } catch (Exception ex) {
             ex.printStackTrace();
@@ -126,12 +130,13 @@ public class RCaNCaller {
             PrintWriter pw = new PrintWriter(sw);
             ex.printStackTrace(pw);
             Platform.runLater(() ->{
-                new RCaNInterfaceDialog("R Interface ","R process has not terminated OK. \n" + sw.toString(), ex);
+                new RCaNInterfaceDialog("R Interface ","R process has not terminated OK. \n\n" + sw.toString(), ex);
             });
          }
         if(runOk) {
             resultString = RCaNParser.decodeParser( caller,  rCommandXML);
          }
+        Context.setChanged(false, "Result : "+ runOk);
     }
     // ------------------------------------------------------------------------
     public static void stopCommandR(){
@@ -142,7 +147,6 @@ public class RCaNCaller {
             // caller.stopStreamConsumers();
             // caller.stopRCallerOnline();
         } catch (Exception ex ){
-            stopSessionR();
             new RCaNInterfaceDialog("R Interface ","R command not stopped properly. \n", ex);
             stopSessionR();
         }
@@ -181,7 +185,6 @@ public class RCaNCaller {
         }
         return(null);
     }
-
     // ------------------------------------------------------------------------
 }
 
