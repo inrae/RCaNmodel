@@ -165,7 +165,10 @@ List cpgs(const int N, const Eigen::MatrixXd &A ,
   int stage=0; //0 adapting phase, 1 discarding phase, 2 sampling
   if (covMat.isNotNull()) {
     stage = 2;
-    S = Rcpp::as< Map<MatrixXd> >(covMat);
+    T1 = Rcpp::as< Map<MatrixXd> >(covMat);
+    T2=T1.inverse();
+    updatingS = false;
+    Rcout<<"using provided S"<<std::endl;
   }
   int runupmax= p*log2(p); //https://doi.org/10.1021/acs.jproteome.5b01029
   int sampleit=0; //total number of iteration during sampling, useful for thin
@@ -397,17 +400,17 @@ List sampleCaNCPP(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorXd &
                Rcpp::Nullable<Eigen::MatrixXd> covMat = R_NilValue) {
   int p=A.cols();
   int m2=C.rows();
-  MatrixXd F(N, p);
-  List x;
+
+    List x;
   MatrixXd B(N, L.rows());
   if(m2>0){ //there are equality constraints
     x=cpgsEquality(N, A, b, C, v, x0, thin, gibbs, seed, stream, covMat);
   } else{
     x=cpgs(N, A, b, x0, thin,gibbs, seed, stream, covMat);
   }
-  Eigen::MatrixXd xtmp(Rcpp::as<Eigen::MatrixXd>(x["X"]));
+  Eigen::MatrixXd F(Rcpp::as<Eigen::MatrixXd>(x["X"]));
   for (int i=0;i<N;++i){
-    B.row(i)=L*xtmp.row(i).transpose();
+    B.row(i)=L*F.row(i).transpose();
   }
   return(List::create(F,B, x["covMat"]));
 }

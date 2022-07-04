@@ -74,7 +74,7 @@ sampleCaN <- function(myCaNmod,
     clusterEvalQ(cl, {
       library(stats)
     })
-    clusterExport(cl, c("myCaNmod", "N"), envir = environment())
+    clusterExport(cl, c("myCaNmod", "N", "covMat"), envir = environment())
     registerDoParallel(cl)
     `%myinfix%` <- `%dopar%`
   }
