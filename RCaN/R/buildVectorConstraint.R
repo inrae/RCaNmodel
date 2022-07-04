@@ -77,7 +77,7 @@ buildVectorConstraint <-
       }
     } else {
       mycoeffs <- sapply(as.list(get_args(basic_constraint)), function(e) {
-        if (get_type(e) %in% c("RealDouble", "Symbol")) {
+        if (get_type(e) %in% c("Integer", "RealDouble")) {
           return(c("1" = as.numeric(e)))
         } else if (get_type(e) == "Symbol") {
           val <- 1
