@@ -14,38 +14,36 @@ import javafx.beans.property.StringProperty;
 public class MetaElement {
 
     final String metaName;
-    final String metaHint;
+
     boolean metaType;
-    final StringProperty metaContentProperty = new SimpleStringProperty();
+    final StringProperty metaContent = new SimpleStringProperty();
+    final StringProperty metaHint = new SimpleStringProperty();
 
     // --------------------------------------------
     public MetaElement(String elementR) {
         if(elementR.startsWith("<")){
             metaType = false;
             this.metaName = elementR;
-            setMetaContentProperty("");
-            this.metaHint = "";
+            setMetaContent("");
+            setMetaHint("");
         }
         else {
             metaType = true;
             String[] element = elementR.split(";");
             this.metaName = element[0];
-            setMetaContentProperty("");
-            this.metaHint = element[1];
+            setMetaContent("");
+            setMetaHint(element[1]);
         }
     }
 
+
     // --------------------------------------------
     public void print(){
-        System.out.println("META : "+ metaType + " -- "+ metaName + " -- " +  getMetaContentProperty() + " -- " + metaHint);
+        System.out.println("META : "+ metaType + " -- "+ metaName + " -- " +  getMetaContent() + " -- " + getMetaHint());
     }
     // ---------------------------------------------------------------------------------
     public String getMetaName() {
         return metaName;
-    }
-
-    public String getMetaHint() {
-        return metaHint;
     }
 
     public boolean isMetaType() {
@@ -53,14 +51,26 @@ public class MetaElement {
     }
 
     public StringProperty carContentProperty() {
-        return metaContentProperty;
+        return metaContent;
     }
 
-    public final String getMetaContentProperty() {
+    public final String getMetaContent() {
         return carContentProperty().get() ;
     }
 
-    public final void setMetaContentProperty(String carContent) {
+    public final void setMetaContent(String carContent) {
         carContentProperty().set(carContent);
+    }
+
+    public String getMetaHint() {
+        return metaHint.get();
+    }
+
+    public StringProperty metaHintProperty() {
+        return metaHint;
+    }
+
+    public void setMetaHint(String metaHint) {
+        this.metaHint.set(metaHint);
     }
 }

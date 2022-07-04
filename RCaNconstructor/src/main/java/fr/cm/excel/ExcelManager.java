@@ -26,12 +26,13 @@ public class ExcelManager {
         String fileName = Context.getFullFileName();
         try {
             Workbook workbook = WorkbookFactory.create(true);
-            saveExcelProject(workbook);
+            saveExcelMetaInformation(workbook);
             saveExcelComponents(workbook);
             saveExcelLinks(workbook);
             saveExcelConstraints(workbook);
             saveExcelObservations(workbook);
             saveExcelFileWithObservation(workbook);
+            saveExcelFileActions(workbook);
             FileOutputStream outputStream = new FileOutputStream(fileName);
             workbook.write(outputStream);
         } catch (FileNotFoundException ex) {
@@ -47,12 +48,13 @@ public class ExcelManager {
         try {
             FileInputStream inputStream = new FileInputStream(new File(fileName));
             Workbook workbook = WorkbookFactory.create(inputStream);
-            getExcelProject(workbook);
+            getExcelMetaInformation(workbook);
             getExcelComponents(workbook);
             getExcelLinks(workbook);
             getExcelConstraints(workbook);
             getExcelObservations(workbook);
             getExcelFileWithObservation(workbook);
+            getExcelFileActions(workbook);
         } catch (FileNotFoundException ex) {
             HelpDialog.warning("File not found","Warning", ex);
         } catch (IOException ex) {
@@ -61,7 +63,52 @@ public class ExcelManager {
     }
 
     // -------------------------------------------------------------------------
-    private static void saveExcelProject(Workbook workbook) {
+    private static void saveExcelFileActions(Workbook workbook) {
+        Sheet sheet;
+        Row row;
+        Cell cell;
+        sheet = workbook.createSheet("Actions");
+
+        row = sheet.createRow(0);
+        cell = row.createCell(0);
+        cell.setCellValue("Date");
+        cell = row.createCell(1);
+        cell.setCellValue("Comment");
+
+        List<Action> listOfActions = ProjectListsManager.getListOfActions();
+        int c = 0;
+        for (Action action : listOfActions) {
+            c++;
+            row = sheet.createRow(c + 1);
+            cell = row.createCell(0);
+            cell.setCellValue(action.getDate());
+            cell = row.createCell(1);
+            cell.setCellValue(action.getComment());
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    public static void getExcelFileActions(Workbook workbook) {
+        ProjectListsManager.initListOfActions();
+        Sheet sheet = workbook.getSheet("Actions");
+        Row row;
+        Cell cell;
+        Iterator<Row> iterator = sheet.iterator();
+        iterator.next();
+        while (iterator.hasNext()) {
+            row = iterator.next();
+            cell = row.getCell(0);
+            String date = cell.getStringCellValue();
+            cell = row.getCell(1);
+            String comment = cell.getStringCellValue();
+            System.out.println(date + "--" + comment);
+            Action newAction = new Action(date, comment);
+            ProjectListsManager.addAction(newAction);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    private static void saveExcelMetaInformation(Workbook workbook) {
         Sheet sheet;
         Row row;
         Cell cell;
@@ -79,35 +126,37 @@ public class ExcelManager {
         cell = row.createCell(1);
         cell.setCellValue("Value");
 
-        List<MetaElement> elements = MetaInformation.getElements();
+        MetaInformation metaInformation = ProjectListsManager.getMetaInformation();
+        List<MetaElement> elements = metaInformation.getElements();
         for (int c = 0; c < elements.size(); c++) {
             MetaElement element = elements.get(c);
             row = sheet.createRow(c + 2);
             cell = row.createCell(0);
             cell.setCellValue(element.getMetaName());
             cell = row.createCell(1);
-            cell.setCellValue(element.getMetaContentProperty());
+            cell.setCellValue(element.getMetaContent());
             cell = row.createCell(2);
             cell.setCellValue(element.getMetaHint());
         }
     }
 
     // -------------------------------------------------------------------------
-    public static void getExcelProject(Workbook workbook) {
-        MetaInformation metaInformation = new MetaInformation();
+    public static void getExcelMetaInformation(Workbook workbook) {
+        new MetaInformation();
         Sheet sheet = workbook.getSheet("INFO");
         Row row;
         Cell cell;
+        MetaInformation metaInformation = ProjectListsManager.getMetaInformation();
         List<MetaElement> elements = metaInformation.getElements();
         try {
             for (int c = 0; c < elements.size(); c++) {
                 row = sheet.getRow(c + 2);
                 cell = row.getCell(1);
                 String content = cell.getStringCellValue();
-                elements.get(c).setMetaContentProperty(content);
+                elements.get(c).setMetaContent(content);
             }
         } catch (Exception e) {
-            metaInformation = new MetaInformation();
+            new MetaInformation();
         }
     }
 

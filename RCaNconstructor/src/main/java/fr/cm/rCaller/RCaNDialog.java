@@ -5,7 +5,6 @@ import fr.cm.RCaNMain.Context;
 import fr.cm.RCaNMain.MainApplication;
 import fr.cm.parameters.ColorsAndFormats;
 import fr.cm.xmlFiles.RCommandXML;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -17,6 +16,8 @@ import javafx.stage.Window;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static java.lang.Thread.sleep;
 
 public class RCaNDialog extends Dialog {
 
@@ -30,14 +31,13 @@ public class RCaNDialog extends Dialog {
     boolean started;
     RTimer rTimer;
 
-
     public RCaNDialog(RCommandXML rCommandXML) {
-        rTimer = new RTimer();
-        rTimer.start();
         started = false;
+        Label caution = new Label("");
+        secondes = new Label("Not started");
         this.rCommandXML = rCommandXML;
         getParameters(rCommandXML);
-        RCaNCaller.initR();
+        RCaNCaller.initRCaller();
         double width = 0.6 * Context.getWindowWidth();
         double height =  0.7 * Context.getWindowHeight();
 
@@ -104,14 +104,11 @@ public class RCaNDialog extends Dialog {
     // --------------------------------------------
 
     private  void goStopR() {
-        if(goStop.getText().equals("OK")){
-            hide();
-            close();
-        }
         // si ce n'est pas demarre, on demarre
-        else if (! started) {
-            rTimer.setStarted(true);
-            rTimer.setLabel(secondes);
+        if (! started) {
+            caution = new Label("If you stop this R computation, results of previous R computations will be lost");
+            rTimer = new RTimer(this,! rCommandXML.isPlot() && !rCommandXML.isTable(), secondes, caution, goStop);
+            rTimer.start();
             executor = Executors.newFixedThreadPool(10);
             threadCommandR = new ThreadCommandR();
             executor.execute(threadCommandR);
@@ -123,7 +120,6 @@ public class RCaNDialog extends Dialog {
         }
         // s c'est demarre, on arrete
         else {
-            rTimer.setStarted(false);
             executor.shutdownNow();
             RCaNCaller.stopCommandR();
             MainApplication.updateMenus();
@@ -134,32 +130,24 @@ public class RCaNDialog extends Dialog {
         }
     }
 
+    public void disparait(){
+        hide();
+        close();
+    }
     // ------------------------------------------------------------------------
     public  class ThreadCommandR implements Runnable {
+
         public void run()  {
             if(rCommandXML.isDisconnect()){
                 RCaNCaller.stopSessionR();
             } else {
                 RCaNCaller.runCommandR();
+                rTimer.setStringResult(RCaNCaller.resultString);
+                rTimer.setCompleted(true);
             }
-            rTimer.setStarted(false);
-            manageDialog();
+            };
         }
-    }
 
-    void manageDialog(){
-        Platform.runLater(() -> {
-            if(rCommandXML.isPlot() || rCommandXML.isTable()) {
-                hide();
-                close();
-            } else {
-                goStop.setText("OK");
-                secondes.setText("");
-                caution.setText(RCaNCaller.resultString);
-            }
-
-        });
-    }
     // ------------------------------------------------------------------------
 }
 
