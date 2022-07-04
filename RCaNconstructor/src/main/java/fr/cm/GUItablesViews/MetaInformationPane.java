@@ -9,11 +9,14 @@ import fr.cm.canObjects.MetaInformation;
 import fr.cm.canObjects.MetaElement;
 
 import fr.cm.RCaNMain.Context;
+import fr.cm.canObjects.ProjectListsManager;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+
+import java.util.List;
 
 /**
  *
@@ -24,23 +27,24 @@ public class MetaInformationPane extends Pane {
     double width = Context.getWindowWidth();
     double height =  Context.getWindowHeight();
     final TextArea[] metaTextArea;
-    final int nc;
 
     public MetaInformationPane() {
 
         ScrollPane scrollPane = new ScrollPane();
 
-        nc = MetaInformation.getNc();
+        MetaInformation metaInformation = ProjectListsManager.getMetaInformation();
+        List<MetaElement> elements = metaInformation.getElements();
+        int nc = elements.size();
         metaTextArea = new TextArea[nc];
         VBox vbox = new VBox();
         vbox.setSpacing(10);
         vbox.setPadding(new Insets(10, 10, 10, 10));
-        for (MetaElement metaElement : MetaInformation.getElements()) {
+        for (MetaElement metaElement : elements) {
             HBox hbox = new HBox();
             hbox.setSpacing(10);
             hbox.setPadding(new Insets(10, 10, 10, 10));
             Label metaName = new Label(metaElement.getMetaName());
-            TextArea metaInput = new TextArea(metaElement.getMetaContentProperty());
+            TextArea metaInput = new TextArea(metaElement.getMetaContent());
             Label metaHint = new Label(metaElement.getMetaHint());
 
             metaName.setPrefWidth(0.15*width);
@@ -80,7 +84,7 @@ public class MetaInformationPane extends Pane {
     }
 
     private void save(MetaElement metaElement, String newValue){
-        metaElement.setMetaContentProperty(newValue);
+        metaElement.setMetaContent(newValue);
     }
 
 }

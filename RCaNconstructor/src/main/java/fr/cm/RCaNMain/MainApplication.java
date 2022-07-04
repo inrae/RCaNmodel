@@ -2,11 +2,9 @@
 package fr.cm.RCaNMain;
 
 import fr.cm.GUIdialogs.*;
-import fr.cm.canObjects.MetaInformation;
 import fr.cm.canObjects.ProjectListsManager;
 import fr.cm.parameters.ColorsAndFormats;
 import fr.cm.rCaller.RCaNCaller;
-import fr.cm.rCaller.RTimer;
 import fr.cm.xmlFiles.HelpListXML;
 import fr.cm.xmlFiles.RCommandListXML;
 import javafx.application.Application;
@@ -42,7 +40,7 @@ public class MainApplication extends Application {
     public void start(Stage primaryStage) {
 
 
-        RCaNCaller.initR();
+        RCaNCaller.initRCaller();
 
         stage = primaryStage;
         stage.widthProperty().addListener(changeSizelistener);
@@ -53,7 +51,6 @@ public class MainApplication extends Application {
         HelpListXML.init();
         Context.init();
         ProjectListsManager.init();
-        MetaInformation.init();
         ProjectListsManager.getNetworkView().update();
 
         borderPaneRacine = new BorderPane();

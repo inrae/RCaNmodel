@@ -16,8 +16,6 @@ public class RCommandXML {
     private List<String> rPlots;
     private String help;
     private String condition;
-    private String contextchange;
-    private String conditioncontextchange;
     private String typeParameter;
     private String table;
 
@@ -37,8 +35,6 @@ public class RCommandXML {
                        String rPlots,
                        String help,
                        String condition,
-                       String conditioncontextchange,
-                       String contextchange,
                        String typeParameter,
                        String table) {
         this.name = nolf(name);
@@ -47,8 +43,6 @@ public class RCommandXML {
         this.help = help;
         this.table = nolf(table);
         this.condition = nolf(condition);
-        this.contextchange = contextchange;
-        this.conditioncontextchange = conditioncontextchange;
         this.typeParameter = nolf(typeParameter);
         this.rCompute = new ArrayList<>();
         List<String> sCommands = Arrays.asList(rCompute.split("\n"));
@@ -144,6 +138,15 @@ public class RCommandXML {
             sCommandLine = sCommandLine.replace(typeParameter, parameter);
         }
         return (sCommandLine);
+    }
+
+    public String actionCommandLine() {
+        StringBuilder sCommandLine = new StringBuilder("R : ");
+        for(String rCommand : rCompute){
+            sCommandLine.append(completeCommandLine(rCommand));
+            sCommandLine.append(" ; ");
+        }
+        return (sCommandLine.toString());
     }
     // ------------------------------------------------------------------------
     public String getTextMenu() { return textMenu; }

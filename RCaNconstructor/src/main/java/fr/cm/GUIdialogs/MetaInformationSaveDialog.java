@@ -17,11 +17,13 @@ public class MetaInformationSaveDialog {
 
         StringBuilder sB = new StringBuilder("PROJECT");
         sB.append("\n");
+        MetaInformation metaInformation = ProjectListsManager.getMetaInformation();
+        List<MetaElement> elements = metaInformation.getElements();
 
-        for (MetaElement metaElement : MetaInformation.getElements()) {
+        for (MetaElement metaElement : elements) {
             sB.append(metaElement.getMetaName().toUpperCase());
             sB.append("\n      ");
-            sB.append(metaElement.getMetaContentProperty());
+            sB.append(metaElement.getMetaContent());
             sB.append("\n");
         }
 

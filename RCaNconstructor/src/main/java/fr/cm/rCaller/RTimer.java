@@ -1,24 +1,33 @@
 package fr.cm.rCaller;
 
 import javafx.animation.AnimationTimer;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
 public  class RTimer extends AnimationTimer {
     boolean started = false;
-    int seconds;
-    Label label;
+    boolean completed = false;
+    String stringResult = "";
+    int secondsAfterStart, secondsAfterCompletion;
+    Label secondes, caution;
+    boolean hasToWaitWhenCompleted;
+    Button button;
     long sleeps = 1000000000;
     long prevTime = 0;
+    RCaNDialog rCaNDialog;
 
-    public RTimer(){
+    public RTimer(RCaNDialog rCaNDialog, boolean hasToWaitWhenCompleted, Label secondes, Label caution, Button button){
         super();
-        setStarted(false);
-    }
-
-    public void setStarted(boolean st){
-        seconds = 0;
-        started = st;
-    }
+        this.rCaNDialog = rCaNDialog;
+        this.hasToWaitWhenCompleted = hasToWaitWhenCompleted;
+        this.secondes = secondes;
+        this.caution = caution;
+        this.button = button;
+        started = true;
+        completed = false;
+        secondsAfterStart = 0;
+        secondsAfterCompletion = 0;
+     }
 
     @Override
     public void handle(long now) {
@@ -26,24 +35,32 @@ public  class RTimer extends AnimationTimer {
             return;
         }
         prevTime = now;
-        doHandle();
-    }
-
-    void doHandle(){
-        if(label != null) {
-            seconds++;
+        if(secondes != null) {
+            secondsAfterStart++;
+            secondsAfterCompletion++;
+            System.out.println(secondsAfterStart+ " sec");
             if (started) {
-                label.setText("Running RCaN command. Elapsed time : " + seconds + " seconds");
-            } else {
-                if (seconds > 10) {
-                    label.setText("--");
+                secondes.setText("Running RCaN command. Elapsed time : " + secondsAfterStart + " seconds");
+            }
+            else if(completed && hasToWaitWhenCompleted && secondsAfterCompletion < 5){
+                    caution.setText("");
+                    secondes.setText(stringResult);
                 }
+            else {
+                 rCaNDialog.disparait();
+                this.stop();
             }
         }
     }
 
-    public  void setLabel(Label label) {
-        this.label = label;
+    public void setStringResult(String stringResult) {
+        this.stringResult = stringResult;
     }
 
-}
+    public void setCompleted(boolean completed) {
+        secondsAfterCompletion = 0;
+        started = false;
+        this.completed = completed;
+    }
+
+ }
