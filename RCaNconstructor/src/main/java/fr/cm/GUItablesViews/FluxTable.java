@@ -27,7 +27,7 @@ import javafx.util.Callback;
  *
  * @author christianmullon
  */
-public class LinkTable extends Pane {
+public class FluxTable extends Pane {
 
     final TableView<Flux> table;
     ObservableList<Flux> list;
@@ -35,7 +35,7 @@ public class LinkTable extends Pane {
     double width = 0.9 * Context.getWindowWidth();
     double height =  0.9 * Context.getWindowHeight();
 
-    public LinkTable() {
+    public FluxTable() {
         table = new TableView<>();
         table.setMinWidth(800.0);
         table.setEditable(true);

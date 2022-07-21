@@ -26,10 +26,8 @@ public class MetaInformationTable extends Pane {
 
     double width = 0.9 * Context.getWindowWidth();
     double height =  0.9 * Context.getWindowHeight();
-
     final TableView<MetaElement> table;
     ObservableList<MetaElement> list;
-
     public MetaInformationTable() {
         super();
 
@@ -56,7 +54,7 @@ public class MetaInformationTable extends Pane {
                             String string = item.toString();
                             Font font;
                             if(string.startsWith("<")) {
-                                font = Font.font("Verdana", FontWeight.BOLD, 20);
+                                font = Font.font("Verdana", FontWeight.BOLD, 18);
                                 string = string.
                                         replace("<","").
                                         replace(">","");
@@ -93,7 +91,6 @@ public class MetaInformationTable extends Pane {
         metaHint.setCellValueFactory(new PropertyValueFactory<MetaElement, String>("metaHint"));
         metaHint.setEditable(false);
         metaHint.setMinWidth(5 * width/12);
-
         Callback<TableColumn, TableCell> cellFactoryHint = new Callback<TableColumn, TableCell>() {
             @Override
             public TableCell call( TableColumn param) {
@@ -104,7 +101,7 @@ public class MetaInformationTable extends Pane {
                         super.updateItem(item, empty);
                         if (!isEmpty()) {
                             text= new Text(item.toString());
-                            Font font = Font.font("Verdana",FontPosture.ITALIC, 12);
+                            Font font = Font.font("Verdana", 12);
                             text.setFont(font);
                             text.setWrappingWidth(5 * width/12);
                             setGraphic(text);

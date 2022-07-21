@@ -6,15 +6,23 @@ public class Action {
 
     String date;
     String comment;
+    String commentAuthor;
 
     public Action(String comment){
         this.date = Context.getDate();
         this.comment = comment;
+        this.commentAuthor="";
     }
-
-    public Action(String date, String comment){
+    
+    public Action(String comment, String commentAuthor){
+        this.date = Context.getDate();
+        this.comment = comment;
+        this.commentAuthor=commentAuthor;
+    }
+    public Action(String date, String comment, String commentAuthor){
         this.date = date;
         this.comment = comment;
+        this.commentAuthor=commentAuthor;
     }
 
     public String getDate() {
@@ -31,5 +39,10 @@ public class Action {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public String getCommentAuthor() { return commentAuthor; }
+
+    public void setCommentAuthor(String commentAuthor) { this.commentAuthor = commentAuthor;
     }
 }
