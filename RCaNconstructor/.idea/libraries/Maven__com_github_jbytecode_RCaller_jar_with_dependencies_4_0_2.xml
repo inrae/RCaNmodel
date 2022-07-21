@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.github.jbytecode:RCaller:jar-with-dependencies:4.0.2">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/jbytecode/RCaller/4.0.2/RCaller-4.0.2-jar-with-dependencies.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/jbytecode/RCaller/4.0.2/RCaller-4.0.2-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/jbytecode/RCaller/4.0.2/RCaller-4.0.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -59,8 +59,8 @@ public class MenuView {
                 borderPaneRacine.setCenter(componentTable);
                 break;
             case 2 :
-                LinkTable linkTable = new LinkTable();
-                borderPaneRacine.setCenter(linkTable);
+                FluxTable fluxTable = new FluxTable();
+                borderPaneRacine.setCenter(fluxTable);
                 break;
             case 3:
                 ObservationTable observationTable = new ObservationTable();

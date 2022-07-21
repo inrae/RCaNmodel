@@ -84,6 +84,8 @@ public class ExcelManager {
             cell.setCellValue(action.getDate());
             cell = row.createCell(1);
             cell.setCellValue(action.getComment());
+            cell = row.createCell(2);
+            cell.setCellValue(action.getCommentAuthor());
         }
     }
 
@@ -101,8 +103,13 @@ public class ExcelManager {
             String date = cell.getStringCellValue();
             cell = row.getCell(1);
             String comment = cell.getStringCellValue();
-            System.out.println(date + "--" + comment);
-            Action newAction = new Action(date, comment);
+            String commentAuthor ="";
+            try{
+                cell = row.getCell(2);
+                commentAuthor = cell.getStringCellValue();
+            }
+            catch(Exception e){};
+            Action newAction = new Action(date, comment,commentAuthor);
             ProjectListsManager.addAction(newAction);
         }
     }

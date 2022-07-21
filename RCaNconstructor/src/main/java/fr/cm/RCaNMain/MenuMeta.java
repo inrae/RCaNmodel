@@ -22,7 +22,7 @@ public class MenuMeta {
 
     public MenuMeta(BorderPane borderPaneRacine) {
         this.borderPaneRacine = borderPaneRacine;
-        menuItems = Arrays.asList(projectPane, saveMetaTxt);
+        menuItems = Arrays.asList(projectPane, saveMetaTxt, projectTable);
         for (MenuItem menuItem : menuItems) {
             menuItem.setOnAction(MetaListener);
         }
