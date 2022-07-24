@@ -7,7 +7,6 @@ import org.apache.poi.ss.usermodel.*;
 
 import fr.cm.RCaNMain.Context;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -35,6 +34,7 @@ public class ExcelManager {
             saveExcelFileActions(workbook);
             FileOutputStream outputStream = new FileOutputStream(fileName);
             workbook.write(outputStream);
+            // ProjectListsManager.addAction("Saved file : "+fileName);
         } catch (FileNotFoundException ex) {
             HelpDialog.warning("File not found","Warning", ex);
         } catch (IOException ex) {
@@ -46,7 +46,7 @@ public class ExcelManager {
     public static void getExcel() {
         String fileName = Context.getFullFileName();
         try {
-            FileInputStream inputStream = new FileInputStream(new File(fileName));
+            FileInputStream inputStream = new FileInputStream(fileName);
             Workbook workbook = WorkbookFactory.create(inputStream);
             getExcelMetaInformation(workbook);
             getExcelComponents(workbook);
@@ -55,6 +55,7 @@ public class ExcelManager {
             getExcelObservations(workbook);
             getExcelFileWithObservation(workbook);
             getExcelFileActions(workbook);
+            // ProjectListsManager.addAction(false,"Open file : "+fileName);
         } catch (FileNotFoundException ex) {
             HelpDialog.warning("File not found","Warning", ex);
         } catch (IOException ex) {
@@ -73,7 +74,9 @@ public class ExcelManager {
         cell = row.createCell(0);
         cell.setCellValue("Date");
         cell = row.createCell(1);
-        cell.setCellValue("Comment");
+        cell.setCellValue("Task");
+        cell = row.createCell(2);
+        cell.setCellValue("Annotation");
 
         List<Action> listOfActions = ProjectListsManager.getListOfActions();
         int c = 0;
@@ -83,7 +86,7 @@ public class ExcelManager {
             cell = row.createCell(0);
             cell.setCellValue(action.getDate());
             cell = row.createCell(1);
-            cell.setCellValue(action.getComment());
+            cell.setCellValue(action.getWhichAction());
             cell = row.createCell(2);
             cell.setCellValue(action.getCommentAuthor());
         }
@@ -103,12 +106,9 @@ public class ExcelManager {
             String date = cell.getStringCellValue();
             cell = row.getCell(1);
             String comment = cell.getStringCellValue();
-            String commentAuthor ="";
-            try{
-                cell = row.getCell(2);
-                commentAuthor = cell.getStringCellValue();
-            }
-            catch(Exception e){};
+            String commentAuthor;
+            cell = row.getCell(2);
+            commentAuthor = cell.getStringCellValue();
             Action newAction = new Action(date, comment,commentAuthor);
             ProjectListsManager.addAction(newAction);
         }
@@ -357,11 +357,9 @@ public class ExcelManager {
         CellType cellType = cell.getCellType();
         try {
             if (cellType == CellType.NUMERIC) {
-                int stringCellValue = (int) cell.getNumericCellValue();
-                return stringCellValue;
+                return (int) cell.getNumericCellValue();
             } else if (cellType == CellType.STRING) {
-                int stringCellValue = Integer.parseInt(cell.getStringCellValue());
-                return stringCellValue;
+                return Integer.parseInt(cell.getStringCellValue());
             }
         } catch(Exception ex){
             return(-1);
@@ -373,11 +371,9 @@ public class ExcelManager {
         try {
             CellType cellType = cell.getCellType();
             if (cellType == CellType.NUMERIC) {
-                double stringCellValue = cell.getNumericCellValue();
-                return stringCellValue;
+                return cell.getNumericCellValue();
             } else if (cellType == CellType.STRING) {
-                double stringCellValue = Double.parseDouble(cell.getStringCellValue());
-                return stringCellValue;
+                return Double.parseDouble(cell.getStringCellValue());
             }
         } catch(Exception ex){
             return(-1.0);

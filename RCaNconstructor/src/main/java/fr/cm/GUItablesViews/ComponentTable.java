@@ -57,35 +57,20 @@ public class ComponentTable extends Pane {
         name.setOnEditCommit(
                 event -> {
                     Component component = event.getTableView().getItems().get(event.getTablePosition().getRow());
-                    component.setName(event.getNewValue());
+                    component.changeName(event.getNewValue());
                 }
         );
         table.getColumns().add(name);
 
         TableColumn<Component, Boolean> insideCol = new TableColumn<>("Inside system");
-        insideCol.setCellValueFactory(new Callback<CellDataFeatures<Component, Boolean>, ObservableValue<Boolean>>() {
-            @Override
-            public ObservableValue<Boolean> call(CellDataFeatures<Component, Boolean> param) {
-                Component component = param.getValue();
-                SimpleBooleanProperty booleanProp = new SimpleBooleanProperty(component.isInside());
-                booleanProp.addListener(new ChangeListener<Boolean>() {
-                    @Override
-                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue,
-                                        Boolean newValue) {
-                        component.setInside(newValue);
-                    }
-                });
-                return booleanProp;
-            }
+        insideCol.setCellValueFactory(param -> {
+            Component component = param.getValue();
+            SimpleBooleanProperty booleanProp = new SimpleBooleanProperty(component.isInside());
+            booleanProp.addListener((observable, oldValue, newValue) -> component.changeInside(newValue));
+            return booleanProp;
         });
 
-        insideCol.setCellFactory(new Callback<TableColumn<Component, Boolean>, TableCell<Component, Boolean>>() {
-            @Override
-            public TableCell<Component, Boolean> call(TableColumn<Component, Boolean> p) {
-                CheckBoxTableCell<Component, Boolean> cell = new CheckBoxTableCell<Component, Boolean>();
-                return cell;
-            }
-        });
+        insideCol.setCellFactory(p -> new CheckBoxTableCell<>());
         table.getColumns().add(insideCol);
 
         for (int p = 0; p < nbParameters; p++) {
@@ -104,7 +89,7 @@ public class ComponentTable extends Pane {
             col.setOnEditCommit(
                     event -> {
                         Component component = event.getTableView().getItems().get(event.getTablePosition().getRow());
-                        component.setParameters(q, event.getNewValue());
+                        component.changeParameters(q, event.getNewValue());
                     }
             );
 

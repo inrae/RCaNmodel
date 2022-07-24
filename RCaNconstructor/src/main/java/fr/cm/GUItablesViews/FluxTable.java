@@ -46,35 +46,8 @@ public class FluxTable extends Pane {
         name.setMinWidth(300.0);
 
         TableColumn<Flux, Boolean> trophicCol = new TableColumn<>("Trophic link");
-
-        trophicCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Flux, Boolean>, ObservableValue<Boolean>>() {
-
-            @Override
-            public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<Flux, Boolean> param) {
-                Flux flux = param.getValue();
-
-                SimpleBooleanProperty booleanProp = new SimpleBooleanProperty(flux.isTypeTrophic());
-
-                booleanProp.addListener(new ChangeListener<Boolean>() {
-
-                    @Override
-                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue,
-                                        Boolean newValue) {
-                        flux.setTypeTrophic(newValue);
-                    }
-                });
-                return booleanProp;
-            }
-        });
-
-        trophicCol.setCellFactory(new Callback<TableColumn<Flux, Boolean>, TableCell<Flux, Boolean>>() {
-            @Override
-            public TableCell<Flux, Boolean> call(TableColumn<Flux, Boolean> p) {
-                CheckBoxTableCell<Flux, Boolean> cell = new CheckBoxTableCell<Flux, Boolean>();
-                return cell;
-            }
-        });
-
+        trophicCol.setCellValueFactory(FluxTable::call);
+        trophicCol.setCellFactory(p -> new CheckBoxTableCell<>());
 
         TableColumn<Flux, String> in = new TableColumn<>("From");
         in.setCellValueFactory(new PropertyValueFactory<>("inName"));
@@ -132,6 +105,13 @@ public class FluxTable extends Pane {
 
         this.getChildren().addAll(vbox);
      }
+
+    private static ObservableValue<Boolean> call(TableColumn.CellDataFeatures<Flux, Boolean> param) {
+        Flux flux = param.getValue();
+        SimpleBooleanProperty booleanProp = new SimpleBooleanProperty(flux.isTypeTrophic());
+        booleanProp.addListener((observable, oldValue, newValue) -> flux.changeTypeTrophic(newValue));
+        return booleanProp;
+    }
 
     public void updateTable() {
         Flux flux = table.getSelectionModel().getSelectedItem();

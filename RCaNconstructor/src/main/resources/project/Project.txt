@@ -3,9 +3,9 @@ Model Name; Title/name of the food-web model
 Model Version and date; Specific code used to uniquely identify the model version
 Authors; Names and addresses of the principal investigators associated with the food-web model development
 <DOMAIN AND UNITS>
-Domain coverage; geographical and temporal extent of the model.
+Domain coverage; Geographical and temporal extent of the model.
 Time unit; Time-step used in the model, e.g. daily, weekly, quarterly, annually.
-Biomass units; main unit for biomasses and fluxes (e.g. tonnes fresh weight, thousand tonnes, tonnes/km2, gC/m2, etc.)
+Biomass units; Main unit for biomasses and fluxes (e.g. tonnes fresh weight, thousand tonnes, tonnes/km2, gC/m2, etc.)
 <COMPONENTS>
 Components within the model domain; List of the trophospecies within the model domain and a description of how they were defined, e.g. are these taxonomic species? Are some divided by developmental stage or are several species grouped under a single trophospecies? Are there trophospecies that are split by geographical areas? Indication of relevant sources of data and information.
 Components outside the model domain; List of the components outside the model domain, e.g. primary production, source/sink of migration from/to other regions, fisheries. Indication of relevant sources of data and information.
@@ -14,7 +14,7 @@ Trophic links; List of the trophic links and a description of how these were def
 Non-trophic links; List of the non-trophic links and a description of how these were defined/selected. Non-trophic links are e.g. import, export, migration, production or other transfer of biomass that are not ingested by a predatory group. Indication of relevant sources of data and information.
 <INPUT PARAMETERS, DATA AND CONSTRAINTS>
 Input parameters; Source of information (datasets, references, experimental results, theory-based, other models, [Ellipsis]) used to derive EACH input parameter values (i.e. AssimilationE,	Digestibility,	OtherLosses,	Inertia,	Satiation and	RefugeBiomass for each trophospecies within the model domain).
-Observation series; description of individual time-series, including units, source of information (surveys, assessments, [Ellipsis]) and doi when available.
+Observation series; Description of individual time-series, including units, source of information (surveys, assessments, [Ellipsis]) and doi when available.
 Constraints; Sources of information used to define the user-defined constraints used in the model (i.e. outside satiation, inertia, positive fluxes and Biomass>Refuge Biomass, which are implicit constraints in all RCaN models).
 <UNCERTAINTIES AND LIMITATIONS>
 Species Exhaustivity; How well does the list of trophospecies cover the biomass of all species within the model domain? Could/should more species be added?

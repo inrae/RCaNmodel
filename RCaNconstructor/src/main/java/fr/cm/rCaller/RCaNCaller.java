@@ -5,6 +5,7 @@ import com.github.rcaller.rstuff.*;
 import fr.cm.GUIdialogs.HelpDialog;
 import fr.cm.RCaNMain.Context;
 import fr.cm.RCaNMain.MainApplication;
+import fr.cm.canObjects.ProjectListsManager;
 import fr.cm.xmlFiles.RCommandXML;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
@@ -104,7 +105,7 @@ public class RCaNCaller {
                 }
                 code.endPlot();
                 caller.setRCode(code);
-                Context.setChanged(false, rCommandXML.actionCommandLine());
+                ProjectListsManager.addAction(rCommandXML.actionCommandLine());
             }
          } catch (Exception ex) {
             new RCaNInterfaceDialog("R Interface ", "Problem with R command.", ex);
@@ -129,14 +130,12 @@ public class RCaNCaller {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             ex.printStackTrace(pw);
-            Platform.runLater(() ->{
-                new RCaNInterfaceDialog("R Interface ","R process has not terminated OK. \n\n" + sw.toString(), ex);
-            });
+            Platform.runLater(() -> new RCaNInterfaceDialog("R Interface ","R process has not terminated OK. \n\n" + sw, ex));
          }
         if(runOk) {
             resultString = RCaNParser.decodeParser( caller,  rCommandXML);
          }
-        Context.setChanged(false, "Result : "+ runOk);
+        ProjectListsManager.addAction( "Result : "+ runOk);
     }
     // ------------------------------------------------------------------------
     public static void stopCommandR(){

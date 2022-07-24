@@ -13,21 +13,21 @@ import java.util.List;
 public class MenuView {
 
     static final MenuItem networkItem = new MenuItem("Network");
-    static final MenuItem actionsItem = new MenuItem("Actions");
     static final MenuItem groupsItem = new MenuItem("Components");
     static final MenuItem linksItem = new MenuItem("Fluxes");
     static final MenuItem constraintsItem = new MenuItem("Constraints");
     static final MenuItem observationsItem = new MenuItem("Observations");
     static final MenuItem dataFileItem = new MenuItem("Data Files");
+    static final MenuItem metaTableItem = new MenuItem("Project information");
+    static final MenuItem actionsItem = new MenuItem("Project tracking");
 
     static List<MenuItem> menuItems = null;
 
     static BorderPane borderPaneRacine;
 
     public MenuView(BorderPane borderPaneRacine) {
-        this.borderPaneRacine = borderPaneRacine;
-        menuItems = Arrays.asList(networkItem, groupsItem, linksItem, observationsItem, constraintsItem, dataFileItem, actionsItem
-        );
+        MenuView.borderPaneRacine = borderPaneRacine;
+        menuItems = Arrays.asList(networkItem, groupsItem, linksItem, observationsItem, constraintsItem, dataFileItem, actionsItem, metaTableItem);
         for (MenuItem menuItem : menuItems) {
             menuItem.setOnAction(ViewListener);
         }
@@ -44,41 +44,46 @@ public class MenuView {
         return menuItems;
     }
 
-    static final EventHandler<ActionEvent> ViewListener = e -> handle(e);
+    static final EventHandler<ActionEvent> ViewListener = MenuView::handle;
 
     private static void handle(ActionEvent e) {
         MenuItem menuItem = (MenuItem) e.getSource();
         int numItem = menuItems.indexOf(menuItem);
         switch (numItem) {
-            case 0 :
+            case 0 -> {
                 ProjectListsManager.getNetworkView().update();
                 borderPaneRacine.setCenter(ProjectListsManager.getNetworkView());
-                break;
-            case 1:
+            }
+            case 1 -> {
                 ComponentTable componentTable = new ComponentTable();
                 borderPaneRacine.setCenter(componentTable);
-                break;
-            case 2 :
+            }
+            case 2 -> {
                 FluxTable fluxTable = new FluxTable();
                 borderPaneRacine.setCenter(fluxTable);
-                break;
-            case 3:
+            }
+            case 3 -> {
                 ObservationTable observationTable = new ObservationTable();
                 borderPaneRacine.setCenter(observationTable);
-                break;
-            case 4 :
+            }
+            case 4 -> {
                 ConstraintTable constraintTable = new ConstraintTable();
                 borderPaneRacine.setCenter(constraintTable);
-                break;
-            case 5 :
+            }
+            case 5 -> {
                 DataFileTable dataFileTable = new DataFileTable();
                 borderPaneRacine.setCenter(dataFileTable);
-                break;
-            case 6 :
+            }
+            case 6 -> {
                 ActionTable actionTable = new ActionTable();
                 borderPaneRacine.setCenter(actionTable);
-                break;
-            default:
+            }
+            case 7 -> {
+                MetaInformationTable metaInformationTable = new MetaInformationTable();
+                borderPaneRacine.setCenter(metaInformationTable);
+            }
+            default -> {
+            }
         }
     }
 }

@@ -18,11 +18,9 @@ public class ProjectListsManager {
     private static List<DataFile> listOfDataFiles;
     private static List<Action> listOfActions;
     private static MetaInformation metaInformation;
-
     private static NetworkView networkView;
 
     // --------------------------------------------
-
     public static void init() {
         networkView = new NetworkView();
         metaInformation = new MetaInformation();
@@ -34,11 +32,17 @@ public class ProjectListsManager {
         listOfDataFiles = new ArrayList<>();
         listOfActions = new ArrayList<>();
     }
-
     // ------------------------------------------------------------------------------
     // ACTIONS
-    public static void addAction(Action action){
+
+    public static void addAction(Action action) {
+
         listOfActions.add(action);
+    }
+    public static void addAction(String comment) {
+        Action action = new Action(comment);
+        listOfActions.add(action);
+        saveExcel();
     }
 
     public static List<Action> getListOfActions() {
@@ -53,6 +57,12 @@ public class ProjectListsManager {
         ProjectListsManager.listOfActions = listOfActions;
     }
 
+    public static void updateAction(int nu, String comment) {
+        Action action = listOfActions.get(nu);
+        action.setCommentAuthor(comment);
+        saveExcel();
+    }
+
     // ------------------------------------------------------------------------------
     // META INFORMATION
 
@@ -62,6 +72,11 @@ public class ProjectListsManager {
 
     public static void setMetaInformation(MetaInformation metaInformation) {
         ProjectListsManager.metaInformation = metaInformation;
+    }
+
+    public static void updateMetaElement(int nu, String comment) {
+        MetaInformation.updateMetaElement(nu, comment);
+        saveExcel();
     }
 
     // ------------------------------------------------------------------------------
@@ -84,7 +99,7 @@ public class ProjectListsManager {
                     networkView.getMouseDoubleClickOnCircleEventHandler());
             listOfComponents.add(component);
         }
-        Context.setChanged(true,"Added component: "+component.getName());
+        addAction("Added component: "+component.getName());
     }
     public static void removeComponent(Component component) {
         listOfConstraints.removeIf(constraint -> constraint.involve(component));
@@ -97,13 +112,14 @@ public class ProjectListsManager {
             }
         }
         listOfComponents.remove(component);
-        Context.setChanged(true,"Removed component: "+component.getName());
+        addAction("Removed component: "+component.getName());
     }
     public static boolean containsComponent(String groupName) {
         boolean contain = false;
         for (Component component : listOfComponents){
             if (groupName.equals(component.getName())) {
                 contain = true;
+                break;
             }
         }
         return contain;
@@ -136,14 +152,12 @@ public class ProjectListsManager {
         int numComponent = listOfComponents.indexOf(component);
         if (numComponent > 0) {
             permuteListOfComponents(numComponent, numComponent - 1);
-            Context.setChanged(true);
         }
     }
     public static void downComponent(Component component) {
         int numComponent = listOfComponents.indexOf(component);
         if (numComponent < listOfComponents.size() - 1) {
             permuteListOfComponents(numComponent, numComponent + 1);
-            Context.setChanged(true);
         }
     }
     public static void permuteListOfComponents(int rowA, int rowB) {
@@ -164,7 +178,7 @@ public class ProjectListsManager {
         } else {
             flux.define(networkView.getMouseDoubleClickOnLineEventHandler());
             listOfFluxes.add(flux);
-            Context.setChanged(true,"Added Flux: "+ flux.getName());
+            addAction("Added Flux: "+ flux.getName());
         }
     }
     public static List<String> getNamesOfLinks() {
@@ -186,7 +200,7 @@ public class ProjectListsManager {
     public static void removeLink(Flux flux) {
         listOfConstraints.removeIf(constraint -> constraint.involve(flux));
         listOfFluxes.remove(flux);
-        Context.setChanged(true,"Removed Flux: "+ flux.getName());
+        addAction("Removed Flux: "+ flux.getName());
     }
     public static void permuteListOfLinks(int rowA, int rowB) {
         Flux fluxA = listOfFluxes.get(rowA);
@@ -198,14 +212,12 @@ public class ProjectListsManager {
         int numLink = listOfFluxes.indexOf(flux);
         if (numLink > 0) {
             permuteListOfLinks(numLink, numLink - 1);
-            Context.setChanged(true);
         }
     }
     public static void downLink(Flux flux) {
         int numLink = listOfFluxes.indexOf(flux);
         if (numLink < listOfFluxes.size() - 1) {
             permuteListOfLinks(numLink, numLink + 1);
-            Context.setChanged(true);
         }
     }
     public static List<Flux> getListOfFluxes() {
@@ -222,20 +234,20 @@ public class ProjectListsManager {
         }
             else {
             listOfObservations.add(observation);
-             Context.setChanged(true,"Added Observation: "+ observation.getObsName());
+            addAction("Added Observation: "+ observation.getObsName());
         }
     }
      public static void removeObservation(String observationName){
         for (Observation observation : listOfObservations)
             if (observationName.equals(observation.getObsName())) {
                 listOfObservations.remove(observation);
-                Context.setChanged(true,"Removed Observation: "+ observation.getObsName());
+                addAction("Removed Observation: "+ observation.getObsName());
                 break;
             }
     }
     public static void removeObservation(Observation observation){
         listOfObservations.remove(observation);
-        Context.setChanged(true,"Removed Observation: "+ observation.getObsName());
+        addAction("Removed Observation: "+ observation.getObsName());
     }
 
    public static boolean containsObservation(String observationName) {
@@ -275,30 +287,28 @@ public class ProjectListsManager {
     // CONSTRAINTS
     public static void addConstraint(Constraint constraint) {
         listOfConstraints.add(constraint);
-        Context.setChanged(true,"Added Constraint: "+ constraint.getName());
+        addAction("Added Constraint: "+ constraint.getName());
     }
     public static void removeConstraints(Constraint constraint) {
         listOfConstraints.remove(constraint);
-        Context.setChanged(true,"Removed Constraint: "+ constraint.getName());
+        addAction("Removed Constraint: "+ constraint.getName());
     }
     public static void updateConstraint(Constraint oldC, Constraint newC) {
         int pos = listOfConstraints.indexOf(oldC);
         listOfConstraints.set(pos,newC);
-        Context.setChanged(true,"Updated Constraint: "+ oldC.getName());
+        addAction("Updated Constraint: "+ oldC.getName()+ "-W" + newC.getName());
     }
     public static void upConstraint(Constraint constraint) {
         int numConstraint = listOfConstraints.indexOf(constraint);
         if (numConstraint > 0) {
             permuteListOfConstraints(numConstraint, numConstraint - 1);
-            Context.setChanged(true);
         }
     }
     public static void downConstraint(Constraint constraint) {
         int numConstraint = listOfConstraints.indexOf(constraint);
         if (numConstraint < listOfConstraints.size() - 1) {
             permuteListOfConstraints(numConstraint, numConstraint + 1);
-            Context.setChanged(true);
-        }
+         }
     }
     public static void permuteListOfConstraints(int rowA, int rowB) {
         Constraint groupA = listOfConstraints.get(rowA);
@@ -322,7 +332,7 @@ public class ProjectListsManager {
         }
         if(! in) {
             listOfDataFiles.add(newDataFile);
-            Context.setChanged(true,"Added Data File: "+ newDataFile.getShortName());
+            addAction("Added Data File: "+ newDataFile.getShortName());
         }
         else {
             HelpDialog.warning("File has already been introduced","Warning");

@@ -213,4 +213,11 @@ public class Flux extends Group {
         }
     }
     // --------------------------------------------
+    public void changeTypeTrophic(boolean newTypeTrophic){
+        if(!typeTrophic==newTypeTrophic){
+            ProjectListsManager.addAction("Change type of flux " + getName() + " : trophic "+ typeTrophic +" -> "+ newTypeTrophic);
+            typeTrophic = newTypeTrophic;
+        }
+    }
+
 }

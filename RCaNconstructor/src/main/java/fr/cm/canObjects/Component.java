@@ -83,8 +83,7 @@ public class Component extends Group {
         double ma = Context.getInsideMax();
         boolean posInside = insideRect(mi, ma);
         if (inside) {
-            if (posInside) {
-            } else {
+            if ( ! posInside)  {
                 alpha = 100000;
                 if (x >= ma) {
                     alpha = Math.min(alpha, (x - ma) / (x - 0.5));
@@ -102,8 +101,7 @@ public class Component extends Group {
                 y = (y - alpha * (y - 0.5));
             }
         } else {
-            if ( ! posInside) {
-            } else {
+            if ( posInside)  {
                 alpha = -100000;
                 if (x > 0.5) {
                     alpha = Math.max(alpha, (x - ma) / (x - 0.5));
@@ -213,5 +211,32 @@ public class Component extends Group {
         return y;
     }
     // --------------------------------------------
+    public void changeName(String newName){
+        if(!name.equals(newName)){
+            ProjectListsManager.addAction("Change component name : " + name + " -> "+ newName);
+            name = newName;
+        }
+    }
+    public void changeInside(boolean newInside){
+        if(!inside==newInside){
+            ProjectListsManager.addAction("Change position of component  " + name + " : inside "+ inside +" -> "+ newInside);
+            inside = newInside;
+        }
+    }
 
+    public void changeParameters(int p, String newVal){
+        double nVal;
+        try {
+            nVal = Double.parseDouble(newVal);
+            if ((Math.abs(nVal - parameters[p]) > 0.0000001) && nVal>=0.0) {
+                ProjectListsManager.addAction("Change value of parameter "
+                        + Strings.getParametersNames(p)+ " for component  "
+                        + name + " : " + parameters[p] + " -> " + newVal);
+                parameters[p] = nVal;
+            }
+        }
+        catch (NumberFormatException e) {
+
+        }
+    }
 }
