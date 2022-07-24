@@ -58,7 +58,7 @@ public class ConstraintTable extends Pane {
         name.setOnEditCommit(
                 event -> {
                     Constraint constraint = event.getTableView().getItems().get(event.getTablePosition().getRow());
-                    constraint.setName(event.getNewValue());
+                    constraint.changeName(event.getNewValue());
                 }
         );
 
@@ -68,28 +68,13 @@ public class ConstraintTable extends Pane {
         formula.setEditable(false);
 
         TableColumn<Constraint, Boolean> activeCol = new TableColumn<>("Active constraint");
-        activeCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Constraint, Boolean>, ObservableValue<Boolean>>() {
-            @Override
-            public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<Constraint, Boolean> param) {
-                Constraint constraint = param.getValue();
-                SimpleBooleanProperty booleanProp = new SimpleBooleanProperty(constraint.isActive());
-                booleanProp.addListener(new ChangeListener<Boolean>() {
-                    @Override
-                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue,
-                                        Boolean newValue) {
-                        constraint.setActive(newValue);
-                    }
-                });
-                return booleanProp;
-            }
+        activeCol.setCellValueFactory(param -> {
+            Constraint constraint = param.getValue();
+            SimpleBooleanProperty booleanProp = new SimpleBooleanProperty(constraint.isActive());
+            booleanProp.addListener((observable, oldValue, newValue) -> constraint.changeActive(newValue));
+            return booleanProp;
         });
-       activeCol.setCellFactory(new Callback<TableColumn<Constraint, Boolean>, TableCell<Constraint, Boolean>>() {
-            @Override
-            public TableCell<Constraint, Boolean> call(TableColumn<Constraint, Boolean> p) {
-                CheckBoxTableCell<Constraint, Boolean> cell = new CheckBoxTableCell<Constraint, Boolean>();
-                return cell;
-            }
-        });
+       activeCol.setCellFactory(p -> new CheckBoxTableCell<>());
         activeCol.setEditable(true);
 
         TableColumn<Constraint, String> years = new TableColumn<>("Years");

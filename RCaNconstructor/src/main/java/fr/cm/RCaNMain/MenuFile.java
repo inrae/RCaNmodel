@@ -16,25 +16,27 @@ public class MenuFile {
     static final MenuItem openFileItem = new MenuItem("Open");
     static final MenuItem saveFileItem = new MenuItem("Save");
     static final MenuItem saveAsFileItem = new MenuItem("Save as ...");
+    static final MenuItem closeFileItem = new MenuItem("Close");
     static final MenuItem exitItem = new MenuItem("Exit");
     static BorderPane borderPaneRacine;
 
     static List<MenuItem> menuItems = null;
 
     public MenuFile(BorderPane borderPaneRacine) {
-        this.borderPaneRacine = borderPaneRacine;
-        menuItems = Arrays.asList(newItem, openFileItem, saveFileItem, saveAsFileItem, exitItem);
+        MenuFile.borderPaneRacine = borderPaneRacine;
+        menuItems = Arrays.asList(newItem, openFileItem, closeFileItem, saveFileItem, saveAsFileItem, exitItem);
         for (MenuItem menuItem : menuItems) {
             menuItem.setOnAction(FileListener);
         }
     }
 
     public static void updateMenus() {
-        boolean notStarted = !Context.isStarted();
-        newItem.setDisable(false);
-        openFileItem.setDisable(false);
-        saveFileItem.setDisable(notStarted);
-        saveAsFileItem.setDisable(notStarted);
+        boolean started = Context.isStarted();
+        newItem.setDisable(started);
+        openFileItem.setDisable(started);
+        closeFileItem.setDisable(! started);
+        saveFileItem.setDisable(! started);
+        saveAsFileItem.setDisable(! started);
         exitItem.setDisable(false);
     }
 
@@ -42,24 +44,24 @@ public class MenuFile {
         return menuItems;
     }
 
-    static final EventHandler<ActionEvent> FileListener = e -> handle(e);
+    static final EventHandler<ActionEvent> FileListener = MenuFile::handle;
 
     private static void handle(ActionEvent e) {
         MenuItem menuItem = (MenuItem) e.getSource();
         int numItem = menuItems.indexOf(menuItem);
         switch (numItem) {
-            case 0 :  // new project
-                // System.out.println("new project");
+            case 0 :
                 new ProjectCreateNew();
                 if (Context.isStarted()) {
                     Context.initRCaN();
                     ProjectListsManager.init();
                     MainApplication.updateMenus();
+                    ProjectListsManager.addAction("Project creation "+ Context.getFileName());
+                    ProjectListsManager.saveExcel();
                     borderPaneRacine.setCenter(ProjectListsManager.getNetworkView());
                 }
                 break;
-            case 1: // open project
-                // System.out.println("open project");
+            case 1:
                 new ProjectOpenExisting();
                 if (Context.isStarted()) {
                     Context.initRCaN();
@@ -69,25 +71,29 @@ public class MenuFile {
                     borderPaneRacine.setCenter(ProjectListsManager.getNetworkView());
                 }
                 break;
-            case 2: // save project
-                // System.out.println("save project");
+            case 2:
+                ProjectListsManager.init();
+                Context.setStarted(false);
+                MainApplication.updateMenus();
+                MainApplication.setFirstPage();
+               break;
+            case 3:
                 if (Context.isStarted()) {
                     if(Context.getDirName().length() == 0){
-                        new ProjectChangeFileName();
+                        new ProjectSaveAs();
                     }
                     ProjectListsManager.saveExcel();
-                    Context.setChanged(false);
                 }
                 break;
-            case 3: // save as...
+            case 4:
                 if (Context.isStarted()) {
-                    new ProjectChangeFileName();
+                    new ProjectSaveAs();
                     ProjectListsManager.saveExcel();
-                    Context.setChanged(false);
+                    ProjectListsManager.addAction("Project saved as "+ Context.getFileName());
                 }
                 break;
-            case 4 : // exit
-                MainApplication.close();
+            case 5 :
+                MainApplication.exit();
                 break;
             default:
         }

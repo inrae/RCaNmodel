@@ -39,7 +39,6 @@ public class MainApplication extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-
         RCaNCaller.initRCaller();
 
         stage = primaryStage;
@@ -55,9 +54,8 @@ public class MainApplication extends Application {
 
         borderPaneRacine = new BorderPane();
 
+        setFirstPage();
         MenuBar menuBar = setMenus();
-        firstPage = new FirstPage();
-        borderPaneRacine.setCenter(firstPage);
         borderPaneRacine.setTop(menuBar);
 
         Scene scene = new Scene(borderPaneRacine, Context.getWindowWidth(), Context.getWindowHeight());
@@ -69,50 +67,46 @@ public class MainApplication extends Application {
         primaryStage.show();
     }
 
+    static void setFirstPage(){
+        firstPage = new FirstPage();
+        borderPaneRacine.setCenter(firstPage);
+    }
     public static void updateMenus() {
         MenuFile.updateMenus();
-        MenuMeta.updateMenus();
         MenuView.updateMenus();
         MenuRCaN.updateMenus();
     }
 
     static MenuBar setMenus() {
         new MenuRCaN(borderPaneRacine);
-        new MenuMeta(borderPaneRacine);
         new MenuFile(borderPaneRacine);
         new MenuHelp(borderPaneRacine);
         new MenuView(borderPaneRacine);
 
         MenuBar menuBar = new MenuBar();
         Menu fileMenu = new Menu("File");
-        Menu metaMenu = new Menu("Meta Information");
         Menu viewMenu = new Menu("View");
         Menu rcanMenu = new Menu("RCaN");
         Menu helpMenu = new Menu("Information and help");
 
         fileMenu.getItems().addAll(MenuFile.getMenuItems());
-        metaMenu.getItems().addAll(MenuMeta.getMenuItems());
         viewMenu.getItems().addAll(MenuView.getMenuItems());
         rcanMenu.getItems().addAll(MenuRCaN.getMenuItems());
         helpMenu.getItems().addAll(MenuHelp.getMenus());
 
-        menuBar.getMenus().addAll(fileMenu, metaMenu, viewMenu, rcanMenu, helpMenu);
+        menuBar.getMenus().addAll(fileMenu, viewMenu, rcanMenu, helpMenu);
         updateMenus();
         return menuBar;
     }
 
-    public static void close() {
-        if (Context.isChanged()) {
-            new ProjectSaveBeforeClosing();
-        }
+    public static void exit() {
         Platform.exit();
         System.exit(0);
      }
 
     static void setOnClose() {
-        stage.setOnCloseRequest((WindowEvent t) -> {
-            close();
-        });
+
+        stage.setOnCloseRequest((WindowEvent t) -> exit());
     }
 
     // -------------------------------------------------------------------------------------
@@ -130,9 +124,7 @@ public class MainApplication extends Application {
             task = new TimerTask() {
                 @Override
                 public void run() {
-                    Platform.runLater(() -> {
-                        ProjectListsManager.getNetworkView().redrawChangingSize();
-                    });
+                    Platform.runLater(() -> ProjectListsManager.getNetworkView().redrawChangingSize());
                 }
             };
             timer.schedule(task, delayTime);
@@ -141,6 +133,7 @@ public class MainApplication extends Application {
 
     // ------------------------------------------------------------------------
     public static void setTitle(String fileName) {
+
         stage.setTitle(" RCaN - " + fileName.replace(".xlsx", " "));
     }
 

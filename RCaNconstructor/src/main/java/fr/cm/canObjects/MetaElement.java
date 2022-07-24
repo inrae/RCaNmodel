@@ -5,6 +5,8 @@
  */
 package fr.cm.canObjects;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -15,20 +17,19 @@ public class MetaElement {
 
     final String metaName;
 
-    boolean metaType;
-    final StringProperty metaContent = new SimpleStringProperty();
+     final StringProperty metaContent = new SimpleStringProperty();
     final StringProperty metaHint = new SimpleStringProperty();
-
+    final BooleanProperty metaType = new SimpleBooleanProperty();
     // --------------------------------------------
     public MetaElement(String elementR) {
         if(elementR.startsWith("<")){
-            metaType = false;
+            metaType.set(false);
             this.metaName = elementR;
             setMetaContent("");
             setMetaHint("");
         }
         else {
-            metaType = true;
+            metaType.set(true);
             String[] element = elementR.split(";");
             this.metaName = element[0];
             setMetaContent("");
@@ -47,7 +48,7 @@ public class MetaElement {
     }
 
     public boolean isMetaType() {
-        return metaType;
+        return metaType.get();
     }
 
     public StringProperty carContentProperty() {
@@ -73,4 +74,12 @@ public class MetaElement {
     public void setMetaHint(String metaHint) {
         this.metaHint.set(metaHint);
     }
+
+    public void changeMetaContent(String newMetaContent){
+        if(! getMetaName().equals(newMetaContent)){
+            ProjectListsManager.addAction("Change meta information content of  : " + metaName + " -> "+ getMetaName());
+            carContentProperty().set(newMetaContent);
+        }
+    }
+
 }

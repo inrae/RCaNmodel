@@ -5,12 +5,17 @@
  */
 package fr.cm.GUIdialogs;
 
+import fr.cm.RCaNMain.Context;
+
+import java.io.File;
 import java.util.Optional;
 
-import fr.cm.RCaNMain.Context;
+import fr.cm.RCaNMain.MainApplication;
 import fr.cm.parameters.ColorsAndFormats;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 
 /**
  * @author christianmullon
@@ -37,17 +42,22 @@ public class ProjectCreateNew extends Dialog<ButtonType> {
         if (result.isPresent()) {
             if (result.get() == ButtonType.OK) {
                 String fileName = textFileName.getText();
-                if(fileName.length()>0) {
+                if (fileName.length() > 0) {
                     if (!fileName.contains(".xlsx")) {
                         fileName = fileName + ".xlsx";
                     }
                 }
                 Context.init();
+                DirectoryChooser chooser = new DirectoryChooser();
+                chooser.setTitle("Select the directory of your project");
+                chooser.setInitialDirectory(Context.getWorkingDirectory());
+                File selectedDirectory = chooser.showDialog(MainApplication.stage);
+                Context.setDirName(selectedDirectory.getAbsolutePath());
                 Context.setFileName(fileName);
-                Context.setDirName("");
                 Context.setStarted(true);
-            }
+             }
         }
     }
     // --------------------------------------------
 }
+

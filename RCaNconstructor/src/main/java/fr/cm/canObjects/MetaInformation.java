@@ -27,15 +27,17 @@ public class MetaInformation {
         elements = new ArrayList<>();
         String fileName = "project/Project.txt";
         InputStream inst = MetaInformation.class.getClassLoader().getResourceAsStream(fileName);
-        List<String> elementsResource = new ArrayList<>();
-        try {
-            elementsResource = IOUtils.readLines(inst, StandardCharsets.UTF_8.name());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        for(String elementR : elementsResource){
-            MetaElement metaElement = new MetaElement(elementR);
-            elements.add(metaElement);
+        if(inst != null){
+            List<String> elementsResource = new ArrayList<>();
+            try {
+                elementsResource = IOUtils.readLines(inst, StandardCharsets.UTF_8.name());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            for(String elementR : elementsResource){
+                MetaElement metaElement = new MetaElement(elementR);
+                elements.add(metaElement);
+            }
         }
     }
 
@@ -45,6 +47,10 @@ public class MetaInformation {
 
     public  List<MetaElement> getElements() {
         return elements;
+    }
+
+    public static void updateMetaElement(int nu, String comment) {
+        elements.get(nu).setMetaContent(comment);
     }
 
 }

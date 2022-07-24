@@ -62,7 +62,7 @@ public class MetaInformationSaveDialog {
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Name of text file");
-        fileChooser.setInitialDirectory(Context.getWorkingDirectory());
+        fileChooser.setInitialDirectory(new File(Context.getDirName()));
         String fileNameTxt = Context.getFileName().replace(".xlsx",".txt");
         fileChooser.setInitialFileName(fileNameTxt);
         File selectedFile = fileChooser.showSaveDialog(MainApplication.stage);

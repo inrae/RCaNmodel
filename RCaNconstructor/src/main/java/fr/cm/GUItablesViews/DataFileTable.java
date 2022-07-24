@@ -23,7 +23,7 @@ public class DataFileTable extends Pane {
 
     double width = Context.getWindowWidth();
     double height =  Context.getWindowHeight();
-    DataFile selectedDataFile = null;
+    DataFile selectedDataFile;
     // GAUCHE
     Label leftTitle = new Label("Project data files");
     TableView<DataFile> tableOfFiles = new TableView<>();
@@ -55,7 +55,6 @@ public class DataFileTable extends Pane {
                         HelpDialog.warning("No selected data file","Warning");
                     } else {
                         new CharacteristicsOfFileDialog(selectedDataFile);
-
                     }
                 }
         );
@@ -85,14 +84,13 @@ public class DataFileTable extends Pane {
         listOfFiles = observableArrayList(ProjectListsManager.getListOfDataFiles());
         tableOfFiles.setItems(listOfFiles);
         tableOfFiles.getSelectionModel().selectFirst();
-        ObservableList selectedCells = tableOfFiles.getSelectionModel().getSelectedCells();
-        selectedCells.addListener(new ListChangeListener() {
-            @Override
-            public void onChanged(Change c) {
-                TablePosition tablePosition = (TablePosition) selectedCells.get(0);
-                int nl = tablePosition.getRow();
-                selectedDataFile = listOfFiles.get(nl);
-            }});
+        @SuppressWarnings("rawtypes")
+        ObservableList<TablePosition> selectedCells = tableOfFiles.getSelectionModel().getSelectedCells();
+        selectedCells.addListener((ListChangeListener<TablePosition>) c -> {
+            TablePosition tablePosition = selectedCells.get(0);
+            int nl = tablePosition.getRow();
+            selectedDataFile = listOfFiles.get(nl);
+        });
 
         fileName.setPrefWidth(0.3*width);
         leftTitle.setFont(ColorsAndFormats.titleFont);
@@ -116,8 +114,7 @@ public class DataFileTable extends Pane {
         fileChooser.getExtensionFilters().add(extFilter);
         File selectedFile = fileChooser.showOpenDialog(MainApplication.stage);
         try{
-            String fileName = selectedFile.getAbsolutePath();
-            return(fileName);
+            return(selectedFile.getAbsolutePath());
         }
         catch(Exception e){
             return null;

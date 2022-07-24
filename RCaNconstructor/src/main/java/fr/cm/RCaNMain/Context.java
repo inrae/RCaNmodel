@@ -23,8 +23,7 @@ public class Context {
     private static int lastYear;
 
     // etats du systeme
-    private static boolean warnings = false;
-    private static boolean changed;
+
     private static boolean started;
     private static boolean connectedR;
     private static boolean builtR;
@@ -38,21 +37,19 @@ public class Context {
     static final double radiusComponent = 30.0f;
     static final double radiusInternalLink = 38.0f;
 
-    // ------------------------------------------------------------------------
+    static String textAreaContent;
 
-    public static boolean isWarnings() { return warnings; }
-
-    public static boolean isChanged() { return changed; }
-
-    public static void setChanged(boolean changed, String comment) {
-        Action action = new Action(comment);
-        Context.changed = changed;
-        ProjectListsManager.addAction(action);
+    public static String getTextAreaContent() {
+        return textAreaContent;
     }
 
-    public static void setChanged(boolean changed) {
-        Context.changed = changed;
+    public static void setTextAreaContent(String textAreaContent) {
+        Context.textAreaContent = textAreaContent;
     }
+// ------------------------------------------------------------------------
+
+
+    public static boolean isWarnings() { return false; }
 
     public static String getFileName() { return fileName; }
 
@@ -64,7 +61,8 @@ public class Context {
 
     public static File getWorkingDirectory() { return workingDirectory; }
 
-    public static String getFullFileName() { return (Context.dirName + "/" + Context.fileName); }
+    public static String getFullFileName() {
+        return (Context.dirName + "/" + Context.fileName); }
 
     public static int getFirstYear() { return firstYear; }
 
@@ -130,6 +128,8 @@ public class Context {
         firstYear = 4000;
         lastYear = -1000;
         workingDirectory = new File(System.getProperty("user.dir"));
+        dirName = workingDirectory.getAbsolutePath();
+        fileName = "";
         started = false;
         initRCaN();
         Rectangle2D rect = Screen.getPrimary().getVisualBounds();
@@ -137,8 +137,7 @@ public class Context {
         double screenHeight = rect.getHeight();
         setWindowWidth(0.9 * screenWidth);
         setWindowHeight(0.9 * screenHeight);
-        changed = false;
-    }
+     }
 
     public static void initRCaN() {
         connectedR = false;
