@@ -39,7 +39,7 @@ ggSeries <- function(mysampleCaNmod,
     stop("Package ggplot2 needed for this function to work. Please install it.",
          call. = FALSE)
   }
-  if (class(mysampleCaNmod) != "sampleCaNmod")
+  if (! inherits(mysampleCaNmod, "sampleCaNmod"))
     stop("you should provide a sampleCaNmod object")
   mat_res <- as.matrix(mysampleCaNmod$mcmc)
 
