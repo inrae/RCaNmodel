@@ -5,7 +5,7 @@
  */
 package fr.cm.GUItablesViews;
 
-import fr.cm.canObjects.ProjectListsManager;
+import fr.cm.ProjectManager.ProjectListsManager;
 import fr.cm.canObjects.Observation;
 import fr.cm.RCaNMain.Context;
 import fr.cm.parameters.ColorsAndFormats;

@@ -7,13 +7,11 @@ package fr.cm.GUItablesViews;
 
 import fr.cm.canObjects.Constraint;
 
-import fr.cm.canObjects.ProjectListsManager;
+import fr.cm.ProjectManager.ProjectListsManager;
 import fr.cm.RCaNMain.Context;
 import fr.cm.GUIdialogs.ConstraintNewOrEditDialog;
 import fr.cm.parameters.ColorsAndFormats;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -24,7 +22,6 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.util.Callback;
 
 /**
  * @author christianmullon
@@ -67,14 +64,14 @@ public class ConstraintTable extends Pane {
         formula.setSortable(true);
         formula.setEditable(false);
 
-        TableColumn<Constraint, Boolean> activeCol = new TableColumn<>("Active constraint");
+        TableColumn<Constraint, Boolean> activeCol = new TableColumn<>("Active y/n");
         activeCol.setCellValueFactory(param -> {
             Constraint constraint = param.getValue();
             SimpleBooleanProperty booleanProp = new SimpleBooleanProperty(constraint.isActive());
             booleanProp.addListener((observable, oldValue, newValue) -> constraint.changeActive(newValue));
             return booleanProp;
         });
-       activeCol.setCellFactory(p -> new CheckBoxTableCell<>());
+        activeCol.setCellFactory(p -> new CheckBoxTableCell<>());
         activeCol.setEditable(true);
 
         TableColumn<Constraint, String> years = new TableColumn<>("Years");
@@ -82,22 +79,7 @@ public class ConstraintTable extends Pane {
         years.setEditable(false);
         years.setSortable(true);
 
-        /*
-        TableColumn<Constraint, String> comment = new TableColumn<>("Comment");
-        comment.setCellValueFactory(new PropertyValueFactory<>("comment"));
-        comment.setCellFactory(TextFieldTableCell.forTableColumn());
-        comment.setEditable(true);
-        comment.setSortable(true);
-        comment.setOnEditCommit(
-                event -> {
-                    Constraint constraint = event.getTableView().
-                        getItems().get(event.getTablePosition().getRow());
-                    constraint.setComment(event.getNewValue());
-                }
-        );
-        */
-
-        TableColumn<Constraint, String> comment = new TableColumn<>("Comment");
+        TableColumn<Constraint, String> comment = new TableColumn<>("Annotation");
         comment.setCellValueFactory(new PropertyValueFactory<>("comment"));
         comment.setCellFactory(TextFieldTableCell.forTableColumn());
 
@@ -166,7 +148,7 @@ public class ConstraintTable extends Pane {
         years.setMinWidth(0.15 * width);
         comment.setMinWidth(0.3 * width);
 
-        final Label title = new Label("System constraints");
+        final Label title = new Label("Constraints");
         title.setFont(ColorsAndFormats.titleFont);
         ColorsAndFormats.setVBoxCharacteristics(vbox);
         vbox.getChildren().addAll(title, constraintTable, hboxButtons);

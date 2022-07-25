@@ -1,7 +1,8 @@
-package fr.cm.GUInetwork;
+package fr.cm.GUIdialogs;
 
+import fr.cm.GUInetwork.NetworkView;
 import fr.cm.canObjects.Component;
-import fr.cm.canObjects.ProjectListsManager;
+import fr.cm.ProjectManager.ProjectListsManager;
 
 import java.util.Optional;
 
@@ -19,11 +20,11 @@ import javafx.stage.Window;
 /**
  * @author christianmullon
  */
-public class ComponentClic extends Dialog<ButtonType> {
+public class ComponentClicDialog extends Dialog<ButtonType> {
 
     final Window window;
 
-    public ComponentClic(Component component, NetworkView networkView) {
+    public ComponentClicDialog(Component component, NetworkView networkView) {
         window = this.getDialogPane().getScene().getWindow();
         window.setOnCloseRequest(event -> window.hide());
         setTitle(component.getName());
@@ -40,7 +41,7 @@ public class ComponentClic extends Dialog<ButtonType> {
         Optional<ButtonType> result = this.showAndWait();
         if (result.isPresent()) {
             if (result.get() == buttonTypeEdit) {
-                new ComponentEdit(component);
+                new ComponentEditDialog(component);
             }
             if (result.get() == buttonTypeDelete) {
                 ProjectListsManager.removeComponent(component);

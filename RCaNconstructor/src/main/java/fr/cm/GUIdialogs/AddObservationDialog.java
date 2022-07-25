@@ -3,7 +3,7 @@ package fr.cm.GUIdialogs;
 import fr.cm.RCaNMain.Context;
 import fr.cm.canObjects.DataFile;
 import fr.cm.canObjects.Observation;
-import fr.cm.canObjects.ProjectListsManager;
+import fr.cm.ProjectManager.ProjectListsManager;
 import fr.cm.parameters.ColorsAndFormats;
 import javafx.geometry.HPos;
 import javafx.scene.control.ButtonType;
@@ -72,7 +72,7 @@ public class AddObservationDialog extends Dialog<ButtonType> {
                     int fY = Integer.parseInt(fieldFirstYear.getText());
                     int lY = Integer.parseInt(fieldLastYear.getText());
                     observation.redimValues(fY, lY);
-                    ProjectListsManager.addObservation(observation);
+                    ProjectListsManager.addObservation(observation, true);
                     dataFile.addObservationFromColumn(observation);
                 }
                 catch(Exception ex){

@@ -1,6 +1,6 @@
 package fr.cm.rCaller;
 
-import fr.cm.canObjects.ProjectListsManager;
+import fr.cm.ProjectManager.ProjectListsManager;
 import fr.cm.RCaNMain.Context;
 import fr.cm.xmlFiles.RCommandXML;
 import javafx.collections.FXCollections;

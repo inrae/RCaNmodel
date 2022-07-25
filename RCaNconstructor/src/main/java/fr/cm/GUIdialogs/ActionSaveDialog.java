@@ -1,6 +1,7 @@
 
 package fr.cm.GUIdialogs;
 
+import fr.cm.ProjectManager.ProjectListsManager;
 import fr.cm.canObjects.*;
 import fr.cm.RCaNMain.Context;
 import fr.cm.RCaNMain.MainApplication;

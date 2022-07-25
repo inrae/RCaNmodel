@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import fr.cm.canObjects.Action;
-import fr.cm.canObjects.ProjectListsManager;
 import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
 

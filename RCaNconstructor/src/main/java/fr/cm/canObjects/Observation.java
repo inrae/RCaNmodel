@@ -5,6 +5,7 @@
  */
 package fr.cm.canObjects;
 
+import fr.cm.ProjectManager.ProjectListsManager;
 import fr.cm.RCaNMain.Context;
 
 /**

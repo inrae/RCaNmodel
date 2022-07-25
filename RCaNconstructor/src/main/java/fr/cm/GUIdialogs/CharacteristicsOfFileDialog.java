@@ -13,7 +13,6 @@ import javafx.scene.text.Text;
 import java.util.Optional;
 
 public class CharacteristicsOfFileDialog  extends Dialog <ButtonType> {
-
     double width = Context.getWindowWidth();
     Label middleTitle, labelShortName, labelMetaInformation, labelPathLabel, labelPathStill, labelPathStillOK, labelOwner;
     TextField fieldShortName, fieldOwner;

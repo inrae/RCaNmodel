@@ -1,8 +1,7 @@
-package fr.cm.GUInetwork;
+package fr.cm.GUIdialogs;
 
 import fr.cm.canObjects.Component;
-import fr.cm.canObjects.ProjectListsManager;
-import fr.cm.GUIdialogs.HelpDialog;
+import fr.cm.ProjectManager.ProjectListsManager;
 import fr.cm.parameters.Strings;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
@@ -22,12 +21,12 @@ import java.util.Optional;
  * @author christianmullon
  */
 
-public class ComponentEdit extends Dialog<ButtonType> {
+public class ComponentEditDialog extends Dialog<ButtonType> {
 
     final TextField[] fieldCaracteristiques;
     final Window window;
 
-    public ComponentEdit(Component component) {
+    public ComponentEditDialog(Component component) {
         window = this.getDialogPane().getScene().getWindow();
         window.setOnCloseRequest(event -> window.hide());
         this.setTitle(Strings.component);

@@ -2,6 +2,7 @@ package fr.cm.canObjects;
 
 import fr.cm.GUIdialogs.AddObservationDialog;
 import fr.cm.GUIdialogs.HelpDialog;
+import fr.cm.ProjectManager.ProjectListsManager;
 import fr.cm.excel.ExcelManagerCSV;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;

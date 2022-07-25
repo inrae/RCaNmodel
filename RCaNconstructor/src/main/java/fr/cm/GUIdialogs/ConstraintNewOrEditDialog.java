@@ -7,7 +7,7 @@ package fr.cm.GUIdialogs;
 
 import fr.cm.canObjects.Constraint;
 import fr.cm.canObjects.Formula;
-import fr.cm.canObjects.ProjectListsManager;
+import fr.cm.ProjectManager.ProjectListsManager;
 import fr.cm.RCaNMain.Context;
 import fr.cm.parameters.ColorsAndFormats;
 import fr.cm.parameters.Strings;
@@ -308,7 +308,7 @@ public class ConstraintNewOrEditDialog extends Dialog<ButtonType> {
             }
             else {
                 Constraint constraint = new Constraint(cstNameTextArea.getText(),formula.fromTokensToString(), labelTokenYears.getText(), true, "");
-                ProjectListsManager.addConstraint(constraint);
+                ProjectListsManager.addConstraint(constraint, true);
             }
             window.hide();
         }

@@ -6,7 +6,7 @@ import fr.cm.GUIdialogs.HelpDialog;
 import fr.cm.RCaNMain.Context;
 import fr.cm.RCaNMain.MainApplication;
 import fr.cm.canObjects.DataFile;
-import fr.cm.canObjects.ProjectListsManager;
+import fr.cm.ProjectManager.ProjectListsManager;
 import fr.cm.parameters.ColorsAndFormats;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -40,7 +40,7 @@ public class DataFileTable extends Pane {
                     // ADDING A FILE
                     String newFileName = observationFileChooser();
                     DataFile dataFile = new DataFile(newFileName);
-                    ProjectListsManager.addDataFile(dataFile);
+                    ProjectListsManager.addDataFile(dataFile, true);
                     selectedDataFile = dataFile;
                     tableOfFiles.getSelectionModel().selectLast();
                     listOfFiles = observableArrayList(ProjectListsManager.getListOfDataFiles());
@@ -108,7 +108,7 @@ public class DataFileTable extends Pane {
 
     static String observationFileChooser() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Select file with observation");
+        fileChooser.setTitle("Select a data file with observation");
         fileChooser.setInitialDirectory(Context.getWorkingDirectory());
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Excel files", "*.csv");
         fileChooser.getExtensionFilters().add(extFilter);

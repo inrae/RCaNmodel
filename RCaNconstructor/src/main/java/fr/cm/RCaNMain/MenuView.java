@@ -1,7 +1,7 @@
 package fr.cm.RCaNMain;
 
 import fr.cm.GUItablesViews.*;
-import fr.cm.canObjects.ProjectListsManager;
+import fr.cm.ProjectManager.ProjectListsManager;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.MenuItem;
@@ -27,7 +27,7 @@ public class MenuView {
 
     public MenuView(BorderPane borderPaneRacine) {
         MenuView.borderPaneRacine = borderPaneRacine;
-        menuItems = Arrays.asList(networkItem, groupsItem, linksItem, observationsItem, constraintsItem, dataFileItem, actionsItem, metaTableItem);
+        menuItems = Arrays.asList(networkItem, groupsItem, linksItem, dataFileItem, observationsItem, constraintsItem, actionsItem, metaTableItem);
         for (MenuItem menuItem : menuItems) {
             menuItem.setOnAction(ViewListener);
         }
@@ -63,18 +63,18 @@ public class MenuView {
                 borderPaneRacine.setCenter(fluxTable);
             }
             case 3 -> {
-                ObservationTable observationTable = new ObservationTable();
-                borderPaneRacine.setCenter(observationTable);
-            }
-            case 4 -> {
-                ConstraintTable constraintTable = new ConstraintTable();
-                borderPaneRacine.setCenter(constraintTable);
-            }
-            case 5 -> {
                 DataFileTable dataFileTable = new DataFileTable();
                 borderPaneRacine.setCenter(dataFileTable);
             }
-            case 6 -> {
+            case 4 -> {
+                ObservationTable observationTable = new ObservationTable();
+                borderPaneRacine.setCenter(observationTable);
+            }
+            case 5 -> {
+                ConstraintTable constraintTable = new ConstraintTable();
+                borderPaneRacine.setCenter(constraintTable);
+            }
+               case 6 -> {
                 ActionTable actionTable = new ActionTable();
                 borderPaneRacine.setCenter(actionTable);
             }

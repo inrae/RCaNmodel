@@ -5,6 +5,7 @@
  */
 package fr.cm.canObjects;
 
+import fr.cm.ProjectManager.ProjectListsManager;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -44,10 +45,12 @@ public class MetaElement {
     }
     // ---------------------------------------------------------------------------------
     public String getMetaName() {
+
         return metaName;
     }
 
     public boolean isMetaType() {
+
         return metaType.get();
     }
 
@@ -77,7 +80,8 @@ public class MetaElement {
 
     public void changeMetaContent(String newMetaContent){
         if(! getMetaName().equals(newMetaContent)){
-            ProjectListsManager.addAction("Change meta information content of  : " + metaName + " -> "+ getMetaName());
+            ProjectListsManager.addAction(
+                    "Change meta information content of  : " + metaName + " -> "+ getMetaName(),true);
             carContentProperty().set(newMetaContent);
         }
     }
