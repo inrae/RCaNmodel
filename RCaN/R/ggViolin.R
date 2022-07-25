@@ -43,7 +43,7 @@ ggViolin <- function(mysampleCaNmod,
   }
   if (is.null(years))
     years <- mysampleCaNmod$CaNmod$series$Year
-  if (class(mysampleCaNmod) != "sampleCaNmod")
+  if (! inherits(mysampleCaNmod, "sampleCaNmod"))
     stop("you should provide a sampleCaNmod object")
   mat_res <- as.matrix(mysampleCaNmod$mcmc)
   mat_res <- mat_res[, colnames(mat_res) %in% paste0(rep(param,
