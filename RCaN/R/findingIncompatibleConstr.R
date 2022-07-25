@@ -107,8 +107,12 @@ findingIncompatibleConstr <- function(x) {
     param_name[which(solutions > 0 & (seq_len(length(solutions))) > (nbparam))]
   if (length(problematic) > 0) {
     results <- lapply(seq_len(length(problematic)), function(p) {
-      Aslacked <- Aslacked[, -which(colnames(Aslacked) == problematic[p])]
-      Cslacked <- Cslacked[, -which(colnames(Cslacked) == problematic[p])]
+      Aslacked <- Aslacked[,
+                           -which(colnames(Aslacked) == problematic[p]),
+                           drop = FALSE]
+      Cslacked <- Cslacked[,
+                           -which(colnames(Cslacked) == problematic[p]),
+                           drop = FALSE]
       # bslacked <- b
       # Cslacked <- as.matrix(C)
       # vslacked <- v
