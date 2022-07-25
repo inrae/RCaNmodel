@@ -1,8 +1,7 @@
 
 package fr.cm.RCaNMain;
 
-import fr.cm.GUIdialogs.*;
-import fr.cm.canObjects.ProjectListsManager;
+import fr.cm.ProjectManager.ProjectListsManager;
 import fr.cm.parameters.ColorsAndFormats;
 import fr.cm.rCaller.RCaNCaller;
 import fr.cm.xmlFiles.HelpListXML;

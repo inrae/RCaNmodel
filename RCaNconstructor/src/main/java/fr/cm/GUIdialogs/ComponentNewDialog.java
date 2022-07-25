@@ -1,9 +1,9 @@
-package fr.cm.GUInetwork;
+package fr.cm.GUIdialogs;
 
 import fr.cm.canObjects.Component;
 import java.util.Optional;
 
-import fr.cm.canObjects.ProjectListsManager;
+import fr.cm.ProjectManager.ProjectListsManager;
 import fr.cm.parameters.Strings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -26,11 +26,11 @@ import javafx.stage.Window;
  *
  * @author christianmullon
  */
-public class ComponentNew extends Dialog<ButtonType>{
+public class ComponentNewDialog extends Dialog<ButtonType>{
 
     final Window window;
 
-    public ComponentNew(double wx, double hy) {
+    public ComponentNewDialog(double wx, double hy) {
         window = this.getDialogPane().getScene().getWindow();
         window.setOnCloseRequest(event -> window.hide());
         setTitle(Strings.addingAComponent);
@@ -71,7 +71,7 @@ public class ComponentNew extends Dialog<ButtonType>{
                 component.setInside(type);
                 component.setText();
                 component.setWH(wx, hy);
-                ProjectListsManager.addComponent(component);
+                ProjectListsManager.addComponent(component, true);
             }
          }
     }

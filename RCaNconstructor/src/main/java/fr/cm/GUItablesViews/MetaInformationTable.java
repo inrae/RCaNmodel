@@ -1,22 +1,17 @@
 package fr.cm.GUItablesViews;
 
 
-import fr.cm.GUIdialogs.MetaInformationSaveDialog;
+import fr.cm.GUIdialogs.MetaInformationSaveTextDialog;
 import fr.cm.GUIdialogs.TextAreaDialog;
 import fr.cm.RCaNMain.Context;
-import fr.cm.canObjects.Action;
-import fr.cm.canObjects.Constraint;
 import fr.cm.canObjects.MetaElement;
-import fr.cm.canObjects.ProjectListsManager;
+import fr.cm.ProjectManager.ProjectListsManager;
 import fr.cm.parameters.ColorsAndFormats;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -57,16 +52,10 @@ public class MetaInformationTable extends Pane {
                 @SuppressWarnings("rawtypes")
                 TableColumn column = pos.getTableColumn();
                 String oComment = column.getCellData(row).toString();
-                if(col==1){
-                    new TextAreaDialog("Edit answer",oComment);
+                if(col==1 && ProjectListsManager.metaInformationType(row)){
+                    new TextAreaDialog("Edit annotation",oComment);
                     String nComment = Context.getTextAreaContent();
-                    System.out.println("Clic on: "+ row
-                            + " " + oComment
-                            + " " + nComment
-                            + " " + nComment.equals(oComment)
-                    );
                     if(!nComment.equals(oComment)) {
-                        System.out.println("Clic");
                         ProjectListsManager.updateMetaElement(row, nComment);
                         table.refresh();
                     }
@@ -93,6 +82,7 @@ public class MetaInformationTable extends Pane {
         TableColumn<MetaElement, String> metaNameCol = new TableColumn<>("Field");
         metaNameCol.setCellValueFactory(new PropertyValueFactory<>("metaName"));
         metaNameCol.setEditable(false);
+        metaNameCol.setSortable(false);
         metaNameCol.setMinWidth(0.35*width);
         @SuppressWarnings("rawtypes")
         Callback cellFactoryMeta = new Callback<TableColumn, TableCell>() {
@@ -126,7 +116,7 @@ public class MetaInformationTable extends Pane {
         metaNameCol.setCellFactory(cellFactoryMeta);
         table.getColumns().add(metaNameCol);
         // -------------------------------------------------------------------------
-        TableColumn<MetaElement, String> metaContentCol = new TableColumn<>("Your answers");
+        TableColumn<MetaElement, String> metaContentCol = new TableColumn<>("Annotations");
         metaContentCol.setCellValueFactory(new PropertyValueFactory<>("metaContent"));
         metaContentCol.setMinWidth(0.5*width);
         metaContentCol.setCellFactory(tc -> {
@@ -138,17 +128,18 @@ public class MetaInformationTable extends Pane {
             return cell ;
         });
         metaContentCol.setEditable(false);
+        metaContentCol.setSortable(false);
         table.getColumns().add(metaContentCol);
         // ------------------------------------------------------------------------
         // -------------------------------------------------------------------------
-        list = FXCollections.observableArrayList(ProjectListsManager.getMetaInformation().getElements());
+        list = FXCollections.observableArrayList(ProjectListsManager.getListOfMetaElements());
         table.setItems(list);
         table.getSelectionModel().selectFirst();
 
         final Label title = new Label("Meta Information");
         title.setFont(ColorsAndFormats.titleFont);
         final Button button = new Button("Save as text file");
-        button.setOnAction((ActionEvent e) -> new MetaInformationSaveDialog());
+        button.setOnAction((ActionEvent e) -> new MetaInformationSaveTextDialog());
         final HBox hbox = new HBox(50);
         hbox.getChildren().addAll(title, button);
 

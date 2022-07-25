@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.cm.GUInetwork;
+package fr.cm.GUIdialogs;
 
 import fr.cm.canObjects.Flux;
-import fr.cm.canObjects.ProjectListsManager;
+import fr.cm.ProjectManager.ProjectListsManager;
 import fr.cm.parameters.Strings;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
@@ -18,10 +18,10 @@ import java.util.Optional;
 /**
  * @author christianmullon
  */
-public class LinkEdit extends Dialog<ButtonType> {
+public class LinkEditDialog extends Dialog<ButtonType> {
     final Window window;
 
-    public LinkEdit(Flux flux) {
+    public LinkEditDialog(Flux flux) {
         window = this.getDialogPane().getScene().getWindow();
         window.setOnCloseRequest(event -> window.hide());
         setTitle("Link");

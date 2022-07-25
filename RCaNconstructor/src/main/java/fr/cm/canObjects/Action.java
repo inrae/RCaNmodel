@@ -22,36 +22,48 @@ public class Action {
         this.setCommentAuthor(commentAuthor);
     }
     public Action(String date, String whichAction, String commentAuthor){
-        this.setDate(Context.getDate());
+        this.setDate(date);
         this.setWhichAction(whichAction);
         this.setCommentAuthor(commentAuthor);
     }
 
     public String getDate() {
+
         return date.get();
     }
     public StringProperty dateProperty() {
+
         return date;
     }
-    public void setDate(String date) {
+    private void setDate(String date) {
+
         this.date.set(date);
     }
     public String getWhichAction() {
+
         return whichAction.get();
     }
     public StringProperty whichActionProperty() {
+
         return whichAction;
     }
     public void setWhichAction(String whichAction) {
+
         this.whichAction.set(whichAction);
     }
     public String getCommentAuthor() {
+
         return commentAuthor.get();
     }
     public StringProperty commentAuthorProperty() {
         return commentAuthor;
     }
     public void setCommentAuthor(String commentAuthor) {
+
         this.commentAuthor.set(commentAuthor);
+    }
+
+    public void print(){
+        System.out.println(this.getDate() + " " + this.getWhichAction()+ " "+this.getCommentAuthor());
     }
 }

@@ -5,15 +5,14 @@ import fr.cm.GUIdialogs.ActionSaveDialog;
 import fr.cm.GUIdialogs.TextAreaDialog;
 import fr.cm.RCaNMain.Context;
 import fr.cm.canObjects.Action;
-import fr.cm.canObjects.ProjectListsManager;
+import fr.cm.ProjectManager.ProjectListsManager;
+import fr.cm.canObjects.Constraint;
 import fr.cm.parameters.ColorsAndFormats;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -52,17 +51,17 @@ public class ActionTable extends Pane {
         });
          // ------------------------------------------------------------------------
         TableColumn<Action, String> dateCol = new TableColumn<>("Date");
+        dateCol.setSortable(true);
         dateCol.setCellValueFactory(new PropertyValueFactory<>("date"));
         dateCol.setMinWidth(0.16 *width);
         // ------------------------------------------------------------------------
         TableColumn<Action, String> whichActionCol = new TableColumn<>("Task");
         whichActionCol.setCellValueFactory(new PropertyValueFactory<>("whichAction"));
-        // whichActionCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        whichActionCol.setSortable(true);
         whichActionCol.setCellFactory(tc -> {
             TableCell<Action, String> cell = new TableCell<>();
             Text text = new Text();
             cell.setGraphic(text);
-            // cell.setPrefHeight(Control.USE_COMPUTED_SIZE);
             text.wrappingWidthProperty().bind(whichActionCol.widthProperty());
             text.textProperty().bind(cell.itemProperty());
             return cell ;
@@ -71,7 +70,6 @@ public class ActionTable extends Pane {
         whichActionCol.setMinWidth(0.4 *width);
         // ------------------------------------------------------------------------
         TableColumn<Action, String> commentAuthorCol = new TableColumn<>("Annotation");
-        // commentAuthorCol.setCellFactory(cellFactory);
         commentAuthorCol.setCellValueFactory(new PropertyValueFactory<>("commentAuthor"));
         commentAuthorCol.setMinWidth((0.4 *width));
         commentAuthorCol.setEditable(false);
@@ -97,8 +95,21 @@ public class ActionTable extends Pane {
         title.setFont(ColorsAndFormats.titleFont);
         final Button button = new Button("Save as text file");
         button.setOnAction((ActionEvent e) -> new ActionSaveDialog());
+        final Button buttonNewAnnotation = new Button("Add annotation");
+        buttonNewAnnotation.setOnAction((ActionEvent e) -> {
+            new TextAreaDialog("Add annotation","");
+            String nComment = Context.getTextAreaContent();
+            Action action = new Action("Added by author",nComment);
+            action.print();
+            System.out.println(ProjectListsManager.getListOfActions().size());
+            ProjectListsManager.addAction(action,false);
+            System.out.println(ProjectListsManager.getListOfActions().size());
+            list = FXCollections.observableArrayList(ProjectListsManager.getListOfActions());
+            table.setItems(list);
+            table.refresh();
+        });
         final HBox hbox = new HBox(50);
-        hbox.getChildren().addAll(title, button);
+        hbox.getChildren().addAll(title, button, buttonNewAnnotation);
 
         final VBox vbox = new VBox();
         ColorsAndFormats.setVBoxCharacteristics(vbox);

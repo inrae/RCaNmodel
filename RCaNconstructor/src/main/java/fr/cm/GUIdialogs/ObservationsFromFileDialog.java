@@ -3,7 +3,7 @@ package fr.cm.GUIdialogs;
 import fr.cm.RCaNMain.Context;
 import fr.cm.canObjects.DataFile;
 import fr.cm.canObjects.Observation;
-import fr.cm.canObjects.ProjectListsManager;
+import fr.cm.ProjectManager.ProjectListsManager;
 import fr.cm.parameters.ColorsAndFormats;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;

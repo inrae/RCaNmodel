@@ -1,6 +1,6 @@
 package fr.cm.RCaNMain;
 
-import fr.cm.canObjects.ProjectListsManager;
+import fr.cm.ProjectManager.ProjectListsManager;
 import fr.cm.GUIdialogs.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -55,8 +55,9 @@ public class MenuFile {
                 if (Context.isStarted()) {
                     Context.initRCaN();
                     ProjectListsManager.init();
+                    ProjectListsManager.makeMetaElementsList();
                     MainApplication.updateMenus();
-                    ProjectListsManager.addAction("Project creation "+ Context.getFileName());
+                    ProjectListsManager.addAction("Project creation "+ Context.getFileName(),true);
                     ProjectListsManager.saveExcel();
                     borderPaneRacine.setCenter(ProjectListsManager.getNetworkView());
                 }
@@ -89,7 +90,7 @@ public class MenuFile {
                 if (Context.isStarted()) {
                     new ProjectSaveAs();
                     ProjectListsManager.saveExcel();
-                    ProjectListsManager.addAction("Project saved as "+ Context.getFileName());
+                    ProjectListsManager.addAction("Project saved as "+ Context.getFileName(),true);
                 }
                 break;
             case 5 :

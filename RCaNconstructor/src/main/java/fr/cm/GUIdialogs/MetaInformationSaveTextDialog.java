@@ -1,5 +1,6 @@
 package fr.cm.GUIdialogs;
 
+import fr.cm.ProjectManager.ProjectListsManager;
 import fr.cm.canObjects.*;
 import fr.cm.RCaNMain.Context;
 import fr.cm.RCaNMain.MainApplication;
@@ -10,15 +11,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-public class MetaInformationSaveDialog {
+public class MetaInformationSaveTextDialog {
 
     // --------------------------------------------
-    public MetaInformationSaveDialog() {
+    public MetaInformationSaveTextDialog() {
 
         StringBuilder sB = new StringBuilder("PROJECT");
         sB.append("\n");
-        MetaInformation metaInformation = ProjectListsManager.getMetaInformation();
-        List<MetaElement> elements = metaInformation.getElements();
+        List<MetaElement> elements = ProjectListsManager.getListOfMetaElements();
 
         for (MetaElement metaElement : elements) {
             sB.append(metaElement.getMetaName().toUpperCase());

@@ -1,5 +1,6 @@
 package fr.cm.excel;
 
+import fr.cm.ProjectManager.ProjectListsManager;
 import fr.cm.canObjects.*;
 import fr.cm.GUIdialogs.HelpDialog;
 import fr.cm.parameters.Strings;
@@ -55,7 +56,6 @@ public class ExcelManager {
             getExcelObservations(workbook);
             getExcelFileWithObservation(workbook);
             getExcelFileActions(workbook);
-            // ProjectListsManager.addAction(false,"Open file : "+fileName);
         } catch (FileNotFoundException ex) {
             HelpDialog.warning("File not found","Warning", ex);
         } catch (IOException ex) {
@@ -80,7 +80,9 @@ public class ExcelManager {
 
         List<Action> listOfActions = ProjectListsManager.getListOfActions();
         int c = 0;
+        System.out.println("Saving actions");
         for (Action action : listOfActions) {
+            action.print();
             c++;
             row = sheet.createRow(c + 1);
             cell = row.createCell(0);
@@ -100,17 +102,18 @@ public class ExcelManager {
         Cell cell;
         Iterator<Row> iterator = sheet.iterator();
         iterator.next();
+        System.out.println("Reading actions");
         while (iterator.hasNext()) {
             row = iterator.next();
             cell = row.getCell(0);
             String date = cell.getStringCellValue();
             cell = row.getCell(1);
             String comment = cell.getStringCellValue();
-            String commentAuthor;
             cell = row.getCell(2);
-            commentAuthor = cell.getStringCellValue();
-            Action newAction = new Action(date, comment,commentAuthor);
-            ProjectListsManager.addAction(newAction);
+            String commentAuthor = cell.getStringCellValue();
+            Action newAction = new Action(date, comment, commentAuthor);
+            newAction.print();
+            ProjectListsManager.addAction(newAction,false);
         }
     }
 
@@ -120,21 +123,18 @@ public class ExcelManager {
         Row row;
         Cell cell;
         sheet = workbook.createSheet("INFO");
-
         row = sheet.createRow(0);
         cell = row.createCell(0);
         cell.setCellValue("PathName");
         cell = row.createCell(1);
         cell.setCellValue(Context.getFullFileName());
-
         row = sheet.createRow(1);
         cell = row.createCell(0);
         cell.setCellValue("Caracteristic");
         cell = row.createCell(1);
         cell.setCellValue("Value");
 
-        MetaInformation metaInformation = ProjectListsManager.getMetaInformation();
-        List<MetaElement> elements = metaInformation.getElements();
+        List<MetaElement> elements = ProjectListsManager.getListOfMetaElements();
         for (int c = 0; c < elements.size(); c++) {
             MetaElement element = elements.get(c);
             row = sheet.createRow(c + 2);
@@ -149,21 +149,21 @@ public class ExcelManager {
 
     // -------------------------------------------------------------------------
     public static void getExcelMetaInformation(Workbook workbook) {
-        new MetaInformation();
         Sheet sheet = workbook.getSheet("INFO");
         Row row;
         Cell cell;
-        MetaInformation metaInformation = ProjectListsManager.getMetaInformation();
-        List<MetaElement> elements = metaInformation.getElements();
+        ProjectListsManager.makeMetaElementsList();
+        List<MetaElement> elements = ProjectListsManager.getListOfMetaElements();
         try {
-            for (int c = 0; c < elements.size(); c++) {
-                row = sheet.getRow(c + 2);
+            for (int r = 0; r < elements.size(); r++) {
+                row = sheet.getRow(r + 2);
                 cell = row.getCell(1);
                 String content = cell.getStringCellValue();
-                elements.get(c).setMetaContent(content);
+                elements.get(r).setMetaContent(content);
             }
+            ProjectListsManager.setListOfMetaElements(elements);
         } catch (Exception e) {
-            new MetaInformation();
+            ProjectListsManager.makeMetaElementsList();
         }
     }
 
@@ -259,7 +259,7 @@ public class ExcelManager {
                 y = 0.2 + 0.4 * Math.random();
             }
             Component component = new Component(nameComponent, parameters, typeComponent, x, y);
-            ProjectListsManager.addComponent(component);
+            ProjectListsManager.addComponent(component, false);
         }
     }
 
@@ -312,7 +312,7 @@ public class ExcelManager {
             cell = row.getCell(3);
             boolean stype = getBoolean(cell);
             Flux newFlux = new Flux(in, out, stype);
-            ProjectListsManager.addLink(newFlux);
+            ProjectListsManager.addLink(newFlux, false);
         }
     }
 
@@ -427,7 +427,7 @@ public class ExcelManager {
             }
             for (int o = 0; o < nbo; o++) {
                 Observation observation = new Observation(idObs.get(o), values[o]);
-                ProjectListsManager.addObservation(observation);
+                ProjectListsManager.addObservation(observation, false);
             }
         }
     }
@@ -498,7 +498,7 @@ public class ExcelManager {
                     comment = cell.getStringCellValue();
                 }
                 Constraint constraint = new Constraint(name, formula, years, active, comment);
-                ProjectListsManager.addConstraint(constraint);
+                ProjectListsManager.addConstraint(constraint, false);
             } catch (Exception e) {
                 // le champ active n'existe pas encore
             }
@@ -573,7 +573,7 @@ public class ExcelManager {
                         owner,
                         listOfObservations);
                 if(dataFile.isStillExisting()){
-                    ProjectListsManager.addDataFile(dataFile);
+                    ProjectListsManager.addDataFile(dataFile, false);
                 }
             }
         } catch (Exception e) {

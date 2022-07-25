@@ -1,6 +1,6 @@
 package fr.cm.RCaNMain;
 
-import fr.cm.canObjects.ProjectListsManager;
+import fr.cm.ProjectManager.ProjectListsManager;
 import fr.cm.rCaller.RCaNDialog;
 import fr.cm.rCaller.RCaNCaller;
 import fr.cm.xmlFiles.RCommandListXML;

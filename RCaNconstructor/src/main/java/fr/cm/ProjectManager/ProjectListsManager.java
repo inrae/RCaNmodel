@@ -1,10 +1,14 @@
-package fr.cm.canObjects;
+package fr.cm.ProjectManager;
 
 import fr.cm.GUInetwork.NetworkView;
-import fr.cm.RCaNMain.Context;
 import fr.cm.GUIdialogs.HelpDialog;
+import fr.cm.canObjects.*;
 import fr.cm.excel.ExcelManager;
+import org.apache.commons.io.IOUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -17,13 +21,13 @@ public class ProjectListsManager {
     private static List<Observation> listOfObservations;
     private static List<DataFile> listOfDataFiles;
     private static List<Action> listOfActions;
-    private static MetaInformation metaInformation;
+    private static List<MetaElement> listOfMetaElements;
+
     private static NetworkView networkView;
 
     // --------------------------------------------
     public static void init() {
         networkView = new NetworkView();
-        metaInformation = new MetaInformation();
         networkView.init();
         listOfComponents = new ArrayList<>();
         listOfFluxes = new ArrayList<>();
@@ -31,25 +35,30 @@ public class ProjectListsManager {
         listOfObservations = new ArrayList<>();
         listOfDataFiles = new ArrayList<>();
         listOfActions = new ArrayList<>();
+        listOfMetaElements =  new ArrayList<>();
     }
     // ------------------------------------------------------------------------------
     // ACTIONS
 
-    public static void addAction(Action action) {
+    public static void addAction(Action action, boolean save) {
 
         listOfActions.add(action);
+        if(save) saveExcel();
+
     }
-    public static void addAction(String comment) {
+    public static void addAction(String comment, boolean save) {
         Action action = new Action(comment);
         listOfActions.add(action);
-        saveExcel();
+        if(save) saveExcel();
     }
 
     public static List<Action> getListOfActions() {
+
         return listOfActions;
     }
 
     public static void initListOfActions() {
+
         listOfActions = new ArrayList<>();
     }
 
@@ -65,20 +74,40 @@ public class ProjectListsManager {
 
     // ------------------------------------------------------------------------------
     // META INFORMATION
-
-    public static MetaInformation getMetaInformation() {
-        return metaInformation;
+    public static void makeMetaElementsList(){
+        listOfMetaElements = new ArrayList<>();
+        String fileName = "project/Project.txt";
+        InputStream inst = ProjectListsManager.class.getClassLoader().getResourceAsStream(fileName);
+        if(inst != null){
+            List<String> elementsResource = new ArrayList<>();
+            try {
+                elementsResource = IOUtils.readLines(inst, StandardCharsets.UTF_8.name());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            for(String elementR : elementsResource){
+                MetaElement metaElement = new MetaElement(elementR);
+                listOfMetaElements.add(metaElement);
+            }
+        }
     }
 
-    public static void setMetaInformation(MetaInformation metaInformation) {
-        ProjectListsManager.metaInformation = metaInformation;
+    public static List<MetaElement> getListOfMetaElements() {
+        return listOfMetaElements;
+    }
+
+    public static void setListOfMetaElements(List<MetaElement> listOfMetaElements) {
+        ProjectListsManager.listOfMetaElements = listOfMetaElements;
     }
 
     public static void updateMetaElement(int nu, String comment) {
-        MetaInformation.updateMetaElement(nu, comment);
+        listOfMetaElements.get(nu).setMetaContent(comment);
         saveExcel();
     }
 
+    public static boolean metaInformationType(int nu){
+        return listOfMetaElements.get(nu).isMetaType();
+    }
     // ------------------------------------------------------------------------------
     // NETWORK VIEW
     public static NetworkView getNetworkView() {
@@ -87,7 +116,7 @@ public class ProjectListsManager {
     }
     // ------------------------------------------------------------------------------
     // COMPONENTS
-    public static void addComponent(Component component) {
+    public static void addComponent(Component component, boolean save) {
         if (containsComponent(component.getName())) {
             HelpDialog.warning("This component already exists","Warning");
         } else  if(containsObservation(component.getName())){
@@ -99,7 +128,7 @@ public class ProjectListsManager {
                     networkView.getMouseDoubleClickOnCircleEventHandler());
             listOfComponents.add(component);
         }
-        addAction("Added component: "+component.getName());
+        addAction("Added component: "+component.getName(),save);
     }
     public static void removeComponent(Component component) {
         listOfConstraints.removeIf(constraint -> constraint.involve(component));
@@ -112,7 +141,7 @@ public class ProjectListsManager {
             }
         }
         listOfComponents.remove(component);
-        addAction("Removed component: "+component.getName());
+        addAction("Removed component: "+component.getName(),true);
     }
     public static boolean containsComponent(String groupName) {
         boolean contain = false;
@@ -172,13 +201,13 @@ public class ProjectListsManager {
 
     // ------------------------------------------------------------------------------
     // LINKS
-    public static void addLink(Flux flux) {
+    public static void addLink(Flux flux, boolean save) {
         if (containsLink(flux.getName())) {
             HelpDialog.warning("Link already exists","Warning");
         } else {
             flux.define(networkView.getMouseDoubleClickOnLineEventHandler());
             listOfFluxes.add(flux);
-            addAction("Added Flux: "+ flux.getName());
+            addAction("Added Flux: "+ flux.getName(),save);
         }
     }
     public static List<String> getNamesOfLinks() {
@@ -200,7 +229,7 @@ public class ProjectListsManager {
     public static void removeLink(Flux flux) {
         listOfConstraints.removeIf(constraint -> constraint.involve(flux));
         listOfFluxes.remove(flux);
-        addAction("Removed Flux: "+ flux.getName());
+        addAction("Removed Flux: "+ flux.getName(),true);
     }
     public static void permuteListOfLinks(int rowA, int rowB) {
         Flux fluxA = listOfFluxes.get(rowA);
@@ -226,7 +255,7 @@ public class ProjectListsManager {
 
     // --------------------------------------------------------------------------
     //  OBSERVATIONS
-    public static void addObservation(Observation observation) {
+    public static void addObservation(Observation observation, boolean save) {
         if(containsObservation(observation.getObsName())){
             HelpDialog.warning("Observation already exists","Warning");
         } else if(containsComponent(observation.getObsName())){
@@ -234,20 +263,20 @@ public class ProjectListsManager {
         }
             else {
             listOfObservations.add(observation);
-            addAction("Added Observation: "+ observation.getObsName());
+            addAction("Added Observation: "+ observation.getObsName(),save);
         }
     }
      public static void removeObservation(String observationName){
         for (Observation observation : listOfObservations)
             if (observationName.equals(observation.getObsName())) {
                 listOfObservations.remove(observation);
-                addAction("Removed Observation: "+ observation.getObsName());
+                addAction("Removed Observation: "+ observation.getObsName(),true);
                 break;
             }
     }
     public static void removeObservation(Observation observation){
         listOfObservations.remove(observation);
-        addAction("Removed Observation: "+ observation.getObsName());
+        addAction("Removed Observation: "+ observation.getObsName(),true);
     }
 
    public static boolean containsObservation(String observationName) {
@@ -285,18 +314,18 @@ public class ProjectListsManager {
 
     // ------------------------------------------------------------------------------
     // CONSTRAINTS
-    public static void addConstraint(Constraint constraint) {
+    public static void addConstraint(Constraint constraint, boolean save) {
         listOfConstraints.add(constraint);
-        addAction("Added Constraint: "+ constraint.getName());
+        addAction("Added Constraint: "+ constraint.getName(),save);
     }
     public static void removeConstraints(Constraint constraint) {
         listOfConstraints.remove(constraint);
-        addAction("Removed Constraint: "+ constraint.getName());
+        addAction("Removed Constraint: "+ constraint.getName(),true);
     }
     public static void updateConstraint(Constraint oldC, Constraint newC) {
         int pos = listOfConstraints.indexOf(oldC);
         listOfConstraints.set(pos,newC);
-        addAction("Updated Constraint: "+ oldC.getName()+ "-W" + newC.getName());
+        addAction("Updated Constraint: "+ oldC.getName()+ "-W" + newC.getName(),true);
     }
     public static void upConstraint(Constraint constraint) {
         int numConstraint = listOfConstraints.indexOf(constraint);
@@ -322,7 +351,7 @@ public class ProjectListsManager {
 
     // ------------------------------------------------------------------------------
     // DATA FILES
-    public static void addDataFile(DataFile newDataFile) {
+    public static void addDataFile(DataFile newDataFile, boolean save) {
         boolean in = false;
         for(DataFile dataFile : listOfDataFiles){
             if (dataFile.getShortName().equals(newDataFile.getShortName())) {
@@ -332,7 +361,7 @@ public class ProjectListsManager {
         }
         if(! in) {
             listOfDataFiles.add(newDataFile);
-            addAction("Added Data File: "+ newDataFile.getShortName());
+            addAction("Added Data File: "+ newDataFile.getShortName(),save);
         }
         else {
             HelpDialog.warning("File has already been introduced","Warning");

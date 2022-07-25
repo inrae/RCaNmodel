@@ -13,8 +13,7 @@ public class ColorsAndFormats {
     public static final String font = "-fx-font: normal 16px 'sans-serif' ";
 
     public static final Color background = Color.rgb(100,200,200);
-    // public static final Color background = Color.BLACK;
-
+    
     public static final Color inside = Color.rgb(100,150,202);
 
     public static final Color componentInside = Color.rgb(150,250,150);

@@ -1,8 +1,11 @@
 package fr.cm.GUInetwork;
 
+import fr.cm.GUIdialogs.ComponentClicDialog;
+import fr.cm.GUIdialogs.ComponentNewDialog;
+import fr.cm.GUIdialogs.LinkEditDialog;
 import fr.cm.canObjects.Component;
 import fr.cm.canObjects.Flux;
-import fr.cm.canObjects.ProjectListsManager;
+import fr.cm.ProjectManager.ProjectListsManager;
 import fr.cm.RCaNMain.Context;
 import fr.cm.RCaNMain.MainApplication;
 
@@ -137,7 +140,7 @@ public class NetworkView extends Pane {
     final EventHandler<MouseEvent> mouseDoubleClickOnBcgEventHandler = (t)
             -> {
         if (t.getClickCount() == 2) {
-            new ComponentNew(t.getX(), t.getY());
+            new ComponentNewDialog(t.getX(), t.getY());
             update();
             resetLink();
         }
@@ -147,7 +150,7 @@ public class NetworkView extends Pane {
             -> {
         if (t.getClickCount() == 2) {
             Flux flux = (Flux) (t.getSource());
-            new LinkEdit(flux);
+            new LinkEditDialog(flux);
             update();
             resetLink();
         }
@@ -161,19 +164,19 @@ public class NetworkView extends Pane {
         clickedComponent = (Component) (circle.getParent());
         if (originOfLink == null) {
             if(t.getClickCount()>1) {
-                new ComponentClic(clickedComponent, this);
+                new ComponentClicDialog(clickedComponent, this);
                 update();
              }
         } else {
             if (addingTrophicLink) {
                 Flux flux = new Flux(originOfLink, clickedComponent, true);
-                ProjectListsManager.addLink(flux);
+                ProjectListsManager.addLink(flux, true);
                 resetLink();
                 update();
             }
             if (addingNonTrophicLink) {
                 Flux flux = new Flux(originOfLink, clickedComponent, false);
-                ProjectListsManager.addLink(flux);
+                ProjectListsManager.addLink(flux, true);
                 resetLink();
                 update();
              }

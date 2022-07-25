@@ -5,7 +5,7 @@ import com.github.rcaller.rstuff.*;
 import fr.cm.GUIdialogs.HelpDialog;
 import fr.cm.RCaNMain.Context;
 import fr.cm.RCaNMain.MainApplication;
-import fr.cm.canObjects.ProjectListsManager;
+import fr.cm.ProjectManager.ProjectListsManager;
 import fr.cm.xmlFiles.RCommandXML;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
@@ -105,7 +105,7 @@ public class RCaNCaller {
                 }
                 code.endPlot();
                 caller.setRCode(code);
-                ProjectListsManager.addAction(rCommandXML.actionCommandLine());
+                ProjectListsManager.addAction(rCommandXML.actionCommandLine(),true);
             }
          } catch (Exception ex) {
             new RCaNInterfaceDialog("R Interface ", "Problem with R command.", ex);
@@ -135,7 +135,7 @@ public class RCaNCaller {
         if(runOk) {
             resultString = RCaNParser.decodeParser( caller,  rCommandXML);
          }
-        ProjectListsManager.addAction( "Result : "+ runOk);
+        ProjectListsManager.addAction( "Result : "+ runOk, true);
     }
     // ------------------------------------------------------------------------
     public static void stopCommandR(){

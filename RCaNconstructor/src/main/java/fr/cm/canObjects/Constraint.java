@@ -5,6 +5,7 @@
  */
 package fr.cm.canObjects;
 
+import fr.cm.ProjectManager.ProjectListsManager;
 import javafx.beans.property.SimpleStringProperty;
 
 public class Constraint {
@@ -46,13 +47,13 @@ public class Constraint {
 
     public void changeName(String newName){
         if(! this.getName().equals(newName)){
-            ProjectListsManager.addAction("Change constraint name : " + name + " -> "+ newName);
+            ProjectListsManager.addAction("Change constraint name : " + name + " -> "+ newName, true);
             setName(newName);
         }
     }
     public void changeActive(boolean newActive){
         if(!active==newActive){
-            ProjectListsManager.addAction("Change position of component  " + name + " : active "+ active +" -> "+ newActive);
+            ProjectListsManager.addAction("Change position of component  " + name + " : active "+ active +" -> "+ newActive, true);
             active = newActive;
         }
     }

@@ -6,28 +6,23 @@
 package fr.cm.GUItablesViews;
 
 import fr.cm.canObjects.Component;
-import fr.cm.canObjects.ProjectListsManager;
+import fr.cm.ProjectManager.ProjectListsManager;
 import fr.cm.RCaNMain.Context;
 import fr.cm.parameters.ColorsAndFormats;
 import fr.cm.parameters.Strings;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
-import javafx.scene.control.TableColumn.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.Pane;
-
-import javafx.util.Callback;
 
 /**
  * @author christianmullon
