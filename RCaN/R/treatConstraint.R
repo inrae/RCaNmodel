@@ -9,7 +9,7 @@
 #'
 #' @return a matrix that correspond to the coefficient of the constraints, first
 #' column corresponds to the -intercept and each line to a constraint (year)
-#' @importFrom symengine expand
+#' @importFrom symengine expand V
 #' @importFrom stringr str_extract_all
 
 
@@ -89,14 +89,30 @@ treatConstraint <- function(myconstraint,
     stop(paste("unrecognized sign in constraint:", myconstraint))
   }
 
+  symbolic_enviro$sum <- function(x, ..., na.rm = TRUE) {
+    if (inherits(x, "VecBasic"))
+      return(sum(x))
+    base::sum(x, ..., na.rm = na.rm)
+  }
+  symbolic_enviro$mean <- function(x, ..., na.rm = TRUE) {
+    if (inherits(x, "VecBasic"))
+      return(mean(x))
+    base::mean(x, ..., na.rm = na.rm)
+  }
+
   symbolic_constraint <-
       eval(parse(text = left), symbolic_enviro)  -
       eval(parse(text = right), symbolic_enviro)
+  if (length(symbolic_constraint) == 1) #this is not a vector but a single
+                                        #constraint
+    symbolic_constraint <- V(symbolic_constraint)  #conversion into VecBasic
   mat <-
     do.call(rbind,
             lapply(as.vector(symbolic_constraint), function(s)
               buildVectorConstraint(s, symbolic_enviro)))
   if (is.null(yr)) {
+    yr <- seq_len(nrow(mat))
+  } else if (is.na(yr)) {
     yr <- seq_len(nrow(mat))
   } else{
     yr <- years %in% as.character(eval(parse(text = yr)))
