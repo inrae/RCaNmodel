@@ -35,7 +35,6 @@ public class ExcelManager {
             saveExcelFileActions(workbook);
             FileOutputStream outputStream = new FileOutputStream(fileName);
             workbook.write(outputStream);
-            // ProjectListsManager.addAction("Saved file : "+fileName);
         } catch (FileNotFoundException ex) {
             HelpDialog.warning("File not found","Warning", ex);
         } catch (IOException ex) {
@@ -80,9 +79,7 @@ public class ExcelManager {
 
         List<Action> listOfActions = ProjectListsManager.getListOfActions();
         int c = 0;
-        System.out.println("Saving actions");
         for (Action action : listOfActions) {
-            action.print();
             c++;
             row = sheet.createRow(c + 1);
             cell = row.createCell(0);
@@ -102,7 +99,6 @@ public class ExcelManager {
         Cell cell;
         Iterator<Row> iterator = sheet.iterator();
         iterator.next();
-        System.out.println("Reading actions");
         while (iterator.hasNext()) {
             row = iterator.next();
             cell = row.getCell(0);
@@ -112,7 +108,6 @@ public class ExcelManager {
             cell = row.getCell(2);
             String commentAuthor = cell.getStringCellValue();
             Action newAction = new Action(date, comment, commentAuthor);
-            newAction.print();
             ProjectListsManager.addAction(newAction,false);
         }
     }
