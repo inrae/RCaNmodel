@@ -30,8 +30,8 @@ public class FluxTable extends Pane {
     final TableView<Flux> table;
     ObservableList<Flux> list;
 
-    double width = 0.9 * Context.getWindowWidth();
-    double height =  0.9 * Context.getWindowHeight();
+    double width = Context.getWindowWidth();
+    double height =  Context.getWindowHeight();
 
     public FluxTable() {
         table = new TableView<>();
@@ -65,6 +65,9 @@ public class FluxTable extends Pane {
         list = FXCollections.observableArrayList(ProjectListsManager.getListOfFluxes());
         table.setItems(list);
         table.getSelectionModel().selectFirst();
+        table.setPrefWidth(0.8*width);
+        table.setPrefHeight(0.7*height);
+
 
         final Button deleteG = new Button("Delete");
         deleteG.setOnAction((ActionEvent e) -> {
@@ -89,9 +92,10 @@ public class FluxTable extends Pane {
             updateTable();
         });
 
-        final HBox hbox = new HBox();
-        hbox.getChildren().addAll(buttonUp, buttonDown, deleteG);
-        hbox.setSpacing(50.0);
+        final Label how = new Label("Change trophic type with a clic on cell");
+        final HBox hBoxButton = new HBox();
+        hBoxButton.getChildren().addAll(buttonUp, buttonDown, deleteG, how);
+        hBoxButton.setSpacing(80.0);
         // hbox.setMinSize(500.0, 120.0);
 
 
@@ -99,7 +103,7 @@ public class FluxTable extends Pane {
         title.setFont(ColorsAndFormats.titleFont);
         final VBox vbox = new VBox();
         ColorsAndFormats.setVBoxCharacteristics(vbox);
-        vbox.getChildren().addAll(title, table, hbox);
+        vbox.getChildren().addAll(title, table, hBoxButton);
 
         this.getChildren().addAll(vbox);
      }

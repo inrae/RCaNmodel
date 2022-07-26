@@ -64,7 +64,7 @@ public class MenuRCaN {
     }
 
     static void updateMenus() {
-        boolean notStarted = !Context.isStarted();
+        boolean notStarted = (!Context.isStarted()) && (!Context.isRunningR());
         for (MenuItem menuItem : menuItems) {
             if(notStarted) menuItem.setDisable(notStarted);
             else {

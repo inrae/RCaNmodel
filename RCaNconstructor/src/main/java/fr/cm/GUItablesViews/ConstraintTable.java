@@ -30,8 +30,8 @@ public class ConstraintTable extends Pane {
 
     final TableView<Constraint> constraintTable;
     ObservableList<Constraint> list;
-    final Button editC = new Button("Edit selected constraint");
-    final Button newC = new Button("Add a new constraint");
+    final Button editC = new Button("Edit");
+    final Button newC = new Button("Add");
     final Button buttonUp = new Button("Up");
     final Button buttonDown = new Button("Down");
     final Button deleteC = new Button("Delete");
@@ -39,8 +39,8 @@ public class ConstraintTable extends Pane {
     final HBox hboxButtons = new HBox();
     final VBox vbox = new VBox();
 
-    double width = 0.9 * Context.getWindowWidth();
-    double height = 0.9 * Context.getWindowHeight();
+    double width = Context.getWindowWidth();
+    double height = Context.getWindowHeight();
 
     public ConstraintTable() {
         constraintTable = new TableView<>();
@@ -95,12 +95,14 @@ public class ConstraintTable extends Pane {
                 }
         );
 
-
         constraintTable.getColumns().add(name);
         constraintTable.getColumns().add(formula);
         constraintTable.getColumns().add(activeCol);
         constraintTable.getColumns().add(years);
         constraintTable.getColumns().add(comment);
+        constraintTable.setPrefHeight(0.7 * height);
+        constraintTable.setPrefWidth(0.8 * width);
+
 
         list = FXCollections.observableArrayList(ProjectListsManager.getListOfConstraints());
         constraintTable.setItems(list);
@@ -139,11 +141,9 @@ public class ConstraintTable extends Pane {
             }
         });
         // -------------------------------------------------------------------------------------------------------------
-        hboxButtons.getChildren().addAll(buttonUp, buttonDown, editC, newC, deleteC);
-        hboxButtons.setSpacing(10.0);
+        hboxButtons.getChildren().addAll(buttonUp, buttonDown, newC, editC, deleteC);
+        hboxButtons.setSpacing(80.0);
         // -------------------------------------------------------------------------------------------------------------
-        constraintTable.setMinHeight(0.8 * height);
-        constraintTable.setMinWidth(0.8 * width);
         formula.setMinWidth(0.35 * width);
         years.setMinWidth(0.15 * width);
         comment.setMinWidth(0.3 * width);
@@ -154,8 +154,6 @@ public class ConstraintTable extends Pane {
         vbox.getChildren().addAll(title, constraintTable, hboxButtons);
 
         // -------------------------------------------------------------------------------------------------------------
-        this.setMinWidth(width);
-        this.setMinHeight(height);
         this.getChildren().addAll(vbox);
     }
 

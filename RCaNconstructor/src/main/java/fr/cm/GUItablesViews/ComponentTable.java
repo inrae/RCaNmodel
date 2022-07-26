@@ -29,8 +29,8 @@ import javafx.scene.layout.Pane;
  */
 public class ComponentTable extends Pane {
 
-    double width = 0.9 * Context.getWindowWidth();
-    double height =  0.9 * Context.getWindowHeight();
+    double width = Context.getWindowWidth();
+    double height =  Context.getWindowHeight();
 
     final TableView<Component> table;
     ObservableList<Component> list;
@@ -94,6 +94,8 @@ public class ComponentTable extends Pane {
         list = FXCollections.observableArrayList(ProjectListsManager.getListOfComponents());
         table.setItems(list);
         table.getSelectionModel().selectFirst();
+        table.setPrefWidth(0.8*width);
+        table.setPrefHeight(0.7*height);
 
         final Button deleteG = new Button("Delete");
         deleteG.setOnAction((ActionEvent e) -> {
@@ -119,9 +121,10 @@ public class ComponentTable extends Pane {
             updateTable();
         });
 
+        final Label how = new Label("Edit a parameter with a doublce clic on cell");
         final HBox hboxButtons = new HBox();
-        hboxButtons.getChildren().addAll(buttonUp, buttonDown, deleteG);
-        hboxButtons.setSpacing(50);
+        hboxButtons.getChildren().addAll(buttonUp, buttonDown, deleteG, how);
+        hboxButtons.setSpacing(80);
         // hboxButtons.setMinSize(800.0, 120.0);
 
         final Label title = new Label("System components");

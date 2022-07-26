@@ -4,6 +4,7 @@ import fr.cm.GUInetwork.NetworkView;
 import fr.cm.GUIdialogs.HelpDialog;
 import fr.cm.canObjects.*;
 import fr.cm.excel.ExcelManager;
+import fr.cm.parameters.Strings;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -381,7 +382,19 @@ public class ProjectListsManager {
         }
         return(null);
     }
-    public static List<DataFile> getListOfDataFiles() { return listOfDataFiles; }
+    public static List<DataFile> getListOfDataFiles() {
+        return listOfDataFiles;
+    }
+    public static String getDataFileId(){
+        for(String letter : Strings.getLetters()){
+            for(DataFile dataFile : listOfDataFiles){
+                if( ! letter.equals(dataFile.getId())){
+                    return(letter);
+                }
+            }
+        }
+        return(Strings.getLetters()[0]);
+    }
 
      // ------------------------------------------------------------------------------
     public static void saveExcel() { ExcelManager.saveExcel(); }

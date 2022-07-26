@@ -36,7 +36,7 @@ public class MetaInformationSaveTextDialog {
         for (DataFile dataFile : listOfDataFiles) {
             sB.append(dataFile.getShortName().toUpperCase());
             sB.append("\n    ");
-            sB.append(dataFile.getMetaInformationAboutDataFile());
+            sB.append(dataFile.getMetaInformation());
             sB.append("\n");
         }
 

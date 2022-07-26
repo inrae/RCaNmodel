@@ -1,6 +1,5 @@
 package fr.cm.canObjects;
 
-import fr.cm.GUIdialogs.AddObservationDialog;
 import fr.cm.GUIdialogs.HelpDialog;
 import fr.cm.ProjectManager.ProjectListsManager;
 import fr.cm.excel.ExcelManagerCSV;
@@ -10,31 +9,34 @@ import javafx.beans.property.StringProperty;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class DataFile {
+
+    private String id;
     private final StringProperty shortName = new SimpleStringProperty(this, "name");
     private final StringProperty fullFileName = new SimpleStringProperty(this, "fullFileName");
     String owner;
     boolean stillExisting;
-    String metaInformationAboutDataFile;
-    List<Observation> columnsInThisFilesAddedAsObservations;
+    String metaInformation;
+    List<Observation> addedAsObservations;
     private List<String> namesColumnInFile;
     String[][] dataInFile;
 
     int firstYear, lastYear;
 
     // --------------------------------------------
-    public DataFile(String shortName,
+    public DataFile(String id,
+                    String shortName,
                     String fullFileName,
                     String metaInformationAboutDataFile,
                     String owner,
                     String codedObservations) {
+        this.id = id;
         this.owner = owner;
-        this.metaInformationAboutDataFile = metaInformationAboutDataFile;
+        this.metaInformation = metaInformationAboutDataFile;
         setShortName(shortName);
         setFullFileName(fullFileName);
-        columnsInThisFilesAddedAsObservations = new ArrayList<>();
+        addedAsObservations = new ArrayList<>();
         decodeAddedObservations(codedObservations);
         readData();
     }
@@ -42,12 +44,13 @@ public class DataFile {
     // --------------------------------------------
     public DataFile(String fullFileName) {
         try {
+            id = ProjectListsManager.getDataFileId();
             setFullFileName(fullFileName);
             File file = new File(fullFileName);
             setShortName(file.getName());
             owner = "Owner";
-            metaInformationAboutDataFile = "Information about dataFile";
-            columnsInThisFilesAddedAsObservations = new ArrayList<>();
+            metaInformation = "Information about dataFile";
+            addedAsObservations = new ArrayList<>();
             readData();
         }
         catch(Exception ex){}
@@ -91,29 +94,25 @@ public class DataFile {
         return(namesColumnInFile.size());
     }
     // --------------------------------------------
-    public Observation observationFromColumn(String nameColumn) {
-        int numObs = namesColumnInFile.indexOf(nameColumn);
-        int ny = dataInFile.length - 1;
-        double[] values = new double[ny];
-        for (int y = 0; y < ny; y++) {
-            values[y] = correct(dataInFile[y][numObs]);
-        }
-        Observation observation = new Observation(this, nameColumn, values, firstYear, lastYear);
-        return observation;
-    }
-
-    public void addObservationFromColumn(Observation observation) {
-        columnsInThisFilesAddedAsObservations.add(observation);
-    }
 
     public void removeObservationFromColumn(Observation observation) {
-        columnsInThisFilesAddedAsObservations.remove(observation);
+
+        addedAsObservations.remove(observation);
+        ProjectListsManager.removeObservation(observation);
     }
 
-    public Observation newObservationFromColumn(String nameColumn) {
+    public Observation makeObservationFromColumn(String nameColumn) {
         if (!ProjectListsManager.containsObservation(nameColumn)) {
-            Observation observation =  observationFromColumn(nameColumn);
-            new AddObservationDialog(observation, this);
+            String nameObs = id + "_" + nameColumn;
+            int numObs = namesColumnInFile.indexOf(nameColumn);
+            int ny = dataInFile.length - 1;
+            double[] values = new double[ny];
+            for (int y = 0; y < ny; y++) {
+                values[y] = correct(dataInFile[y][numObs]);
+            }
+            Observation observation = new Observation(this, nameObs, values, firstYear, lastYear);
+            ProjectListsManager.addObservation(observation,true);
+            addedAsObservations.add(observation);
             return(observation);
         }
         else {
@@ -125,7 +124,7 @@ public class DataFile {
     // --------------------------------------------
     public String codeAddedObservations() {
         StringBuilder bo = new StringBuilder("");
-        for (Observation observation : columnsInThisFilesAddedAsObservations) {
+        for (Observation observation : addedAsObservations) {
             bo.append(observation.codeInDataFile());
             bo.append(";");
         }
@@ -134,63 +133,15 @@ public class DataFile {
 
     // --------------------------------------------
     public void decodeAddedObservations(String codeObservations) {
-        columnsInThisFilesAddedAsObservations = new ArrayList<>();
+        addedAsObservations = new ArrayList<>();
         String[] stObservations = codeObservations.split(";");
         for (String stObservation : stObservations) {
             if (!stObservation.equals("")) {
                 Observation observation = Observation.codeFromDataFile(stObservation);
                 observation.setOriginalFile(this);
-                columnsInThisFilesAddedAsObservations.add(observation);
+                addedAsObservations.add(observation);
             }
         }
-    }
-
-    // --------------------------------------------
-    public void updateObservations(List<Observation> listOfAddedObservations, List<Observation> listORemovedObservations) {
-        for (Observation observation : listOfAddedObservations) {
-            addObservationFromColumn(observation);
-        }
-        for (Observation observation : listORemovedObservations) {
-            removeObservationFromColumn(observation);
-        }
-        columnsInThisFilesAddedAsObservations = columnsInThisFilesAddedAsObservations.stream().distinct().collect(Collectors.toList());
-    }
-
-    // --------------------------------------------
-    public String getShortName() {
-        return shortName.get();
-    }
-
-    public StringProperty getShortNameProperty() {
-        return shortName;
-    }
-
-    public StringProperty getFullFileNameProperty() {
-        return fullFileName;
-    }
-
-    public String getFullFileName() {
-        return fullFileName.get();
-    }
-
-    public String getMetaInformationAboutDataFile() {
-        return metaInformationAboutDataFile;
-    }
-
-    public void setMetaInformationAboutDatatFile(String metaInformationAboutDataFile) {
-        this.metaInformationAboutDataFile = metaInformationAboutDataFile;
-    }
-
-    public void setFullFileName(String fullFileName) {
-        this.fullFileName.set(fullFileName);
-    }
-
-    public void setShortName(String shortName) {
-        this.shortName.set(shortName);
-    }
-
-    public List<String> getNamesColumnInFile() {
-        return namesColumnInFile;
     }
 
     String form(String s){
@@ -211,6 +162,38 @@ public class DataFile {
                 formatedData[l][c] = form(dataInFile[l][c]);
         return formatedData;
     }
+    // --------------------------------------------------
+    public String getStringAddedObservations() {
+        StringBuilder bo = new StringBuilder("");
+        for (Observation observation : addedAsObservations) {
+            bo.append(observation.getObsName());
+            bo.append("\n");
+        }
+        return bo.toString();
+    }
+
+    public String getId() {
+        return id;
+    }
+    public String getShortName() {
+        return shortName.get();
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName.set(shortName);
+    }
+
+    public String getFullFileName() {
+        return fullFileName.get();
+    }
+
+    public StringProperty fullFileNameProperty() {
+        return fullFileName;
+    }
+
+    public void setFullFileName(String fullFileName) {
+        this.fullFileName.set(fullFileName);
+    }
 
     public String getOwner() {
         return owner;
@@ -222,6 +205,30 @@ public class DataFile {
 
     public boolean isStillExisting() {
         return stillExisting;
+    }
+
+    public String getMetaInformation() {
+        return metaInformation;
+    }
+
+    public void setMetaInformation(String metaInformation) {
+        this.metaInformation = metaInformation;
+    }
+
+    public List<Observation> getAddedAsObservations() {
+        return addedAsObservations;
+    }
+
+    public List<String> getNamesColumnInFile() {
+        return namesColumnInFile;
+    }
+
+    public int getFirstYear() {
+        return firstYear;
+    }
+
+    public int getLastYear() {
+        return lastYear;
     }
 
 }

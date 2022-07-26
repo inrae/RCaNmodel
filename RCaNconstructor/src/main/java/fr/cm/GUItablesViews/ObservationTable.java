@@ -35,8 +35,8 @@ public class ObservationTable extends Pane {
     int no;
     int ny;
 
-    double width = 0.9 * Context.getWindowWidth();
-    double height = 0.9 * Context.getWindowHeight();
+    double width = Context.getWindowWidth();
+    double height = Context.getWindowHeight();
 
     public ObservationTable() {
         observationTable = new TableView<>();
@@ -48,10 +48,7 @@ public class ObservationTable extends Pane {
         final VBox vbox = new VBox();
         ColorsAndFormats.setVBoxCharacteristics(vbox);
         vbox.getChildren().addAll(title, observationTable);
-
         this.getChildren().addAll(vbox);
-        this.setMinWidth(width);
-        this.setHeight(height);
     }
 
 ;
@@ -108,8 +105,8 @@ public class ObservationTable extends Pane {
 
     //
     public void buildTable() {
-        observationTable.setPrefWidth(0.9 * width);
-        observationTable.setPrefHeight(0.8 * height);
+        observationTable.setPrefWidth(0.8*width);
+        observationTable.setPrefHeight(0.7*height);
         observationTable.getColumns().removeAll(observationTable.getColumns());
         transposeListOfObservations();
         makeTable();

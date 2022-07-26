@@ -9,6 +9,8 @@ import java.util.List;
 
 public class Strings {
 
+    private static final String[] letters = new String[]{
+            "A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U"};
     private static final String[] units = new String[]{
             "Million tons" ,
             "Thousands tons",
@@ -46,6 +48,9 @@ public class Strings {
     };
 
 
+    public static String[] getLetters(){
+        return letters;
+    }
     public static String[] getTypesOfComponents() { return (typesOfComponents); }
 
     public static String[] getTypesOfLinks() { return (typesOfLinks); }

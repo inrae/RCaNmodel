@@ -21,8 +21,8 @@ public class Context {
     private static int lastYear;
 
     // etats du systeme
-
     private static boolean started;
+    private static boolean runningR;
     private static boolean connectedR;
     private static boolean builtR;
     private static boolean sampledR;
@@ -32,81 +32,166 @@ public class Context {
 
     static double insideMin = 0.2;
     static double insideMax = 0.8;
-    static final double radiusComponent = 30.0f;
-    static final double radiusInternalLink = 38.0f;
+    static final double radiusComponent = 20.0f;
+    static final double radiusInternalLink = 25.0f;
 
     static String textAreaContent;
 
     public static String getTextAreaContent() {
+
         return textAreaContent;
     }
 
     public static void setTextAreaContent(String textAreaContent) {
+
         Context.textAreaContent = textAreaContent;
     }
 // ------------------------------------------------------------------------
+    public static boolean isWarnings() {
 
+        return true;
+    }
 
-    public static boolean isWarnings() { return false; }
+    public static String getFileName() {
 
-    public static String getFileName() { return fileName; }
+        return fileName;
+    }
 
-    public static void setFileName(String fileName) { Context.fileName = fileName; }
+    public static void setFileName(String fileName) {
+        Context.fileName = fileName;
+    }
 
-    public static String getDirName() { return dirName; }
+    public static String getDirName() {
 
-    public static void setDirName(String dirName) { Context.dirName = dirName; }
+        return dirName;
+    }
 
-    public static File getWorkingDirectory() { return workingDirectory; }
+    public static void setDirName(String dirName) {
+
+        Context.dirName = dirName;
+    }
+
+    public static File getWorkingDirectory() {
+
+        return workingDirectory;
+    }
 
     public static String getFullFileName() {
-        return (Context.dirName + "/" + Context.fileName); }
+        return (Context.dirName + "/" + Context.fileName);
+    }
 
-    public static int getFirstYear() { return firstYear; }
+    public static int getFirstYear() {
 
-    public static int getLastYear() { return lastYear; }
+        return firstYear;
+    }
 
-    public static void setFirstYear(int firstYear) { Context.firstYear = firstYear; }
+    public static int getLastYear() {
 
-    public static void setLastYear(int lastYear) { Context.lastYear = lastYear; }
+        return lastYear;
+    }
 
-    public static int getNbYears() { return lastYear - firstYear + 1; }
+    public static void setFirstYear(int firstYear) {
 
-    public static boolean isConnectedR() { return connectedR; }
+        Context.firstYear = firstYear;
+    }
 
-    public static void setConnectedR(boolean connectedR) { Context.connectedR = connectedR; }
+    public static void setLastYear(int lastYear) {
 
-    public static boolean isBuiltR() { return builtR; }
+        Context.lastYear = lastYear;
+    }
 
-    public static void setBuiltR(boolean builtR) { Context.builtR = builtR; }
+    public static int getNbYears() {
 
-    public static boolean isSampledR() { return sampledR; }
+        return lastYear - firstYear + 1;
+    }
 
-    public static void setSampledR(boolean sampledR) { Context.sampledR = sampledR; }
+    public static boolean isRunningR() {
 
-    public static boolean isStarted() { return started; }
+        return runningR;
+    }
 
-    public static void setStarted(boolean started) { Context.started = started; }
+    public static void setRunningR(boolean runningR) {
 
-    public static double getWindowWidth() { return windowWidth; }
+        Context.runningR = runningR;
+    }
 
-    public static void setWindowWidth(double w) { windowWidth = w; }
+    public static boolean isConnectedR() {
 
-    public static double getWindowHeight() { return windowHeight; }
+        return connectedR;
+    }
 
-    public static void setWindowHeight(double h) { windowHeight = h; }
+    public static void setConnectedR(boolean connectedR) {
 
-    public static double getInsideMin() { return insideMin; }
+        Context.connectedR = connectedR;
+    }
 
-    public static double getInsideMax() { return insideMax; }
+    public static boolean isBuiltR() {
 
-    public static double getBackgroundWidth() { return windowWidth; }
+        return builtR;
+    }
 
-    public static double getBackgroundHeight() { return (0.9 * windowHeight); }
+    public static void setBuiltR(boolean builtR) {
 
-    public static double getRadiusComponent() { return radiusComponent; }
+        Context.builtR = builtR;
+    }
 
-    public static double getRadiusInternalLink() { return radiusInternalLink; }
+    public static boolean isSampledR() {
+
+        return sampledR;
+    }
+
+    public static void setSampledR(boolean sampledR) {
+
+        Context.sampledR = sampledR;
+    }
+
+    public static boolean isStarted() {
+        return started;
+    }
+
+    public static void setStarted(boolean started) {
+        Context.started = started;
+    }
+
+    public static double getWindowWidth() {
+        return windowWidth;
+    }
+
+    public static void setWindowWidth(double w) {
+        windowWidth = w;
+    }
+
+    public static double getWindowHeight() {
+        return windowHeight;
+    }
+
+    public static void setWindowHeight(double h) {
+        windowHeight = h;
+    }
+
+    public static double getInsideMin() {
+        return insideMin;
+    }
+
+    public static double getInsideMax() {
+        return insideMax;
+    }
+
+    public static double getBackgroundWidth() {
+        return windowWidth;
+    }
+
+    public static double getBackgroundHeight() {
+        return (0.9 * windowHeight);
+    }
+
+    public static double getRadiusComponent() {
+        return radiusComponent;
+    }
+
+    public static double getRadiusInternalLink() {
+        return radiusInternalLink;
+    }
 
     public static String getDate(){
         Date date = new Date();
