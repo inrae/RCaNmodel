@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ProjectListsManager {
+// ---------------------------------
 
     private static List<Component> listOfComponents;
     private static List<Flux> listOfFluxes;

@@ -27,6 +27,7 @@ import javafx.scene.layout.VBox;
  * @author christianmullon
  */
 public class ConstraintTable extends Pane {
+// ---------------------------------
 
     final TableView<Constraint> constraintTable;
     ObservableList<Constraint> list;

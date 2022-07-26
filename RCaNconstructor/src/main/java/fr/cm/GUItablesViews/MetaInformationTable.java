@@ -28,6 +28,7 @@ import javafx.scene.control.TableView;
 
 
 public class MetaInformationTable extends Pane {
+// ---------------------------------
 
     double width = Context.getWindowWidth();
     double height =  Context.getWindowHeight();

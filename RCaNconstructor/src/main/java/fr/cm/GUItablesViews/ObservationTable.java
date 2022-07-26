@@ -24,6 +24,7 @@ import java.util.List;
  * @author christianmullon
  */
 public class ObservationTable extends Pane {
+// ---------------------------------
 
     ObservableList<Observation> observableListOfTransposeObservations;
     List<Observation> listOfTransposedObservations;

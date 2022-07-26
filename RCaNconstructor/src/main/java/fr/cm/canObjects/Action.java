@@ -5,7 +5,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class Action {
-
+// ---------------------------------
     final SimpleStringProperty date = new SimpleStringProperty();
     final SimpleStringProperty whichAction = new SimpleStringProperty();
     final SimpleStringProperty commentAuthor = new SimpleStringProperty();

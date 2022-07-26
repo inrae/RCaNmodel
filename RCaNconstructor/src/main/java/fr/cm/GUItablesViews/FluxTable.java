@@ -26,6 +26,7 @@ import javafx.scene.layout.VBox;
  * @author christianmullon
  */
 public class FluxTable extends Pane {
+// ---------------------------------
 
     final TableView<Flux> table;
     ObservableList<Flux> list;

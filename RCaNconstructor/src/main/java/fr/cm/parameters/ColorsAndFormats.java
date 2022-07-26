@@ -9,6 +9,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 public class ColorsAndFormats {
+// ---------------------------------
 
     public static final String font = "-fx-font: normal 16px 'sans-serif' ";
 

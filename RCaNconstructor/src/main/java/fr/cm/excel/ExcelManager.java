@@ -20,8 +20,7 @@ import java.util.List;
  * @author christianmullon
  */
 public class ExcelManager {
-
-    // -------------------------------------------------------------------------
+    // ---------------------------------
     public static void saveExcel() {
         String fileName = Context.getFullFileName();
         try {

@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MenuView {
+// ---------------------------------
 
     static final MenuItem networkItem = new MenuItem("Network");
     static final MenuItem groupsItem = new MenuItem("Components");

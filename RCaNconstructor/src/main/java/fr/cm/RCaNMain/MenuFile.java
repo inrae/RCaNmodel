@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MenuFile {
+    // ---------------------------------
 
     static final MenuItem newItem = new MenuItem("New");
     static final MenuItem openFileItem = new MenuItem("Open");
