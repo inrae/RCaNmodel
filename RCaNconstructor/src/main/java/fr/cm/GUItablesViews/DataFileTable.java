@@ -22,6 +22,7 @@ import java.io.File;
 import static javafx.collections.FXCollections.observableArrayList;
 
 public class DataFileTable extends Pane {
+// ---------------------------------
 
     double width = Context.getWindowWidth();
     double height =  Context.getWindowHeight();

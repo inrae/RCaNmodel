@@ -28,6 +28,7 @@ import javafx.scene.layout.Pane;
  * @author christianmullon
  */
 public class ComponentTable extends Pane {
+// ---------------------------------
 
     double width = Context.getWindowWidth();
     double height =  Context.getWindowHeight();

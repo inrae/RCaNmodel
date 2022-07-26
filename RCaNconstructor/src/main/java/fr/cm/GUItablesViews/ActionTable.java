@@ -19,6 +19,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 public class ActionTable extends Pane {
+    // ---------------------------------
+
     final TableView<Action> table;
     ObservableList<Action> list;
     double width = Context.getWindowWidth();

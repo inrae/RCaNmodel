@@ -9,7 +9,9 @@ import fr.cm.GUInetwork.ComponentGroup;
 import fr.cm.ProjectManager.ProjectListsManager;
 import fr.cm.parameters.Strings;
 
+
 public class Component extends ComponentGroup {
+    // ---------------------------------
     private final int np;
     private final double[] parameters;
     // --------------------------------------------
