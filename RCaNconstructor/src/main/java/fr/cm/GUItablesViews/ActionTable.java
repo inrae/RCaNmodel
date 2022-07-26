@@ -94,6 +94,7 @@ public class ActionTable extends Pane {
         final Label title = new Label("RCaN Tasks");
         title.setFont(ColorsAndFormats.titleFont);
         final Button button = new Button("Save as text file");
+        final Label hint = new Label("Double clic on an annotation to edit it");
         button.setOnAction((ActionEvent e) -> new ActionSaveDialog());
         final Button buttonNewAnnotation = new Button("Add annotation");
         buttonNewAnnotation.setOnAction((ActionEvent e) -> {
@@ -101,16 +102,13 @@ public class ActionTable extends Pane {
             String nComment = Context.getTextAreaContent();
             Action action = new Action("Added by author",nComment);
             action.print();
-            System.out.println(ProjectListsManager.getListOfActions().size());
             ProjectListsManager.addAction(action,false);
-            System.out.println(ProjectListsManager.getListOfActions().size());
             list = FXCollections.observableArrayList(ProjectListsManager.getListOfActions());
             table.setItems(list);
             table.refresh();
         });
 
         final HBox hboxButtons = new HBox();
-        final Label hint = new Label("Double clic on an annotation cell to edit it");
         hboxButtons.getChildren().addAll( button, hint);
         hboxButtons.setSpacing(80);
 
@@ -118,6 +116,7 @@ public class ActionTable extends Pane {
         ColorsAndFormats.setVBoxCharacteristics(vbox);
         vbox.getChildren().addAll(title, table, hboxButtons);
         ColorsAndFormats.setVBoxCharacteristics(vbox);
+
         this.getChildren().addAll(vbox);
     }
 

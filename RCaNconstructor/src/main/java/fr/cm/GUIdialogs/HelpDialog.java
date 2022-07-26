@@ -7,13 +7,13 @@ package fr.cm.GUIdialogs;
 
 import fr.cm.RCaNMain.Context;
 import fr.cm.parameters.ColorsAndFormats;
+
 import fr.cm.xmlFiles.HelpXML;
 import fr.cm.xmlFiles.RCommandXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

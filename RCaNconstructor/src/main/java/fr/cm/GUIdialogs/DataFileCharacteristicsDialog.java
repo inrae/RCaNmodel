@@ -12,7 +12,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import java.util.Optional;
 
-public class CharacteristicsOfFileDialog  extends Dialog <ButtonType> {
+public class DataFileCharacteristicsDialog extends Dialog <ButtonType> {
     double width = Context.getWindowWidth();
     Label middleTitle, labelShortName, labelMetaInformation, labelPathLabel, labelPathStill, labelPathStillOK, labelOwner;
     TextField fieldShortName, fieldOwner;
@@ -23,7 +23,7 @@ public class CharacteristicsOfFileDialog  extends Dialog <ButtonType> {
 
     int middleWidth = (int)(0.3 * width);
 
-    public CharacteristicsOfFileDialog(DataFile selectedDataFile){
+    public DataFileCharacteristicsDialog(DataFile selectedDataFile){
         this.selectedDataFile = selectedDataFile;
         middleTitle = new Label("Meta information about selected file");
         labelShortName = new Label("Short name of datafile");
@@ -65,7 +65,7 @@ public class CharacteristicsOfFileDialog  extends Dialog <ButtonType> {
             middleTitle.setText("Selected data file");
             middleTitle.setFont(ColorsAndFormats.titleFont);
             fieldShortName.setText(selectedDataFile.getShortName());
-            areaMetaInformation.setText(selectedDataFile.getMetaInformationAboutDataFile());
+            areaMetaInformation.setText(selectedDataFile.getMetaInformation());
             textPath.setText(selectedDataFile.getFullFileName());
             labelPathStill.setText("The file is : ");
             if(selectedDataFile.isStillExisting()){
@@ -87,10 +87,11 @@ public class CharacteristicsOfFileDialog  extends Dialog <ButtonType> {
                     selectedDataFile.setShortName(fieldShortName.getText());
                     selectedDataFile.setFullFileName(textPath.getText());
                     selectedDataFile.setOwner(fieldOwner.getText());
-                    selectedDataFile.setMetaInformationAboutDatatFile(areaMetaInformation.getText());
+                    selectedDataFile.setMetaInformation(areaMetaInformation.getText());
+                    Context.setTextAreaContent("True");
                 }
                 catch(Exception ex){
-
+                    Context.setTextAreaContent("False");
                 }
             }
         }

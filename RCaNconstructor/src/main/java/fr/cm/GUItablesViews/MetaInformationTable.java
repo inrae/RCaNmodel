@@ -139,7 +139,7 @@ public class MetaInformationTable extends Pane {
         table.setPrefHeight(0.7*height);
 
         final Label title = new Label("Project Information");
-        final Label hint = new Label("A tooltip gives advices about what is expected. Double clic on an annotation to edit it");
+        final Label hint = new Label("A tooltip gives you advices about what is expected. Double clic on an annotation to edit it");
         title.setFont(ColorsAndFormats.titleFont);
         final Button button = new Button("Save as text file");
         button.setOnAction((ActionEvent e) -> new MetaInformationSaveTextDialog());
