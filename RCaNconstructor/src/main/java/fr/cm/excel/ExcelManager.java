@@ -509,32 +509,40 @@ public class ExcelManager {
         int lig = 0;
         row = sheet.createRow(lig);
         cell = row.createCell(0);
-        cell.setCellValue("File name");
+        cell.setCellValue("Id");
         cell = row.createCell(1);
-        cell.setCellValue("Full file name");
+        cell.setCellValue("File name");
         cell = row.createCell(2);
-        cell.setCellValue("Meta information");
+        cell.setCellValue("Full file name");
         cell = row.createCell(3);
-        cell.setCellValue("Owner");
+        cell.setCellValue("Meta information");
         cell = row.createCell(4);
-        cell.setCellValue("First year");
+        cell.setCellValue("Owner");
         cell = row.createCell(5);
-        cell.setCellValue("Last year");
+        cell.setCellValue("First year");
         cell = row.createCell(6);
+        cell.setCellValue("Last year");
+        cell = row.createCell(7);
         cell.setCellValue("Selected columns");
         lig++;
         for (int c = 0; c < ProjectListsManager.getListOfDataFiles().size(); c++) {
             DataFile dataFile = ProjectListsManager.getListOfDataFiles().get(c);
             row = sheet.createRow(lig);
             cell = row.createCell(0);
-            cell.setCellValue(dataFile.getShortName());
+            cell.setCellValue(dataFile.getId());
             cell = row.createCell(1);
-            cell.setCellValue(dataFile.getFullFileName());
+            cell.setCellValue(dataFile.getShortName());
             cell = row.createCell(2);
-            cell.setCellValue(dataFile.getMetaInformationAboutDataFile());
+            cell.setCellValue(dataFile.getFullFileName());
             cell = row.createCell(3);
-            cell.setCellValue(dataFile.getOwner());
+            cell.setCellValue(dataFile.getMetaInformation());
             cell = row.createCell(4);
+            cell.setCellValue(dataFile.getOwner());
+            cell = row.createCell(5);
+            cell.setCellValue(dataFile.getFirstYear());
+            cell = row.createCell(6);
+            cell.setCellValue(dataFile.getLastYear());
+            cell = row.createCell(7);
             cell.setCellValue(dataFile.codeAddedObservations());
             lig++;
         }
@@ -552,16 +560,23 @@ public class ExcelManager {
             while (iterator.hasNext()) {
                 row = iterator.next();
                 cell = row.getCell(0);
-                String shortName = cell.getStringCellValue();
+                String id = cell.getStringCellValue();
                 cell = row.getCell(1);
-                String fullFileName = cell.getStringCellValue();
+                String shortName = cell.getStringCellValue();
                 cell = row.getCell(2);
-                String metaInformation = cell.getStringCellValue();
+                String fullFileName = cell.getStringCellValue();
                 cell = row.getCell(3);
-                String owner = cell.getStringCellValue();
+                String metaInformation = cell.getStringCellValue();
                 cell = row.getCell(4);
+                String owner = cell.getStringCellValue();
+                cell = row.getCell(5);
+                int firstYear = (int) cell.getNumericCellValue();
+                cell = row.getCell(6);
+                int lastYear = (int) cell.getNumericCellValue();
+                cell = row.getCell(7);
                 String listOfObservations = cell.getStringCellValue();
                 DataFile dataFile = new DataFile(
+                        id,
                         shortName,
                         fullFileName,
                         metaInformation,

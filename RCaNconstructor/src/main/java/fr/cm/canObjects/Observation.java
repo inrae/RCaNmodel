@@ -18,7 +18,7 @@ public class Observation {
     DataFile dataFile;
     String originalColumn;
     String unit;
-    int firstYear, lastYear;
+    static int firstYear, lastYear;
 
     // --------------------------------------------
     public Observation(String obsName, double [] nValues){

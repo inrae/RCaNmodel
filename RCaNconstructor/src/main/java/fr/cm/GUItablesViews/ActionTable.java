@@ -21,13 +21,11 @@ import javafx.scene.text.Text;
 public class ActionTable extends Pane {
     final TableView<Action> table;
     ObservableList<Action> list;
-    double width = 0.9 * Context.getWindowWidth();
-    double height =  0.8 * Context.getWindowHeight();
+    double width = Context.getWindowWidth();
+    double height =  Context.getWindowHeight();
 
     public ActionTable() {
         table = new TableView<>();
-        table.setMinWidth(width);
-        table.setMinHeight(height);
         table.setEditable(true);
         table.getSelectionModel().setCellSelectionEnabled(true);  // selects cell only, not the whole row
         table.setOnMouseClicked(click -> {
@@ -53,7 +51,7 @@ public class ActionTable extends Pane {
         TableColumn<Action, String> dateCol = new TableColumn<>("Date");
         dateCol.setSortable(true);
         dateCol.setCellValueFactory(new PropertyValueFactory<>("date"));
-        dateCol.setMinWidth(0.16 *width);
+        dateCol.setMinWidth(0.12 *width);
         // ------------------------------------------------------------------------
         TableColumn<Action, String> whichActionCol = new TableColumn<>("Task");
         whichActionCol.setCellValueFactory(new PropertyValueFactory<>("whichAction"));
@@ -67,11 +65,11 @@ public class ActionTable extends Pane {
             return cell ;
         });
         whichActionCol.setEditable(false);
-        whichActionCol.setMinWidth(0.4 *width);
+        whichActionCol.setMinWidth(0.34 *width);
         // ------------------------------------------------------------------------
         TableColumn<Action, String> commentAuthorCol = new TableColumn<>("Annotation");
         commentAuthorCol.setCellValueFactory(new PropertyValueFactory<>("commentAuthor"));
-        commentAuthorCol.setMinWidth((0.4 *width));
+        commentAuthorCol.setMinWidth((0.34 *width));
         commentAuthorCol.setEditable(false);
         commentAuthorCol.setCellFactory(tc -> {
             TableCell<Action, String> cell = new TableCell<>();
@@ -90,6 +88,8 @@ public class ActionTable extends Pane {
         list = FXCollections.observableArrayList(ProjectListsManager.getListOfActions());
         table.setItems(list);
         table.getSelectionModel().selectFirst();
+        table.setPrefWidth(0.8*width);
+        table.setPrefHeight(0.7*height);
 
         final Label title = new Label("RCaN Tasks");
         title.setFont(ColorsAndFormats.titleFont);
@@ -108,12 +108,16 @@ public class ActionTable extends Pane {
             table.setItems(list);
             table.refresh();
         });
-        final HBox hbox = new HBox(50);
-        hbox.getChildren().addAll(title, button, buttonNewAnnotation);
+
+        final HBox hboxButtons = new HBox();
+        final Label hint = new Label("Double clic on an annotation cell to edit it");
+        hboxButtons.getChildren().addAll( button, hint);
+        hboxButtons.setSpacing(80);
 
         final VBox vbox = new VBox();
         ColorsAndFormats.setVBoxCharacteristics(vbox);
-        vbox.getChildren().addAll(hbox, table);
+        vbox.getChildren().addAll(title, table, hboxButtons);
+        ColorsAndFormats.setVBoxCharacteristics(vbox);
         this.getChildren().addAll(vbox);
     }
 

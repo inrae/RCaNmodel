@@ -62,26 +62,11 @@ public class RCommandXML {
         }
     }
     // ------------------------------------------------------------------------
-    public String nolf(String st){ return(st.replace("\n","").trim()); }
-    // ------------------------------------------------------------------------
-    public void print(){
-        System.out.println("MENU");
-        System.out.println(this.name);
-        System.out.println(this.textMenu);
-        System.out.println(this.help);
-        System.out.println(this.condition);
-        System.out.println(this.typeParameter);
-        System.out.println("R");
-        for(String st : this.rCompute){
-            System.out.println("     "+st);
-        }
-        System.out.println("RP");
-        for(String st : this.rPlots){
-            System.out.println("     "+st);
-        }
+    public String nolf(String st){
+        return(st.replace("\n","").trim());
     }
     // ------------------------------------------------------------------------
-    public void setState(boolean ok){
+     public void setState(boolean ok){
         switch(name){
             case "connect":
                 Context.setConnectedR(ok);

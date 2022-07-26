@@ -18,29 +18,22 @@ public class RCaNCaller {
     static RCaller caller;
     static RCode code;
     static File filePlot;
-    static boolean plot = false,  initialized = false,  runOk = false;
+    static boolean plot = false,   runOk = false;
     static String resultString = "";
     static RCommandXML rCommandXML = null;
 
+
     // ------------------------------------------------------------------------
     public static void initRCaller() {
-        if( ! initialized) {
+        if( ! Context.isRunningR()) {
             Context.initRCaN();
             caller = RCaller.create();
             code = RCode.create();
             caller.setRCode(code);
             caller.setGraphicsTheme(new SkyTheme());
-            check("standard R and RScript");
-            if(! initialized) {
-                initRdir("/usr/local/bin/");
+            initRdir("/usr/local/bin/");
+            if(Context.isRunningR()) {
                 check("/usr/local/bin/");
-            }
-            if(! initialized) {
-                initRdir("/Applications/anaconda3/bin/");
-                check("/Applications/anaconda3/bin/");
-            }
-            if(! initialized) {
-                System.exit(0);
             }
         }
     }
@@ -57,13 +50,18 @@ public class RCaNCaller {
         );
         try {
             caller = RCaller.create(code, rCallerOptions);
+            Context.setRunningR(true);
         }
         catch(Exception ex){
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             ex.printStackTrace(pw);
-            new RCaNInterfaceDialog("R Interface ", "Unable to create code and caller", ex);
-            initialized = false;
+            new HelpDialog(
+                    "Check that R and Rscript are installed in directory /usr/local/bin/. "
+                    + "\n You may use the constructor without runing R commands.",
+                    "Connection with R",
+                    "Warning", "Warning", 300, 300);
+            Context.setRunningR(false);
         }
     }
     // ------------------------------------------------------------------------
@@ -72,12 +70,14 @@ public class RCaNCaller {
             code.addRCode("test <- 0");
             caller.runAndReturnResult("test");
             caller.getParser();
-            initialized = true;
             HelpDialog.warning("R Interface ","Connection to R initialized on " +message + "\n");
         } catch(Exception ex){
-            new RCaNInterfaceDialog("R Interface ","Unable to initialize connection to R on "
-                    + message , ex);
-            initialized = false;
+            new HelpDialog(
+                    "Check that R and Rscript are installed in directory /usr/local/bin/. "
+                            + "\n You may use the constructor without runing R commands.",
+                    "Connection with R",
+                    "Warning", "Warning", 300, 300);
+            Context.setRunningR(false);
         }
      }
     // ------------------------------------------------------------------------
@@ -153,7 +153,6 @@ public class RCaNCaller {
     // ------------------------------------------------------------------------
     static void stopSessionR(){
         try {
-            initialized = false;
             Context.initRCaN();
             MainApplication.updateMenus();
             caller.stopStreamConsumers();

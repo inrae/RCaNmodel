@@ -22,67 +22,44 @@ import java.util.Optional;
 
 import static javafx.collections.FXCollections.observableArrayList;
 
-public class ObservationsFromFileDialog extends Dialog <ButtonType> {
-
+public class DataFileObservationsDialog extends Dialog <ButtonType> {
 
     double width = Context.getWindowWidth();
     double height =  Context.getWindowHeight();
     DataFile selectedDataFile = null;
     // DROITE
-    Label rightTitle;
-    Label systemTitle;
-    TableView<String[]> tableOfDataValues = new TableView<>();
-    TableView<Observation> tableOfObservationsInSystem = new TableView<Observation>();
+    Label rightTitle,  systemTitle;
+    TableView<String[]> tableOfDataValues ;
+    TableView<Observation> tableOfObservationsFromDataFile ;
     ObservableList<String[]> listOfDataValues;
-    ObservableList<Observation> listOfObservationsInSystem;
-    List<Observation> listOfAddedObservations;
-    List<Observation> projectObservations;
-    List<Observation> listORemovedObservations;
     Text textAddObservation, textRemoveObservation;
     Button buttonRemove = new Button("Remove selected observation");
 
     int rightWidth = (int)(0.3 * width);
+    int leftWidth = (int)(0.7 * width);
 
-    public ObservationsFromFileDialog(DataFile selectedDataFile){
-        projectObservations = new ArrayList<>(ProjectListsManager.getListOfObservations());
-        listOfAddedObservations = new ArrayList<>();
-        listORemovedObservations = new ArrayList<>();
+    public DataFileObservationsDialog(DataFile selectedDataFile){
         this.selectedDataFile = selectedDataFile;
-        buttonRemove.setOnAction(
-                (ActionEvent e) -> {
-                    // REMOVING AN OBSERVATION (?)
-                    if (tableOfObservationsInSystem.getSelectionModel().getSelectedItem() != null) {
-                        Observation observation = tableOfObservationsInSystem.getSelectionModel().getSelectedItem();
-                        ProjectListsManager.removeObservation(observation.getObsName());
-                        updateBottom();
-                        listORemovedObservations.add(observation);
-                    }
-                }
-                );
+
+        makeTableOfDataInFile();
+        makeTableExtractedObservations();
 
         textAddObservation = new Text("Click on the header of a column to add it as an observation of the system");
         textAddObservation.wrappingWidthProperty().set(rightWidth);
         textRemoveObservation = new Text("To remove an observation in the above list, select it and then click Button Remove");
         textRemoveObservation.wrappingWidthProperty().set(rightWidth);
 
-        rightTitle = new Label("Columns of selected file");
-        systemTitle = new Label("Observations in the system");
+        rightTitle = new Label("Data in file");
+        systemTitle = new Label("Extracted observations");
         rightTitle.setFont(ColorsAndFormats.titleFont);
         systemTitle.setFont(ColorsAndFormats.titleFont);
         VBox vBoxLeft = new VBox();
         vBoxLeft.getChildren().addAll(rightTitle, tableOfDataValues, textAddObservation);
         VBox vBoxRight = new VBox();
-        vBoxRight.getChildren().addAll(
-                systemTitle, tableOfObservationsInSystem,
-                textRemoveObservation, buttonRemove);
+        vBoxRight.getChildren().addAll(systemTitle, tableOfObservationsFromDataFile, textRemoveObservation, buttonRemove);
         HBox hBox = new HBox();
         hBox.getChildren().addAll(vBoxLeft,vBoxRight);
-        updateTop();
-        updateBottom();
-        vBoxLeft.setPrefWidth(0.3 * width);
-        vBoxRight.setPrefWidth(0.3 * width);
         ColorsAndFormats.setVBoxCharacteristics(vBoxLeft);
-        ColorsAndFormats.setVBoxCharacteristics(vBoxRight);
         ColorsAndFormats.setHBoxCharacteristics(hBox);
         this.setTitle("Add and remove observation from "+ selectedDataFile.getShortName());
         this.getDialogPane().setContent(hBox);
@@ -92,17 +69,13 @@ public class ObservationsFromFileDialog extends Dialog <ButtonType> {
         Optional<ButtonType> result = this.showAndWait();
         if (result.isPresent()) {
             if (result.get() == ButtonType.OK) {
-                selectedDataFile.updateObservations(listOfAddedObservations, listORemovedObservations);
-            }
-            if (result.get() == ButtonType.CANCEL) {
-                ProjectListsManager.setListOfObservations(projectObservations);
-            }
+             }
         }
     }
 
-
-    public void updateTop() {
-        tableOfDataValues.getColumns().clear();
+    public void makeTableOfDataInFile() {
+        tableOfDataValues = new TableView<>();
+        tableOfDataValues.setMinWidth(leftWidth);
         if (selectedDataFile != null) {
             int nc = selectedDataFile.getNumberOfColumns();
             if (nc > 0) {
@@ -112,12 +85,14 @@ public class ObservationsFromFileDialog extends Dialog <ButtonType> {
                     TableColumn tableColumn = new TableColumn();
                     Label colHeader = new Label(namesOfColumns.get(col));
                     colHeader.setOnMouseClicked(event -> {
+                        System.out.println("Clic dans names of columns");
                         Label labs = (Label) event.getSource();
                         String colInDataFile = labs.getText();
-                        Observation newObservation = selectedDataFile.newObservationFromColumn(colInDataFile);
-                        updateBottom();
-                        if(newObservation != null) {
-                            listOfAddedObservations.add(newObservation);
+                        System.out.println("Clic dans names  column " + colInDataFile);
+                        Observation observation = selectedDataFile.makeObservationFromColumn(colInDataFile);
+                        System.out.println("Added");
+                        if(observation != null) {
+                            tableOfObservationsFromDataFile.getItems().add(observation);
                         }
                     });
                     tableColumn.setGraphic(colHeader);
@@ -129,7 +104,6 @@ public class ObservationsFromFileDialog extends Dialog <ButtonType> {
                             return new SimpleStringProperty((p.getValue()[colNo]));
                         }
                     });
-                    tableColumn.setPrefWidth(100);
                     tableOfDataValues.getColumns().add(tableColumn);
                 }
                 listOfDataValues = observableArrayList(Arrays.asList(dataValues));
@@ -138,21 +112,27 @@ public class ObservationsFromFileDialog extends Dialog <ButtonType> {
         }
     }
 
-    public void updateBottom() {
-        tableOfObservationsInSystem.getColumns().clear();
-        TableColumn<Observation, String>    obsName = new TableColumn<>("Name");
-        obsName.setCellValueFactory(new PropertyValueFactory<>("obsName"));
-        obsName.setEditable(false);
-        obsName.setPrefWidth(100);
-        TableColumn<Observation, String>    dataFileName = new TableColumn<>("Data File");
-        dataFileName.setCellValueFactory(new PropertyValueFactory<>("dataFileName"));
-        dataFileName.setEditable(false);
-        dataFileName.setPrefWidth(300);
-        tableOfObservationsInSystem.getColumns().add(obsName);
-        tableOfObservationsInSystem.getColumns().add(dataFileName);
-        listOfObservationsInSystem = observableArrayList(ProjectListsManager.getListOfObservations());
-        tableOfObservationsInSystem.setItems(listOfObservationsInSystem);
-        tableOfObservationsInSystem.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+    public void makeTableExtractedObservations() {
+        tableOfObservationsFromDataFile = new TableView<Observation>();
+        TableColumn<Observation, String>    obsNameCol = new TableColumn<>("Name");
+        obsNameCol.setCellValueFactory(new PropertyValueFactory<>("obsName"));
+        obsNameCol.setEditable(false);
+        obsNameCol.setPrefWidth(rightWidth);
+        tableOfObservationsFromDataFile.setItems(observableArrayList(selectedDataFile.getAddedAsObservations()));
+        tableOfObservationsFromDataFile.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        tableOfObservationsFromDataFile.getColumns().add(obsNameCol);
+
+        buttonRemove.setOnAction(
+                (ActionEvent e) -> {
+                    Observation observation = tableOfObservationsFromDataFile.getSelectionModel().getSelectedItem();
+                    if (observation != null) {
+                        selectedDataFile.removeObservationFromColumn(observation);
+                        tableOfObservationsFromDataFile.getItems().remove(observation);
+                        Context.setTextAreaContent("True");
+                    }
+                }
+        );
+
     }
 
 }
