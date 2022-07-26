@@ -43,11 +43,17 @@ chebyCentre <- function(A, b) {
                         b,
                         maximum = FALSE,
                         ob = f)
-  res <- ROI_solve(lp_mod, solver = "lpsolve",
-                   control = list(presolve = c("rows",
-                                               "lindep",
-                                               "rowdominate",
-                                               "mergerows")))
+  if (requireNamespace("ROI.plugin.cbc", quietly = TRUE)){
+    res <- ROI_solve(lp_model,
+                     solver = "cbc",
+                     control = list(logLevel = 0))
+  } else {
+    res <- ROI_solve(lp_mod, solver = "lpsolve",
+                     control = list(presolve = c("rows",
+                                                 "lindep",
+                                                 "rowdominate",
+                                                 "mergerows")))
+  }
   if (res$status$msg$code != 0 &
       requireNamespace("ROI.plugin.clp", quietly = TRUE)){
     res <- ROI_solve(lp_mod, solver = "clp", control = list(amount = 0))
