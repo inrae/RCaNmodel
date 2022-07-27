@@ -43,21 +43,11 @@ checkPolytopeStatus <- function(x) {
 
   nbparam <- ncol(A)
   lp_model <- defineLPMod(A, b, C, v, maximum = FALSE)
-  res <- ROI_solve(lp_model, solver = "lpsolve",
-                   control = list(presolve = c("rows",
-                                               "lindep",
-                                               "rowdominate",
-                                               "mergerows"),
-                                  scaling = c("extreme",
-                                              "equilibrate",
-                                              "integers")))
-  if (res$status$msg$code == 5 &
-      requireNamespace("ROI.plugin.clp", quietly = TRUE)){
-    res2 <- ROI_solve(lp_model, solver = "clp", control = list(amount = 0))
-    if (res2$status$msg$code ==0) res <- res2
-  }
-  if (res$status$msg$code == 0) {
-    lp_model <- defineLPMod(A, b, C, v, maximum = TRUE)
+  if (requireNamespace("ROI.plugin.cbc", quietly = TRUE)){
+    res <- ROI_solve(lp_model,
+                     solver = "cbc",
+                     control = list(logLevel = 0))
+  } else {
     res <- ROI_solve(lp_model, solver = "lpsolve",
                      control = list(presolve = c("rows",
                                                  "lindep",
@@ -66,22 +56,44 @@ checkPolytopeStatus <- function(x) {
                                     scaling = c("extreme",
                                                 "equilibrate",
                                                 "integers")))
-    if (res$status$msg$code == 5 &
+  }
+  if (res$status$code == 5 &
+      requireNamespace("ROI.plugin.clp", quietly = TRUE)){
+    res2 <- ROI_solve(lp_model, solver = "clp", control = list(amount = 0))
+    if (res2$status$msg$code ==0) res <- res2
+  }
+  if (res$status$code == 0) {
+    lp_model <- defineLPMod(A, b, C, v, maximum = TRUE)
+    if (requireNamespace("ROI.plugin.cbc", quietly = TRUE)){
+      res <- ROI_solve(lp_model,
+                       solver = "cbc",
+                       control = list(logLevel = 0))
+    } else {
+      res <- ROI_solve(lp_model, solver = "lpsolve",
+                       control = list(presolve = c("rows",
+                                                   "lindep",
+                                                   "rowdominate",
+                                                   "mergerows"),
+                                      scaling = c("extreme",
+                                                  "equilibrate",
+                                                  "integers")))
+    }
+    if (res$status$code == 5 &
         requireNamespace("ROI.plugin.clp", quietly = TRUE)){
       res2 <- ROI_solve(lp_model, solver = "clp", control = list(amount = 0))
       if (res2$status$msg$code ==0) res <- res2
     }
 
   }
-  if (res$status$msg$code == 0) {
+  if (res$status$code == 0) {
     print("polytope ok")
-  } else if (res$status$msg$code == 2) {
+  } else if (res$status$code == 2) {
     print("empty polytope")
-  } else if (res$status$msg$code == 3) {
+  } else if (res$status$code == 3) {
     print("polytope not bounded")
-  } else if (res$status$msg$code == 9) {
+  } else if (res$status$code == 9) {
     print("unique solution")
-  } else if (res$status$msg$code == 5) {
+  } else if (res$status$code == 5) {
     print("numerical error")
   } else {
     print("potential problem")
