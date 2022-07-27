@@ -54,7 +54,7 @@ chebyCentre <- function(A, b) {
                                                  "rowdominate",
                                                  "mergerows")))
   }
-  if (res$status$msg$code != 0 &
+  if (res$status$code != 0 &
       requireNamespace("ROI.plugin.clp", quietly = TRUE)){
     res <- ROI_solve(lp_mod, solver = "clp", control = list(amount = 0))
   }
