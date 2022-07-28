@@ -18,8 +18,17 @@
 
 ROI_solve <-
   function(x, solver, control = list()) {
+    if (!solver %in% c("cbc", "lpsolve"))
+      stop("solver should be one of cbc or lpsolve")
     if (solver != "lpsolve"){
       res <- ROI::ROI_solve(x, solver, control)
+      if (res$status$msg$symbol == "unbounded"){
+        res$status$code <- 3
+      } else if (res$status$msg$symbol == "Numerical instability"){
+        res$status$code <- 5
+      } else if (res$status$msg$symbol== "infeasible"){
+        res$status$code <- 2
+      }
     } else {
       lp_model <- x$lp_model
       dims <- dim.lpExtPtr(lp_model)
@@ -44,6 +53,7 @@ ROI_solve <-
                                                optimum  = optimum,
                                                status   = conv,
                                                solver   = solver)
+      res$status$code <- res$status$msg$code
     }
     return(res)
   }

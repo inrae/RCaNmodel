@@ -57,11 +57,7 @@ checkPolytopeStatus <- function(x) {
                                                 "equilibrate",
                                                 "integers")))
   }
-  if (res$status$code == 5 &
-      requireNamespace("ROI.plugin.clp", quietly = TRUE)){
-    res2 <- ROI_solve(lp_model, solver = "clp", control = list(amount = 0))
-    if (res2$status$msg$code ==0) res <- res2
-  }
+
   if (res$status$code == 0) {
     lp_model <- defineLPMod(A, b, C, v, maximum = TRUE)
     if (requireNamespace("ROI.plugin.cbc", quietly = TRUE)){
@@ -78,11 +74,7 @@ checkPolytopeStatus <- function(x) {
                                                   "equilibrate",
                                                   "integers")))
     }
-    if (res$status$code == 5 &
-        requireNamespace("ROI.plugin.clp", quietly = TRUE)){
-      res2 <- ROI_solve(lp_model, solver = "clp", control = list(amount = 0))
-      if (res2$status$msg$code ==0) res <- res2
-    }
+
 
   }
   if (res$status$code == 0) {
