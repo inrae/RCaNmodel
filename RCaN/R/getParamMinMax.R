@@ -12,7 +12,7 @@ getParamMinMax <- function(OP, p) {
   ntry <- 0
   while (ntry < 3) {
     if (requireNamespace("ROI.plugin.cbc", quietly = TRUE)){
-      res <- ROI_solve(lp_model,
+      res <- ROI_solve(OP,
                        solver = "cbc",
                        control = list(logLevel = 0))
     } else {
@@ -23,14 +23,6 @@ getParamMinMax <- function(OP, p) {
                                      "equilibrate",
                                      "integers")))
     }
-    if (requireNamespace("ROI.plugin.clp", quietly = TRUE) &
-        res$status$code == 5){
-      res <- ROI_solve(OP, solver = "clp", control = list(amount = 0))
-    }
-    if (res$status$code != 0 &
-        requireNamespace("ROI.plugin.clp", quietly = TRUE))
-      res <- ROI_solve(OP, solver = "glpk",
-                       control=list(tm_limit = 1000))
 
     if (res$status$code == 0) {
       bound <- res$solution[p]
