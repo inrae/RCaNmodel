@@ -100,10 +100,7 @@ sampleCaN <- function(myCaNmod,
                                                     "equilibrate",
                                                     "integers")))
       }
-      if (requireNamespace("ROI.plugin.clp", quietly = TRUE)
-          & res$status$code == 5){
-        res <- ROI_solve(lp_model, solver = "clp", control = list(amount = 0))
-      }
+
       x0 <- res$solution
 
       if (res$status$code == 0)

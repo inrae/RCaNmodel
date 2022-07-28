@@ -103,10 +103,7 @@ findingIncompatibleConstr <- function(x) {
                                                  "rowdominate",
                                                  "mergerows")))
   }
-  if (requireNamespace("ROI.plugin.clp", quietly = TRUE)
-      & res$status$code == 5 ){
-    res <- ROI_solve(lp_model, solver = "clp", control = list(amount = 0))
-  }
+
 
   solutions <- res$solution
   problematic <-
@@ -161,10 +158,7 @@ findingIncompatibleConstr <- function(x) {
                                                       "rowdominate",
                                                       "mergerows")))
       }
-      if (requireNamespace("ROI.plugin.clp", quietly = TRUE) &
-          res$status$code == 5){
-        res <- ROI_solve(lp_model, solver = "clp", control = list(amount = 0))
-      }
+
       solutions <- res$solution
       c(gsub("^\\s*\\w*", "", problematic[p]),
         gsub("^\\s*\\w*", "",
