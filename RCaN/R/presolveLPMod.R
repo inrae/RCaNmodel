@@ -64,7 +64,7 @@ presolveLPMod <-
     if (is.null(colnames(A))) {
       colnames(A) <- paste("param", seq_len(ncol(A)))
     }
-    lp_model <- make.lp(nrow(A) + nrow(C), nbparam)
+    lp_model <- lpSolveAPI::make.lp(nrow(A) + nrow(C), nbparam)
     set.bounds(lp_model, lower = lower, upper = upper)
     for (p in 1:nbparam) {
       set.column(lp_model, p, c(A[, p], C[, p]))

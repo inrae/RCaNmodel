@@ -10,21 +10,16 @@ Authors@R: c(person("Hilaire","Drouineau",email="hilaire.drouineau@irstea.fr",ro
 Description: One paragraph description of what the package does as one or more full sentences.
 License: BSD_3_clause + file LICENSE
 Imports: 
-    Rcpp (>= 1.0.3),
-    RcppEigen,
     symengine,
     Matrix,
     tidyr,
     coda,
     doParallel,
-    doRNG,
     foreach,
     readxl,
     dplyr,
     stringr,
-    dqrng,
     writexl,
-    ROI.plugin.lpsolve,
     lpSolveAPI,
     magrittr,
     rlang,
