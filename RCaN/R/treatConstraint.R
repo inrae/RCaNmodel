@@ -100,6 +100,12 @@ treatConstraint <- function(myconstraint,
     base::mean(x, ..., na.rm = na.rm)
   }
 
+  symbolic_enviro$geomean <- function(x, ..., na.rm = TRUE) {
+    if (inherits(x, "VecBasic"))
+      stop("geomean can be applied only to time series")
+    exp(base::mean(log(x), ..., na.rm = na.rm))
+  }
+
   symbolic_constraint <-
       eval(parse(text = left), symbolic_enviro)  -
       eval(parse(text = right), symbolic_enviro)
