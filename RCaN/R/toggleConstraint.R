@@ -24,7 +24,7 @@ toggleConstraint <- function(myCaNmod, constr){
                             rownames(myCaNmod$C))
 
   for (co in constr){
-    if (sum(startsWith(allconstraints, co)) == 0)
+    if (sum(grepl(co, allconstraints)) == 0)
       stop(paste("no match for constraint", co))
   }
 
@@ -33,24 +33,24 @@ toggleConstraint <- function(myCaNmod, constr){
     if (is.null(rownames(myCaNmod$AAll))) {
       suballA <- character(0)
     } else {
-      suballA <- rownames(myCaNmod$AAll)[startsWith(rownames(myCaNmod$AAll), co)]
+      suballA <- rownames(myCaNmod$AAll)[grepl(co, rownames(myCaNmod$AAll))]
     }
     if (is.null(rownames(myCaNmod$AAll))) {
       subactiveA <- character(0)
     } else {
-      subactiveA <- rownames(myCaNmod$A)[startsWith(rownames(myCaNmod$A), co)]
+      subactiveA <- rownames(myCaNmod$A)[grepl(co, rownames(myCaNmod$A))]
     }
     inactiveA <- suballA[!suballA %in% subactiveA]
 
     if (is.null(rownames(myCaNmod$CAll))) {
       suballC <- character(0)
     } else {
-      suballC <- rownames(myCaNmod$CAll)[startsWith(rownames(myCaNmod$CAll), co)]
+      suballC <- rownames(myCaNmod$CAll)[grepl(co, rownames(myCaNmod$CAll))]
     }
     if (is.null(rownames(myCaNmod$CAll))) {
       subactiveC <- character(0)
     } else {
-      subactiveC <- rownames(myCaNmod$C)[startsWith(rownames(myCaNmod$C), co)]
+      subactiveC <- rownames(myCaNmod$C)[grepl(co, rownames(myCaNmod$C))]
     }
     inactiveC <- suballC[!suballC %in% subactiveC]
 
