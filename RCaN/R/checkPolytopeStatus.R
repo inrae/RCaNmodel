@@ -45,7 +45,8 @@ checkPolytopeStatus <- function(x) {
   lp_model <- defineLPMod(A, b, C, v, maximum = FALSE)
   if (requireNamespace("ROI.plugin.cbc", quietly = TRUE)){
     res <- ROI_solve(lp_model,
-                     solver = "cbc")
+                     solver = "cbc",
+                     control = list(logLevel = 0))
   } else {
     res <- ROI_solve(lp_model, solver = "lpsolve",
                      control = list(presolve = c("rows",
@@ -61,7 +62,8 @@ checkPolytopeStatus <- function(x) {
     lp_model <- defineLPMod(A, b, C, v, maximum = TRUE)
     if (requireNamespace("ROI.plugin.cbc", quietly = TRUE)){
       res <- ROI_solve(lp_model,
-                       solver = "cbc")
+                       solver = "cbc",
+                       control = list(logLevel = 0))
     } else {
       res <- ROI_solve(lp_model, solver = "lpsolve",
                        control = list(presolve = c("rows",
