@@ -37,7 +37,6 @@
 #' @importFrom foreach foreach
 #' @importFrom foreach %dopar%
 #' @importFrom foreach %do%
-#' @importFrom foreach %do%
 #' @importFrom stats runif
 sampleCaN <- function(myCaNmod,
                       N,
@@ -67,9 +66,6 @@ sampleCaN <- function(myCaNmod,
     })
     clusterEvalQ(cl, {
       library(coda)
-    })
-    clusterEvalQ(cl, {
-      library(doRNG)
     })
     clusterEvalQ(cl, {
       library(stats)
