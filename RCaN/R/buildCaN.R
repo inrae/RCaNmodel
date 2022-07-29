@@ -262,11 +262,9 @@ buildCaN <- function(x, generic = FALSE) {
         flow,
         data_series_name,
         "mean",
+        "geomean",
         "exp",
         "sum",
-        "na.rm",
-        "TRUE",
-        "FALSE",
         ""
       ) & suppressWarnings(is.na(as.numeric(constraints_word)))
     )
