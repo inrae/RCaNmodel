@@ -44,7 +44,7 @@ chebyCentre <- function(A, b) {
                         maximum = FALSE,
                         ob = f)
   if (requireNamespace("ROI.plugin.cbc", quietly = TRUE)){
-    res <- ROI_solve(lp_model,
+    res <- ROI_solve(lp_mod,
                      solver = "cbc",
                      control = list(logLevel = 0))
   } else {
