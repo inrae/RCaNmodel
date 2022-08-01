@@ -33,7 +33,7 @@ absence of such constraints}
 
 \item{maximum}{tells whether the objective function is maximised or not}
 
-\item{ob}{the coefficient of the ojective function (default all 1)}
+\item{ob}{the coefficient of the objective function (default all 1)}
 }
 \value{
 returns an OP object
