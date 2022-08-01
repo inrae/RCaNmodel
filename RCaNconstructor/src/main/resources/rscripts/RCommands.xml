@@ -26,14 +26,8 @@
             general
         </submenu>
         <textmenu>
-            Start R session and load libraries
+            Load libraries
         </textmenu>
-        <conditioncontextchange>
-            R session is started
-        </conditioncontextchange>
-        <contextchange>
-            Libraries loaded
-        </contextchange>
         <rcompute>
             require(ggplot2)
             require(ggraph)
@@ -52,25 +46,6 @@
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
         <name>
-            disconnect
-        </name>
-        <submenu>
-            general
-        </submenu>
-        <textmenu>
-            Stop R session
-        </textmenu>
-        <condition>
-            connected
-        </condition>
-        <help>
-            This command stops a R session.
-        </help>
-        <!--  CHECKED -->
-    </rcommand>
-    <!--  +++++++++++++++++++++++++++++ -->
-    <rcommand>
-        <name>
             build
         </name>
         <submenu>
@@ -82,12 +57,6 @@
         <condition>
             connected
         </condition>
-        <conditioncontextchange>
-            Polytope is built - polytope is ok
-        </conditioncontextchange>
-        <contextchange>
-            built
-        </contextchange>
         <rcompute>
             POLYTOPE &lt;- buildCaN('FILENAME')
             built &lt;- 'Polytope is built'

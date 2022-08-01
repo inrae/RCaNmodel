@@ -1,6 +1,6 @@
 package fr.cm.rCaller;
 
-import fr.cm.RCaNMain.Context;
+import fr.cm.Main.Context;
 import fr.cm.xmlFiles.RCommandXML;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
@@ -27,8 +27,11 @@ public class RCaNDialogGetParametersForSampling extends Dialog<ButtonType> {
         window = this.getDialogPane().getScene().getWindow();
         window.setOnCloseRequest(event -> window.hide());
 
+        double width = Math.min(400.0, 0.5 * Context.getWindowWidth());
+        double height =  Math.min(400.0, 0.5 * Context.getWindowHeight());
+
         GridPane gridPane = new GridPane();
-        gridPane.setPrefSize(0.8 * Context.getWindowWidth(),0.8 * Context.getWindowHeight());
+        gridPane.setPrefSize(width,height);
         gridPane.setHgap(10);
         gridPane.setVgap(10);
         gridPane.setPadding(new Insets(10, 10, 10, 10));

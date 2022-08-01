@@ -1,11 +1,9 @@
 package fr.cm.rCaller;
 
-import com.github.rcaller.graphics.SkyTheme;
 import com.github.rcaller.rstuff.*;
-import fr.cm.GUIdialogs.HelpDialog;
-import fr.cm.RCaNMain.Context;
-import fr.cm.RCaNMain.MainApplication;
-import fr.cm.ProjectManager.ProjectListsManager;
+import fr.cm.Main.Context;
+import fr.cm.Main.MainApplication;
+import fr.cm.project.ProjectListsManager;
 import fr.cm.xmlFiles.RCommandXML;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
@@ -15,76 +13,18 @@ import java.io.*;
 import java.util.List;
 
 public class RCaNCaller {
-    // ---------------------------------
-    static RCaller caller;
-    static RCode code;
     static File filePlot;
-    static boolean plot = false,   runOk = false;
+    static boolean plot = false,  initialized = false,  runOk = false;
     static String resultString = "";
     static RCommandXML rCommandXML = null;
+    static RCaller caller;
+    static RCode code;
 
-
-    // ------------------------------------------------------------------------
-    public static void initRCaller() {
-        if( ! Context.isRunningR()) {
-            Context.initRCaN();
-            caller = RCaller.create();
-            code = RCode.create();
-            caller.setRCode(code);
-            caller.setGraphicsTheme(new SkyTheme());
-            initRdir("/usr/local/bin/");
-            if(Context.isRunningR()) {
-                check("/usr/local/bin/");
-            }
-        }
-    }
-    // ------------------------------------------------------------------------
-    public static void initRdir(String dir) {
-        code = RCode.create();
-        RCallerOptions rCallerOptions = RCallerOptions.create(
-                dir + "Rscript",
-                dir + "R",
-                FailurePolicy.CONTINUE,
-                9223372036854775807L,
-                100L,
-                RProcessStartUpOptions.create()
-        );
-        try {
-            caller = RCaller.create(code, rCallerOptions);
-            Context.setRunningR(true);
-        }
-        catch(Exception ex){
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            ex.printStackTrace(pw);
-            new HelpDialog(
-                    "Check that R and Rscript are installed in directory /usr/local/bin/. "
-                    + "\n You may use the constructor without runing R commands.",
-                    "Connection with R",
-                    "Warning", "Warning", 300, 300);
-            Context.setRunningR(false);
-        }
-    }
-    // ------------------------------------------------------------------------
-    static void check(String message){
-        try{
-            code.addRCode("test <- 0");
-            caller.runAndReturnResult("test");
-            caller.getParser();
-            HelpDialog.warning("R Interface ","Connection to R initialized on " +message + "\n");
-        } catch(Exception ex){
-            new HelpDialog(
-                    "Check that R and Rscript are installed in directory /usr/local/bin/. "
-                            + "\n You may use the constructor without runing R commands.",
-                    "Connection with R",
-                    "Warning", "Warning", 300, 300);
-            Context.setRunningR(false);
-        }
-     }
     // ------------------------------------------------------------------------
     public static void makeRCommand(RCommandXML rCommandXML) {
+        caller = RCaNStartR.getCaller();
+        code = RCaNStartR.getCode();
         RCaNCaller.rCommandXML = rCommandXML;
-        initRCaller();
         plot = false;
         filePlot = null;
         resultString = "";
@@ -95,25 +35,26 @@ public class RCaNCaller {
             code.addRCode("resultR <- 'ok'");
             if (commandsR.size() > 0) {
                 for (String commandLine : commandsR) {
-                    code.addRCode(rCommandXML.completeCommandLine( commandLine));
+                    code.addRCode(rCommandXML.explicitCommandLine( commandLine));
                 }
             }
             if (commandsP.size() > 0) {
                 plot = true;
                 filePlot = code.startPlot();
                 for (String commandLine : commandsP) {
-                    code.addRCode(rCommandXML.completeCommandLine( commandLine));
+                    code.addRCode(rCommandXML.explicitCommandLine( commandLine));
                 }
                 code.endPlot();
                 caller.setRCode(code);
-                ProjectListsManager.addAction(rCommandXML.actionCommandLine(),true);
             }
-         } catch (Exception ex) {
-            new RCaNInterfaceDialog("R Interface ", "Problem with R command.", ex);
+        } catch (Exception ex) {
+            new RCaNDialogWarnings("R Interface ", "Problem with R command.", ex);
         }
     }
     // ------------------------------------------------------------------------
     public static void runCommandR()  {
+        caller = RCaNStartR.getCaller();
+        code = RCaNStartR.getCode();
         runOk = false;
         resultString = "";
         try{
@@ -124,66 +65,75 @@ public class RCaNCaller {
                 caller.runAndReturnResultOnline("resultR", true);
             }
             runOk = true;
-         } catch (Exception ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
             runOk = false;
-            // stopCommandR();
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             ex.printStackTrace(pw);
-            Platform.runLater(() -> new RCaNInterfaceDialog("R Interface ","R process has not terminated OK. \n\n" + sw, ex));
-         }
+            Platform.runLater(() ->{
+                new RCaNDialogWarnings("R Interface ","R process has not terminated OK. \n\n" + sw.toString(), ex);
+            });
+        }
         if(runOk) {
             resultString = RCaNParser.decodeParser( caller,  rCommandXML);
-         }
-        ProjectListsManager.addAction( "Result : "+ runOk, true);
+        }
     }
     // ------------------------------------------------------------------------
     public static void stopCommandR(){
-         try {
+        RCaller caller = RCaNStartR.getCaller();
+        RCode code = RCaNStartR.getCode();
+        try {
             System.out.println("Stop R command");
             caller.stopRCallerAsync();
             caller.deleteTempFiles();
             // caller.stopStreamConsumers();
             // caller.stopRCallerOnline();
         } catch (Exception ex ){
-            new RCaNInterfaceDialog("R Interface ","R command not stopped properly. \n", ex);
+            new RCaNDialogWarnings("R Interface ","R command not stopped properly. \n", ex);
             stopSessionR();
         }
     }
     // ------------------------------------------------------------------------
     static void stopSessionR(){
+        RCaller caller = RCaNStartR.getCaller();
+        RCode code = RCaNStartR.getCode();
         try {
+            initialized = false;
             Context.initRCaN();
             MainApplication.updateMenus();
             caller.stopStreamConsumers();
             caller.deleteTempFiles();
             caller.stopRCallerAsync();
         } catch (Exception ex ) {
-            new RCaNInterfaceDialog("R Interface ","R session not stopped properly.", ex);
+            new RCaNDialogWarnings("R Interface ","R session not stopped properly.", ex);
         }
     }
     // ------------------------------------------------------------------------
     public static HBox getResultsR() {
         if(runOk){
+            if( ! rCommandXML.getName().equals("connect")) {
+                ProjectListsManager.addAction(rCommandXML.getShortStringCommandLine(), true);
+            }
             rCommandXML.setState(true);
             MainApplication.updateMenus();
             if(rCommandXML.isPlot()){
                 try {
                     FileInputStream inputstream = new FileInputStream(filePlot);
                     Image imageR = new Image(inputstream);
-                    return RCaNBoxesOutput.RCaNBox(imageR);
+                    new RCaNDialogOutput(rCommandXML, imageR);
                 }
                 catch (FileNotFoundException ex){
                     return(null);
                 }
             }
             else if(rCommandXML.isTable()){
-                return RCaNBoxesOutput.RCaNBox(resultString);
+                new RCaNDialogOutput(rCommandXML, resultString);
             }
         }
         return(null);
     }
     // ------------------------------------------------------------------------
+
 }
 

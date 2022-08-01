@@ -5,10 +5,9 @@
  */
 package fr.cm.excel;
 
-import fr.cm.GUIdialogs.HelpDialog;
+import fr.cm.dialogs.HelpDialog;
 
 import java.io.*;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

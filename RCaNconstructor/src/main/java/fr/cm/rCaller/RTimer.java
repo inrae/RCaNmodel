@@ -11,18 +11,16 @@ public  class RTimer extends AnimationTimer {
     int secondsAfterStart, secondsAfterCompletion;
     Label secondes, caution;
     boolean hasToWaitWhenCompleted;
-    Button button;
     long sleeps = 1000000000;
     long prevTime = 0;
     RCaNDialog rCaNDialog;
 
-    public RTimer(RCaNDialog rCaNDialog, boolean hasToWaitWhenCompleted, Label secondes, Label caution, Button button){
+    public RTimer(RCaNDialog rCaNDialog, boolean hasToWaitWhenCompleted, Label secondes, Label caution){
         super();
         this.rCaNDialog = rCaNDialog;
         this.hasToWaitWhenCompleted = hasToWaitWhenCompleted;
         this.secondes = secondes;
         this.caution = caution;
-        this.button = button;
         started = true;
         completed = false;
         secondsAfterStart = 0;
@@ -38,11 +36,10 @@ public  class RTimer extends AnimationTimer {
         if(secondes != null) {
             secondsAfterStart++;
             secondsAfterCompletion++;
-            System.out.println(secondsAfterStart+ " sec");
             if (started) {
                 secondes.setText("Running RCaN command. Elapsed time : " + secondsAfterStart + " seconds");
             }
-            else if(completed && hasToWaitWhenCompleted && secondsAfterCompletion < 5){
+            else if(completed && hasToWaitWhenCompleted && secondsAfterCompletion < 1){
                     caution.setText("");
                     secondes.setText(stringResult);
                 }
