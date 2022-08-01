@@ -43,11 +43,24 @@ checkPolytopeStatus <- function(x) {
 
   nbparam <- ncol(A)
   lp_model <- defineLPMod(A, b, C, v, maximum = FALSE)
-  if (requireNamespace("ROI.plugin.cbc", quietly = TRUE)){
+  res <- ROI_solve(lp_model, solver = "lpsolve",
+                   control = list(presolve = c("rows",
+                                               "lindep",
+                                               "rowdominate",
+                                               "mergerows"),
+                                  scaling = c("extreme",
+                                              "equilibrate",
+                                              "integers")))
+  if (requireNamespace("ROI.plugin.cbc", quietly = TRUE)
+      & res$status$code == 5){
     res <- ROI_solve(lp_model,
                      solver = "cbc",
                      control = list(logLevel = 0))
-  } else {
+  }
+
+  if (res$status$code == 0) {
+    lp_model <- defineLPMod(A, b, C, v, maximum = TRUE)
+
     res <- ROI_solve(lp_model, solver = "lpsolve",
                      control = list(presolve = c("rows",
                                                  "lindep",
@@ -56,23 +69,11 @@ checkPolytopeStatus <- function(x) {
                                     scaling = c("extreme",
                                                 "equilibrate",
                                                 "integers")))
-  }
-
-  if (res$status$code == 0) {
-    lp_model <- defineLPMod(A, b, C, v, maximum = TRUE)
-    if (requireNamespace("ROI.plugin.cbc", quietly = TRUE)){
+    if (requireNamespace("ROI.plugin.cbc", quietly = TRUE)
+        & res$status$code ==5){
       res <- ROI_solve(lp_model,
                        solver = "cbc",
                        control = list(logLevel = 0))
-    } else {
-      res <- ROI_solve(lp_model, solver = "lpsolve",
-                       control = list(presolve = c("rows",
-                                                   "lindep",
-                                                   "rowdominate",
-                                                   "mergerows"),
-                                      scaling = c("extreme",
-                                                  "equilibrate",
-                                                  "integers")))
     }
 
 

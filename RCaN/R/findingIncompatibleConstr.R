@@ -92,16 +92,17 @@ findingIncompatibleConstr <- function(x) {
   lp_model <- defineLPMod(Aslacked, bslacked, Cslacked, vslacked,
                           ob = c(rep(1, nbparam), rep(1000, nbineq + 2 * nbeq)),
                           maximum = FALSE)
-  if (requireNamespace("ROI.plugin.cbc", quietly = TRUE)){
+
+  res <- ROI_solve(lp_model, solver = "lpsolve",
+                   control = list(presolve = c("rows",
+                                               "lindep",
+                                               "rowdominate",
+                                               "mergerows")))
+  if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
+      res$status$code == 5){
     res <- ROI_solve(lp_model,
                      solver = "cbc",
                      control = list(logLevel = 0))
-  } else {
-    res <- ROI_solve(lp_model, solver = "lpsolve",
-                     control = list(presolve = c("rows",
-                                                 "lindep",
-                                                 "rowdominate",
-                                                 "mergerows")))
   }
 
 
@@ -147,16 +148,17 @@ findingIncompatibleConstr <- function(x) {
                                     rep(1000,
                                         ncol(Aslacked) - nbparam)),
                               maximum = FALSE)
-      if (requireNamespace("ROI.plugin.cbc", quietly = TRUE)){
+
+      res <- ROI_solve(lp_model, solver = "lpsolve",
+                       control <- list(presolve = c("rows",
+                                                    "lindep",
+                                                    "rowdominate",
+                                                    "mergerows")))
+      if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
+          res$status$code == 5){
         res <- ROI_solve(lp_model,
                          solver = "cbc",
                          control = list(logLevel = 0))
-      } else {
-        res <- ROI_solve(lp_model, solver = "lpsolve",
-                         control <- list(presolve = c("rows",
-                                                      "lindep",
-                                                      "rowdominate",
-                                                      "mergerows")))
       }
 
       solutions <- res$solution
