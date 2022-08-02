@@ -10,13 +10,13 @@ import org.apache.poi.ss.usermodel.Workbook;
 import java.util.Iterator;
 import java.util.List;
 
-public class ActionExcel {
+public class TimeLineExcel {
 
-    public static void saveExcelFileActions(Workbook workbook) {
+    public static void saveExcelFileTimeLines(Workbook workbook) {
         Sheet sheet;
         Row row;
         Cell cell;
-        sheet = workbook.createSheet("Actions");
+        sheet = workbook.createSheet("TimeLines");
 
         row = sheet.createRow(0);
         cell = row.createCell(0);
@@ -26,25 +26,25 @@ public class ActionExcel {
         cell = row.createCell(2);
         cell.setCellValue("Annotation");
 
-        List<Action> listOfActions = ProjectListsManager.getListOfActions();
+        List<TimeLine> listOfTimeLines = ProjectListsManager.getListOfTimeLines();
         int c = 0;
-        for (Action action : listOfActions) {
+        for (TimeLine timeLine : listOfTimeLines) {
             c++;
             row = sheet.createRow(c + 1);
             cell = row.createCell(0);
-            cell.setCellValue(action.getDate());
+            cell.setCellValue(timeLine.getDate());
             cell = row.createCell(1);
-            cell.setCellValue(action.getWhichAction());
+            cell.setCellValue(timeLine.getWhichTimeLines());
             cell = row.createCell(2);
-            cell.setCellValue(action.getCommentAuthor());
+            cell.setCellValue(timeLine.getCommentAuthor());
         }
     }
 
     // -------------------------------------------------------------------------
-    public static void getExcelFileActions(Workbook workbook) {
+    public static void getExcelFileTimeLines(Workbook workbook) {
         try {
-            ProjectListsManager.initListOfActions();
-            Sheet sheet = workbook.getSheet("Actions");
+            ProjectListsManager.initListOfTimeLines();
+            Sheet sheet = workbook.getSheet("TimeLines");
             Row row;
             Cell cell;
             Iterator<Row> iterator = sheet.iterator();
@@ -57,11 +57,11 @@ public class ActionExcel {
                 String comment = cell.getStringCellValue();
                 cell = row.getCell(2);
                 String commentAuthor = cell.getStringCellValue();
-                Action newAction = new Action(date, comment, commentAuthor);
-                ProjectListsManager.addAction(newAction, false);
+                TimeLine newTimeLine = new TimeLine(date, comment, commentAuthor);
+                ProjectListsManager.addTimeLine(newTimeLine, false);
             }
         } catch (Exception ex) {
-            HelpDialog.warning("Sheet Action does not exist", "Warning ", ex);
+            HelpDialog.warning("Sheet TimeLine does not exist", "Warning ", ex);
         }
     }
 }

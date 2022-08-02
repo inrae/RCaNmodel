@@ -72,28 +72,36 @@ public class MainApplication extends Application {
     }
     public static void updateMenus() {
         MenuFile.updateMenus();
-        MenuView.updateMenus();
-        MenuRCaN.updateMenus();
+        MenuSetUp.updateMenus();
+        MenuDocument.updateMenus();
+        MenuRCaNBuild.updateMenus();
+        MenuRCaNSample.updateMenus();
     }
 
     static MenuBar setMenus() {
-        new MenuRCaN(borderPaneRacine);
+        new MenuRCaNBuild(borderPaneRacine);
+        new MenuRCaNSample(borderPaneRacine);
         new MenuFile(borderPaneRacine);
         new MenuHelp(borderPaneRacine);
-        new MenuView(borderPaneRacine);
+        new MenuSetUp(borderPaneRacine);
+        new MenuDocument(borderPaneRacine);
 
         MenuBar menuBar = new MenuBar();
         Menu fileMenu = new Menu("File");
-        Menu viewMenu = new Menu("View");
-        Menu rcanMenu = new Menu("RCaN");
+        Menu viewMenu = new Menu("Set up trophic network");
+        Menu documentMenu = new Menu("Document project");
+        Menu rcanMenuBuild = new Menu("Build polytope");
+        Menu rcanMenuSample = new Menu("Sample trajectories");
         Menu helpMenu = new Menu("Information and help");
 
         fileMenu.getItems().addAll(MenuFile.getMenuItems());
-        viewMenu.getItems().addAll(MenuView.getMenuItems());
-        rcanMenu.getItems().addAll(MenuRCaN.getMenuItems());
+        viewMenu.getItems().addAll(MenuSetUp.getMenuItems());
+        documentMenu.getItems().addAll(MenuDocument.getMenuItems());
+        rcanMenuBuild.getItems().addAll(MenuRCaNBuild.getMenuItems());
+        rcanMenuSample.getItems().addAll(MenuRCaNSample.getMenuItems());
         helpMenu.getItems().addAll(MenuHelp.getMenus());
 
-        menuBar.getMenus().addAll(fileMenu, viewMenu, rcanMenu, helpMenu);
+        menuBar.getMenus().addAll(fileMenu, viewMenu, documentMenu, rcanMenuBuild, rcanMenuSample, helpMenu);
         updateMenus();
         return menuBar;
     }

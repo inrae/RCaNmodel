@@ -2,7 +2,7 @@ package fr.cm.excel;
 
 import fr.cm.dialogs.HelpDialog;
 import fr.cm.Main.Context;
-import fr.cm.objects.ActionExcel;
+import fr.cm.objects.TimeLineExcel;
 import fr.cm.objects.ComponentExcel;
 import fr.cm.objects.ConstraintExcel;
 import fr.cm.objects.DataFileExcel;
@@ -31,7 +31,7 @@ public class ExcelManager {
             ConstraintExcel.saveExcelConstraints(workbook);
             ObservationExcel.saveExcelObservations(workbook);
             DataFileExcel.saveExcelFileWithObservation(workbook);
-            ActionExcel.saveExcelFileActions(workbook);
+            TimeLineExcel.saveExcelFileTimeLines(workbook);
             FileOutputStream outputStream = new FileOutputStream(fileName);
             workbook.write(outputStream);
         } catch (FileNotFoundException ex) {
@@ -53,7 +53,7 @@ public class ExcelManager {
             ConstraintExcel.getExcelConstraints(workbook);
             ObservationExcel.getExcelObservations(workbook);
             DataFileExcel.getExcelFileWithObservation(workbook);
-            ActionExcel.getExcelFileActions(workbook);
+            TimeLineExcel.getExcelFileTimeLines(workbook);
         } catch (FileNotFoundException ex) {
             HelpDialog.warning("File not found","Warning", ex);
         } catch (IOException ex) {

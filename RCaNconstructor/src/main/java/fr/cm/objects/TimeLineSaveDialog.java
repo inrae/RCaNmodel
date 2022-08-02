@@ -12,22 +12,22 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-public class ActionSaveDialog {
+public class TimeLineSaveDialog {
 
     // --------------------------------------------
-    public ActionSaveDialog() {
+    public TimeLineSaveDialog() {
 
         StringBuilder sB = new StringBuilder("PROJECT TRACKING");
         sB.append("\n");
-        List<Action> listOfActions = ProjectListsManager.getListOfActions() ;
+        List<TimeLine> listOfTimeLines = ProjectListsManager.getListOfTimeLines() ;
 
 
-        for (Action action : listOfActions) {
-            sB.append(action.getDate());
+        for (TimeLine timeLine : listOfTimeLines) {
+            sB.append(timeLine.getDate());
             sB.append("\t");
-            sB.append(action.getWhichAction());
+            sB.append(timeLine.getWhichTimeLines());
             sB.append("\t");
-            sB.append(action.getCommentAuthor());
+            sB.append(timeLine.getCommentAuthor());
             sB.append("\n");
         }
 

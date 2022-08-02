@@ -11,7 +11,7 @@ public class RCommandXML {
 
     private String name;
     private String textMenu;
-    private String subMenu;
+    private String menu;
     private List<String> rCompute;
     private List<String> rPlots;
     private String help;
@@ -24,7 +24,7 @@ public class RCommandXML {
     // ------------------------------------------------------------------------
     public RCommandXML(String name,
                        String textMenu,
-                       String subMenu,
+                       String menu,
                        String rCompute,
                        String rPlots,
                        String help,
@@ -33,7 +33,7 @@ public class RCommandXML {
                        String table) {
         this.name = nolf(name);
         this.textMenu = nolf(textMenu);
-        this.subMenu = nolf(subMenu);
+        this.menu = nolf(menu);
         this.help = help;
         this.table = nolf(table);
         this.condition = nolf(condition);
@@ -154,7 +154,7 @@ public class RCommandXML {
 
     public String getHelp() { return help; }
 
-    public String getSubMenu() { return subMenu; }
+    public String getMenu() { return menu; }
 
     public List<String> getrCompute() {return rCompute; }
 

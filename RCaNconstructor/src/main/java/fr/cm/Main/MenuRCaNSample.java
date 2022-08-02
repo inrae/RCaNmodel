@@ -17,50 +17,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MenuRCaN {
+public class MenuRCaNSample {
 
     static List<MenuItem> menuItems = null;
-    static final Menu general = new Menu("Environment");
-    static final Menu polytope = new Menu("Polytope");
-    static final Menu sample = new Menu("Sample");
-    static final Menu analyzePolytope = new Menu("Analyze polytope");
-    static final Menu analyzeSample = new Menu("Analyze sample");
-    static final Menu experiments = new Menu("Experiments");
-    static MenuItem status = new MenuItem("Status");
-    static List<MenuItem> menus = Arrays.asList(status, general, polytope, analyzePolytope, sample, analyzeSample, experiments);
     static BorderPane borderPaneRacine;
     List<RCommandXML> RCommandXMLS = null;
 
-    public MenuRCaN(BorderPane borderPaneRacine) {
-        this.borderPaneRacine = borderPaneRacine;
+    public MenuRCaNSample(BorderPane borderPaneRacine) {
+        MenuRCaNSample.borderPaneRacine = borderPaneRacine;
         menuItems = new ArrayList<>();
-        status.setOnAction(StatusListener);
         RCommandXMLS = RCommandListXML.getListOfRCommandXML();
-        // general.getItems().add(status);
         for (RCommandXML rCommandXML : RCommandXMLS) {
-            MenuItem menuItem = new MenuItem(rCommandXML.getTextMenu());
-            switch (rCommandXML.getSubMenu()) {
-                case "general":
-                    general.getItems().add(menuItem);
-                    break;
-                case "polytope":
-                    polytope.getItems().add(menuItem);
-                    break;
-                case "analyzePolytope":
-                    analyzePolytope.getItems().add(menuItem);
-                    break;
-                case "sample":
-                    sample.getItems().add(menuItem);
-                    break;
-                case "analyzeSample":
-                    analyzeSample.getItems().add(menuItem);
-                    break;
-                case "experiments":
-                    experiments.getItems().add(menuItem);
-                    break;
+            if (rCommandXML.getMenu().equals("sample")) {
+                MenuItem menuItem = new MenuItem(rCommandXML.getTextMenu());
+                menuItems.add(menuItem);
+                menuItem.setOnAction(MenuListener);
             }
-            menuItems.add(menuItem);
-            menuItem.setOnAction(MenuListener);
         }
     }
 
@@ -77,7 +49,7 @@ public class MenuRCaN {
 
     public static List<MenuItem> getMenuItems() {
 
-        return menus;
+        return menuItems;
     }
 
     static final EventHandler<ActionEvent> StatusListener = e -> statusConnection(e);

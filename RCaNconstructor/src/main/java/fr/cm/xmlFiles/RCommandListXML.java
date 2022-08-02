@@ -37,14 +37,14 @@ public class RCommandListXML {
                 if (node.getNodeType() == Node.ELEMENT_NODE) {
                     String name = getByTag(node,"name");
                     String textmenu = getByTag(node,"textmenu");
-                    String submenu = getByTag(node,"submenu");
+                    String menu = getByTag(node,"menu");
                     String rcompute = getByTag(node,"rcompute");
                     String rplots = getByTag(node,"rplots");
                     String help = getByTag(node,"help");
                     String condition = getByTag(node,"condition");
                     String parameter = getByTag(node,"parameter");
                     String table = getByTag(node,"table");
-                    RCommandXML rCommandXML = new RCommandXML(name, textmenu, submenu, rcompute,
+                    RCommandXML rCommandXML = new RCommandXML(name, textmenu, menu, rcompute,
                             rplots, help, condition,  parameter, table);
                     listOfRCommandXML.add(rCommandXML);
                 }

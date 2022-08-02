@@ -2,7 +2,7 @@ package fr.cm.project;
 
 import fr.cm.network.NetworkView;
 import fr.cm.dialogs.HelpDialog;
-import fr.cm.objects.Action;
+import fr.cm.objects.TimeLine;
 import fr.cm.objects.Component;
 import fr.cm.objects.Constraint;
 import fr.cm.objects.DataFile;
@@ -28,7 +28,7 @@ public class ProjectListsManager {
     private static List<Constraint> listOfConstraints;
     private static List<Observation> listOfObservations;
     private static List<DataFile> listOfDataFiles;
-    private static List<Action> listOfActions;
+    private static List<TimeLine> listOfTimeLines;
     private static List<MetaElement> listOfMetaElements;
     private static NetworkView networkView;
 
@@ -41,41 +41,41 @@ public class ProjectListsManager {
         listOfConstraints = new ArrayList<>();
         listOfObservations = new ArrayList<>();
         listOfDataFiles = new ArrayList<>();
-        listOfActions = new ArrayList<>();
+        listOfTimeLines = new ArrayList<>();
         listOfMetaElements =  new ArrayList<>();
     }
     // ------------------------------------------------------------------------------
     // ACTIONS
 
-    public static void addAction(Action action, boolean save) {
+    public static void addTimeLine(TimeLine timeLine, boolean save) {
 
-        listOfActions.add(action);
+        listOfTimeLines.add(timeLine);
         if(save) saveExcel();
 
     }
-    public static void addAction(String comment, boolean save) {
-        Action action = new Action(comment);
-        listOfActions.add(action);
+    public static void addTimeLine(String comment, boolean save) {
+        TimeLine timeLine = new TimeLine(comment);
+        listOfTimeLines.add(timeLine);
         if(save) saveExcel();
     }
 
-    public static List<Action> getListOfActions() {
+    public static List<TimeLine> getListOfTimeLines() {
 
-        return listOfActions;
+        return listOfTimeLines;
     }
 
-    public static void initListOfActions() {
+    public static void initListOfTimeLines() {
 
-        listOfActions = new ArrayList<>();
+        listOfTimeLines = new ArrayList<>();
     }
 
-    public static void setListOfActions(List<Action> listOfActions) {
-        ProjectListsManager.listOfActions = listOfActions;
+    public static void setListOfTimeLines(List<TimeLine> listOfTimeLines) {
+        ProjectListsManager.listOfTimeLines = listOfTimeLines;
     }
 
     public static void updateAction(int nu, String comment) {
-        Action action = listOfActions.get(nu);
-        action.setCommentAuthor(comment);
+        TimeLine timeLine = listOfTimeLines.get(nu);
+        timeLine.setCommentAuthor(comment);
         saveExcel();
     }
 
@@ -135,7 +135,7 @@ public class ProjectListsManager {
                     networkView.getMouseDoubleClickOnCircleEventHandler());
             listOfComponents.add(component);
         }
-        addAction("Added component: "+component.getName(),save);
+        addTimeLine("Added component: "+component.getName(),save);
     }
     public static void removeComponent(Component component) {
         listOfConstraints.removeIf(constraint -> constraint.involve(component));
@@ -148,7 +148,7 @@ public class ProjectListsManager {
             }
         }
         listOfComponents.remove(component);
-        addAction("Removed component: "+component.getName(),true);
+        addTimeLine("Removed component: "+component.getName(),true);
     }
     public static boolean containsComponent(String groupName) {
         boolean contain = false;
@@ -214,7 +214,7 @@ public class ProjectListsManager {
         } else {
             flux.define(networkView.getMouseDoubleClickOnLineEventHandler());
             listOfFluxes.add(flux);
-            addAction("Added Flux: "+ flux.getName(),save);
+            addTimeLine("Added Flux: "+ flux.getName(),save);
         }
     }
     public static List<String> getNamesOfLinks() {
@@ -236,7 +236,7 @@ public class ProjectListsManager {
     public static void removeLink(Flux flux) {
         listOfConstraints.removeIf(constraint -> constraint.involve(flux));
         listOfFluxes.remove(flux);
-        addAction("Removed Flux: "+ flux.getName(),true);
+        addTimeLine("Removed Flux: "+ flux.getName(),true);
     }
     public static void permuteListOfLinks(int rowA, int rowB) {
         Flux fluxA = listOfFluxes.get(rowA);
@@ -270,20 +270,20 @@ public class ProjectListsManager {
         }
             else {
             listOfObservations.add(observation);
-            addAction("Added Observation: "+ observation.getObsName(),save);
+            addTimeLine("Added Observation: "+ observation.getObsName(),save);
         }
     }
      public static void removeObservation(String observationName){
         for (Observation observation : listOfObservations)
             if (observationName.equals(observation.getObsName())) {
                 listOfObservations.remove(observation);
-                addAction("Removed Observation: "+ observation.getObsName(),true);
+                addTimeLine("Removed Observation: "+ observation.getObsName(),true);
                 break;
             }
     }
     public static void removeObservation(Observation observation){
         listOfObservations.remove(observation);
-        addAction("Removed Observation: "+ observation.getObsName(),true);
+        addTimeLine("Removed Observation: "+ observation.getObsName(),true);
     }
 
    public static boolean containsObservation(String observationName) {
@@ -323,16 +323,16 @@ public class ProjectListsManager {
     // CONSTRAINTS
     public static void addConstraint(Constraint constraint, boolean save) {
         listOfConstraints.add(constraint);
-        addAction("Added Constraint: "+ constraint.getName(),save);
+        addTimeLine("Added Constraint: "+ constraint.getName(),save);
     }
     public static void removeConstraints(Constraint constraint) {
         listOfConstraints.remove(constraint);
-        addAction("Removed Constraint: "+ constraint.getName(),true);
+        addTimeLine("Removed Constraint: "+ constraint.getName(),true);
     }
     public static void updateConstraint(Constraint oldC, Constraint newC) {
         int pos = listOfConstraints.indexOf(oldC);
         listOfConstraints.set(pos,newC);
-        addAction("Updated Constraint: "+ oldC.getName()+ "-W" + newC.getName(),true);
+        addTimeLine("Updated Constraint: "+ oldC.getName()+ "-W" + newC.getName(),true);
     }
     public static void upConstraint(Constraint constraint) {
         int numConstraint = listOfConstraints.indexOf(constraint);
@@ -368,7 +368,7 @@ public class ProjectListsManager {
         }
         if(! in) {
             listOfDataFiles.add(newDataFile);
-            addAction("Added Data File: "+ newDataFile.getShortName(),save);
+            addTimeLine("Added Data File: "+ newDataFile.getShortName(),save);
         }
         else {
             HelpDialog.warning("File has already been introduced","Warning");
