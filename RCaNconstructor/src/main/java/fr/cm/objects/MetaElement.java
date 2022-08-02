@@ -80,7 +80,7 @@ public class MetaElement {
 
     public void changeMetaContent(String newMetaContent){
         if(! getMetaName().equals(newMetaContent)){
-            ProjectListsManager.addAction(
+            ProjectListsManager.addTimeLine(
                     "Change meta information content of  : " + metaName + " -> "+ getMetaName(),true);
             carContentProperty().set(newMetaContent);
         }

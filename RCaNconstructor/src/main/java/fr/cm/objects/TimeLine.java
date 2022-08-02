@@ -4,26 +4,26 @@ import fr.cm.Main.Context;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-public class Action {
+public class TimeLine {
 // ---------------------------------
     final SimpleStringProperty date = new SimpleStringProperty();
-    final SimpleStringProperty whichAction = new SimpleStringProperty();
+    final SimpleStringProperty whichTimeLine = new SimpleStringProperty();
     final SimpleStringProperty commentAuthor = new SimpleStringProperty();
 
-    public Action(String whichAction){
+    public TimeLine(String whichTimeLine){
         this.setDate(Context.getDate());
-        this.setWhichAction(whichAction);
+        this.setWhichTimeLines(whichTimeLine);
         this.setCommentAuthor("");
     }
     
-    public Action(String whichAction, String commentAuthor){
+    public TimeLine(String whichTimeLine, String commentAuthor){
         this.setDate(Context.getDate());
-        this.setWhichAction(whichAction);
+        this.setWhichTimeLines(whichTimeLine);
         this.setCommentAuthor(commentAuthor);
     }
-    public Action(String date, String whichAction, String commentAuthor){
+    public TimeLine(String date, String whichTimeLine, String commentAuthor){
         this.setDate(date);
-        this.setWhichAction(whichAction);
+        this.setWhichTimeLines(whichTimeLine);
         this.setCommentAuthor(commentAuthor);
     }
 
@@ -39,17 +39,17 @@ public class Action {
 
         this.date.set(date);
     }
-    public String getWhichAction() {
+    public String getWhichTimeLines() {
 
-        return whichAction.get();
+        return whichTimeLine.get();
     }
-    public StringProperty whichActionProperty() {
+    public StringProperty whichTimeLineProperty() {
 
-        return whichAction;
+        return whichTimeLine;
     }
-    public void setWhichAction(String whichAction) {
+    public void setWhichTimeLines(String whichTimeLine) {
 
-        this.whichAction.set(whichAction);
+        this.whichTimeLine.set(whichTimeLine);
     }
     public String getCommentAuthor() {
 
@@ -64,6 +64,6 @@ public class Action {
     }
 
     public void print(){
-        System.out.println(this.getDate() + " " + this.getWhichAction()+ " "+this.getCommentAuthor());
+        System.out.println(this.getDate() + " " + this.getWhichTimeLines()+ " "+this.getCommentAuthor());
     }
 }

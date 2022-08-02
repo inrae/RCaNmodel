@@ -32,7 +32,7 @@ public class MenuHelp {
     List<RCommandXML> RCommandXMLS = null;
 
     public MenuHelp(BorderPane borderPaneRacine) {
-        this.borderPaneRacine = borderPaneRacine;
+        MenuHelp.borderPaneRacine = borderPaneRacine;
         menuItems = new ArrayList<>();
         helpsXML = HelpListXML.getListOfHelpXML();
         for(HelpXML helpXML : helpsXML){

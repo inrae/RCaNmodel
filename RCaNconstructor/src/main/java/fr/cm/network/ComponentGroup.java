@@ -183,13 +183,13 @@ public class ComponentGroup extends Group {
         // --------------------------------------------
         public void changeName(String newName){
             if(!name.equals(newName)){
-                ProjectListsManager.addAction("Change component name : " + name + " -> "+ newName, true);
+                ProjectListsManager.addTimeLine("Change component name : " + name + " -> "+ newName, true);
                 name = newName;
             }
         }
         public void changeInside(boolean newInside){
             if(!inside==newInside){
-                ProjectListsManager.addAction(
+                ProjectListsManager.addTimeLine(
                         "Change position of component  " + name + " : inside "+ inside +" -> "+ newInside,true);
                 inside = newInside;
             }

@@ -55,7 +55,7 @@ public class Component extends ComponentGroup {
         try {
             nVal = Double.parseDouble(newVal);
             if ((Math.abs(nVal - parameters[p]) > 0.0000001) && nVal>=0.0) {
-                ProjectListsManager.addAction("Change value of parameter "
+                ProjectListsManager.addTimeLine("Change value of parameter "
                         + Strings.getParametersNames(p)+ " for component  "
                         + this.getName() + " : " + parameters[p] + " -> " + newVal, true);
                 parameters[p] = nVal;

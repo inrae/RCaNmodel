@@ -113,7 +113,7 @@ public class RCaNCaller {
     public static HBox getResultsR() {
         if(runOk){
             if( ! rCommandXML.getName().equals("connect")) {
-                ProjectListsManager.addAction(rCommandXML.getShortStringCommandLine(), true);
+                ProjectListsManager.addTimeLine(rCommandXML.getShortStringCommandLine(), true);
             }
             rCommandXML.setState(true);
             MainApplication.updateMenus();

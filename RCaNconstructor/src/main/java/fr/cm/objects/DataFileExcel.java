@@ -45,10 +45,6 @@ public class DataFileExcel {
             cell = row.createCell(4);
             cell.setCellValue(dataFile.getOwner());
             cell = row.createCell(5);
-            cell.setCellValue(dataFile.getFirstYear());
-            cell = row.createCell(6);
-            cell.setCellValue(dataFile.getLastYear());
-            cell = row.createCell(7);
             cell.setCellValue(dataFile.codeAddedObservations());
             lig++;
         }

@@ -60,7 +60,7 @@ public class MenuFile {
                     ProjectListsManager.init();
                     ProjectListsManager.makeMetaElementsList();
                     MainApplication.updateMenus();
-                    ProjectListsManager.addAction("Project creation "+ Context.getFileName(),true);
+                    ProjectListsManager.addTimeLine("Project creation "+ Context.getFileName(),true);
                     ProjectListsManager.saveExcel();
                     borderPaneRacine.setCenter(ProjectListsManager.getNetworkView());
                 }
@@ -93,7 +93,7 @@ public class MenuFile {
                 if (Context.isStarted()) {
                     new ProjectSaveAs();
                     ProjectListsManager.saveExcel();
-                    ProjectListsManager.addAction("Project saved as "+ Context.getFileName(),true);
+                    ProjectListsManager.addTimeLine("Project saved as "+ Context.getFileName(),true);
                 }
                 break;
             case 5 :

@@ -15,15 +15,15 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-public class ActionTable extends Pane {
+public class TimeLineTable extends Pane {
     // ---------------------------------
 
-    final TableView<Action> table;
-    ObservableList<Action> list;
+    final TableView<TimeLine> table;
+    ObservableList<TimeLine> list;
     double width = Context.getWindowWidth();
     double height =  Context.getWindowHeight();
 
-    public ActionTable() {
+    public TimeLineTable() {
         Context.setActiveWindow("action");
         table = new TableView<>();
         table.setEditable(true);
@@ -48,44 +48,44 @@ public class ActionTable extends Pane {
             }
         });
          // ------------------------------------------------------------------------
-        TableColumn<Action, String> dateCol = new TableColumn<>("Date");
+        TableColumn<TimeLine, String> dateCol = new TableColumn<>("Date");
         dateCol.setSortable(true);
         dateCol.setCellValueFactory(new PropertyValueFactory<>("date"));
         dateCol.setMinWidth(0.12 *width);
         // ------------------------------------------------------------------------
-        TableColumn<Action, String> whichActionCol = new TableColumn<>("Task");
-        whichActionCol.setCellValueFactory(new PropertyValueFactory<>("whichAction"));
-        whichActionCol.setSortable(true);
-        whichActionCol.setCellFactory(tc -> {
-            TableCell<Action, String> cell = new TableCell<>();
+        TableColumn<TimeLine, String> whichTimeLineCol = new TableColumn<>("Task");
+        whichTimeLineCol.setCellValueFactory(new PropertyValueFactory<>("whichTimeLine"));
+        whichTimeLineCol.setSortable(true);
+        whichTimeLineCol.setCellFactory(tc -> {
+            TableCell<TimeLine, String> cell = new TableCell<>();
             Text text = new Text();
             cell.setGraphic(text);
-            text.wrappingWidthProperty().bind(whichActionCol.widthProperty());
+            text.wrappingWidthProperty().bind(whichTimeLineCol.widthProperty());
             text.textProperty().bind(cell.itemProperty());
             return cell ;
         });
-        whichActionCol.setEditable(false);
-        whichActionCol.setMinWidth(0.34 *width);
+        whichTimeLineCol.setEditable(false);
+        whichTimeLineCol.setMinWidth(0.34 *width);
         // ------------------------------------------------------------------------
-        TableColumn<Action, String> commentAuthorCol = new TableColumn<>("Annotation");
+        TableColumn<TimeLine, String> commentAuthorCol = new TableColumn<>("Annotation");
         commentAuthorCol.setCellValueFactory(new PropertyValueFactory<>("commentAuthor"));
         commentAuthorCol.setMinWidth((0.34 *width));
         commentAuthorCol.setEditable(false);
         commentAuthorCol.setCellFactory(tc -> {
-            TableCell<Action, String> cell = new TableCell<>();
+            TableCell<TimeLine, String> cell = new TableCell<>();
             Text text = new Text();
             cell.setGraphic(text);
-            text.wrappingWidthProperty().bind(whichActionCol.widthProperty());
+            text.wrappingWidthProperty().bind(whichTimeLineCol.widthProperty());
             text.textProperty().bind(cell.itemProperty());
             return cell ;
         });
-        whichActionCol.setEditable(false);
+        whichTimeLineCol.setEditable(false);
         // ------------------------------------------------------------------------
         table.getColumns().add(dateCol);
-        table.getColumns().add(whichActionCol);
+        table.getColumns().add(whichTimeLineCol);
         table.getColumns().add(commentAuthorCol);
 
-        list = FXCollections.observableArrayList(ProjectListsManager.getListOfActions());
+        list = FXCollections.observableArrayList(ProjectListsManager.getListOfTimeLines());
         table.setItems(list);
         table.getSelectionModel().selectFirst();
         table.setPrefWidth(0.8*width);
@@ -95,21 +95,21 @@ public class ActionTable extends Pane {
         title.setFont(ColorsAndFormats.titleFont);
         final Button button = new Button("Save as text file");
         final Label hint = new Label("Double clic on an annotation to edit it");
-        button.setOnAction((ActionEvent e) -> new ActionSaveDialog());
-        final Button buttonNewAnnotation = new Button("Add annotation");
+        button.setOnAction((ActionEvent e) -> new TimeLineSaveDialog());
+        final Button buttonNewAnnotation = new Button("Add time line");
         buttonNewAnnotation.setOnAction((ActionEvent e) -> {
             new TextAreaDialog("Add annotation","");
             String nComment = Context.getTextAreaContent();
-            Action action = new Action("Added by author",nComment);
-            action.print();
-            ProjectListsManager.addAction(action,false);
-            list = FXCollections.observableArrayList(ProjectListsManager.getListOfActions());
+            TimeLine timeLine = new TimeLine("Added by author",nComment);
+            timeLine.print();
+            ProjectListsManager.addTimeLine(timeLine,false);
+            list = FXCollections.observableArrayList(ProjectListsManager.getListOfTimeLines());
             table.setItems(list);
             table.refresh();
         });
 
         final HBox hboxButtons = new HBox();
-        hboxButtons.getChildren().addAll( button, hint);
+        hboxButtons.getChildren().addAll( button, buttonNewAnnotation, hint);
         hboxButtons.setSpacing(80);
 
         final VBox vbox = new VBox();

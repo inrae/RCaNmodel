@@ -1,6 +1,6 @@
 package fr.cm.Main;
 
-import fr.cm.objects.ActionTable;
+import fr.cm.objects.TimeLineTable;
 import fr.cm.objects.ComponentTable;
 import fr.cm.objects.ConstraintTable;
 import fr.cm.objects.DataFileTable;
@@ -16,7 +16,7 @@ import javafx.scene.layout.BorderPane;
 import java.util.Arrays;
 import java.util.List;
 
-public class MenuView {
+public class MenuSetUp {
 // ---------------------------------
 
     static final MenuItem networkItem = new MenuItem("Network");
@@ -25,16 +25,13 @@ public class MenuView {
     static final MenuItem constraintsItem = new MenuItem("Constraints");
     static final MenuItem observationsItem = new MenuItem("Observations");
     static final MenuItem dataFileItem = new MenuItem("Data Files");
-    static final MenuItem metaTableItem = new MenuItem("Project information");
-    static final MenuItem actionsItem = new MenuItem("Project tracking");
-
     static List<MenuItem> menuItems = null;
 
     static BorderPane borderPaneRacine;
 
-    public MenuView(BorderPane borderPaneRacine) {
-        MenuView.borderPaneRacine = borderPaneRacine;
-        menuItems = Arrays.asList(networkItem, groupsItem, linksItem, dataFileItem, observationsItem, constraintsItem, actionsItem, metaTableItem);
+    public MenuSetUp(BorderPane borderPaneRacine) {
+        MenuSetUp.borderPaneRacine = borderPaneRacine;
+        menuItems = Arrays.asList(networkItem, groupsItem, linksItem, dataFileItem, observationsItem, constraintsItem);
         for (MenuItem menuItem : menuItems) {
             menuItem.setOnAction(ViewListener);
         }
@@ -51,7 +48,7 @@ public class MenuView {
         return menuItems;
     }
 
-    static final EventHandler<ActionEvent> ViewListener = MenuView::handle;
+    static final EventHandler<ActionEvent> ViewListener = MenuSetUp::handle;
 
     private static void handle(ActionEvent e) {
         MenuItem menuItem = (MenuItem) e.getSource();
@@ -80,14 +77,6 @@ public class MenuView {
             case 5 -> {
                 ConstraintTable constraintTable = new ConstraintTable();
                 borderPaneRacine.setCenter(constraintTable);
-            }
-               case 6 -> {
-                ActionTable actionTable = new ActionTable();
-                borderPaneRacine.setCenter(actionTable);
-            }
-            case 7 -> {
-                MetaInformationTable metaInformationTable = new MetaInformationTable();
-                borderPaneRacine.setCenter(metaInformationTable);
             }
             default -> {
             }

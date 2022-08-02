@@ -216,7 +216,7 @@ public class FluxGroup extends Group {
     // --------------------------------------------
     public void changeTypeTrophic(boolean newTypeTrophic){
         if(!typeTrophic==newTypeTrophic){
-            ProjectListsManager.addAction(
+            ProjectListsManager.addTimeLine(
                     "Change type of flux " + getName() + " : trophic "+ typeTrophic +" -> "+ newTypeTrophic, false);
             typeTrophic = newTypeTrophic;
         }
