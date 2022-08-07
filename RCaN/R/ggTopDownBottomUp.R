@@ -60,7 +60,7 @@ ggTopDownBottomUp <- function(mysampleCaNmod,
       sort(unique(to))
     })
     names(species) <- sp
-    species <- species[lengths(species) > 0, drop = FALSE]
+    #    species <- species[lengths(species) > 0, drop = FALSE]
   } else if (is.null(names(species))) {
     stop("species should be a named list")
   } else { # check that predators are defined
@@ -95,6 +95,7 @@ ggTopDownBottomUp <- function(mysampleCaNmod,
   fluxTo <- myCaNmodFit_long %>%
     rename("Flux" = !!sym("Var")) %>%
     inner_join(CanMod$fluxes_def) %>%
+    filter(!!sym("Trophic") == TRUE) %>% #we restrict to feeding flows
     filter(!!sym("To") %in% names(species)) %>%
     group_by(!!sym("To"),
              !!sym("Year"),
@@ -132,7 +133,7 @@ ggTopDownBottomUp <- function(mysampleCaNmod,
 
   #full_table
   cortable <- biomass %>%
-    inner_join(fluxFrom) %>%
+    left_join(fluxFrom) %>%
     inner_join(fluxTo) %>%
     mutate(feeding = !!sym("feeding") / !!sym("value_curr"),
            predation = !!sym("predation") / !!sym("value_curr")) %>%
