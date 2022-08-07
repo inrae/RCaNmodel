@@ -54,22 +54,32 @@ ggTopDownBottomUp <- function(mysampleCaNmod,
                               frac = 1){
   CanMod <- mysampleCaNmod$CaNmod
   if (is.null(species)){
-      sp <- CanMod$species #all species
-      species <- lapply(sp, function(s){
-        to <- unique(CanMod$fluxes_def$To[CanMod$fluxes_def$From == s])
-        sort(unique(to))
-        })
-      names(species) <- sp
-      species <- species[lengths(species) > 0]
+    sp <- CanMod$species #all species
+    species <- lapply(sp, function(s){
+      to <- unique(CanMod$fluxes_def$To[CanMod$fluxes_def$From == s])
+      sort(unique(to))
+    })
+    names(species) <- sp
+    species <- species[lengths(species) > 0, drop = FALSE]
+  } else if (is.null(names(species))) {
+    stop("species should be a named list")
+  } else { # check that predators are defined
+    for (i in seq_along(species)){
+      if (is.null(species[[i]])) {
+        prey <- names(species)[i]
+        to <- unique(CanMod$fluxes_def$To[CanMod$fluxes_def$From == prey])
+        species[[i]] <- sort(unique(to))
+      }
+    }
   }
   if (is.null(years))
     years <- mysampleCaNmod$CaNmod$series$Year
   combinations <- do.call('rbind.data.frame',
                           lapply(seq_along(species), function(i){
                             data.frame(From = rep(names(species)[i],
-                                                length(species[[i]])),
+                                                  length(species[[i]])),
                                        To = species[[i]])
-                            })
+                          })
   )
   # Data wrangling ----------------------------------------------------------
   # Transform the mcmc output into a 4 col vector with simulation id, year, variable and value
@@ -114,10 +124,10 @@ ggTopDownBottomUp <- function(mysampleCaNmod,
 
   biomass <- biomass %>%
     inner_join(select(biomass, -!!sym("next_year")),
-              by = c("next_year" = "Year",
-                     "Sample_id" = "Sample_id",
-                     "Species" = "Species"),
-              suffix = c("_curr", "_next")) %>%
+               by = c("next_year" = "Year",
+                      "Sample_id" = "Sample_id",
+                      "Species" = "Species"),
+               suffix = c("_curr", "_next")) %>%
     mutate("growth" = !!sym("value_next")/!!sym("value_curr"))
 
   #full_table
