@@ -1,6 +1,5 @@
 package fr.cm.objects;
 
-
 import fr.cm.dialogs.TextAreaDialog;
 import fr.cm.Main.Context;
 import fr.cm.project.ProjectListsManager;
@@ -24,20 +23,16 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 
-
 public class MetaInformationTable extends Pane {
 // ---------------------------------
 
-    double width = Context.getWindowWidth();
-    double height =  Context.getWindowHeight();
+    double width = Context.getWindowWidth(), height =  Context.getWindowHeight();
 
     final TableView<MetaElement> table;
     ObservableList<MetaElement> list;
 
     public MetaInformationTable() {
         super();
-
-        Context.setActiveWindow("meta");
         table = new TableView<>();
         table.setPrefWidth(width);
         table.setPrefHeight(height);
