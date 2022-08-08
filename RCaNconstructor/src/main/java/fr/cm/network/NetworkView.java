@@ -17,6 +17,7 @@ import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -36,7 +37,6 @@ public class NetworkView extends Pane {
     }
     // ---------------------------------------------------------------------
     public void init() {
-        Context.setActiveWindow("network");
         fond = background();
         interieur = inside();
         getChildren().addAll(fond, interieur);

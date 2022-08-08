@@ -41,7 +41,6 @@ public class ConstraintTable extends Pane {
     double height = Context.getWindowHeight();
 
     public ConstraintTable() {
-        Context.setActiveWindow("constraint");
         constraintTable = new TableView<>();
         constraintTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         constraintTable.setEditable(true);

@@ -135,12 +135,9 @@ public class MainApplication extends Application {
                     double nh = MainApplication.stage.getHeight();
                     Context.setWindowWidth(nw);
                     Context.setWindowHeight(nh);
-                    String aWindow = Context.getActiveWindow();
                     if (nw > 1.0 && nh > 1.0) {
-                        if(aWindow.equals("network")) {
-                            Platform.runLater(() -> ProjectListsManager.getNetworkView().redrawChangingSize());
-                        }
-                     }
+                           Platform.runLater(() -> ProjectListsManager.getNetworkView().redrawChangingSize());
+                    }
                 }
             };
             timer.schedule(task, delayTime);

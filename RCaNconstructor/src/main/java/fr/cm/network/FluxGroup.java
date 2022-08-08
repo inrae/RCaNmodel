@@ -88,13 +88,13 @@ public class FluxGroup extends Group {
         }
         if (in == out) {
             circle.setStroke(col);
-            circle.setStrokeWidth(10.0);
+            circle.setStrokeWidth(7.0);
             circle.setFill(col);
         } else {
             path.setStroke(col);
-            path.setStrokeWidth(10.0);
+            path.setStrokeWidth(7.0);
             arrow.setStroke(col);
-            arrow.setStrokeWidth(1.0);
+            arrow.setStrokeWidth(0.7);
             arrow.setFill(col);
         }
     }
