@@ -5,9 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Scanner;
 
-import fr.cm.xmlFiles.RCommandListXML;
 import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
 
@@ -19,24 +17,14 @@ public class Context {
     private static String fileName; // le nom du fichier projet
     private static String dirName; // le nom du répertoire du fichier projet
     // private static File workingDirectory;
-    private static int firstYear;
-    private static int lastYear;
+    private static int firstYear, lastYear;
     // etats du systeme
     private static String howConnected;
-    private static boolean started;
-    private static boolean connectedR;
-    private static boolean builtR;
-    private static boolean sampledR;
-    static double windowWidth = 1500.0;
-    static double windowHeight = 1000.0;
-    static double insideMin = 0.2;
-    static double insideMax = 0.8;
-    static final double radiusComponent = 20.0f;
-    static final double radiusInternalLink = 25.0f;
+    private static boolean started, connectedR, builtR, sampledR;
+    static double windowWidth = 1500.0, windowHeight = 1000.0;
+    static double insideMin = 0.2, insideMax = 0.8;
+    static final double radiusComponent = 20.0f, radiusInternalLink = 25.0f;
     static String textAreaContent ="";
-
-    static String activeWindow;
-
 
     public static void init() {
         firstYear = 4000;
@@ -50,8 +38,8 @@ public class Context {
         double screenHeight = rect.getHeight();
         setWindowWidth(0.9 * screenWidth);
         setWindowHeight(0.9 * screenHeight);
-        activeWindow = "firstPage";
-    }
+
+     }
 
     public static void initRCaN() {
         connectedR = false;
@@ -70,9 +58,9 @@ public class Context {
         Context.textAreaContent = textAreaContent;
     }
     // ------------------------------------------------------------------------
-    public static boolean isWarnings() {
+    public static boolean isWithWarnings() {
 
-        return true;
+        return false;
     }
 
     public static String getFileName() {
@@ -231,15 +219,6 @@ public class Context {
         }
         return (liste);
     }
-
-    public static String getActiveWindow() {
-        return activeWindow;
-    }
-
-    public static void setActiveWindow(String activeWindow) {
-        Context.activeWindow = activeWindow;
-    }
-
 
 
 }

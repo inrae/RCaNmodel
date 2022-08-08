@@ -162,7 +162,6 @@ public class DataFileTable extends Pane {
     }
 
     static String observationFileChooser() {
-        Context.setActiveWindow("datafile");
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select a data file with observation");
         fileChooser.setInitialDirectory(new File(Context.getDirName()));

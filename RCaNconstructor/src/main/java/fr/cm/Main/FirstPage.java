@@ -7,7 +7,6 @@ import javafx.scene.layout.Pane;
 
 public class FirstPage extends Pane {
     public FirstPage(){
-        Context.setActiveWindow(("firstPage"));
         ImageView imageView = new ImageView();
         double he = Context.getWindowHeight();
         double wi = Context.getWindowWidth();
