@@ -33,10 +33,6 @@
             require(ggraph)
             library(coda)
             library(RCaN)
-            library(dplyr)
-            library(tidyverse)
-            library(lubridate)
-            library(GGally)
             resultR &lt;- 'R session is started'
         </rcompute>
         <help>
@@ -80,7 +76,7 @@
             Plot polytope in two selected dimensions
         </textmenu>
         <menu>
-            analyzePolytope
+            build
         </menu>
         <condition>
             built
@@ -106,7 +102,7 @@
             Plot network
         </textmenu>
         <menu>
-            analyzePolytope
+            build
         </menu>
         <condition>
             built
@@ -128,7 +124,7 @@
             Diagnostic polytope
         </textmenu>
         <menu>
-            analyzePolytope
+            build
         </menu>
         <condition>
             built
@@ -154,7 +150,7 @@
             Bounds of polytope
         </textmenu>
         <menu>
-            analyzePolytope
+            build
         </menu>
         <condition>
             built

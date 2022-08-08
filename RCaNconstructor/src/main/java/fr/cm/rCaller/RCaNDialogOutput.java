@@ -62,8 +62,8 @@ public class RCaNDialogOutput extends Dialog {
     static HBox RCaNBox(String txt){
         HBox hbox = new HBox();
         Label outputR = new Label(txt);
-        outputR.setTextFill(Color.BLACK);
-        outputR.setFont(new Font("Courier", 20));
+        outputR.setTextFill(Color.DARKBLUE);
+        outputR.setFont(new Font("Courier", 14));
         ScrollPane scrollOutputR;
         scrollOutputR = new ScrollPane(outputR);
         double cw = 0.9 * Context.getWindowWidth();
