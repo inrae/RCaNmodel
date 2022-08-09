@@ -14,8 +14,19 @@
 #' @param d fraction of days in which a species grow (1 for 365 days / year).
 #' used in gillooly and makarieva
 #'
-#' @return other losses as explained in supplementary material in Planque et al.
-#' 2020
+#' @return other losses as explained in supplementary material in
+#' \insertCite{planque2022;textual}{RCaN}
+#'
+#'
+#' @details \insertCite{planque2022;textual}{RCaN} proposed several
+#' methods based on allometric relationships to estimate otherlosses. Method
+#' "gillooly" is based on \insertCite{gillooly2001;textual}{RCaN}, "yodzis"
+#' is based on \insertCite{yodzis1992;textual}{RCaN} and "makarieva" on
+#' \insertCite{makarieva2008;textual}{RCaN}
+#'
+#' @importFrom Rdpack reprompt
+#' @references
+#'     \insertAllCited{}
 #' @export
 #'
 #' @examples
