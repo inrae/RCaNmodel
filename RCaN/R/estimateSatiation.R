@@ -23,19 +23,19 @@
 #' @examples
 #' estimateSatiation(1e-4, taxon = "invertebrate", 1, 0.9, 0.3)
 estimateSatiation <- function(weight,
-                                taxon,
+                              taxon,
                               assimilation_efficiency = 1,
                               digestibility = 1,
                               fractional = 0.3){
-    if (!taxon %in% c("endotherm", "vertebrate ecotherm", "invertebrate"))
-      stop('taxon should be one of "endotherm", "vertebrate ecotherm",
+  if (!taxon %in% c("endotherm", "vertebrate ecotherm", "invertebrate"))
+    stop('taxon should be one of "endotherm", "vertebrate ecotherm",
       "inverebrate" with this method')
-    a <- switch(taxon,
-                "endotherm" = 89.2,
-                "vertebrate ecotherm" = 8.9,
-                "invertebrate" = 9.7)
-    sigma <- (fractional * a * (weight * 1e-3) ^ -0.25) /
-      (assimilation_efficiency * digestibility)
+  a <- switch(taxon,
+              "endotherm" = 89.2,
+              "vertebrate ecotherm" = 8.9,
+              "invertebrate" = 9.7)
+  sigma <- (fractional * a * (weight * 1e-3) ^ -0.25) /
+    (assimilation_efficiency * digestibility)
 
 
   return (sigma)
