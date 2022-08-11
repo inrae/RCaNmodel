@@ -11,7 +11,8 @@ sampleCaN(
   ncore = 1,
   thin = 1,
   method = "gibbs",
-  lastF = FALSE
+  lastF = FALSE,
+  algo = 1
 )
 }
 \arguments{
@@ -29,6 +30,8 @@ phase and discarding phases won't be necessary}
 \item{method}{one of gibbs (default) or hitandrun}
 
 \item{lastF}{should flow for last year be simulated (default = FALSE)}
+
+\item{algo}{1 for gibbs, 2 for vayda, 3 for john walk}
 }
 \value{
 a sampleCaNmod object which contains three elements

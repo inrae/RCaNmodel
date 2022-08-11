@@ -9,6 +9,7 @@
 #' @param thin thinning interval
 #' @param method one of gibbs (default) or hitandrun
 #' @param lastF should flow for last year be simulated (default = FALSE)
+#' @param algo 1 for gibbs, 2 for vayda, 3 for john walk
 #' @return a sampleCaNmod object which contains three elements
 #' \itemize{
 #'  \item{"CaNmod"}{the CaNmod object descring the model}
@@ -44,7 +45,8 @@ sampleCaN <- function(myCaNmod,
                       ncore = 1,
                       thin = 1,
                       method="gibbs",
-                      lastF = FALSE) {
+                      lastF = FALSE,
+                      algo = 1) {
   if (inherits(myCaNmod, "sampleCaNmod")){
     covMat <- myCaNmod$covMat
     myCaNmod <- myCaNmod$CaNmod
@@ -117,6 +119,7 @@ sampleCaN <- function(myCaNmod,
         as.matrix(myCaNmod$L),
         x0,
         method == "gibbs",
+        algo,
         i,
         i,
         covMat

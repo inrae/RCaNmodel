@@ -5,6 +5,8 @@
 #include <limits>
 #include <dqrng.h>
 #include <dqrng_RcppExports.h>
+#include "public_interface.h"
+
 // [[Rcpp::depends(RcppEigen)]]
 // [[Rcpp::depends(dqrng)]]
 using namespace Rcpp;
@@ -99,13 +101,13 @@ IntegerVector order_(const NumericVector & x) {
 
 
 List cpgs(const int N, const Eigen::MatrixXd &A ,
-                     const Eigen::VectorXd &b,
-                     const Eigen::VectorXd &x0,
-                     const int thin=1,
-                     const bool gibbs=true,
-                     const int seed=1,
-                     const int stream=1,
-                     Rcpp::Nullable<Eigen::MatrixXd> covMat = R_NilValue) {
+          const Eigen::VectorXd &b,
+          const Eigen::VectorXd &x0,
+          const int thin=1,
+          const bool gibbs=true,
+          const int seed=1,
+          const int stream=1,
+          Rcpp::Nullable<Eigen::MatrixXd> covMat = R_NilValue) {
   dqrng::dqRNGkind("Xoroshiro128+");
   dqrng::dqset_seed(IntegerVector::create(seed),
                     IntegerVector::create(stream));
@@ -178,7 +180,7 @@ List cpgs(const int N, const Eigen::MatrixXd &A ,
     //std::random_shuffle(index.begin(), index.end()); //we change the order to
     //limit the influence of initial ordering
 
-      index=dqrng::dqsample_int(p,p,false);
+    index=dqrng::dqsample_int(p,p,false);
     y=x;
     // compute approximate stochastic transformation
     if ((stage==1 && discard==0) || (stage>0 && updatingS==true)){ //first true
@@ -224,25 +226,25 @@ List cpgs(const int N, const Eigen::MatrixXd &A ,
       }
     }
     else {
-        Eigen::Map<Eigen::VectorXd> u(Rcpp::as<Eigen::Map<Eigen::VectorXd> >(dqrng::dqrnorm(p)));
-        u /= u.norm();
-        z = W * u;
-        d2=(b - W*y);
-        d=d2.cwiseQuotient(z);
-        double tmin=-inf;
-        double tmax=inf;
-        for (int j=0;j<m;++j){
-          if (z(j)<0 && tmin<d(j)) tmin=d(j);
-          if (z(j)>0 && tmax>d(j)) tmax=d(j);
-        }
-        tmin=std::min(0.0, tmin);
-        tmax=std::max(0.0, tmax);
-
-
-        y += (tmin+(tmax-tmin)*dqrng::runif())*u;
-
-        //y =std::min(std::max(y(i),-inf),inf);
+      Eigen::Map<Eigen::VectorXd> u(Rcpp::as<Eigen::Map<Eigen::VectorXd> >(dqrng::dqrnorm(p)));
+      u /= u.norm();
+      z = W * u;
+      d2=(b - W*y);
+      d=d2.cwiseQuotient(z);
+      double tmin=-inf;
+      double tmax=inf;
+      for (int j=0;j<m;++j){
+        if (z(j)<0 && tmin<d(j)) tmin=d(j);
+        if (z(j)>0 && tmax>d(j)) tmax=d(j);
       }
+      tmin=std::min(0.0, tmin);
+      tmax=std::max(0.0, tmax);
+
+
+      y += (tmin+(tmax-tmin)*dqrng::runif())*u;
+
+      //y =std::min(std::max(y(i),-inf),inf);
+    }
     x=T1*y;
 
     if (stage==0){//still in adapting phase
@@ -312,102 +314,69 @@ using Eigen::FullPivLU;
 
 
 
-//' Complex Polytope Gibbs Sampling
-//' This function draw uniform samples in a convex polytope with both equality and inequality constraints
-//'
-//' @param N the number of samples to generate
-//' @param A a matrix of coefficients of inequality constants A.x<=b
-//' @param b a vector of length equals to nrow(A)
-//' @param C a matrix of coefficients of inequality constants C.x=v
-//' @param v a vector of length equals to nrow(C)
-//' @param x0 a vector of length equals to ncol(A) that should be in the polytope, for example returned by \code{\link{chebyCentre}}
-//' @param thin the thinning interval
-//' @param gibbs if true, gibbs sampling, else hitandrun
-//' @param seed seed of the dqrng generator
-//' @param stream stream of the dqrng generator
-//' @param covMat prespecified covmatrix (avoid initialisation and discard) if
-//' prespecified (default null)
-//'
-//' @section Details:
-//' This function is based on an initial matlab code developped called CPRND
-//' (https://ch.mathworks.com/matlabcentral/fileexchange/34208-uniform-distribution-over-a-convex-polytope)
-//' It generates samples within the complex polytope defined by \eqn{A \cdot x \leqslant   b}
-//'
-//' @return a list with two elements: a matrix with one row per sample and one
-//'  column per parameter and a list with the covariance matrix used in the
-//'  algorithm that can be used to resample the model
-//' @examples
-//' n <- 20
-//' A1 <- -diag(n)
-//' b1 <- as.matrix(rep(0,n))
-//' A2 <- diag(n)
-//' b2 <- as.matrix(rep(1,n))
-//' A <- rbind(A1,A2)
-//' b <- rbind(b1,b2)
-//' C <- rbind(c(1,1,rep(0,n-2)),c(0,0,1,1,rep(0,n-4)))
-//' v <- matrix(rep(0.2,2),2)
-//' X0 <- rep(0.1,n)
-//' x <- cpgsEquality(1000,A,b,C,v,X0)
-//' @export
+
 // [[Rcpp::export]]
-
-
-List cpgsEquality(const int N, const Eigen::MatrixXd &A,
-                             const Eigen::VectorXd &b, const Eigen::MatrixXd &C,
-                             const Eigen::VectorXd &v, const Eigen::VectorXd &x0,
-                             const int thin=1, const bool gibbs=true,
-                             const int seed=1, const int stream=1,
-                             Rcpp::Nullable<Eigen::MatrixXd> covMat = R_NilValue){
+List sampleCaNCPP(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorXd &b,
+                  const Eigen::MatrixXd &C ,const Eigen::VectorXd &v,
+                  const Eigen::MatrixXd &L,
+                  const Eigen::VectorXd &x0, const int thin, const bool gibbs=true,
+                  const int algo=1,
+                  const int seed=1, const int stream=1,
+                  Rcpp::Nullable<Eigen::MatrixXd> covMat = R_NilValue) {
   int p=A.cols();
-  int m=A.rows();
-  int p2=C.cols();
   int m2=C.rows();
 
   MatrixXd X(N,p);
 
-  // Check input arguments
-  if (m < (p+1) || b.size()!=m || x0.size()!=p){
-    throw std::range_error("dimensions mismatch");
-  }
-  if (v.size()!=m2 || x0.size()!=p2){
-    throw std::range_error("dimensions mismatch");
-  }
-  // Initialisation
-  FullPivLU<MatrixXd> lu(C);
-  MatrixXd Nt = lu.kernel();
-  MatrixXd Abis=A*Nt;
-  VectorXd bbis=b-A*x0;
-
-  VectorXd x0bis=VectorXd::Zero(Nt.cols());
-  List x=cpgs(N, Abis, bbis, x0bis, thin, gibbs, seed, stream, covMat);
-  Eigen::MatrixXd xtmp(Rcpp::as<Eigen::MatrixXd>(x["X"]));
-  for(int i=0;i<N;++i) {
-    X.row(i)=Nt*(xtmp.row(i).transpose())+x0;
-  }
-  return (List::create(Named("X") = X, Named("covMat") = x["covMat"]));
-}
-
-
-
-
-
-// [[Rcpp::export]]
-List sampleCaNCPP(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorXd &b,
-               const Eigen::MatrixXd &C ,const Eigen::VectorXd &v,
-               const Eigen::MatrixXd &L,
-               const Eigen::VectorXd &x0, const int thin, const bool gibbs=true,
-               const int seed=1, const int stream=1,
-               Rcpp::Nullable<Eigen::MatrixXd> covMat = R_NilValue) {
-  int p=A.cols();
-  int m2=C.rows();
-
-    List x;
+  List x;
   MatrixXd B(N, L.rows());
   if(m2>0){ //there are equality constraints
-    x=cpgsEquality(N, A, b, C, v, x0, thin, gibbs, seed, stream, covMat);
+
+    // Initialisation
+    FullPivLU<MatrixXd> lu(C);
+    MatrixXd Nt = lu.kernel();
+    MatrixXd Abis=A*Nt;
+    VectorXd bbis=b-A*x0;
+
+    VectorXd x0bis=VectorXd::Zero(Nt.cols());
+
+    List xeq;
+
+    Eigen::MatrixXd xtmp;
+    if (algo == 1){
+      xeq=cpgs(N, Abis, bbis, x0bis, thin, gibbs, seed, stream, covMat);
+      xtmp=Rcpp::as<Eigen::MatrixXd>(xeq["X"]);
+    } else if (algo == 2){
+      xtmp=generateVaidyaWalkSamples(x0bis, Abis, bbis, 0.4, N, thin);
+    } else if (algo == 3){
+      xtmp=generateJohnWalkSamples(x0bis, Abis, bbis, 0.4, N, thin);
+    }
+    for(int i=0;i<N;++i) {
+      X.row(i)=Nt*(xtmp.row(i).transpose())+x0;
+    }
+
+    if (algo == 1){
+      x = List::create(Named("X") = X, Named("covMat") = xeq["covMat"]);
+    } else {
+      x = List::create(Named("X") = X, Named("covMat") = covMat);
+    }
+
+
+
   } else{
-    x=cpgs(N, A, b, x0, thin,gibbs, seed, stream, covMat);
+    if (algo == 1) {
+      x=cpgs(N, A, b, x0, thin,gibbs, seed, stream, covMat);
+    } else if (algo == 2){
+      //calls vayida
+      x=List::create(Named("X") = generateVaidyaWalkSamples(x0, A, b, 1e-4, N, thin),
+                     Named("covMat") = covMat) ;
+    } else if (algo == 3){
+      //calls john walk
+      x=List::create(Named("X") = generateJohnWalkSamples(x0, A, b, 1e-4, N, thin),
+                     Named("covMat") = covMat) ;
+    }
   }
+
   Eigen::MatrixXd F(Rcpp::as<Eigen::MatrixXd>(x["X"]));
   for (int i=0;i<N;++i){
     B.row(i)=L*F.row(i).transpose();

@@ -1,0 +1,10 @@
+
+Hilaire Drouineau, Benjamin Planque and Christian Mullon wrote the R package 'RCaN'
+
+The Complex Polytope Gibbs Sampling algorithm is an adaptation of an initial matlab code called CPRND
+available at <https://ch.mathworks.com/matlabcentral/fileexchange/34208-uniform-distribution-over-a-convex-polytope>
+
+
+RCaN uses sampling algorithm prvided by Chen _et al_ describes in the Corels uses the rulelib library by Yang _et al_ described in the 2018
+Journal of Machine Learning Research and 2017 arXiv paper (<arXiv:1710.08165>) with its code repo at
+https://github.com/yuachen/polytopewalk available with a MIT License

@@ -46,38 +46,17 @@ namespace RCaN {
         return Rcpp::as<List >(rcpp_result_gen);
     }
 
-    inline List cpgsEquality(const int N, const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const Eigen::MatrixXd& C, const Eigen::VectorXd& v, const Eigen::VectorXd& x0, const int thin = 1, const bool gibbs = true, const int seed = 1, const int stream = 1, Rcpp::Nullable<Eigen::MatrixXd> covMat = R_NilValue) {
-        typedef SEXP(*Ptr_cpgsEquality)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
-        static Ptr_cpgsEquality p_cpgsEquality = NULL;
-        if (p_cpgsEquality == NULL) {
-            validateSignature("List(*cpgsEquality)(const int,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::VectorXd&,const int,const bool,const int,const int,Rcpp::Nullable<Eigen::MatrixXd>)");
-            p_cpgsEquality = (Ptr_cpgsEquality)R_GetCCallable("RCaN", "_RCaN_cpgsEquality");
-        }
-        RObject rcpp_result_gen;
-        {
-            RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_cpgsEquality(Shield<SEXP>(Rcpp::wrap(N)), Shield<SEXP>(Rcpp::wrap(A)), Shield<SEXP>(Rcpp::wrap(b)), Shield<SEXP>(Rcpp::wrap(C)), Shield<SEXP>(Rcpp::wrap(v)), Shield<SEXP>(Rcpp::wrap(x0)), Shield<SEXP>(Rcpp::wrap(thin)), Shield<SEXP>(Rcpp::wrap(gibbs)), Shield<SEXP>(Rcpp::wrap(seed)), Shield<SEXP>(Rcpp::wrap(stream)), Shield<SEXP>(Rcpp::wrap(covMat)));
-        }
-        if (rcpp_result_gen.inherits("interrupted-error"))
-            throw Rcpp::internal::InterruptedException();
-        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
-            throw Rcpp::LongjumpException(rcpp_result_gen);
-        if (rcpp_result_gen.inherits("try-error"))
-            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
-        return Rcpp::as<List >(rcpp_result_gen);
-    }
-
-    inline List sampleCaNCPP(const int N, const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const Eigen::MatrixXd& C, const Eigen::VectorXd& v, const Eigen::MatrixXd& L, const Eigen::VectorXd& x0, const int thin, const bool gibbs = true, const int seed = 1, const int stream = 1, Rcpp::Nullable<Eigen::MatrixXd> covMat = R_NilValue) {
-        typedef SEXP(*Ptr_sampleCaNCPP)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
+    inline List sampleCaNCPP(const int N, const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const Eigen::MatrixXd& C, const Eigen::VectorXd& v, const Eigen::MatrixXd& L, const Eigen::VectorXd& x0, const int thin, const bool gibbs = true, const int algo = 1, const int seed = 1, const int stream = 1, Rcpp::Nullable<Eigen::MatrixXd> covMat = R_NilValue) {
+        typedef SEXP(*Ptr_sampleCaNCPP)(SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP,SEXP);
         static Ptr_sampleCaNCPP p_sampleCaNCPP = NULL;
         if (p_sampleCaNCPP == NULL) {
-            validateSignature("List(*sampleCaNCPP)(const int,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::MatrixXd&,const Eigen::VectorXd&,const int,const bool,const int,const int,Rcpp::Nullable<Eigen::MatrixXd>)");
+            validateSignature("List(*sampleCaNCPP)(const int,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::MatrixXd&,const Eigen::VectorXd&,const int,const bool,const int,const int,const int,Rcpp::Nullable<Eigen::MatrixXd>)");
             p_sampleCaNCPP = (Ptr_sampleCaNCPP)R_GetCCallable("RCaN", "_RCaN_sampleCaNCPP");
         }
         RObject rcpp_result_gen;
         {
             RNGScope RCPP_rngScope_gen;
-            rcpp_result_gen = p_sampleCaNCPP(Shield<SEXP>(Rcpp::wrap(N)), Shield<SEXP>(Rcpp::wrap(A)), Shield<SEXP>(Rcpp::wrap(b)), Shield<SEXP>(Rcpp::wrap(C)), Shield<SEXP>(Rcpp::wrap(v)), Shield<SEXP>(Rcpp::wrap(L)), Shield<SEXP>(Rcpp::wrap(x0)), Shield<SEXP>(Rcpp::wrap(thin)), Shield<SEXP>(Rcpp::wrap(gibbs)), Shield<SEXP>(Rcpp::wrap(seed)), Shield<SEXP>(Rcpp::wrap(stream)), Shield<SEXP>(Rcpp::wrap(covMat)));
+            rcpp_result_gen = p_sampleCaNCPP(Shield<SEXP>(Rcpp::wrap(N)), Shield<SEXP>(Rcpp::wrap(A)), Shield<SEXP>(Rcpp::wrap(b)), Shield<SEXP>(Rcpp::wrap(C)), Shield<SEXP>(Rcpp::wrap(v)), Shield<SEXP>(Rcpp::wrap(L)), Shield<SEXP>(Rcpp::wrap(x0)), Shield<SEXP>(Rcpp::wrap(thin)), Shield<SEXP>(Rcpp::wrap(gibbs)), Shield<SEXP>(Rcpp::wrap(algo)), Shield<SEXP>(Rcpp::wrap(seed)), Shield<SEXP>(Rcpp::wrap(stream)), Shield<SEXP>(Rcpp::wrap(covMat)));
         }
         if (rcpp_result_gen.inherits("interrupted-error"))
             throw Rcpp::internal::InterruptedException();
