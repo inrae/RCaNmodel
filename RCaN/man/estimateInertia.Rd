@@ -11,7 +11,7 @@ estimateInertia(
   taxon,
   temperature = NULL,
   d = 1,
-  fractional = 0.3
+  fractional = 0.1
 )
 }
 \arguments{
@@ -28,7 +28,8 @@ for yodzis and one of ("unicellular eukaryote","multicellular eukaryote",
 \item{d}{fraction of days in which a species grow (1 for 365 days / year).
 used in savage}
 
-\item{fractional}{Fractional properties of the ecosystem (unitless)}
+\item{fractional}{Fractional properties (unitless), generally in the order
+of 0.1 (default value)}
 }
 \value{
 satiation as explained in supplementary material in

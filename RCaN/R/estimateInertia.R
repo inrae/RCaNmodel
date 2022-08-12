@@ -8,7 +8,8 @@
 #' @param temperature temperature in °C (if savage)
 #' @param d fraction of days in which a species grow (1 for 365 days / year).
 #' used in savage
-#' @param fractional Fractional properties of the ecosystem (unitless)
+#' @param fractional Fractional properties (unitless), generally in the order
+#' of 0.1 (default value)
 #'
 #' @return satiation as explained in supplementary material in
 #' \insertCite{planque2022;textual}{RCaN}
@@ -30,7 +31,7 @@ estimateInertia <- function(weight,
                             taxon,
                             temperature = NULL,
                             d = 1,
-                            fractional = 0.3){
+                            fractional = 0.1){
   if (!method %in% c("savage", "yodzis") | length(method) > 1)
     stop("method should be unique and one of 'savage' or 'yodzis'")
   if (method == "temperature" & is.null(temperature))
