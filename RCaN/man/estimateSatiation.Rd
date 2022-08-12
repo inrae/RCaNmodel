@@ -9,8 +9,7 @@ estimateSatiation(
   weight,
   taxon,
   assimilation_efficiency = 1,
-  digestibility = 1,
-  fractional = 0.3
+  digestibility = 1
 )
 }
 \arguments{
@@ -21,10 +20,8 @@ estimateSatiation(
 \item{assimilation_efficiency}{assimilation efficiency of the species
 (unitless)}
 
-\item{digestibility}{average digestibility correction factor of preys
+\item{digestibility}{average digestibility correction factor of prey
 (unitless)}
-
-\item{fractional}{Fractional properties of the ecosystem (unitless)}
 }
 \value{
 satiation as explained in supplementary material in
