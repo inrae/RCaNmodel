@@ -43,7 +43,7 @@ sampleCaN <- function(myCaNmod,
                       nchain = 1,
                       ncore = 1,
                       thin = 1,
-                      method="gibbs",
+                      method = "gibbs",
                       lastF = FALSE) {
   if (inherits(myCaNmod, "sampleCaNmod")){
     covMat <- myCaNmod$covMat
@@ -70,7 +70,8 @@ sampleCaN <- function(myCaNmod,
     clusterEvalQ(cl, {
       library(stats)
     })
-    clusterExport(cl, c("myCaNmod", "N", "covMat"), envir = environment())
+    clusterExport(cl, c("myCaNmod", "N", "covMat", "thin", "method"),
+                  envir = environment())
     registerDoParallel(cl)
     `%myinfix%` <- `%dopar%`
   }
@@ -109,17 +110,17 @@ sampleCaN <- function(myCaNmod,
     res <-
       sampleCaNCPP(
         N,
+        A = as.matrix(myCaNmod$A),
+        b = myCaNmod$b,
+        C = as.matrix(myCaNmod$C),
+        v = myCaNmod$v,
+        L = as.matrix(myCaNmod$L),
+        x0 = x0,
         thin = thin,
-        as.matrix(myCaNmod$A),
-        myCaNmod$b,
-        as.matrix(myCaNmod$C),
-        myCaNmod$v,
-        as.matrix(myCaNmod$L),
-        x0,
-        method == "gibbs",
-        i,
-        i,
-        covMat
+        gibbs = (method == "gibbs"),
+        seed = i,
+        stream = i,
+        covMat = covMat
       )
     names(res) <- c("F", "B", "covMat")
     res$F <- res$F[, -seq_len(length(myCaNmod$species))]
