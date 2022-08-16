@@ -46,7 +46,7 @@ estimates satiation based on an allometric relationship formulated by
 \insertCite{savage2004;textual}{RCaN}
 }
 \examples{
-estimateInertia(1e-4, "yodzis", taxon = "invertebrate", factional = 0.1)
+estimateInertia(1e-4, "yodzis", taxon = "invertebrate", fractional = 0.1)
 }
 \references{
 \insertAllCited{}
