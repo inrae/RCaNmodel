@@ -52,13 +52,13 @@ checkPolytopeStatus <- function(x) {
                                               "equilibrate",
                                               "integers")))
   if (requireNamespace("ROI.plugin.cbc", quietly = TRUE)
-      & res$status$code == 5){
+      & res$status$msg$code == 5){
     res <- ROI_solve(lp_model,
                      solver = "cbc",
                      control = list(logLevel = 0))
   }
 
-  if (res$status$code == 0) {
+  if (res$status$msg$code == 0) {
     lp_model <- defineLPMod(A, b, C, v, maximum = TRUE)
 
     res <- ROI_solve(lp_model, solver = "lpsolve",
@@ -70,7 +70,7 @@ checkPolytopeStatus <- function(x) {
                                                 "equilibrate",
                                                 "integers")))
     if (requireNamespace("ROI.plugin.cbc", quietly = TRUE)
-        & res$status$code ==5){
+        & res$status$msg$code ==5){
       res <- ROI_solve(lp_model,
                        solver = "cbc",
                        control = list(logLevel = 0))
@@ -78,15 +78,15 @@ checkPolytopeStatus <- function(x) {
 
 
   }
-  if (res$status$code == 0) {
+  if (res$status$msg$code == 0) {
     print("polytope ok")
-  } else if (res$status$code == 2) {
+  } else if (res$status$msg$code == 2) {
     print("empty polytope")
-  } else if (res$status$code == 3) {
+  } else if (res$status$msg$code == 3) {
     print("polytope not bounded")
-  } else if (res$status$code == 9) {
+  } else if (res$status$msg$code == 9) {
     print("unique solution")
-  } else if (res$status$code == 5) {
+  } else if (res$status$msg$code == 5) {
     print("numerical error")
   } else {
     print("potential problem")

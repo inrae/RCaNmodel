@@ -18,13 +18,13 @@ getParamMinMax <- function(OP, p) {
                                    "equilibrate",
                                    "integers")))
     if (requireNamespace("ROI.plugin.cbc", quietly = TRUE)
-        & res$status$code == 5){
+        & res$status$msg$code == 5){
       res <- ROI_solve(OP,
                        solver = "cbc",
                        control = list(logLevel = 0))
     }
 
-    if (res$status$code == 0) {
+    if (res$status$msg$code == 0) {
       bound <- res$solution[p]
       solved[1] <- TRUE
     } else  {

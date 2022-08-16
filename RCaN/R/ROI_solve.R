@@ -12,7 +12,6 @@
 #' @importFrom lpSolveAPI get.primal.solution
 #' @importFrom lpSolveAPI dim.lpExtPtr
 #' @importFrom lpSolveAPI get.objective
-#' @importFrom ROI ROI_plugin_canonicalize_solution
 #'
 
 
@@ -23,11 +22,11 @@ ROI_solve <-
     if (solver != "lpsolve"){
       res <- ROI::ROI_solve(x, solver, control)
       if (res$status$msg$symbol == "unbounded"){
-        res$status$code <- 3
+        res$status$msg$code <- 3
       } else if (res$status$msg$symbol == "Numerical instability"){
-        res$status$code <- 5
+        res$status$msg$code <- 5
       } else if (res$status$msg$symbol== "infeasible"){
-        res$status$code <- 2
+        res$status$msg$code <- 2
       }
     } else {
       lp_model <- x$lp_model
@@ -48,12 +47,16 @@ ROI_solve <-
         conv <- 3
         x0[which(x0 == - 1.0e30)] <- -Inf
       }
+      status <- list(code = as.integer(conv != 0),
+                     msg = list(solver = "lpsolve",
+                                code = conv,
+                                message = "",
+                                roi_code = as.integer(conv != 0)))
       optimum <- get.objective(lp_model)
-      res <- ROI_plugin_canonicalize_solution( solution = x0,
-                                               optimum  = optimum,
-                                               status   = conv,
-                                               solver   = solver)
-      res$status$code <- res$status$msg$code
+      res <- list( solution = x0,
+                   objval = optimum,
+                   status = status)
+
     }
     return(res)
   }
