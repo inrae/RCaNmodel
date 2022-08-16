@@ -20,7 +20,7 @@
 #' @export
 #'
 #' @examples
-#' estimateSatiation(1e-4, taxon = "invertebrate", 1, 0.9, 0.3)
+#' estimateSatiation(1e-4, taxon = "invertebrate", 1, 0.9)
 estimateSatiation <- function(weight,
                               taxon,
                               assimilation_efficiency = 1,
