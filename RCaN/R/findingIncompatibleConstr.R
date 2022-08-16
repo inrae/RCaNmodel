@@ -99,7 +99,7 @@ findingIncompatibleConstr <- function(x) {
                                                "rowdominate",
                                                "mergerows")))
   if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
-      res$status$code == 5){
+      res$status$msg$code == 5){
     res <- ROI_solve(lp_model,
                      solver = "cbc",
                      control = list(logLevel = 0))
@@ -155,7 +155,7 @@ findingIncompatibleConstr <- function(x) {
                                                     "rowdominate",
                                                     "mergerows")))
       if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
-          res$status$code == 5){
+          res$status$msg$code == 5){
         res <- ROI_solve(lp_model,
                          solver = "cbc",
                          control = list(logLevel = 0))

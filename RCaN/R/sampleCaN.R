@@ -93,7 +93,7 @@ sampleCaN <- function(myCaNmod,
                                                   "equilibrate",
                                                   "integers")))
       if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
-          res$status$code == 5){
+          res$status$msg$code == 5){
         res <- ROI_solve(lp_model,
                          solver = "cbc",
                          control = list(logLevel = 0))
@@ -101,7 +101,7 @@ sampleCaN <- function(myCaNmod,
 
       x0 <- res$solution
 
-      if (res$status$code == 0)
+      if (res$status$msg$code == 0)
         find_init <- TRUE
       nbiter <- nbiter + 1
     }
