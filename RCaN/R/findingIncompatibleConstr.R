@@ -1,4 +1,4 @@
-#' findingIncompatibleConstraints
+#' findingIncompatibleConstr
 #' help to dectect constraints that leads to an empty polytope defined
 #' by+A.x<=b and C.x=v or by the polytope of the CaNmod object
 #' @param x either a CaNmod oject or a named list with at least a matrix A and

@@ -2,7 +2,7 @@
 % Please edit documentation in R/findingIncompatibleConstr.R
 \name{findingIncompatibleConstr}
 \alias{findingIncompatibleConstr}
-\title{findingIncompatibleConstraints
+\title{findingIncompatibleConstr
 help to dectect constraints that leads to an empty polytope defined
 by+A.x<=b and C.x=v or by the polytope of the CaNmod object}
 \usage{
@@ -21,7 +21,7 @@ Those constraints appear to be incompatible with following constraints in the
 A is incompatible with B and that D is incompatible with both E and F
 }
 \description{
-findingIncompatibleConstraints
+findingIncompatibleConstr
 help to dectect constraints that leads to an empty polytope defined
 by+A.x<=b and C.x=v or by the polytope of the CaNmod object
 }
