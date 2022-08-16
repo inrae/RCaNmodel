@@ -37,7 +37,7 @@ estimates satiation based on an allometric relationship formulated by
 \insertCite{yodzis1992;textual}{RCaN}
 }
 \examples{
-estimateSatiation(1e-4, taxon = "invertebrate", 1, 0.9, 0.3)
+estimateSatiation(1e-4, taxon = "invertebrate", 1, 0.9)
 }
 \references{
 \insertAllCited{}
