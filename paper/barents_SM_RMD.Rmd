@@ -52,6 +52,7 @@ quiet <- function(x) {
 } 
 ```
 
+
 # Introduction
 We present here an example of RCaN study for the Barents Sea ecosystem. The CaN model has the same structure as the model presented in the main text of the article: same trophic structure, same trophic parameters, same set of time series of observations (@lindstrom2017multiple). Due to data access restriction, the values in the observation times series were slightly modified and do not correspond to the original measurements. Most of the original data can be provided on demand.
 
