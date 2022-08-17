@@ -26,7 +26,10 @@ Imports:
     tidyselect,
     GGally,
     ggplot2,
-    Rdpack
+    Rdpack,
+    Rcpp,
+    dqrng,
+    RcppEigen
 LinkingTo: Rcpp, RcppEigen, dqrng
 Suggests: 
     gridExtra,
