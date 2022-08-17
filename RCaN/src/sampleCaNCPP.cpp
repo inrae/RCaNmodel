@@ -4,6 +4,7 @@
 #include <Eigen/Sparse>
 #include <limits>
 #include <dqrng.h>
+#include <dqrng_RcppExports.h>
 // [[Rcpp::depends(RcppEigen)]]
 // [[Rcpp::depends(dqrng)]]
 using namespace Rcpp;
@@ -238,7 +239,7 @@ List cpgs(const int N, const Eigen::MatrixXd &A ,
         tmax=std::max(0.0, tmax);
 
 
-        y += (tmin+(tmax-tmin)*dqrng::runif())*u;
+        y += (tmin+(tmax-tmin)*dqrng::dqrunif(1)[0])*u;
 
         //y =std::min(std::max(y(i),-inf),inf);
       }
