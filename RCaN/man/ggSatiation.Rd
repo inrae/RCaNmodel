@@ -3,7 +3,8 @@
 \name{ggSatiation}
 \alias{ggSatiation}
 \title{ggSatiation
-plots incoming trophic fluxes versus biomass}
+plots incoming trophic fluxes (consumption) versus biomass, alongside the
+satiation constraints (red dashed line)}
 \usage{
 ggSatiation(mysampleCaNmod, species = NULL, years = NULL, frac = 1)
 }
@@ -22,7 +23,8 @@ a ggplot
 }
 \description{
 ggSatiation
-plots incoming trophic fluxes versus biomass
+plots incoming trophic fluxes (consumption) versus biomass, alongside the
+satiation constraints (red dashed line)
 }
 \details{
 distribution of fluxes or biomass for a specific year
