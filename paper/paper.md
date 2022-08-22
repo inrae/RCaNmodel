@@ -65,8 +65,8 @@ that describe food-webs at equilibrium, but unlike Ecosim, there is no direct dy
 Recently, Planque and Mullon [@planque2019modelling] have developed a
 time-dynamic food-web modelling approach analogous to LIM, based on a generic approach called "Chance and Necessity” 
 (CaN) modelling. CaN models account for Chance, i.e. the stochasticity of nature and for Necessity, i.e.,
-the existence of physical (e.g. mass conservation) or ecological constraints (e.g. inertia of populations,
-satiation of individuals) that can separate food-web dynamics that are possible from those that are not.
+the existence of physical (e.g. mass conservation) or ecological (e.g. inertia of populations,
+satiation of individuals) constraints that can separate food-web dynamics that are possible from those that are not.
 CaN models also use observations to constrain the reconstruction of past food-web dynamics
 (\autoref{fig:canprinciple}). As in LIM, building a trophic food-web CaN model starts with 1) the definition of the structure
 of the food web (who eats whom), followed by 2) the specification of the constraints (what is possible and
@@ -80,13 +80,13 @@ are then 6) analysed, often in a graphical manner, to reveal dynamical interacti
 Because outputs from food-web models are relevant outside the modelling community, e.g., for managers and stakeholders,
 there is a need for a modelling process - from model building to results interpretation - that can be conducted in
 a participatory manner. RCaNmodel and RCaNconstructor provide a mathematically efficient solution to steps 3, 4, and 5
-and an interactive/intuitive interface to support steps 1, 2, and 6.
+and an interactive/intuitive interface to support steps 1, 2, and 6 in a participatory framework.
  
 
 # Methods
 
 RCaNmodel and RCaNconstructor support the full modelling process from the specification of the model to the
-exploration of the outputs (\autoref{fig:approach}), while providing user-friendly solution to each technical challenges:
+exploration of the outputs (\autoref{fig:approach}), while providing user-friendly solutions to each technical challenge:
 
 -   To specify the model, the user provides several tables that define the compartments (i.e., trophic groups), their
 ecological properties (species specific input parameters), the flows among the compartments (i.e., trophic
@@ -94,8 +94,8 @@ interactions), observational time-series, and user-defined explicit constraints.
 an RCaN file that consists of several spreadsheets in the xlsx open format (see supplementary material for an example),
 or directly in the form of R data frames. The RCaN file format facilitates data entry for non-expert users, and exchange
 of input files between users. RCaN files can be constructed using the RCaNconstructor GUI, which ensures internal consistency
-between the data tables. The alternative use of R dataframes can facilitate the use of external databases or version control
-through the use of plain text files. 
+between the data tables. Alternatively, data tables can be provided in R dataframe format to facilitate the use of external 
+databases or version control through the use of plain text files. 
 -   Based on the input data provided in the tables, the function *buildCaN* constructs the matrices that define the
 polytope (see @planque2019modelling for the underlying mathematics). The use of symengine [@ma2020], a library for symbolic
 manipulation, facilitates the automatic translation of user-specified literal constraints (see supplementary material
