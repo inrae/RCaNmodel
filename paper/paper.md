@@ -35,9 +35,9 @@ RCaNmodel is an R package dedicated to the development and exploration of time-d
 The associated user-friendly javafx GUI RCaNconstructor is specifically developed to facilitate the
 co-construction of such models with non-modellers. Together, RCaNmodel and RCaNconstructor ensure the
 traceability and replicability of food-web model developments, and provide a fast and efficient solution
-to handle the complex mathematical steps that arise from linear inverse modelling and polytope sampling
+to handle the complex mathematical steps that arise from dynamic linear inverse modelling and polytope sampling
 in high dimensions. The software includes standard graphical outputs for the exploration of food-webs
-dynamics the detection of trophic controls, which are key questions in trophic ecology.
+dynamics and the detection of trophic controls, which are key questions in trophic ecology.
 
 # Statement of need
 
@@ -48,7 +48,8 @@ Estimations of trophic flows and of other model parameters is a complex task bec
 observations is generally far smaller than the number of estimates from model outputs. Food-web reconstruction
 have no single best solutions, but rather an infinite number of flow patterns that comply with observational
 data, and food-web models are said to be underdetermined [@niquil2011]. Several strategies have been
-developed to tackle this issue. In Ecopath [@Polovina1984], one of the most largely used trophic food-web
+developed to tackle this issue. In Ecopath [@Polovina1984], or in its dynamic extension called Ecosim [@pauly2000; @christensen2004]
+one of the most largely used trophic food-web
 models [@Heymans2016] the modeller is asked to provide additional information on species diet or on their
 vulnerabilities to turn the underdetermined into an overdetermined problem. This approach ignores the highly
 variable and stochastic nature of trophic interactions. Linear Inverse Model (LIM) food-web models have been
@@ -57,22 +58,22 @@ food-web models (e.g., mass conservation) and are constructed using constraints 
 equalities/inequalities) that specify which combinations of flows are possible or not. Mathematically, the
 set of constraints defines a polytope: a fraction of the space that includes all the possible solutions
 satisfying the constraints (i.e. all possible trophic food web states). The polytope can be sampled using
-appropriate MCMC algorithms [@kones2006; @kones2009; @vandenmeersche2009]. Ecopath and LIM are static models
-that describe food-webs at equilibrium. The time-dynamic version of Ecopath is Ecosim
-[@christensen2004; @pauly2000]. Recently, Planque and Mullon [@planque2019modelling] have developed a
-time-dynamic food-web modelling approach analogous to LIM and termed “Chance and Necessity” 
+appropriate MCMC algorithms [@kones2006; @kones2009; @vandenmeersche2009]. Like Ecopath, LIM is a static model
+that describe food-webs at equilibrium, but unlike Ecosim, there is no direct dynamic extension of LIM models.
+Recently, Planque and Mullon [@planque2019modelling] have developed a
+time-dynamic food-web modelling approach analogous to LIM, based on a generic approach called "Chance and Necessity” 
 (CaN) modelling. CaN models account for Chance, i.e. the stochasticity of nature and for Necessity, i.e.,
 the existence of physical (e.g. mass conservation) or ecological constraints (e.g. inertia of populations,
 satiation of individuals) that can separate food-web dynamics that are possible from those that are not.
 CaN models also use observations to constrain the reconstruction of past food-web dynamics
-(\autoref{fig:canprinciple}). As in LIM, building a CaN model starts with 1) the definition of the structure
+(\autoref{fig:canprinciple}). As in LIM, building a trophic food-web CaN model starts with 1) the definition of the structure
 of the food web (who eats whom), followed by 2) the specification of the constraints (what is possible and
 what is not) and 3) the translation of these into the mathematical expression of a polytope.
 The validity of the resulting model is then tested by 4) checking that the polytope is bounded (i.e.
 infinite values are excluded) and not empty (i.e. some solutions exist). The following step is 5) to
 sample solutions within the polytope (i.e. time series of biomass and flows that satisfy all-time series
 of constraints). The complexity of steps 3, 4, and 5 is much greater in CaN than in LIM because the dynamic
-modelling in CaN entails much larger polytope dimensions (often \>100 or even \>1000). CaN model outputs/samples
+modelling in trophic food-web CaN entails much larger polytope dimensions (often \>100 or even \>1000). CaN model outputs/samples
 are then 6) analysed, often in a graphical manner, to reveal dynamical interactions between food-web components.
 Because outputs from food-web models are relevant outside the modelling community, e.g., for managers and stakeholders,
 there is a need for a modelling process - from model building to results interpretation - that can be conducted in
@@ -91,7 +92,7 @@ interactions), observational time-series, and user-defined explicit constraints.
 an RCaN file that consists of several spreadsheets in the xlsx open format (see supplementary material for an example),
 or directly in the form of R data frames. The RCaN file format facilitates data entry for non-expert users, and exchange
 of input files between users. RCaN files can be constructed using the RCaNconstructor GUI, which ensures internal consistency
-between the data table. The alternative use of R dataframes can facilitate the use of external databases or version control
+between the data tables. The alternative use of R dataframes can facilitate the use of external databases or version control
 through the use of plain text files. 
 -   Based on the input data provided in the tables, the function *buildCaN* constructs the matrices that define the
 polytope (see @planque2019modelling for the underlying mathematics). The use of symengine [@ma2020], a library for symbolic
@@ -113,7 +114,7 @@ top-down or bottom-up controls on the different trophic groups (\autoref{fig:ggt
 
 All these steps can be done either directly through R scripts or using the RCaNconstructor GUI. An example using R commands
 is presented in the supplementary material. It should be noted that most of the functions to check the status or to sample
-the polytope can be used with other packages. Finally, the chance and necessity modelling approach is applicable to a wide
+the polytope can be used with other packages (e.g. LIM modelling package). Finally, the chance and necessity modelling approach is applicable to a wide
 range of problems beyond food-web models, and RCaNmodel is currently being generalised to other kind of models that rely on
 similar principles.
 
