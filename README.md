@@ -1,5 +1,5 @@
 # CaN
-<img src="RCaN/man/figures/logo.png" align="right" width="220" />
+<img src="RCaNmodel/man/figures/logo.png" align="right" width="220" />
 
 ## RCaNmodel installation
 For RCaNmodel installation, please look [here](RCaNmodel/README.md)
