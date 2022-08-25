@@ -1,4 +1,4 @@
 ## usethis namespace: start
-#' @useDynLib RCaN, .registration = TRUE
+#' @useDynLib RCaNmodel, .registration = TRUE
 ## usethis namespace: end
 NULL

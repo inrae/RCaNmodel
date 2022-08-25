@@ -28,7 +28,7 @@ corresponds to quantiles 2.5% and 97.5%
 }
 \examples{
 myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
- package = "RCaN"))
+ package = "RCaNmodel"))
 res <- sampleCaN(myCaNmod, 100)
 #with one series
 ggSeries(res,"F01", TRUE)

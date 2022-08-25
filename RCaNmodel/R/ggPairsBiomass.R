@@ -13,7 +13,7 @@
 #'
 #' @examples
 #' myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
-#'  package = "RCaN"))
+#'  package = "RCaNmodel"))
 #' res <- sampleCaN(myCaNmod, 100)
 #' ggPairsBiomass(res)
 #'

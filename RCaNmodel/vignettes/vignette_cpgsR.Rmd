@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
   fig.width=16/2.54,
   fig.height=10/2.54
 )
-library(RCaN)
+library(RCaNmodel)
 ```
 This package aims at uniformly sampling points in a complex polytope defined by the inequalities \eqn{A \cdot x \leqslant   b}. It is based on an original matlab code called CPRND that can be found there
 <https://ch.mathworks.com/matlabcentral/fileexchange/34208-uniform-distribution-over-a-convex-polytope>. The package provides two functions:
@@ -49,7 +49,7 @@ X0 <- chebyCentre(A,b)
 We see that, in our simple example, the centroid is the point with 0.5 in all dimensions. We can now carry out the sampling using the \code{\link{cpgs}}:
 
 ```{r, results="hide"}
-library(RCaN)
+library(RCaNmodel)
 x <- cpgs(1000,A,b,X0)
 ```
 
