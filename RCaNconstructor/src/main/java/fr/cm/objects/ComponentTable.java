@@ -37,7 +37,6 @@ public class ComponentTable extends Pane {
 
     public ComponentTable() {
         super();
-        Context.setActiveWindow("component");
         int nbParameters = Strings.getNumberOfParameters();
 
         table = new TableView<>();

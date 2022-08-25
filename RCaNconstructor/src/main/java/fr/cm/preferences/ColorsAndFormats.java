@@ -13,17 +13,19 @@ public class ColorsAndFormats {
 
     public static final String font = "-fx-font: normal 16px 'sans-serif' ";
 
-    public static final Color background = Color.rgb(100,200,200);
+    public static final Color background = Color.rgb(135,206,250);
     
-    public static final Color inside = Color.rgb(100,150,202);
+    public static final Color inside = Color.rgb(30,144,255
+    );
 
-    public static final Color componentInside = Color.rgb(150,250,150);
+    public static final Color componentInside = Color.rgb(127,255,0
+    );
 
-    public static final Color componentOutside = Color.rgb(250,155,155);
+    public static final Color componentOutside = Color.rgb(0,139,139);
 
-    public static final Color linkTrophic = Color.rgb(220,180,18);
+    public static final Color linkTrophic = Color.rgb(238,232,170);
 
-    public static final Color linkNonTrophic = Color.rgb(180,220,18);
+    public static final Color linkNonTrophic = Color.rgb(218,165,32);
 
     public static final Color names = Color.DARKBLUE;
 

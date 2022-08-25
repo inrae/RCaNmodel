@@ -24,7 +24,6 @@ public class TimeLineTable extends Pane {
     double height =  Context.getWindowHeight();
 
     public TimeLineTable() {
-        Context.setActiveWindow("action");
         table = new TableView<>();
         table.setEditable(true);
         table.getSelectionModel().setCellSelectionEnabled(true);  // selects cell only, not the whole row

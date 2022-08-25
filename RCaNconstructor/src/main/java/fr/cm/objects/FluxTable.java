@@ -34,7 +34,6 @@ public class FluxTable extends Pane {
     double height =  Context.getWindowHeight();
 
     public FluxTable() {
-        Context.setActiveWindow("flux");
         table = new TableView<>();
         table.setMinWidth(800.0);
         table.setEditable(true);
