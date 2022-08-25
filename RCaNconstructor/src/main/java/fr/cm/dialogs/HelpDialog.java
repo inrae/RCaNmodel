@@ -118,21 +118,23 @@ public class HelpDialog extends Alert {
 
     // --------------------------------------------
     public static void warning(String contents, String enTete) {
-        if(Context.isWarnings()){
+        if(Context.isWithWarnings()){
             new HelpDialog(contents, enTete, "Information", "information", 600.0, 400.0);
         }
     }
 
     public static void warning(String debut, String enTete, Exception ex) {
-        String errorCode = "No error";
-        if(ex !=null)  {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        ex.printStackTrace(pw);
-            errorCode = sw.toString();
+        if (Context.isWithWarnings()) {
+            String errorCode = "No error";
+            if (ex != null) {
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                ex.printStackTrace(pw);
+                errorCode = sw.toString();
+            }
+            String contents = debut + "\n" + errorCode;
+            new HelpDialog(contents, enTete, "Information", "information", 600.0, 400.0);
         }
-        String contents = debut + "\n" + errorCode;
-        new HelpDialog(contents, enTete, "Information","information",600.0,400.0);
     }
     // --------------------------------------------
     // --------------------------------------------
