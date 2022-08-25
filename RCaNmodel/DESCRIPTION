@@ -1,4 +1,4 @@
-Package: RCaN
+Package: RCaNmodel
 Type: Package
 Title: a package to fit Chance and Necessity model
 Version: 1.0

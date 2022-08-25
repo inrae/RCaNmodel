@@ -1,15 +1,15 @@
 # CaN
 <img src="man/figures/logo.png" align="right" width="220" />
 
-## RCaN installation
+## RCaNmodel installation
 ### Requirements
-All RCaN dependencies are available on cran so there is no specific requirements. 
+All RCaNmodel dependencies are available on cran so there is no specific requirements. 
 
 ### Installation
 Once these packages are installed, the process is easy using the library devools. On a R console:
 
     > require(devtools)
-    > devtools::install_github("https://github.com/inrae/RCaN.git", subdir="RCaN", dependencies = TRUE)
+    > devtools::install_github("https://github.com/inrae/RCaNmodel.git", subdir="RCaNmodel", dependencies = TRUE)
     
    
     
