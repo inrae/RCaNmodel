@@ -2,7 +2,7 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 #' @export
-#' @useDynLib RCaN
+#' @useDynLib RCaNmodel
 NULL
 
 #' Complex Polytope Gibbs Sampling
@@ -35,7 +35,7 @@ NULL
 #' x <- cpgs(1000,A,b,X0)
 #' @export
 cpgs <- function(N, A, b, x0, thin = 1L, gibbs = TRUE, seed = 1L, stream = 1L) {
-    .Call(`_RCaN_cpgs`, N, A, b, x0, thin, gibbs, seed, stream)
+    .Call(`_RCaNmodel_cpgs`, N, A, b, x0, thin, gibbs, seed, stream)
 }
 
 #' Complex Polytope Gibbs Sampling
@@ -72,14 +72,14 @@ cpgs <- function(N, A, b, x0, thin = 1L, gibbs = TRUE, seed = 1L, stream = 1L) {
 #' x <- cpgsEquality(1000,A,b,C,v,X0)
 #' @export
 cpgsEquality <- function(N, A, b, C, v, x0, thin = 1L, gibbs = TRUE, seed = 1L, stream = 1L) {
-    .Call(`_RCaN_cpgsEquality`, N, A, b, C, v, x0, thin, gibbs, seed, stream)
+    .Call(`_RCaNmodel_cpgsEquality`, N, A, b, C, v, x0, thin, gibbs, seed, stream)
 }
 
 sampleCaNCPP <- function(N, A, b, C, v, L, x0, thin, gibbs = TRUE, seed = 1L, stream = 1L) {
-    .Call(`_RCaN_sampleCaNCPP`, N, A, b, C, v, L, x0, thin, gibbs, seed, stream)
+    .Call(`_RCaNmodel_sampleCaNCPP`, N, A, b, C, v, L, x0, thin, gibbs, seed, stream)
 }
 
 # Register entry points for exported C++ functions
 methods::setLoadAction(function(ns) {
-    .Call('_RCaN_RcppExport_registerCCallable', PACKAGE = 'RCaN')
+    .Call('_RCaNmodel_RcppExport_registerCCallable', PACKAGE = 'RCaNmodel')
 })

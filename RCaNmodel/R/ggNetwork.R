@@ -7,7 +7,7 @@
 #' require(ggraph)
 #' require(ggplot2)
 #' myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
-#'  package = "RCaN"))
+#'  package = "RCaNmodel"))
 #' ggNetwork(myCaNmod)
 #' @importFrom ggplot2 arrow
 #' @importFrom ggplot2 aes_

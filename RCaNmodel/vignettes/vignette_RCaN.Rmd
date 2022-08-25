@@ -1,5 +1,5 @@
 ---
-title: "Tutorial of RCaN"
+title: "Tutorial of RCaNmodel"
 output:
   rmarkdown::html_vignette:
      keep_md: yes
@@ -10,7 +10,7 @@ author:
 - "Benjamin Planque - IMR"
 - "Christian Mullon - IRD"
 vignette: >
-  %\VignetteIndexEntry{Tutorial of RCaN}
+  %\VignetteIndexEntry{Tutorial of RCaNmodel}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(RCaN)
+library(RCaNmodel)
 ```
 
 This package aims at fitting a chance and necessity ecosystem model. A full description of this kind of model is provided in 
@@ -35,11 +35,11 @@ Planque, B., & Mullon, C. (n.d.). Modelling chance and necessity in natural syst
 Inputs should be provided in an xlxs data file. This file can be generated using an independent java graphical user interface, but it can be created independently. An artificial file is provided in the package as a template and as an example for this vignette. You can find the path to the file by entering
 
 ```{r}
-system.file("extdata", "CaN_template_mini.xlsx", package = "RCaN")
+system.file("extdata", "CaN_template_mini.xlsx", package = "RCaNmodel")
 ```
 
 ```{r,echo=FALSE,include=FALSE}
-myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx", package = "RCaN"))
+myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx", package = "RCaNmodel"))
 ```
 
 There are a few important things to remember:
@@ -99,7 +99,7 @@ myCaNmod <- toggleConstraint(myCaNmod, "C01 : 1991")
 The first step of the workflow is to build the model. The function buildCaN does this job. It reads the template file and provides a CaNmod object that includes all necessary data to fit the model.  You see here the different elements included in the object.
 
 ```{r}
-myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx", package = "RCaN"))
+myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx", package = "RCaNmodel"))
 names(myCaNmod)
 ```
 Everything should be all right if your template was well created. The function retrieves meaningful error message if a problem is detected. Two functions can be used to check that the model is correct. The function ggCaNmod draws a graph to show you the trophic food web

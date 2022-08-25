@@ -14,7 +14,7 @@ using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
 //' @export
-//' @useDynLib RCaN
+//' @useDynLib RCaNmodel
 
 
 

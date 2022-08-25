@@ -10,7 +10,7 @@
 #'
 #' @examples
 #' myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
-#'  package = "RCaN"))
+#'  package = "RCaNmodel"))
 #' toggleConstraint(myCaNmod, "C02")
 #'
 #' @importFrom Matrix rbind2

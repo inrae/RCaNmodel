@@ -21,6 +21,6 @@ produces a ggraph representing the flow foodweb
 require(ggraph)
 require(ggplot2)
 myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
- package = "RCaN"))
+ package = "RCaNmodel"))
 ggNetwork(myCaNmod)
 }

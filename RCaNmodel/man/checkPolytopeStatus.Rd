@@ -35,7 +35,7 @@ X0 <- checkPolytopeStatus(list(A = A, b = b, C = C, v = v))
 
 #example with a CaNmod object
 myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
- package = "RCaN"))
+ package = "RCaNmodel"))
 checkPolytopeStatus(myCaNmod)
 
 #we artificially add incompatible constraints (negative flow)
