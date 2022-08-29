@@ -5,6 +5,9 @@
 #include <limits>
 #include <dqrng.h>
 #include <dqrng_RcppExports.h>
+#include <Eigen/Eigenvalues>
+#include <Eigen/LU>
+
 // [[Rcpp::depends(RcppEigen)]]
 // [[Rcpp::depends(dqrng)]]
 using namespace Rcpp;
@@ -417,6 +420,143 @@ List sampleCaNCPP(const int N, const Eigen::MatrixXd &A ,const Eigen::VectorXd &
 
 
 
+
+
+
+void gmscale(MatrixXd A, VectorXd &cscale, VectorXd &rscale, double scltol){
+  /*% Geometric-Mean Scaling finds the scale values for the
+   % `m x n` sparse matrix `A`.
+   %
+   % USAGE:
+   %
+   %    [cscale, rscale] = gmscale(A, iprint, scltol)
+   %
+   % INPUTS:
+   %    A(i, j):           contains entries of `A`.
+   %    iprint:            > 0 requests messages to the screen (0 means no output).
+   %    scltol:            should be in the range (0.0, 1.0).
+   %                       Typically `scltol` = 0.9.  A bigger value like 0.99 asks
+   %                       `gmscale` to work a little harder (more passes).
+   %
+   % OUTPUTS:
+   %    cscale, rscale:    column vectors of column and row scales such that
+   %                       `R` (inverse) `A` `C` (inverse) should have entries near 1.0,
+   %                       where `R= diag(rscale)`, `C = diag(cscale)`.
+   %
+   % An iterative procedure based on geometric means is used,
+   % following a routine written by Robert Fourer, 1979.
+   % Several passes are made through the columns and rows of `A`.
+   % The main steps are:
+   %
+   %   1. Compute :math:`aratio = max_j (max_i Aij / min_i Aij)`.
+   %   2. Divide each row `i` by :math:`sqrt( max_j Aij * min_j Aij)`.
+   %   3. Divide each column `j` by :math:`sqrt( max_i Aij * min_i Aij)`.
+   %   4. Compute `sratio` as in Step 1.
+   %   5. If :math:`sratio < aratio * scltol`,
+   %      set :math:`aratio = sratio` and repeat from Step 2.
+   %
+   % To dampen the effect of very small elements, on each pass,
+   % a new row or column scale will not be smaller than sqrt(damp)
+   % times the largest (scaled) element in that row or column.
+   %
+   % Use of the scales:
+   % To apply the scales to a linear program,
+   % :math:`min c^T x` st :math:`A x = b`, :math:`l \leq x \leq u`,
+   % we need to define "barred" quantities by the following relations:
+   % `A = R Abar C`, `b = R bbar`, `C cbar = c`,
+   % `C l = lbar`, `C u = ubar`, `C x = xbar`.
+   %
+   % This gives the scaled problem
+   % :math:`min\ cbar^T xbar` st :math:`Abar\ xbar = bbar`, :math:`lbar \leq xbar \leq ubar`.
+   %
+   % .. Author: - Michael Saunders, Systems Optimization Laboratory, Stanford University.
+   % ..
+   %    07 Jun 1996: First f77 version, based on MINOS 5.5 routine m2scal.
+   %    24 Apr 1998: Added final pass to make column norms = 1.
+   %    18 Nov 1999: Fixed up documentation.
+   %    26 Mar 2006: (Leo Tenenblat) First Matlab version based on Fortran version.
+   %    21 Mar 2008: (MAS) Inner loops j = 1:n optimized.
+   %    09 Apr 2008: (MAS) All loops replaced by sparse-matrix operations.
+   %                 We can't find the biggest and smallest Aij
+   %                 on each scaling pass, so no longer print them.
+   %    24 Apr 2008: (MAS, Kaustuv) Allow for empty rows and columns.
+   %    13 Nov 2009: gmscal.m renamed gmscale.m.
+   */
+  
+  int m = A.rows();
+  int n = A.cols();
+  
+  A = A.array().abs().matrix();
+  int maxpass=100;
+  double aratio=1e50;
+  double damp=1e-4;
+  double small = 1e-8;
+  double eps=2.2204e-16;
+  MatrixXd SA;
+  //  rscale = VectorXd::Constant(m, 1);
+  //  cscale = VectorXd::Constant(n, 1);
+  
+  /*--------------------------------------------------------------
+   Main loop.
+   --------------------------------------------------------------*/
+  for (int npass = 0; npass <= maxpass; npass ++){
+    
+    // Find the largest column ratio.
+    // Also set new column scales (except on pass 0).
+    
+    rscale = (rscale.array() ==0).select(1, rscale);
+    Eigen::DiagonalMatrix<double, Eigen::Dynamic> Rinv    = rscale.cwiseInverse().asDiagonal();
+    SA      = Rinv*A;
+    MatrixXd invSA   = SA.cwiseInverse().sparseView();
+    VectorXd cmax    = SA.colwise().maxCoeff();   // column vector
+    VectorXd cmin    = invSA.colwise().maxCoeff();   // column vector
+    cmin    = (cmin.array() + eps).matrix().cwiseInverse();
+    double sratio  = cmax.cwiseProduct(cmin.cwiseInverse()).maxCoeff();   // Max col ratio
+    if (npass > 0){
+      cscale = cmax.cwiseProduct(cmin.cwiseMax(damp*cmax)).array().sqrt().matrix();
+    }
+    
+    if (npass >= 2 && sratio >= aratio*scltol){
+      break;
+    }
+    if (npass == maxpass) {
+      break;
+    }
+    aratio  = sratio;
+    
+    // Set new row scales for the next pass.
+    
+    cscale = (cscale.array()==0).select(1,cscale);
+    Eigen::DiagonalMatrix<double, Eigen::Dynamic> Cinv = cscale.cwiseInverse().asDiagonal();
+    SA      = A*Cinv;                  // Scaled A
+    invSA   = SA.cwiseInverse();
+    VectorXd rmax    = SA.rowwise().maxCoeff();   // column vector
+    VectorXd rmin    = invSA.rowwise().maxCoeff();   // column vector
+    rmin    = (rmin.array() + eps).matrix().cwiseInverse();
+    rscale  = rmax.cwiseProduct(rmin.cwiseMax(damp*rmax)).array().sqrt().matrix();
+  }
+  /*---------------------------------------------------------------
+   End of main loop.
+   ---------------------------------------------------------------*/
+  
+  // Reset column scales so the biggest element
+  // in each scaled column will be 1.
+  // Again, allow for empty rows and columns.
+  
+  rscale = (rscale.array() ==0).select(1, rscale);
+  MatrixXd Rinv    = rscale.cwiseInverse().asDiagonal();
+  SA      = Rinv*A;
+  
+  cscale  = SA.colwise().maxCoeff();   // column vector
+  cscale = (cscale.array()==0).select(1,cscale);
+  
+  // end of gmscale
+}
+
+
+
+
+
 void mve_solver(MatrixXd A, VectorXd b, const VectorXd &x0, VectorXd & x,  MatrixXd & E2, const int maxiter = 50, const double tol  = 1.e-4){
   int m = A.rows();
   int n = A.cols();
@@ -459,7 +599,7 @@ void mve_solver(MatrixXd A, VectorXd b, const VectorXd &x0, VectorXd & x,  Matri
       h *= t;
       z = (bmAx-h).cwiseMax(1.e-1);
       Q *= t*t;
-      Y *= 1/(t*t);
+      Y.diagonal() = (Y.diagonal().array()/(t*t)).matrix();
     }
     VectorXd yz = y.cwiseProduct(z);
     VectorXd yh = y.cwiseProduct(h);
@@ -543,140 +683,6 @@ void mve_solver(MatrixXd A, VectorXd b, const VectorXd &x0, VectorXd & x,  Matri
   
   
   
-  
-  
-  
-  void gmscale(MatrixXd A, VectorXd &cscale, VectorXd &rscale, double scltol){
-    /*% Geometric-Mean Scaling finds the scale values for the
-     % `m x n` sparse matrix `A`.
-     %
-     % USAGE:
-     %
-     %    [cscale, rscale] = gmscale(A, iprint, scltol)
-     %
-     % INPUTS:
-     %    A(i, j):           contains entries of `A`.
-     %    iprint:            > 0 requests messages to the screen (0 means no output).
-     %    scltol:            should be in the range (0.0, 1.0).
-     %                       Typically `scltol` = 0.9.  A bigger value like 0.99 asks
-     %                       `gmscale` to work a little harder (more passes).
-     %
-     % OUTPUTS:
-     %    cscale, rscale:    column vectors of column and row scales such that
-     %                       `R` (inverse) `A` `C` (inverse) should have entries near 1.0,
-     %                       where `R= diag(rscale)`, `C = diag(cscale)`.
-     %
-     % An iterative procedure based on geometric means is used,
-     % following a routine written by Robert Fourer, 1979.
-     % Several passes are made through the columns and rows of `A`.
-     % The main steps are:
-     %
-     %   1. Compute :math:`aratio = max_j (max_i Aij / min_i Aij)`.
-     %   2. Divide each row `i` by :math:`sqrt( max_j Aij * min_j Aij)`.
-     %   3. Divide each column `j` by :math:`sqrt( max_i Aij * min_i Aij)`.
-     %   4. Compute `sratio` as in Step 1.
-     %   5. If :math:`sratio < aratio * scltol`,
-     %      set :math:`aratio = sratio` and repeat from Step 2.
-     %
-     % To dampen the effect of very small elements, on each pass,
-     % a new row or column scale will not be smaller than sqrt(damp)
-     % times the largest (scaled) element in that row or column.
-     %
-     % Use of the scales:
-     % To apply the scales to a linear program,
-     % :math:`min c^T x` st :math:`A x = b`, :math:`l \leq x \leq u`,
-     % we need to define "barred" quantities by the following relations:
-     % `A = R Abar C`, `b = R bbar`, `C cbar = c`,
-     % `C l = lbar`, `C u = ubar`, `C x = xbar`.
-     %
-     % This gives the scaled problem
-     % :math:`min\ cbar^T xbar` st :math:`Abar\ xbar = bbar`, :math:`lbar \leq xbar \leq ubar`.
-     %
-     % .. Author: - Michael Saunders, Systems Optimization Laboratory, Stanford University.
-     % ..
-     %    07 Jun 1996: First f77 version, based on MINOS 5.5 routine m2scal.
-     %    24 Apr 1998: Added final pass to make column norms = 1.
-     %    18 Nov 1999: Fixed up documentation.
-     %    26 Mar 2006: (Leo Tenenblat) First Matlab version based on Fortran version.
-     %    21 Mar 2008: (MAS) Inner loops j = 1:n optimized.
-     %    09 Apr 2008: (MAS) All loops replaced by sparse-matrix operations.
-     %                 We can't find the biggest and smallest Aij
-     %                 on each scaling pass, so no longer print them.
-     %    24 Apr 2008: (MAS, Kaustuv) Allow for empty rows and columns.
-     %    13 Nov 2009: gmscal.m renamed gmscale.m.
-     */
-    
-    int m = A.rows();
-  int n = A.cols();
-  
-  A = A.array().abs().matrix();
-  int maxpass=100;
-  double aratio=1e50;
-  double damp=1e-4;
-  double small = 1e-8;
-  double eps=2.2204e-16;
-  MatrixXd SA;
-  //  rscale = VectorXd::Constant(m, 1);
-  //  cscale = VectorXd::Constant(n, 1);
-  
-  /*--------------------------------------------------------------
-   Main loop.
-   --------------------------------------------------------------*/
-  for (int npass = 0; npass <= maxpass; npass ++){
-    
-    // Find the largest column ratio.
-    // Also set new column scales (except on pass 0).
-    
-    rscale = (rscale.array() ==0).select(1, rscale);
-    Eigen::DiagonalMatrix<double, Eigen::Dynamic> Rinv    = rscale.cwiseInverse().asDiagonal();
-    SA      = Rinv*A;
-    MatrixXd invSA   = SA.cwiseInverse().sparseView();
-    VectorXd cmax    = SA.colwise().maxCoeff();   // column vector
-    VectorXd cmin    = invSA.colwise().maxCoeff();   // column vector
-    cmin    = (cmin.array() + eps).matrix().cwiseInverse();
-    double sratio  = cmax.cwiseProduct(cmin.cwiseInverse()).maxCoeff();   // Max col ratio
-    if (npass > 0){
-      cscale = cmax.cwiseProduct(cmin.cwiseMax(damp*cmax)).array().sqrt().matrix();
-    }
-    
-    if (npass >= 2 && sratio >= aratio*scltol){
-      break;
-    }
-    if (npass == maxpass) {
-      break;
-    }
-    aratio  = sratio;
-    
-    // Set new row scales for the next pass.
-    
-    cscale = (cscale.array()==0).select(1,cscale);
-    Eigen::DiagonalMatrix<double, Eigen::Dynamic> Cinv = cscale.cwiseInverse().asDiagonal();
-    SA      = A*Cinv;                  // Scaled A
-    invSA   = SA.cwiseInverse();
-    VectorXd rmax    = SA.rowwise().maxCoeff();   // column vector
-    VectorXd rmin    = invSA.rowwise().maxCoeff();   // column vector
-    rmin    = (rmin.array() + eps).matrix().cwiseInverse();
-    rscale  = rmax.cwiseProduct(rmin.cwiseMax(damp*rmax)).array().sqrt().matrix();
-  }
-  /*---------------------------------------------------------------
-   End of main loop.
-   ---------------------------------------------------------------*/
-  
-  // Reset column scales so the biggest element
-  // in each scaled column will be 1.
-  // Again, allow for empty rows and columns.
-  
-  rscale = (rscale.array() ==0).select(1, rscale);
-  MatrixXd Rinv    = rscale.cwiseInverse().asDiagonal();
-  SA      = Rinv*A;
-  
-  cscale  = SA.colwise().maxCoeff();   // column vector
-  cscale = (cscale.array()==0).select(1,cscale);
-  
-  // end of gmscale
-}
-
-
 
 
 void mve_run_cobra(const MatrixXd &A, const VectorXd &b, const MatrixXd &x0, VectorXd & x, MatrixXd & E){
@@ -703,8 +709,8 @@ void mve_run_cobra(const MatrixXd &A, const VectorXd &b, const MatrixXd &x0, Vec
   MatrixXd E2(n,n);
 
   mve_solver(A,b,x0,x, E2, maxiter,tol2);
-  SparseLLT<Eigen::SparseMatrixType> A_LLT(A.template triangularView<Lower>())
-    E = A_LLT.matrixL().transpose();
+  
+  E=A.llt().matrixU().transpose();
 }
 
 
@@ -717,62 +723,6 @@ void shiftPolytope(MatrixXd & A, VectorXd & b, MatrixXd & N, VectorXd &p, Matrix
   b = b - A*shift;
   A = A*trans;
 }
-
-
-
-
-void round(MatrixXd A, MatrixXd b, VectorXd x0){
-  VectorXd p_shift=VectorXd::Zero(A.cols());
-  
-  //check that x0 is a good answer, otherwise, finds another one
-  while (((A*x0-b).array()>0).any()){
-    VectorXd xnew(A.cols());
-    newSolution(A,b,x0,xnew);
-    x0=xnew;
-  }
-  
-  //scale the matrix to help with numerical precision
-  VectorXd cs(A.cols());
-  VectorXd rs(A.rows());
-  gmscale(A,cs, rs, 0.99);
-  A=rs.cwiseInverse().asDiagonal()*A*cs.cwiseInverse().asDiagonal();
-  b=rs.cwiseInverse().asDiagonal()*b;
-    MatrixXd N_total=Matrix<double, A.cols()>::Identity() * cs.cwiseInverse().asDiagonal();
-  
-  int max_its=20;
-  int its=0;
-  double reg=1e-3;
-  MatrixXd Tmve = Matrix<double, A.cols(), A.cols()>::Identity();
-  MatrixXd T = Matrix<double, A.cols(), A.cols()>::Identity();
-  int converged = 0;
-  VectorXd eigen=Tmve.eigenvalues()
-    while ((eigen.maxCoeff()>6*eigen.minCoeff()) && !converged) || reg >1e-6 || converged ==2){
-      ++its;
-      newSolution(A, b, x0, xnew);
-      x0=xnew;
-      reg=std::max(reg/10., 1e-10);
-      mve_run_cobra(A, b, x0, reg, T_shift, Tmve);
-      shiftPolytope(A, b, N_total, p_shift, T, Tmve, T_shift);
-      x0=Tmve.inverse()*(x0-T_shift); // we shift x0 to be a solution of the shifted polytope
-      VectorXd row_norms=A.rowwise().norm();
-      A=row_norms.cwiseInverse().asDiagonal()*A;
-      b=row_norms.cwiseInverse().asDiagonal()*b;
-      if (its == max_its){
-        break;
-      }
-      }
-      if (b.coeffMin()<=0){
-        newSolution(A, b, x0, xnew);
-        x0=xnew;
-        shiftPolytope(A, b, N_total, p_shif, T, Matrix<double, A.cols()>::Identity(), x);
-      }
-}
-
-//important here the function should return A and b that are rounded Polytope, plus at least N_total and p_shift that allows converting x a solution of
-// the rounded Polytope to y a solution of the initial polytope as
-// y = N_total * x + p_shift
-//Note that Ainital * N = Arounded
-//and brounded=binitial-Ainitial*p_shift
 
 
 
@@ -847,10 +797,75 @@ void newSolution(const Eigen::MatrixXd &A ,
   double tmax=std::max(0.0, tmax);
   
   
-  y += (tmin+(tmax-tmin)*dqrng::dqrunif(1)[0])*u;
+  y = (y.array()+ (tmin+(tmax-tmin)*dqrng::dqrunif(1)[0])*u).matrix();
   
   x=T1*y;
   
 }
+
+
+
+
+
+
+void round(MatrixXd A, MatrixXd b, VectorXd x0){
+  int m=A.cols();
+  int n=A.rows();
+  VectorXd p_shift=VectorXd::Zero(m);
+  
+  //check that x0 is a good answer, otherwise, finds another one
+  while (((A*x0-b).array()>0).any()){
+    VectorXd xnew(m);
+    newSolution(A,b,x0,xnew);
+    x0=xnew;
+  }
+  
+  //scale the matrix to help with numerical precision
+  VectorXd cs(m);
+  VectorXd rs(n);
+  gmscale(A,cs, rs, 0.99);
+  A=rs.cwiseInverse().asDiagonal()*A*cs.cwiseInverse().asDiagonal();
+  b=rs.cwiseInverse().asDiagonal()*b;
+  MatrixXd N_total=MatrixXd::Identity(m, m) * cs.cwiseInverse().asDiagonal();
+  
+  int max_its=20;
+  int its=0;
+  double reg=1e-3;
+  MatrixXd Tmve = MatrixXd::Identity(m, m);
+  MatrixXd T = MatrixXd::Identity(m, m);
+  int converged = 0;
+  Eigen::EigenSolver<Eigen::MatrixXd> es;
+  VectorXd eigen=es.compute(Tmve, false).eigenvalues().real();
+  while (((eigen.maxCoeff()>6*eigen.minCoeff()) && !converged) || reg >1e-6 || converged ==2){
+      ++its;
+    VectorXd xnew;
+      newSolution(A, b, x0, xnew);
+      x0=xnew;
+      reg=std::max(reg/10., 1e-10);
+      VectorXd T_shift(m);
+      mve_run_cobra(A, b, x0, reg, T_shift, Tmve);
+      shiftPolytope(A, b, N_total, p_shift, T, Tmve, T_shift);
+      x0=Tmve.inverse()*(x0-T_shift); // we shift x0 to be a solution of the shifted polytope
+      VectorXd row_norms=A.rowwise().norm();
+      A=row_norms.cwiseInverse().asDiagonal()*A;
+      b=row_norms.cwiseInverse().asDiagonal()*b;
+      if (its == max_its){
+        break;
+      }
+      }
+      if (b.minCoeff()<=0){
+        VectorXd xnew;
+        newSolution(A, b, x0, xnew);
+        x0=xnew;
+        shiftPolytope(A, b, N_total, p_shift, T, MatrixXd::Identity(m,m), x);
+      }
+}
+
+//important here the function should return A and b that are rounded Polytope, plus at least N_total and p_shift that allows converting x a solution of
+// the rounded Polytope to y a solution of the initial polytope as
+// y = N_total * x + p_shift
+//Note that Ainital * N = Arounded
+//and brounded=binitial-Ainitial*p_shift
+
 
 
