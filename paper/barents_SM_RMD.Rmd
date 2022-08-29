@@ -20,7 +20,6 @@ require(DT)
 require(dplyr)
 require(coda)
 require(ggplot2)
-install.packages("kableExtra")
 library(kableExtra)
 
 
@@ -134,7 +133,7 @@ library(RCaNmodel) #the RCaNmodel package itself
 The food web structure, biological parameters, observational data-series and model constraints are all provided in the RCaN file in the .xlsx format. A RCaN file can be edited using a spreadsheet editor (e.g. libre office, open office, MS Escel) or with the RCaNconstructor. The use of RCaNconstructor is recommended as it ensures that names of model entities (species, fluxes and observations) are consistent across the different worksheets of the RCaN-file.
 
 ```{r label=data}
-NAMEFILE <- 'BarentsSeaDummy.xlsx'
+NAMEFILE <- 'annexC_BarentsSeaDummy.xlsx'
 ```
 
 Importing an RCaN-file in the R environment and building the corresponding polytope are done with one single RCaNmodel command:
@@ -505,17 +504,21 @@ The graphical representation of the possible dynamics of the food-web is a impor
 For components, we get:
 
 ```{r label=dynamicsComponents, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
-pdf("SomeGGseriesComponents.pdf")
+#pdf("SomeGGseriesComponents.pdf")
 ggSeries(SAMPLE,c('Hzoo_PelF','PelF_PelF','PelF_DemF','Hzoo','PelF','DemF'))
+<<<<<<< HEAD
 dev.off()
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
 >>>>>>> 56237aa (edit rmd paper)
+=======
+#dev.off()
+>>>>>>> 6bb7183 (fix the markdown)
 #pdf("GGseriesComponents.pdf")
 ggSeries(SAMPLE, POLYTOPE$species, TRUE) +
   theme(legend.position = "none") +
-  facet_grid(cols=POLYTOPE$species)
+  facet_grid(cols=vars(POLYTOPE$species))
 #dev.off()
 <<<<<<< HEAD
 ```
