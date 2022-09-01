@@ -4,7 +4,13 @@
 \alias{ggSeries}
 \title{ggSeries}
 \usage{
-ggSeries(mysampleCaNmod, param, plot_series = TRUE, ylab = "Biomass/Flux")
+ggSeries(
+  mysampleCaNmod,
+  param,
+  plot_series = TRUE,
+  ylab = "Biomass/Flux",
+  facet = TRUE
+)
 }
 \arguments{
 \item{mysampleCaNmod}{result sent by \link{sampleCaN}}
@@ -15,6 +21,9 @@ a biomass)}
 \item{plot_series}{if yes, draw three example of trajectories (default TRUE)}
 
 \item{ylab}{default Biomass Flux}
+
+\item{facet}{if TRUE (default), each param is on a specific panel, otherwise
+they are combined in a single plot}
 }
 \value{
 a ggplot
