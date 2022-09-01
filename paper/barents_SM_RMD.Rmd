@@ -416,7 +416,12 @@ The RCaN function *sampleCaN* is used to sample of the polytope, i.e. to sample 
 With N=100, thin=10, and nchain=2 the *sampleCaN* function will sample two chains of 1,000 values and return one output every 10, that is a total of 200 valid samples
 
 ```{r label=sample}
+if (file.exists("sampleCaN.rdata")){
+  load("sampleCaN.rdata")
+} else {
 system.time(SAMPLE <- sampleCaN(POLYTOPE, N=100, thin=10, nchain=2, ncore=2))
+  save(SAMPLE, file = "sampleCaN.rdata")
+}
 ```
 
 ## Convergence of the sample chains
