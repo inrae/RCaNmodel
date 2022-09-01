@@ -1,0 +1,8 @@
+setwd("~/Documents/Bordeaux/equipe estuaire/CaN/can/paper/")
+library(RCaN)
+library(ggpubr)
+load("sampleCaN.rdata")
+ggSeries(SAMPLE, c("DemF","PelF_DemF"))
+ggTrophicRelation(SAMPLE,species=c("DemF"))
+ggGrowth(SAMPLE, "DemF")
+ggTopDownBottomUp(SAMPLE,list(DemF=NULL))
