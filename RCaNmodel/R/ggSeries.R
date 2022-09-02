@@ -10,8 +10,9 @@
 #' @param facet if TRUE (default), each param is on a specific panel, otherwise
 #' they are combined in a single plot
 #' @return a ggplot
-#' @details the line corresponds to median of the mcmc simulation, the ribbon
-#' corresponds to quantiles 2.5% and 97.5%
+#' @details the 3 lines correspond to 3 random trajectories drawn among the mcmc
+#' iterations, the ribbons correspond to the interval between quantiles
+#' 0%-100%, 2.5%-97.5% and 25%-75%
 #'
 #' @examples
 #' myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
