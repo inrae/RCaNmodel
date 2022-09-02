@@ -110,9 +110,7 @@ biomasses at time-step 1. RCaNmodel uses linear programming tools to perform the
 especially efficient to achieve a uniform sampling in high dimensions polytopes [@andersen2007a; @laddha2020a]. The function
 returns an object of class mcmc.list that can be manipulated/explored using the package coda [@plummer2010a],
 e.g. to check the convergence of the MCMC algorithm.
--   Finally, several graphical functions are available to explore the results per trophic groups and time periods
-(see supplementary). For example, the function *ggTopDownBottomUp* returns a ggplot [@wickam2016] that can be used to detect
-top-down or bottom-up controls on the different trophic groups (\autoref{fig:ggtopdown}).
+-   Finally, several graphical functions are available to explore the results per trophic groups and time periods, including diagralms describing the dynamics of flows and biomass, relationships among species and trophic controls (\autoref{fig:outupfig}).
 
 All these steps can be done either directly through R scripts or using the RCaNconstructor GUI. An example using R commands
 is presented in the supplementary material. It should be noted that most of the functions to check the status or to sample
@@ -130,11 +128,7 @@ possible time-trajectories of the food-web and that can be sample using appriate
 be achieved using either an R script or the RCaNconstructor GUI, except the step denoted with a \*. Italicised texts denote
 RCaNmodel functions. The boxes stand for the main steps, under which is mentioned their links with other R libraries.\label{fig:approach}](approaches.png)
 
-![Example of diagrams returned by ggTopDownBottomUp which display how the yearly biomass growth of a trophic group is correlated
-with the yearly predation pressure exerted on the group (in blue) or on the amount of trophic resources the group consumed (in red).
-The diagram comes from the example presented in supplementary material. Here, the growth of marine mammals (MM) is positively correlated
-to its feeding, suggesting a strong bottom-up control. On the other hand, the growth of pelagic fishes (PelF) is negatively correlated
-to the predation pressure, suggesting a top-down control.\label{fig:ggtopdown}](ggtopdown.png)
+![Example of diagnostic diagrams provided by *RCaNmodelling*, based on the exemple provided as a supplementary material. Panel a shows the time variations of the biomass of a tophic group (DemF =  demersal fishes) and the trophic flow from PelF (Pelagic fishes) to DemF (the lines correspond to 3 random trajectories while the ribbons corresponds to quantiles 50%, 97.5% and 100% among trajectories). Panel b illustrates how the growth rate of DemF (y-axis) decreases with the biomass of the stock (x-axis) among the different years and MCMC iterations, suggesting a limitation by resources. Panel c illustrates that the trophic flow towards DemF is correlated to the amount of available preys, suggesting a bottom-up control of DemF. Panel d shows that the growth of DemF (MM) is positively correlated to its feeding, suggesting a strong bottom-up control. On the other hand, the growth rate is not correlated to the predation by predators suggesting that there is no top-down control.\label{fig:outupfig}](figure3.png)
 
 # References
 =======
