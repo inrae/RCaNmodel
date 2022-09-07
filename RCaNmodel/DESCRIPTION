@@ -30,7 +30,7 @@ Imports:
     Rcpp,
     dqrng,
     RcppEigen
-LinkingTo: Rcpp, RcppEigen, dqrng
+LinkingTo: Rcpp, RcppEigen, dqrng, testthat
 Suggests: 
     gridExtra,
     knitr,
@@ -39,10 +39,11 @@ Suggests:
     ggraph,
     igraph,
     testthat (>= 3.0.0),
-    ROI.plugin.cbc
+    ROI.plugin.cbc,
+    xml2
 RdMacros: Rdpack
 VignetteBuilder: knitr
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
 Encoding: UTF-8
 LazyData: true
 Depends: 
