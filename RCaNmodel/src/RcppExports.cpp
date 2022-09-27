@@ -166,14 +166,11 @@ RcppExport SEXP _RCaNmodel_RcppExport_registerCCallable() {
     return R_NilValue;
 }
 
-RcppExport SEXP run_testthat_tests(SEXP);
-
 static const R_CallMethodDef CallEntries[] = {
     {"_RCaNmodel_cpgs", (DL_FUNC) &_RCaNmodel_cpgs, 9},
     {"_RCaNmodel_cpgsEquality", (DL_FUNC) &_RCaNmodel_cpgsEquality, 11},
     {"_RCaNmodel_sampleCaNCPP", (DL_FUNC) &_RCaNmodel_sampleCaNCPP, 12},
     {"_RCaNmodel_RcppExport_registerCCallable", (DL_FUNC) &_RCaNmodel_RcppExport_registerCCallable, 0},
-    {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 1},
     {NULL, NULL, 0}
 };
 
