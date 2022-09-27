@@ -4,8 +4,10 @@
 name: Build Unix Installer
 
 on:
-  push: [master, RCaNconstructor]
-  pull_request: [master, RCaNconstructor]
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
   build:
@@ -28,4 +30,4 @@ jobs:
         automatic_release_tag: "Ubuntu-latest"
         prerelease: true
         title: "Ubuntu Development Build"
-        files: ./RCaNconstructor/target/*.deb
+        files: ./target/*.deb
