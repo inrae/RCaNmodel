@@ -55,8 +55,8 @@ x <- cpgs(1000,A,b,X0)
 
 ```{r}
 par(mfrow=c(1,2),mar=c(2.5,2.5,1.5,.5),mgp=c(1.5,.5,0))
-hist(x[,1],50)
-plot(x[,1],type='l',main=1)
+hist(x$X[,1],50)
+plot(x$X[,1],type='l',main=1)
 ```
 
 We show that the algorithm has correctly sampled for the first parameter. Among others, polytope arise when fitting lim model. Here we show a modification of the function \code{\link{[limSolve]xsample}} that allow using the Gibbs algorithm instead of the traditionnal mirror algorithm:

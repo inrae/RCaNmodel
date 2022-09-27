@@ -19,19 +19,22 @@
 #' @export
 ggNetwork <- function(myCaNmod) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
-    stop("Package ggplot2 needed for this function to work.
+    print("Package ggplot2 needed for this function to work.
          Please install it",
          call. = FALSE)
+    return()
   }
   if (!requireNamespace("ggraph", quietly = TRUE)) {
-    stop("Package ggraph needed for this function to work.
+    print("Package ggraph needed for this function to work.
          Please install it",
          call. = FALSE)
+    return()
   }
   if (!requireNamespace("igraph", quietly = TRUE)) {
-    stop("Package igraph needed for this function to work.
+    print("Package igraph needed for this function to work.
          Please install it",
          call. = FALSE)
+    return()
   }
   # need to order the links table so that it matches the order of the components
   edge_graph <-

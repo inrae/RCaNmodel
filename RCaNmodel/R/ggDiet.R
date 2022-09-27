@@ -11,7 +11,7 @@
 #'
 #' @examples
 #' myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
-#'  package = "RCaN"))
+#'  package = "RCaNmodel"))
 #' res <- sampleCaN(myCaNmod, 100)
 #' ggDiet(res,"OmniZooplankton")
 #'
@@ -75,7 +75,7 @@ ggDiet <- function(mysampleCaNmod,
   if (barplot)
     mat_res <- mat_res %>%
     group_by(!!sym("prey"), !!sym("predator")) %>%
-    summarize("prop_in_diet" = mean(!!sym("prop_in_diet")))
+    summarize("prop_in_diet" = mean(!!sym("prop_in_diet"), na.rm =TRUE))
   mat_res$predator <- factor(as.character(mat_res$predator),
                              levels = species)
 

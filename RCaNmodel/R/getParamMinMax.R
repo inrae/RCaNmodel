@@ -17,16 +17,14 @@ getParamMinMax <- function(OP, p) {
                        scaling = c("extreme",
                                    "equilibrate",
                                    "integers")))
-    if (requireNamespace("ROI.plugin.clp", quietly = TRUE) &
-        res$status$code == 5){
-      res <- ROI_solve(OP, solver = "clp", control = list(amount = 0))
+    if (requireNamespace("ROI.plugin.cbc", quietly = TRUE)
+        & res$status$msg$code == 5){
+      res <- ROI_solve(OP,
+                       solver = "cbc",
+                       control = list(logLevel = 0))
     }
-    if (res$status$code != 0 &
-        requireNamespace("ROI.plugin.clp", quietly = TRUE))
-      res <- ROI_solve(OP, solver = "glpk",
-                       control=list(tm_limit = 1000))
 
-    if (res$status$code == 0) {
+    if (res$status$msg$code == 0) {
       bound <- res$solution[p]
       solved[1] <- TRUE
     } else  {

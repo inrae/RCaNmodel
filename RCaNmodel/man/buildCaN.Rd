@@ -4,11 +4,16 @@
 \alias{buildCaN}
 \title{buildCaN}
 \usage{
-buildCaN(x)
+buildCaN(x, generic = FALSE)
 }
 \arguments{
 \item{x}{either the path to a RCaN input file or a named list with
-4 elements (components_param, fluxes_def, series, constraints)}
+at least 4 elements (components_param, fluxes_def, series, constraints). It
+can also includes an element dynamics if this is not a trophic model, and
+optionally aliases}
+
+\item{generic}{tells whether the model is a standard RCaN trophic model
+(FALSE, default) or a generic model (TRUE)}
 }
 \value{
 a CaNmod object with following elements
@@ -17,6 +22,8 @@ a CaNmod object with following elements
  \item{"species"}{the name of the species}
  \item{"fluxes_def}{the table of fluxes definition}
  \item{"ntstep"}{the number of time steps}
+ \item{"aliases"}{the aliases specified by the user}
+ \item{"dynamics"}{the dynamics equation for a generic model}
  \item{"data_series_name"}{the names of the data series}a
  \item{"constraints"}{the table of constraints description}
  \item{"H"}{the H matrix from (I-H).B+N.F}
@@ -64,5 +71,10 @@ myCaNmod <- buildCaN(list(components_param = components_param,
                                fluxes_def = fluxes_def,
                                series = series,
                                constraints = constraints))
+
+#example with a template under the generic format
+file <- system.file("extdata",
+ "CaN_template_mini_generic.xlsx", package = "RCaNmodel")
+myCaNmod_generic <- buildCaN(file, generic = TRUE)
 
 }

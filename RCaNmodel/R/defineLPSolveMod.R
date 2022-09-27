@@ -10,7 +10,7 @@
 #' @param lower minimal bounds for paramaters, by default set to zero
 #' @param upper maximum bounds for paramaters, by default set to Inf
 #' @param maximum tells whether the objective function is maximised or not
-#' @param ob the coefficient of the ojective function (default all 1)
+#' @param ob the coefficient of the objective function (default all 1)
 #'
 #' @return returns an OP object
 #'
@@ -19,6 +19,7 @@
 #' @importFrom lpSolveAPI set.rhs
 #' @importFrom lpSolveAPI set.constr.type
 #' @importFrom lpSolveAPI lp.control
+#'
 
 
 defineLPSolveMod <-
