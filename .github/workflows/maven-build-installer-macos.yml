@@ -22,6 +22,25 @@ jobs:
           java-version: 17.0.1
           distribution: 'temurin'
           cache: 'maven'
+
+      - name: Import signing certificate into keychain
+        run: |
+          KEYCHAIN_FILE=default.keychain
+          KEYCHAIN_PASSWORD=myvoiceismypassport
+          security create-keychain -p $KEYCHAIN_PASSWORD $KEYCHAIN_FILE
+          security default-keychain -s $KEYCHAIN_FILE
+          security unlock-keychain -p $KEYCHAIN_PASSWORD $KEYCHAIN_FILE
+          security import <(echo $SIGNING_CERTIFICATE_P12_DATA | base64 --decode) \
+                          -f pkcs12 \
+                          -k $KEYCHAIN_FILE \
+                          -P $SIGNING_CERTIFICATE_PASSWORD \
+                          -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k $KEYCHAIN_PASSWORD $KEYCHAIN_FILE
+        env:
+          SIGNING_CERTIFICATE_P12_DATA: ${{ secrets.SIGNING_CERTIFICATE_P12_DATA }}
+          SIGNING_CERTIFICATE_PASSWORD: ${{ secrets.SIGNING_CERTIFICATE_PASSWORD }}
+
+
       - name: Build with Maven
         run: mvn -B clean install --file RCaNconstructor/pom.xml
       - name: Update Automatic Release
@@ -31,4 +50,4 @@ jobs:
           automatic_release_tag: "macOS-latest"
           prerelease: true
           title: "macOS Development Build"
-          files: ./target/*.dmg
+          files: ./RCaNconstructor/target/*.dmg
