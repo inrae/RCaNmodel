@@ -5,9 +5,12 @@ name: Maven Basic Package
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master
+      - RCaNconstructor
   pull_request:
-    branches: [ master ]
+      - master
+      - RCaNconstructor
 
 jobs:
   build:

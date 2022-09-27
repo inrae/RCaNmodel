@@ -5,9 +5,11 @@ name: Build Windows Installer
 
 on:
   push:
-    branches: [ master ]
+      - master
+      - RCaNconstructor
   pull_request:
-    branches: [ master ]
+      - master
+      - RCaNconstructor
 
 jobs:
   build:
