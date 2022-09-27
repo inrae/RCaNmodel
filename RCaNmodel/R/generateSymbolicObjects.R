@@ -5,8 +5,6 @@
 #' @param components the components data frame
 #' @param fluxes_def fluxes_def
 #' @param ntstep number of the time step
-#' @param H the H matrix of (I-H).B+N.F
-#' @param N the N matrix of (I-H).B+N.F
 #' @param series the names of the series
 #' @param aliases table of alias (default = NULL)
 #' @param dynamics_equation a string that specifies the dynamics equation (NULL

@@ -26,10 +26,6 @@ generateSymbolicObjects(
 
 \item{dynamics_equation}{a string that specifies the dynamics equation (NULL
 if trophic model)}
-
-\item{H}{the H matrix of (I-H).B+N.F}
-
-\item{N}{the N matrix of (I-H).B+N.F}
 }
 \value{
 en environment storing all symbolic elements including among others
