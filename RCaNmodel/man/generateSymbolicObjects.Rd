@@ -4,20 +4,28 @@
 \alias{generateSymbolicObjects}
 \title{generateSymbolicObjects}
 \usage{
-generateSymbolicObjects(flow, species, ntstep, H, N, series)
+generateSymbolicObjects(
+  components,
+  fluxes_def,
+  ntstep,
+  series,
+  aliases,
+  dynamics_equation = NULL
+)
 }
 \arguments{
-\item{flow}{names of the flow}
+\item{components}{the components data frame}
 
-\item{species}{names of the species}
+\item{fluxes_def}{fluxes_def}
 
 \item{ntstep}{number of the time step}
 
-\item{H}{the H matrix of (I-H).B+N.F}
-
-\item{N}{the N matrix of (I-H).B+N.F}
-
 \item{series}{the names of the series}
+
+\item{aliases}{table of alias (default = NULL)}
+
+\item{dynamics_equation}{a string that specifies the dynamics equation (NULL
+if trophic model)}
 }
 \value{
 en environment storing all symbolic elements including among others

@@ -15,7 +15,8 @@ sampleCaN(
 )
 }
 \arguments{
-\item{myCaNmod}{a CaNmod object with following elements}
+\item{myCaNmod}{a CaNmod or a sampleCaNmod. In this latter case, adapative
+phase and discarding phases won't be necessary}
 
 \item{N}{the number of samples required}
 
@@ -30,10 +31,13 @@ sampleCaN(
 \item{lastF}{should flow for last year be simulated (default = FALSE)}
 }
 \value{
-a sampleCaNmod object which contains two elements
+a sampleCaNmod object which contains three elements
 \itemize{
  \item{"CaNmod"}{the CaNmod object descring the model}
  \item{"mcmc"}{\code{\link[coda]{mcmc.list}}}
+ \item{"covMat"}{the estimate of the covariance matrix in the first chain
+ which can be used to samples new iterations without adaptation nor
+ discarding phase}
 }
 }
 \description{

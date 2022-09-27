@@ -1,17 +1,21 @@
 #' sampleCaN
 #'
 #' sample the polytope corresponding to the CaNmod model
-#' @param myCaNmod a CaNmod object with following elements
+#' @param myCaNmod a CaNmod or a sampleCaNmod. In this latter case, adapative
+#' phase and discarding phases won't be necessary
 #' @param N the number of samples required
 #' @param nchain the number of mcmc chains
 #' @param ncore number of cores to use
 #' @param thin thinning interval
 #' @param method one of gibbs (default) or hitandrun
 #' @param lastF should flow for last year be simulated (default = FALSE)
-#' @return a sampleCaNmod object which contains two elements
+#' @return a sampleCaNmod object which contains three elements
 #' \itemize{
 #'  \item{"CaNmod"}{the CaNmod object descring the model}
 #'  \item{"mcmc"}{\code{\link[coda]{mcmc.list}}}
+#'  \item{"covMat"}{the estimate of the covariance matrix in the first chain
+#'  which can be used to samples new iterations without adaptation nor
+#'  discarding phase}
 #' }
 #'
 #' @export
@@ -33,15 +37,20 @@
 #' @importFrom foreach foreach
 #' @importFrom foreach %dopar%
 #' @importFrom foreach %do%
-#' @importFrom foreach %do%
 #' @importFrom stats runif
 sampleCaN <- function(myCaNmod,
                       N,
                       nchain = 1,
                       ncore = 1,
                       thin = 1,
-                      method="gibbs",
+                      method = "gibbs",
                       lastF = FALSE) {
+  if (inherits(myCaNmod, "sampleCaNmod")){
+    covMat <- myCaNmod$covMat
+    myCaNmod <- myCaNmod$CaNmod
+  } else{
+    covMat <- NULL
+  }
   if (! method %in% c("gibbs","hitandrun"))
     stop("method should be either gibbs or hitandrun")
   ncore <- min(min(detectCores() - 1, ncore), nchain)
@@ -59,12 +68,10 @@ sampleCaN <- function(myCaNmod,
       library(coda)
     })
     clusterEvalQ(cl, {
-      library(doRNG)
-    })
-    clusterEvalQ(cl, {
       library(stats)
     })
-    clusterExport(cl, c("myCaNmod", "N"), envir = environment())
+    clusterExport(cl, c("myCaNmod", "N", "covMat", "thin", "method"),
+                  envir = environment())
     registerDoParallel(cl)
     `%myinfix%` <- `%dopar%`
   }
@@ -76,6 +83,7 @@ sampleCaN <- function(myCaNmod,
       lp_model <- defineLPMod(myCaNmod$A, myCaNmod$b, myCaNmod$C, myCaNmod$v,
                               maximum = FALSE,
                               ob = runif(ncol(myCaNmod$A)))
+
       res <- ROI_solve(lp_model, solver = "lpsolve",
                        control = list(presolve = c("rows",
                                                    "lindep",
@@ -84,13 +92,16 @@ sampleCaN <- function(myCaNmod,
                                       scaling = c("extreme",
                                                   "equilibrate",
                                                   "integers")))
-      if (requireNamespace("ROI.plugin.clp", quietly = TRUE)
-          & res$status$code == 5){
-        res <- ROI_solve(lp_model, solver = "clp", control = list(amount = 0))
+      if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
+          res$status$msg$code == 5){
+        res <- ROI_solve(lp_model,
+                         solver = "cbc",
+                         control = list(logLevel = 0))
       }
+
       x0 <- res$solution
 
-      if (res$status$code == 0)
+      if (res$status$msg$code == 0)
         find_init <- TRUE
       nbiter <- nbiter + 1
     }
@@ -99,18 +110,19 @@ sampleCaN <- function(myCaNmod,
     res <-
       sampleCaNCPP(
         N,
+        A = as.matrix(myCaNmod$A),
+        b = myCaNmod$b,
+        C = as.matrix(myCaNmod$C),
+        v = myCaNmod$v,
+        L = as.matrix(myCaNmod$L),
+        x0 = x0,
         thin = thin,
-        as.matrix(myCaNmod$A),
-        myCaNmod$b,
-        as.matrix(myCaNmod$C),
-        myCaNmod$v,
-        as.matrix(myCaNmod$L),
-        x0,
-        method == "gibbs",
-        i,
-        i
+        gibbs = (method == "gibbs"),
+        seed = i,
+        stream = i,
+        covMat = covMat
       )
-    names(res) <- c("F", "B")
+    names(res) <- c("F", "B", "covMat")
     res$F <- res$F[, -seq_len(length(myCaNmod$species))]
     #we remove the first column which corresponds to initial biomasses
     colnames(res$F) <- colnames(myCaNmod$A)[-seq_len(length(myCaNmod$species))]
@@ -125,7 +137,8 @@ sampleCaN <- function(myCaNmod,
         res$F <- res$F[, - lastid]
     }
     colnames(res$B) <- rownames(myCaNmod$L)
-    mcmc(cbind(res$F, res$B), 1, nrow(res$F), 1)
+    list(samples = mcmc(cbind(res$F, res$B), 1, nrow(res$F), 1),
+         covMat = res$covMat)
   }
 
   if (ncore > 1) {
@@ -133,7 +146,8 @@ sampleCaN <- function(myCaNmod,
     stopImplicitCluster()
   }
   sampleCaNmod <- list(CaNmod = myCaNmod,
-                       mcmc = mcmc.list(res))
+                       mcmc = mcmc.list(lapply(res, function(r) r$samples)),
+                       covMat  = res[[1]]$covMat)
   class(sampleCaNmod) <- "sampleCaNmod"
   return(sampleCaNmod)
 

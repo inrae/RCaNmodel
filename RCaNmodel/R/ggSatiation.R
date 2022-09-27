@@ -1,5 +1,6 @@
 #' ggSatiation
-#' plots incoming trophic fluxes versus biomass
+#' plots incoming trophic fluxes (consumption) versus biomass, alongside the
+#' satiation constraints (red dashed line)
 #' @param mysampleCaNmod result sent by \link{sampleCaN}
 #' @param species the name (or a vector of name) of the species of interest
 #' by default, all species
@@ -112,8 +113,8 @@ ggSatiation <- function(mysampleCaNmod,
     facet_wrap(~predator,
                ncol = ceiling(length(species)^0.5),
                scales = "free") +
-    xlab('Predator biomass') +
-    ylab('Total flux to predator') +
+    xlab('Biomass') +
+    ylab('Consumption') +
     theme(legend.position = "none") +
     theme_bw()+
     ggtitle('Satiation')

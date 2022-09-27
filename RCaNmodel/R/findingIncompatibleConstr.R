@@ -1,4 +1,4 @@
-#' findingIncompatibleConstraints
+#' findingIncompatibleConstr
 #' help to dectect constraints that leads to an empty polytope defined
 #' by+A.x<=b and C.x=v or by the polytope of the CaNmod object
 #' @param x either a CaNmod oject or a named list with at least a matrix A and
@@ -55,69 +55,94 @@ findingIncompatibleConstr <- function(x) {
     colnames(A) <- paste("p", seq_len(nbparam), sep = "")
   param_name <- colnames(A)
   ####add slack variable for inequality constraint
-  for (s in seq_len(nrow(A))) {
-    slack <- rep(0, nbineq)
-    slack[s] <- -1
-    Aslacked <- cbind(Aslacked, slack)
-    Cslacked <- cbind(Cslacked, rep(0, nbeq))
+  slack <- -diag(nbineq)
+  Aslacked <- cbind(A, slack)
+  Cslacked <- cbind(C, matrix(0, ncol = nbineq, nrow = nbeq))
+  param_name <- c(param_name,
+                  paste("slack", rownames(A)))
+
+  # for (s in seq_len(nrow(A))) {
+  #   slack <- rep(0, nbineq)
+  #   slack[s] <- -1
+  #   Aslacked <- cbind(Aslacked, slack)
+  #   Cslacked <- cbind(Cslacked, rep(0, nbeq))
+  #   param_name <- c(param_name,
+  #                   paste("slack", rownames(A)[s]))
+  # }
+
+  slack <- -diag(nbeq)
+  Aslacked <- cbind(Aslacked, matrix(0, nrow = nbineq, ncol = 2 * nbeq))
+  Cslacked <- cbind(Cslacked, slack, -slack)
+  if (nrow(C) > 0)
     param_name <- c(param_name,
-                    paste("slack", rownames(A)[s]))
-  }
-  for (s in seq_len(nrow(C))) {
-    slack <- rep(0, nbeq)
-    slack[s] <- -1
-    Aslacked <- cbind(Aslacked, rep(0 ,nbineq), rep(0,nbineq))
-    Cslacked <- cbind(Cslacked, slack, -slack)
-    param_name <- c(param_name,
-                    paste("slack", rownames(C)[s]),
-                    paste("slackbis", rownames(C)[s]))
-  }
+                    paste("slack", rownames(C)),
+                    paste("slackbis", rownames(C)))
+  colnames(Aslacked) <- colnames(Cslacked) <- param_name
+
+  # for (s in seq_len(nrow(C))) {
+  #   slack <- rep(0, nbeq)
+  #   slack[s] <- -1
+  #   Aslacked <- cbind(Aslacked, rep(0 ,nbineq), rep(0,nbineq))
+  #   Cslacked <- cbind(Cslacked, slack, -slack)
+  #   param_name <- c(param_name,
+  #                   paste("slack", rownames(C)[s]),
+  #                   paste("slackbis", rownames(C)[s]))
+  # }
 
   lp_model <- defineLPMod(Aslacked, bslacked, Cslacked, vslacked,
                           ob = c(rep(1, nbparam), rep(1000, nbineq + 2 * nbeq)),
                           maximum = FALSE)
+
   res <- ROI_solve(lp_model, solver = "lpsolve",
                    control = list(presolve = c("rows",
-                                                "lindep",
-                                                "rowdominate",
-                                                "mergerows")))
-  if (requireNamespace("ROI.plugin.clp", quietly = TRUE)
-      & res$status$code == 5 ){
-    res <- ROI_solve(lp_model, solver = "clp", control = list(amount = 0))
+                                               "lindep",
+                                               "rowdominate",
+                                               "mergerows")))
+  if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
+      res$status$msg$code == 5){
+    res <- ROI_solve(lp_model,
+                     solver = "cbc",
+                     control = list(logLevel = 0))
   }
+
 
   solutions <- res$solution
   problematic <-
     param_name[which(solutions > 0 & (seq_len(length(solutions))) > (nbparam))]
   if (length(problematic) > 0) {
     results <- lapply(seq_len(length(problematic)), function(p) {
-      Aslacked <- as.matrix(A)
-      bslacked <- b
-      Cslacked <- as.matrix(C)
-      vslacked <- v
-      param_name <- colnames(A)
-      for (s in seq_len(nrow(A))) {
-        if (paste("slack", rownames(A)[s]) != problematic[p]) {
-          slack <- rep(0, nbineq)
-          slack[s] <- -1
-          Aslacked <- cbind(Aslacked, slack)
-          Cslacked <- cbind(Cslacked, rep(0, nbeq))
-          param_name <- c(param_name,
-                          paste("slack", rownames(A)[s]))
-        }
-      }
-      for (s in seq_len(nrow(C))) {
-        if (paste("slack", rownames(C)[s]) != problematic[p] &
-            paste("slackbis", rownames(C)[s]) != problematic[p]) {
-          slack <- rep(0, nbeq)
-          slack[s] <- -1
-          Cslacked <- cbind(Cslacked, slack, -slack)
-          Aslacked <- cbind(Aslacked, rep(0, nbineq), rep(0, nbineq))
-          param_name <- c(param_name,
-                          paste("slack", rownames(C)[s]),
-                          paste("slackbis", rownames(C)[s]))
-        }
-      }
+      Aslacked <- Aslacked[,
+                           -which(colnames(Aslacked) == problematic[p]),
+                           drop = FALSE]
+      Cslacked <- Cslacked[,
+                           -which(colnames(Cslacked) == problematic[p]),
+                           drop = FALSE]
+      # bslacked <- b
+      # Cslacked <- as.matrix(C)
+      # vslacked <- v
+      # param_name <- colnames(A)
+      # for (s in seq_len(nrow(A))) {
+      #   if (paste("slack", rownames(A)[s]) != problematic[p]) {
+      #     slack <- rep(0, nbineq)
+      #     slack[s] <- -1
+      #     Aslacked <- cbind(Aslacked, slack)
+      #     Cslacked <- cbind(Cslacked, rep(0, nbeq))
+      #     param_name <- c(param_name,
+      #                     paste("slack", rownames(A)[s]))
+      #   }
+      # }
+      # for (s in seq_len(nrow(C))) {
+      #   if (paste("slack", rownames(C)[s]) != problematic[p] &
+      #       paste("slackbis", rownames(C)[s]) != problematic[p]) {
+      #     slack <- rep(0, nbeq)
+      #     slack[s] <- -1
+      #     Cslacked <- cbind(Cslacked, slack, -slack)
+      #     Aslacked <- cbind(Aslacked, rep(0, nbineq), rep(0, nbineq))
+      #     param_name <- c(param_name,
+      #                     paste("slack", rownames(C)[s]),
+      #                     paste("slackbis", rownames(C)[s]))
+      #   }
+      # }
       lp_model <- defineLPMod(Aslacked, bslacked, Cslacked, vslacked,
                               ob= c(rep(1, nbparam),
                                     rep(1000,
@@ -129,10 +154,13 @@ findingIncompatibleConstr <- function(x) {
                                                     "lindep",
                                                     "rowdominate",
                                                     "mergerows")))
-      if (requireNamespace("ROI.plugin.clp", quietly = TRUE) &
-          res$status$code == 5){
-        res <- ROI_solve(lp_model, solver = "clp", control = list(amount = 0))
+      if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
+          res$status$msg$code == 5){
+        res <- ROI_solve(lp_model,
+                         solver = "cbc",
+                         control = list(logLevel = 0))
       }
+
       solutions <- res$solution
       c(gsub("^\\s*\\w*", "", problematic[p]),
         gsub("^\\s*\\w*", "",

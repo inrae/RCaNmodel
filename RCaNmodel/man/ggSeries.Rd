@@ -4,7 +4,13 @@
 \alias{ggSeries}
 \title{ggSeries}
 \usage{
-ggSeries(mysampleCaNmod, param, plot_series = TRUE, ylab = "Biomass/Flux")
+ggSeries(
+  mysampleCaNmod,
+  param,
+  plot_series = TRUE,
+  ylab = "Biomass/Flux",
+  facet = TRUE
+)
 }
 \arguments{
 \item{mysampleCaNmod}{result sent by \link{sampleCaN}}
@@ -15,6 +21,9 @@ a biomass)}
 \item{plot_series}{if yes, draw three example of trajectories (default TRUE)}
 
 \item{ylab}{default Biomass Flux}
+
+\item{facet}{if TRUE (default), each param is on a specific panel, otherwise
+they are combined in a single plot}
 }
 \value{
 a ggplot
@@ -23,8 +32,9 @@ a ggplot
 provide a ggplot of the fit
 }
 \details{
-the line corresponds to median of the mcmc simulation, the ribbon
-corresponds to quantiles 2.5% and 97.5%
+the 3 lines correspond to 3 random trajectories drawn among the mcmc
+iterations, the ribbons correspond to the interval between quantiles
+0%-100%, 2.5%-97.5% and 25%-75%
 }
 \examples{
 myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
