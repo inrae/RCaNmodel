@@ -4,12 +4,8 @@
 name: Build macOS Installer
 
 on:
-  push:
-      - master
-      - RCaNconstructor
-  pull_request:
-      - master
-      - RCaNconstructor
+  push: [master, RCaNconstructor]
+  pull_request: [master, RCaNconstructor]
 
 jobs:
   build:
