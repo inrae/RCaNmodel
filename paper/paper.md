@@ -52,7 +52,7 @@ developed to tackle this issue. In Ecopath [@Polovina1984], or in its dynamic ex
 one of the most largely used trophic food-web
 models [@Heymans2016] the modeller is asked to provide additional information on species diet or on their
 vulnerabilities to turn the underdetermined into an overdetermined problem. This approach ignores the highly
-variable and stochastic nature of trophic interactions. Linear Inverse Model (LIM) food-web models have been
+variable and stochastic nature of trophic interactions. Food-web models based on linear inverse modelling (LIM) have been
 proposed as an alternative approach [@vezina1988]. LIM models rely on the same key assumptions as of any
 food-web models (e.g., mass conservation) and are constructed using constraints (i.e., linear
 equalities/inequalities) that specify which combinations of flows are possible or not. Mathematically, the
@@ -120,12 +120,12 @@ similar principles.
 
 ![The CaN approach applied to a trophic food-web: physical and ecological constraints are used to delineate what food-web
 dynamics are possible or not. These linear equalities and inequalities define a polytope, i.e. a subspace that include all
-possible time-trajectories of the food-web and that can be sample using appriate MCMC algorithms.\label{fig:canprinciple}](can.png)
+possible time-trajectories of the food-web and that can be sampled using appropriate MCMC algorithms.\label{fig:canprinciple}](can.png)
 
 ![Overview of the modelling process to develop and explore a CaN trophic food web model with RCaNmodel. All the steps can
 be achieved using either an R script or the RCaNconstructor GUI, except the step denoted with a \*. Italicised texts denote
-RCaNmodel functions. The boxes stand for the main steps, under which is mentioned their links with other R libraries.\label{fig:approach}](approaches.png)
+*RCaNmodel* functions. The boxes stand for the main steps, under which is mentioned their links with other R libraries.\label{fig:approach}](approaches.png)
 
-![Example of diagnostic diagrams provided by *RCaNmodelling*, based on the exemple provided as a supplementary material. Panel a shows the time variations of the biomass of a tophic group (DemF =  demersal fishes) and the trophic flow from PelF (Pelagic fishes) to DemF (the lines correspond to 3 random trajectories while the ribbons corresponds to quantiles 50%, 97.5% and 100% among trajectories). Panel b illustrates how the growth rate of DemF (y-axis) decreases with the biomass of the stock (x-axis) among the different years and MCMC iterations, suggesting a limitation by resources. Panel c illustrates that the trophic flow towards DemF is correlated to the amount of available preys, suggesting a bottom-up control of DemF. Panel d shows that the growth of DemF (MM) is positively correlated to its feeding, suggesting a strong bottom-up control. On the other hand, the growth rate is not correlated to the predation by predators suggesting that there is no top-down control.\label{fig:outupfig}](figure3.png)
+![Example of diagnostic diagrams provided by *RCaNmodel*, based on the exemple provided as a supplementary material. Panel a shows the time variations of the biomass of a tophic group (DemF =  demersal fishes) and the trophic flow from PelF (Pelagic fishes) to DemF (the lines correspond to 3 random trajectories while the ribbons corresponds to quantiles 50%, 97.5% and 100% among trajectories). Panel b illustrates how the growth rate of DemF (y-axis) decreases with the biomass of the stock (x-axis) among the different years and MCMC iterations, suggesting a limitation by resources. Panel c illustrates that the trophic flow towards DemF is correlated to the amount of available preys, suggesting a bottom-up control of DemF. Panel d shows that the growth of DemF (MM) is positively correlated to its feeding, suggesting a strong bottom-up control. On the other hand, the growth rate is not correlated to the predation by predators suggesting that there is no top-down control.\label{fig:outupfig}](figure3.png)
 
 # References
