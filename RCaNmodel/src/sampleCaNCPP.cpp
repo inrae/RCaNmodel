@@ -233,47 +233,21 @@ List cpgs(const int N, const Eigen::MatrixXd &A ,
     if (stage==0){//still in adapting phase
       ++runup;
       if (updatingS) updateS(S, S2, S0, M, delta0, x, runup);
-      if (runup>p){
-        stage=1;
-        updatingS=false;
-        Rcout<<"########adapation successful after "<<runup<<" iterations"<<std::endl;
-        discardmax=runup;
-      } else if (runup==runupmax){
+      if (runup==runupmax){
         updatingS=false;
         stage=1;
-        M.setZero();
-        S2.setZero();
-        S.setIdentity();
-        Rcout<<"########adapation unsuccessful after "<<runup<<" iterations"<<std::endl;
+        Rcout<<"########adapation ended after "<<runup<<" iterations"<<std::endl;
       }
     } else if (stage==1){ //we are in adapting phase
       ++discard;
-      if (updatingS) {
-        updateS(S, S2, S0, M, delta0, x, discard);
-      }
-      if (discard>p ) {
-        if (updatingS) Rcout<<"##stop updating S during discarding phase"<<std::endl;
-        updatingS=false;
-      }
       if (discard==discardmax){
         stage=2;
-        M.setZero();
-        S.setIdentity();
-        S2.setZero();
         Rcout<<"#######end of discarding phase"<<std::endl;
-        if (updatingS) Rcout<<"S still updated"<<std::endl;
       }
     } else{ //we are in sampling phase
       if ((sampleit % thin) == 0){
         X.row(isample)=x.col(0);
         ++isample;
-      }
-      if (updatingS) {
-        updateS(S, S2, S0, M, delta0, x, isample);
-      }
-      if (isample>p ) {
-        if (updatingS) Rcout<<"##stop updating S during sampling phase"<<std::endl;
-        updatingS=false;
       }
       ++sampleit;
     }
