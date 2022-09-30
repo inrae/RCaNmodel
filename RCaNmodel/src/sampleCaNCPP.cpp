@@ -45,19 +45,6 @@ void updateS(Eigen::MatrixXd &S, Eigen::MatrixXd &S2, Eigen::MatrixXd &S0, Eigen
 }
 
 
-double computeCrit(Eigen::MatrixXd &S, Eigen::MatrixXd &M, int iter){
-  //we know that the true variance is in the 95%interval
-  //k * s²/(qchish(0.975,k)) to k * s²/(qchish(0.975,k))
-  //therefore, we can look at the size of the range compared
-  //to squared sample mean to check whether we have achieved
-  //sufficient precision
-  int k = iter-1;
-  double chi025 = R::qchisq(0.025, k, true, false);
-  double chi975 = R::qchisq(0.975, k, true, false);
-  VectorXd Range=k*S.diagonal()*(1/chi025-1/chi975);
-  return Range.cwiseQuotient(M.cwiseProduct(M)).maxCoeff();
-}
-
 IntegerVector order_(const NumericVector & x) {
   NumericVector sorted = clone(x).sort();
   return match(sorted, x);
@@ -115,7 +102,6 @@ List cpgs(const int N, const Eigen::MatrixXd &A ,
   dqrng::dqset_seed(IntegerVector::create(seed),
                     IntegerVector::create(stream));
   int p=A.cols();
-  Eigen::ArrayXd critHist=Eigen::ArrayXd::Constant(p,999999); // keep tracks of the last criterion values
   int m=A.rows();
   double inf = std::numeric_limits<double>::max();
   
@@ -178,7 +164,6 @@ List cpgs(const int N, const Eigen::MatrixXd &A ,
   int runupmax= p*log2(p); //https://doi.org/10.1021/acs.jproteome.5b01029
   int sampleit=0; //total number of iteration during sampling, useful for thin
   int discardmax=runupmax;
-  double crit=0;
   while (isample<N){               //sampling loop
     //std::random_shuffle(index.begin(), index.end()); //we change the order to
     //limit the influence of initial ordering
@@ -253,16 +238,13 @@ List cpgs(const int N, const Eigen::MatrixXd &A ,
     if (stage==0){//still in adapting phase
       ++runup;
       if (updatingS) updateS(S, S2, S0, M, delta0, x, runup);
-      crit=computeCrit(S,M,runup);
-      critHist(runup % p)=crit;
-      if (runup>p & critHist.minCoeff()==crit & std::sqrt((critHist - critHist.mean()).square().sum()/(p-1))/critHist.mean()<0.01){
+      if (runup>p){
         stage=1;
         updatingS=false;
         Rcout<<"########adapation successful after "<<runup<<" iterations"<<std::endl;
         discardmax=runup;
       } else if (runup==runupmax){
         updatingS=false;
-        critHist.setConstant(99999999);
         stage=1;
         M.setZero();
         S2.setZero();
@@ -273,15 +255,12 @@ List cpgs(const int N, const Eigen::MatrixXd &A ,
       ++discard;
       if (updatingS) {
         updateS(S, S2, S0, M, delta0, x, discard);
-        crit=computeCrit(S,M,discard);
-        critHist(discard % p)=crit;
       }
-      if (discard>p & critHist.minCoeff()==crit & std::sqrt((critHist - critHist.mean()).square().sum()/(p-1))/critHist.mean()<0.01) {
+      if (discard>p ) {
         if (updatingS) Rcout<<"##stop updating S during discarding phase"<<std::endl;
         updatingS=false;
       }
       if (discard==discardmax){
-        critHist.setConstant(99999999);
         stage=2;
         M.setZero();
         S.setIdentity();
@@ -296,16 +275,14 @@ List cpgs(const int N, const Eigen::MatrixXd &A ,
       }
       if (updatingS) {
         updateS(S, S2, S0, M, delta0, x, isample);
-        crit=computeCrit(S,M,isample);
-        critHist(isample % p)=crit;
       }
-      if (isample>p & critHist.minCoeff()==crit & std::sqrt((critHist - critHist.mean()).square().sum()/(p-1))/critHist.mean()<0.0^1) {
+      if (isample>p ) {
         if (updatingS) Rcout<<"##stop updating S during sampling phase"<<std::endl;
         updatingS=false;
       }
       ++sampleit;
     }
-    if (n % 100 == 0) Rcout<<"##iteration "<<n<<" stage "<<stage<<" crit "<<crit<<" cvHist "<<std::sqrt((critHist - critHist.mean()).square().sum()/(p-1))/critHist.mean()<<std::endl;
+    if (n % 100 == 0) Rcout<<"##iteration "<<n<<" stage "<<stage<<std::endl;
     ++n;
   }
   return (List::create(Named("X") = X, Named("covMat") = S));
