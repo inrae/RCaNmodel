@@ -64,7 +64,7 @@ IntegerVector order_(const NumericVector & x) {
 //' @param b a vector of length equals to nrow(A)
 //' @param x0 a vector of length equals to nrcol(A) that should be in the polytope, for example returned by \code{\link{chebyCentre}}
 //' @param thin thinning interval
-//' @param gibbs if true, gibbs sampling, else hitandrun
+//' @param method (1 gibbs, 2 hit-and-run, 3 chrr) 
 //' @param seed seed of the dqrng generator
 //' @param stream stream of the dqrng generator
 //' @param covMat prespecified covmatrix (avoid initialisation and discard) if
@@ -94,7 +94,7 @@ List cpgs(const int N, const Eigen::MatrixXd &A ,
           const Eigen::VectorXd &b,
           const Eigen::VectorXd &x0,
           const int thin=1,
-          const bool gibbs=true,
+          const int method=1,
           const int seed=1,
           const int stream=1,
           Rcpp::Nullable<Eigen::MatrixXd> covMat = R_NilValue) {
@@ -164,6 +164,11 @@ List cpgs(const int N, const Eigen::MatrixXd &A ,
   int runupmax= p*log2(p); //https://doi.org/10.1021/acs.jproteome.5b01029
   int sampleit=0; //total number of iteration during sampling, useful for thin
   int discardmax=runupmax;
+  
+  if (method == 3 ) {//chrr
+
+  }
+
   while (isample<N){               //sampling loop
     //std::random_shuffle(index.begin(), index.end()); //we change the order to
     //limit the influence of initial ordering
@@ -171,7 +176,7 @@ List cpgs(const int N, const Eigen::MatrixXd &A ,
     index=dqrng::dqsample_int(p,p,false);
     y=x;
     // compute approximate stochastic transformation
-    if ((stage==1 && discard==0) || (stage>0 && updatingS==true)){ //first true
+    if (((stage==1 && discard==0) || (stage>0 && updatingS==true)) && method <2){ //first true
       //sample, we now make the isotropic transformation
       ldltOfS.compute(S.transpose());
       D=ldltOfS.vectorD().cwiseMax(Dzero).asDiagonal();
@@ -182,7 +187,7 @@ List cpgs(const int N, const Eigen::MatrixXd &A ,
     }
     if (stage>0) y=T2*y; //otherwise y=I^-1 * y=y
     
-    if (gibbs == true || stage == 0){
+    if (method == 1 || stage == 0){
       NumericVector alea2=dqrng::dqrunif(p);
       // choose p new components
       for (int ip=0;ip<p;++ip){
@@ -213,7 +218,7 @@ List cpgs(const int N, const Eigen::MatrixXd &A ,
         //constraint with the delta of parameter)
       }
     }
-    else {
+    else if (method >=1) { //hit and run
       Eigen::Map<Eigen::VectorXd> u(Rcpp::as<Eigen::Map<Eigen::VectorXd> >(dqrng::dqrnorm(p)));
       u /= u.norm();
       z = W * u;
@@ -238,21 +243,47 @@ List cpgs(const int N, const Eigen::MatrixXd &A ,
     if (stage==0){//still in adapting phase
       ++runup;
       if (updatingS) updateS(S, S2, S0, M, delta0, x, runup);
-      if (runup==runupmax){
+      if (runup>p){
+        stage=1;
+        updatingS=false;
+        Rcout<<"########adapation successful after "<<runup<<" iterations"<<std::endl;
+        discardmax=runup;
+      } else if (runup==runupmax){
         updatingS=false;
         stage=1;
-        Rcout<<"########adapation ended after "<<runup<<" iterations"<<std::endl;
+        M.setZero();
+        S2.setZero();
+        S.setIdentity();
+        Rcout<<"########adapation unsuccessful after "<<runup<<" iterations"<<std::endl;
       }
     } else if (stage==1){ //we are in adapting phase
       ++discard;
+      if (updatingS) {
+        updateS(S, S2, S0, M, delta0, x, discard);
+      }
+      if (discard>p ) {
+        if (updatingS) Rcout<<"##stop updating S during discarding phase"<<std::endl;
+        updatingS=false;
+      }
       if (discard==discardmax){
         stage=2;
+        M.setZero();
+        S.setIdentity();
+        S2.setZero();
         Rcout<<"#######end of discarding phase"<<std::endl;
+        if (updatingS) Rcout<<"S still updated"<<std::endl;
       }
     } else{ //we are in sampling phase
       if ((sampleit % thin) == 0){
         X.row(isample)=x.col(0);
         ++isample;
+      }
+      if (updatingS) {
+        updateS(S, S2, S0, M, delta0, x, isample);
+      }
+      if (isample>p ) {
+        if (updatingS) Rcout<<"##stop updating S during sampling phase"<<std::endl;
+        updatingS=false;
       }
       ++sampleit;
     }
@@ -278,7 +309,7 @@ using Eigen::FullPivLU;
 //' @param v a vector of length equals to nrow(C)
 //' @param x0 a vector of length equals to ncol(A) that should be in the polytope, for example returned by \code{\link{chebyCentre}}
 //' @param thin the thinning interval
-//' @param gibbs if true, gibbs sampling, else hitandrun
+//' @param method (1 gibbs sampling, 2 hitandrun, 3 chrr)
 //' @param seed seed of the dqrng generator
 //' @param stream stream of the dqrng generator
 //' @param covMat prespecified covmatrix (avoid initialisation and discard) if
@@ -311,7 +342,7 @@ using Eigen::FullPivLU;
 List cpgsEquality(const int N, const Eigen::MatrixXd &A,
                   const Eigen::VectorXd &b, const Eigen::MatrixXd &C,
                   const Eigen::VectorXd &v, const Eigen::VectorXd &x0,
-                  const int thin=1, const bool gibbs=true,
+                  const int thin=1, const int method=1,
                   const int seed=1, const int stream=1,
                   Rcpp::Nullable<Eigen::MatrixXd> covMat = R_NilValue){
   int p=A.cols();
@@ -335,7 +366,7 @@ List cpgsEquality(const int N, const Eigen::MatrixXd &A,
   VectorXd bbis=b-A*x0;
   
   VectorXd x0bis=VectorXd::Zero(Nt.cols());
-  List x=cpgs(N, Abis, bbis, x0bis, thin, gibbs, seed, stream, covMat);
+  List x=cpgs(N, Abis, bbis, x0bis, thin, method, seed, stream, covMat);
   Eigen::MatrixXd xtmp(Rcpp::as<Eigen::MatrixXd>(x["X"]));
   for(int i=0;i<N;++i) {
     X.row(i)=Nt*(xtmp.row(i).transpose())+x0;
@@ -355,7 +386,7 @@ List sampleCaNCPP(const int N,
                   const Eigen::MatrixXd &L,
                   const Eigen::VectorXd &x0, 
                   const int thin, 
-                  const bool gibbs=true,
+                  const int method=1,
                   const int seed=1,
                   const int stream=1,
                   Rcpp::Nullable<Eigen::MatrixXd> covMat = R_NilValue) {
@@ -365,9 +396,9 @@ List sampleCaNCPP(const int N,
   List x;
   MatrixXd B(N, L.rows());
   if(m2>0){ //there are equality constraints
-    x=cpgsEquality(N, A, b, C, v, x0, thin, gibbs, seed, stream, covMat);
+    x=cpgsEquality(N, A, b, C, v, x0, thin, method, seed, stream, covMat);
   } else{
-    x=cpgs(N, A, b, x0, thin,gibbs, seed, stream, covMat);
+    x=cpgs(N, A, b, x0, thin,method, seed, stream, covMat);
   }
   Eigen::MatrixXd F(Rcpp::as<Eigen::MatrixXd>(x["X"]));
   for (int i=0;i<N;++i){
@@ -788,7 +819,7 @@ void newSolution(const Eigen::MatrixXd &A ,
 }
 
 
-
+//This function is called preprocess in matlab
 
 void round(MatrixXd &A,
            VectorXd &b, 
@@ -955,10 +986,10 @@ context("test C++ functions") {
     x0 <<75,.75;
     VectorXd x(2);
     MatrixXd E2(2,2);
-    VectorXd x(2);
-    MatrixXd E2(2,2);
-    E2<< 632.88,0,0,.191956;
-    x << -0.193302,0.0845026;
+    VectorXd xfinal(2);
+    MatrixXd E2final(2,2);
+    E2final<< 632.88,0,0,.191956;
+    xfinal << -0.193302,0.0845026;
     expect_true(similar(E2, E2final));
     expect_true(similar(x, xfinal));
     
