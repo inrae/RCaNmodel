@@ -13,7 +13,7 @@ NULL
 #' @param b a vector of length equals to nrow(A)
 #' @param x0 a vector of length equals to nrcol(A) that should be in the polytope, for example returned by \code{\link{chebyCentre}}
 #' @param thin thinning interval
-#' @param gibbs if true, gibbs sampling, else hitandrun
+#' @param method (1 gibbs, 2 hit-and-run, 3 chrr) 
 #' @param seed seed of the dqrng generator
 #' @param stream stream of the dqrng generator
 #' @param covMat prespecified covmatrix (avoid initialisation and discard) if
@@ -36,8 +36,8 @@ NULL
 #' X0 <- chebyCentre(A,b)
 #' x <- cpgs(1000,A,b,X0)
 #' @export
-cpgs <- function(N, A, b, x0, thin = 1L, gibbs = TRUE, seed = 1L, stream = 1L, covMat = NULL) {
-    .Call(`_RCaNmodel_cpgs`, N, A, b, x0, thin, gibbs, seed, stream, covMat)
+cpgs <- function(N, A, b, x0, thin = 1L, method = 1L, seed = 1L, stream = 1L, covMat = NULL) {
+    .Call(`_RCaNmodel_cpgs`, N, A, b, x0, thin, method, seed, stream, covMat)
 }
 
 #' Complex Polytope Gibbs Sampling
@@ -50,7 +50,7 @@ cpgs <- function(N, A, b, x0, thin = 1L, gibbs = TRUE, seed = 1L, stream = 1L, c
 #' @param v a vector of length equals to nrow(C)
 #' @param x0 a vector of length equals to ncol(A) that should be in the polytope, for example returned by \code{\link{chebyCentre}}
 #' @param thin the thinning interval
-#' @param gibbs if true, gibbs sampling, else hitandrun
+#' @param method (1 gibbs sampling, 2 hitandrun, 3 chrr)
 #' @param seed seed of the dqrng generator
 #' @param stream stream of the dqrng generator
 #' @param covMat prespecified covmatrix (avoid initialisation and discard) if
@@ -77,12 +77,12 @@ cpgs <- function(N, A, b, x0, thin = 1L, gibbs = TRUE, seed = 1L, stream = 1L, c
 #' X0 <- rep(0.1,n)
 #' x <- cpgsEquality(1000,A,b,C,v,X0)
 #' @export
-cpgsEquality <- function(N, A, b, C, v, x0, thin = 1L, gibbs = TRUE, seed = 1L, stream = 1L, covMat = NULL) {
-    .Call(`_RCaNmodel_cpgsEquality`, N, A, b, C, v, x0, thin, gibbs, seed, stream, covMat)
+cpgsEquality <- function(N, A, b, C, v, x0, thin = 1L, method = 1L, seed = 1L, stream = 1L, covMat = NULL) {
+    .Call(`_RCaNmodel_cpgsEquality`, N, A, b, C, v, x0, thin, method, seed, stream, covMat)
 }
 
-sampleCaNCPP <- function(N, A, b, C, v, L, x0, thin, gibbs = TRUE, seed = 1L, stream = 1L, covMat = NULL) {
-    .Call(`_RCaNmodel_sampleCaNCPP`, N, A, b, C, v, L, x0, thin, gibbs, seed, stream, covMat)
+sampleCaNCPP <- function(N, A, b, C, v, L, x0, thin, method = 1L, seed = 1L, stream = 1L, covMat = NULL) {
+    .Call(`_RCaNmodel_sampleCaNCPP`, N, A, b, C, v, L, x0, thin, method, seed, stream, covMat)
 }
 
 # Register entry points for exported C++ functions

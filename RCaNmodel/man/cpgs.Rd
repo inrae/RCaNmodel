@@ -11,7 +11,7 @@ cpgs(
   b,
   x0,
   thin = 1L,
-  gibbs = TRUE,
+  method = 1L,
   seed = 1L,
   stream = 1L,
   covMat = NULL
@@ -28,7 +28,7 @@ cpgs(
 
 \item{thin}{thinning interval}
 
-\item{gibbs}{if true, gibbs sampling, else hitandrun}
+\item{method}{(1 gibbs, 2 hit-and-run, 3 chrr)}
 
 \item{seed}{seed of the dqrng generator}
 

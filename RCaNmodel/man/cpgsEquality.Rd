@@ -13,7 +13,7 @@ cpgsEquality(
   v,
   x0,
   thin = 1L,
-  gibbs = TRUE,
+  method = 1L,
   seed = 1L,
   stream = 1L,
   covMat = NULL
@@ -34,7 +34,7 @@ cpgsEquality(
 
 \item{thin}{the thinning interval}
 
-\item{gibbs}{if true, gibbs sampling, else hitandrun}
+\item{method}{(1 gibbs sampling, 2 hitandrun, 3 chrr)}
 
 \item{seed}{seed of the dqrng generator}
 

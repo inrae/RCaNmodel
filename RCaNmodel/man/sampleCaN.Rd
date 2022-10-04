@@ -10,7 +10,7 @@ sampleCaN(
   nchain = 1,
   ncore = 1,
   thin = 1,
-  method = "gibbs",
+  method = 1,
   lastF = FALSE
 )
 }
@@ -26,7 +26,7 @@ phase and discarding phases won't be necessary}
 
 \item{thin}{thinning interval}
 
-\item{method}{one of gibbs (default) or hitandrun}
+\item{method}{1 of gibbs (default), 2 for hit and run, 3 for chrr}
 
 \item{lastF}{should flow for last year be simulated (default = FALSE)}
 }

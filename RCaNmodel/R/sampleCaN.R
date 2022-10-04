@@ -7,7 +7,7 @@
 #' @param nchain the number of mcmc chains
 #' @param ncore number of cores to use
 #' @param thin thinning interval
-#' @param method one of gibbs (default) or hitandrun
+#' @param method 1 of gibbs (default), 2 for hit and run, 3 for chrr
 #' @param lastF should flow for last year be simulated (default = FALSE)
 #' @return a sampleCaNmod object which contains three elements
 #' \itemize{
@@ -43,7 +43,7 @@ sampleCaN <- function(myCaNmod,
                       nchain = 1,
                       ncore = 1,
                       thin = 1,
-                      method = "gibbs",
+                      method = 1,
                       lastF = FALSE) {
   if (inherits(myCaNmod, "sampleCaNmod")){
     covMat <- myCaNmod$covMat
@@ -51,8 +51,8 @@ sampleCaN <- function(myCaNmod,
   } else{
     covMat <- NULL
   }
-  if (! method %in% c("gibbs","hitandrun"))
-    stop("method should be either gibbs or hitandrun")
+  if (! method %in% seq_len(3))
+    stop("method should be in 1:3")
   ncore <- min(min(detectCores() - 1, ncore), nchain)
   `%myinfix%` <- `%do%`
 
@@ -117,7 +117,7 @@ sampleCaN <- function(myCaNmod,
         L = as.matrix(myCaNmod$L),
         x0 = x0,
         thin = thin,
-        gibbs = (method == "gibbs"),
+        method = method,
         seed = i,
         stream = i,
         covMat = covMat
