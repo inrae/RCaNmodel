@@ -7,14 +7,18 @@
 Computes the centroid of a convex polytope. chebyCentre and chebyCenter are
 synonyms.}
 \usage{
-chebyCentre(A, b)
+chebyCentre(A, b, lower = NULL, upper = NULL)
 
-chebyCenter(A, b)
+chebyCenter(A, b, lower = NULL, upper = NULL)
 }
 \arguments{
 \item{A}{a matrix}
 
 \item{b}{a vector of length equals to nrow(A)}
+
+\item{lower}{lower bounds (per default 0)}
+
+\item{upper}{upper bounds (per default Inf)}
 }
 \value{
 a vector corresponding to the centroid of the polytope
