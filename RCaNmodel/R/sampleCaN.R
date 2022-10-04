@@ -80,24 +80,34 @@ sampleCaN <- function(myCaNmod,
     find_init <- FALSE
     nbiter <- 0
     while (nbiter < 100 & !find_init) {
-      lp_model <- defineLPMod(myCaNmod$A, myCaNmod$b, myCaNmod$C, myCaNmod$v,
-                              maximum = FALSE,
-                              ob = runif(ncol(myCaNmod$A)))
+      # lp_model <- defineLPMod(myCaNmod$A, myCaNmod$b, myCaNmod$C, myCaNmod$v,
+      #                         maximum = FALSE,
+      #                         ob = runif(ncol(myCaNmod$A)))
+      presolved <- presolveLPMod(as.matrix(myCaNmod$A),
+                                 myCaNmod$b,
+                                 as.matrix(myCaNmod$C),
+                                 myCaNmod$v, 
+                                 sense = "min")
+      x0 <- chebyCenter(presolved$A, 
+                        presolved$b, 
+                        lower = presolved$lower,
+                        upper = presolved$upper)
+      
 
-      res <- ROI_solve(lp_model, solver = "lpsolve",
-                       control = list(presolve = c("rows",
-                                                   "lindep",
-                                                   "rowdominate",
-                                                   "mergerows"),
-                                      scaling = c("extreme",
-                                                  "equilibrate",
-                                                  "integers")))
-      if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
-          res$status$msg$code == 5){
-        res <- ROI_solve(lp_model,
-                         solver = "cbc",
-                         control = list(logLevel = 0))
-      }
+      # res <- ROI_solve(lp_model, solver = "lpsolve",
+      #                  control = list(presolve = c("rows",
+      #                                              "lindep",
+      #                                              "rowdominate",
+      #                                              "mergerows"),
+      #                                 scaling = c("extreme",
+      #                                             "equilibrate",
+      #                                             "integers")))
+      # if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
+      #     res$status$msg$code == 5){
+      #   res <- ROI_solve(lp_model,
+      #                    solver = "cbc",
+      #                    control = list(logLevel = 0))
+      # }
 
       x0 <- res$solution
 
