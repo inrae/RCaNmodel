@@ -4,6 +4,8 @@
 #'
 #' @param A a matrix
 #' @param b a vector of length equals to nrow(A)
+#' @param lower lower bounds (per default 0)
+#' @param upper upper bounds (per default Inf)
 #'
 #' @section Details:
 #' This code is a translation of the matlab code that can be found there
@@ -24,10 +26,38 @@
 #' X0 <- chebyCentre(A,b)
 #' @export
 
-chebyCentre <- function(A, b) {
+chebyCentre <- function(A, b, lower = NULL, upper = NULL) {
+  if (!is.null(lower)){
+    nonnull <- which(is.finite(lower))
+    if (length(nonnull) > 0){
+      bounds <- matrix(0, length(nonnull), ncol(A))
+      bounds[cbind(seq_len(length(nonnull)),
+                   nonnull)] <- - 1
+      A <- rbind(A, bounds)
+      b <- c(b, -lower[nonnull])
+    }
+  } else{
+    A <- rbind(A, diag(-1, ncol(A)))
+    b <- c(b, rep(0, ncol(A)))
+  }
+  
+  if (!is.null(upper)){
+    nonnull <- which(is.finite(upper))
+    if (length(nonnull) > 0){
+      bounds <- matrix(0, length(nonnull), ncol(A))
+      bounds[cbind(seq_len(length(nonnull)),
+                   nonnull)] <- - 1
+      A <- rbind(A, bounds)
+      b <- c(b, -upper[nonnull])
+    }
+  } else{
+    A <- rbind(A, diag(-1, ncol(A)))
+    b <- c(b, rep(0, ncol(A)))
+  }
+  
   n <- dim(A)[1]
   p <- dim(A)[2]
-
+  
   an <- rowSums(A ^ 2) ^ 0.5
   A1 <- matrix(data = 0,
                nrow = n,
@@ -38,9 +68,12 @@ chebyCentre <- function(A, b) {
 
   f <- rep(0, p + 1)
   f[p + 1] <- -1
+  lower = c(rep(0,p),-Inf)
 
   lp_mod <- defineLPMod(A1,
                         b,
+                        lower = lower,
+                        upper = upper,
                         maximum = FALSE,
                         ob = f)
 
