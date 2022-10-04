@@ -36,6 +36,7 @@ chebyCentre <- function(A, b, lower = NULL, upper = NULL) {
       A <- rbind(A, bounds)
       b <- c(b, -lower[nonnull])
     }
+    lower = c(lower,-Inf)
   } else{
     A <- rbind(A, diag(-1, ncol(A)))
     b <- c(b, rep(0, ncol(A)))
@@ -50,6 +51,7 @@ chebyCentre <- function(A, b, lower = NULL, upper = NULL) {
       A <- rbind(A, bounds)
       b <- c(b, -upper[nonnull])
     }
+    upper = c(upper, Inf)
   } else{
     A <- rbind(A, diag(-1, ncol(A)))
     b <- c(b, rep(0, ncol(A)))
@@ -68,7 +70,6 @@ chebyCentre <- function(A, b, lower = NULL, upper = NULL) {
 
   f <- rep(0, p + 1)
   f[p + 1] <- -1
-  lower = c(rep(0,p),-Inf)
 
   lp_mod <- defineLPMod(A1,
                         b,
