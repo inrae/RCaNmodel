@@ -365,6 +365,66 @@ List cpgsEquality(const int N, const Eigen::MatrixXd &A,
 
 
 
+
+
+//' degenerateSubSpace
+//' This function reduces the space defined by inequality and unequality 
+//' constraints
+//'
+//' @param A a matrix of coefficients of inequality constants A.x<=b
+//' @param b a vector of length equals to nrow(A)
+//' @param C a matrix of coefficients of inequality constants C.x=v
+//' @param v a vector of length equals to nrow(C)
+//' @param x0 a vector of length equals to ncol(A) that should be in the polytope, for example returned by \code{\link{chebyCentre}}
+//'
+//' @return a list with elements A2 and b2 defining the subscape A2 x <= b2 and
+//' Nt that can be used to convert results in appropriate format
+//' 
+//' @examples
+//' A1 <- -diag(n)
+//' b1 <- as.matrix(rep(0,n))
+//' A2 <- diag(n)
+//' b2 <- as.matrix(rep(1,n))
+//' A <- rbind(A1,A2)
+//' b <- rbind(b1,b2)
+//' C <- rbind(c(1,1,rep(0,n-2)),c(0,0,1,1,rep(0,n-4)))
+//' v <- matrix(rep(0.2,2),2)
+//' X0 <- rep(0.1,n)
+//' x <- degenerateSubSpace(A,b,C,v,X0)
+//' @export
+// [[Rcpp::export]]
+
+
+List degenerateSubSpace(const Eigen::MatrixXd &A,
+                  const Eigen::VectorXd &b, const Eigen::MatrixXd &C,
+                  const Eigen::VectorXd &v, const Eigen::VectorXd &z){
+  int p=A.cols();
+  int m=A.rows();
+  int p2=C.cols();
+  int m2=C.rows();
+  
+  // Check input arguments
+  if (m < (p+1) || b.size()!=m || z.size()!=p){
+    throw std::range_error("dimensions mismatch");
+  }
+  if (v.size()!=m2 || z.size()!=p2){
+    throw std::range_error("dimensions mismatch");
+  }
+  // Initialisation
+  FullPivLU<MatrixXd> lu(C);
+  MatrixXd Nt = lu.kernel();
+  MatrixXd Abis=A*Nt;
+  VectorXd bbis=b-A*z;
+
+  return (List::create(Named("A2") = Abis, 
+                       Named("b2") = bbis,
+                       Named("Nt") = Nt));
+}
+
+
+
+
+
 // [[Rcpp::export]]
 List sampleCaNCPP(const int N, 
                   const Eigen::MatrixXd &A ,

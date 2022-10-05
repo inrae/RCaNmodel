@@ -30,6 +30,7 @@
 #' @importFrom parallel clusterEvalQ
 #' @importFrom parallel clusterExport
 #' @importFrom parallel stopCluster
+#' @importFrom Matrix Matrix
 #' @importFrom doParallel registerDoParallel
 #' @importFrom doParallel stopImplicitCluster
 #' @importFrom coda mcmc
@@ -38,6 +39,7 @@
 #' @importFrom foreach %dopar%
 #' @importFrom foreach %do%
 #' @importFrom stats runif
+#' @importFrom lpSolveAPI get.rhs
 sampleCaN <- function(myCaNmod,
                       N,
                       nchain = 1,
@@ -76,6 +78,54 @@ sampleCaN <- function(myCaNmod,
     `%myinfix%` <- `%dopar%`
   }
   i <- NULL
+  
+  #we removed parameters that are fixed because of A or almost
+  bounds <- getAllBoundsParam(list(A = as.matrix(myCaNmod$A),
+                                   b = myCaNmod$b),
+                                   progressBar = FALSE)
+  
+  #if some are fixed, we add them to C
+  fixed <- which(abs(bounds[, 2] - bounds[, 3]) < 1e-7)
+  if (length(fixed) > 0){
+    myCaNmod$v <- c(myCaNmod$v, rowMeans(bounds[fixed, 2:3, drop = FALSE]))
+    newC <- Matrix(0, length(fixed), ncol(myCaNmod$A))
+    newC[cbind(seq_len(length(fixed)), fixed)] <- 1
+    myCaNmod$C <- rbind(myCaNmod$C, newC)
+  }
+  
+  #now we restric to the degenerate subspace
+  if (nrow(myCaNmod$C) > 0){
+    lpmod <- defineLPMod(myCaNmod$A[-seq_len(nrow(myCaNmod$A)), , drop = FALSE],
+                         myCaNmod$b[-seq_len(nrow(myCaNmod$A))], 
+                         myCaNmod$C, 
+                         myCaNmod$v,
+                         maximum = FALSE)
+    solequality <- ROI_solve(lpmod, 
+                             solver = "lpsolve",
+                             control = list(presolve = c("rows",
+                                                         "lindep",
+                                                         "rowdominate",
+                                                         "mergerows")))$solution
+    subspace <- degenerateSubSpace(as.matrix(myCaNmod$A),
+                                   myCaNmod$b,
+                                   as.matrix(myCaNmod$C),
+                                   myCaNmod$v,
+                                   solequality)
+    A2 <- subspace$A2
+    b2 <- subspace$b2
+    Nt <- subspace$Nt
+    
+  } else { #no equality constraints, everything remains the same
+    A2 <-myCaNmod$A
+    b2 <- myCaNmod$b
+    Nt <- diag(ncol(myCaNmod$A))
+    solequality <- rep(0, ncol(myCaNmod$A))
+  }
+  
+  #now we presolve the model to simply the polytope
+  
+  
+  
   res <- foreach(i = 1:nchain) %myinfix% {
     find_init <- FALSE
     nbiter <- 0
@@ -83,11 +133,50 @@ sampleCaN <- function(myCaNmod,
       # lp_model <- defineLPMod(myCaNmod$A, myCaNmod$b, myCaNmod$C, myCaNmod$v,
       #                         maximum = FALSE,
       #                         ob = runif(ncol(myCaNmod$A)))
-      presolved <- presolveLPMod(as.matrix(myCaNmod$A),
-                                 myCaNmod$b,
-                                 as.matrix(myCaNmod$C),
-                                 myCaNmod$v, 
+      presolved <- presolveLPMod(A2,
+                                 b2,
                                  sense = "min")
+      A3 <- presolved$A
+      b3 <- presolved$b
+      
+      
+      
+      #we add the bounds as constraints
+      if (!is.null(presolved$lower)){
+        nonnull <- which(is.finite(presolved$lower))
+        if (length(nonnull) > 0){
+          bounds <- matrix(0, length(nonnull), ncol(A3))
+          bounds[cbind(seq_len(length(nonnull)),
+                       nonnull)] <- - 1
+          A3 <- rbind(A3, bounds)
+          b3 <- c(b3, -presolved$lower[nonnull])
+        }
+      } else{
+        A3 <- rbind(A3, diag(-1, ncol(A3)))
+        b3 <- c(b3, rep(0, ncol(A3)))
+      }
+      
+      if (!is.null(presolved$upper)){
+        nonnull <- which(is.finite(presolved$upper))
+        if (length(nonnull) > 0){
+          bounds <- matrix(0, length(nonnull), ncol(A3))
+          bounds[cbind(seq_len(length(nonnull)),
+                       nonnull)] <- - 1
+          A3 <- rbind(A3, bounds)
+          b3 <- c(b3, -upper[nonnull])
+        }
+      }
+      
+      
+      
+      
+      
+      
+      
+      b3 <- c(b3, -presolved$lower)
+      
+      A3 <- rbind(A3, )
+      
       x0 <- chebyCenter(presolved$A, 
                         presolved$b, 
                         lower = presolved$lower,

@@ -100,6 +100,44 @@ RcppExport SEXP _RCaNmodel_cpgsEquality(SEXP NSEXP, SEXP ASEXP, SEXP bSEXP, SEXP
     UNPROTECT(1);
     return rcpp_result_gen;
 }
+// degenerateSubSpace
+List degenerateSubSpace(const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const Eigen::MatrixXd& C, const Eigen::VectorXd& v, const Eigen::VectorXd& z);
+static SEXP _RCaNmodel_degenerateSubSpace_try(SEXP ASEXP, SEXP bSEXP, SEXP CSEXP, SEXP vSEXP, SEXP zSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type A(ASEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type b(bSEXP);
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type C(CSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type v(vSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type z(zSEXP);
+    rcpp_result_gen = Rcpp::wrap(degenerateSubSpace(A, b, C, v, z));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _RCaNmodel_degenerateSubSpace(SEXP ASEXP, SEXP bSEXP, SEXP CSEXP, SEXP vSEXP, SEXP zSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_RCaNmodel_degenerateSubSpace_try(ASEXP, bSEXP, CSEXP, vSEXP, zSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
 // sampleCaNCPP
 List sampleCaNCPP(const int N, const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const Eigen::MatrixXd& C, const Eigen::VectorXd& v, const Eigen::MatrixXd& L, const Eigen::VectorXd& x0, const int thin, const int method, const int seed, const int stream, Rcpp::Nullable<Eigen::MatrixXd> covMat);
 static SEXP _RCaNmodel_sampleCaNCPP_try(SEXP NSEXP, SEXP ASEXP, SEXP bSEXP, SEXP CSEXP, SEXP vSEXP, SEXP LSEXP, SEXP x0SEXP, SEXP thinSEXP, SEXP methodSEXP, SEXP seedSEXP, SEXP streamSEXP, SEXP covMatSEXP) {
@@ -152,6 +190,7 @@ static int _RCaNmodel_RcppExport_validate(const char* sig) {
     if (signatures.empty()) {
         signatures.insert("List(*cpgs)(const int,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::VectorXd&,const int,const int,const int,const int,Rcpp::Nullable<Eigen::MatrixXd>)");
         signatures.insert("List(*cpgsEquality)(const int,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::VectorXd&,const int,const int,const int,const int,Rcpp::Nullable<Eigen::MatrixXd>)");
+        signatures.insert("List(*degenerateSubSpace)(const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::VectorXd&)");
         signatures.insert("List(*sampleCaNCPP)(const int,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::MatrixXd&,const Eigen::VectorXd&,const int,const int,const int,const int,Rcpp::Nullable<Eigen::MatrixXd>)");
     }
     return signatures.find(sig) != signatures.end();
@@ -161,6 +200,7 @@ static int _RCaNmodel_RcppExport_validate(const char* sig) {
 RcppExport SEXP _RCaNmodel_RcppExport_registerCCallable() { 
     R_RegisterCCallable("RCaNmodel", "_RCaNmodel_cpgs", (DL_FUNC)_RCaNmodel_cpgs_try);
     R_RegisterCCallable("RCaNmodel", "_RCaNmodel_cpgsEquality", (DL_FUNC)_RCaNmodel_cpgsEquality_try);
+    R_RegisterCCallable("RCaNmodel", "_RCaNmodel_degenerateSubSpace", (DL_FUNC)_RCaNmodel_degenerateSubSpace_try);
     R_RegisterCCallable("RCaNmodel", "_RCaNmodel_sampleCaNCPP", (DL_FUNC)_RCaNmodel_sampleCaNCPP_try);
     R_RegisterCCallable("RCaNmodel", "_RCaNmodel_RcppExport_validate", (DL_FUNC)_RCaNmodel_RcppExport_validate);
     return R_NilValue;
@@ -171,6 +211,7 @@ RcppExport SEXP run_testthat_tests(SEXP);
 static const R_CallMethodDef CallEntries[] = {
     {"_RCaNmodel_cpgs", (DL_FUNC) &_RCaNmodel_cpgs, 9},
     {"_RCaNmodel_cpgsEquality", (DL_FUNC) &_RCaNmodel_cpgsEquality, 11},
+    {"_RCaNmodel_degenerateSubSpace", (DL_FUNC) &_RCaNmodel_degenerateSubSpace, 5},
     {"_RCaNmodel_sampleCaNCPP", (DL_FUNC) &_RCaNmodel_sampleCaNCPP, 12},
     {"_RCaNmodel_RcppExport_registerCCallable", (DL_FUNC) &_RCaNmodel_RcppExport_registerCCallable, 0},
     {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 1},
