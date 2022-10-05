@@ -38,7 +38,7 @@ chebyCentre <- function(A, b, lower = NULL, upper = NULL) {
     }
     lower = c(lower,-Inf)
   } else{
-    A <- rbind(A, diag(-1, ncol(A)))
+    A <- rbind(A, -diag(ncol(A)))
     b <- c(b, rep(0, ncol(A)))
   }
   
@@ -53,7 +53,7 @@ chebyCentre <- function(A, b, lower = NULL, upper = NULL) {
     }
     upper = c(upper, Inf)
   } else{
-    A <- rbind(A, diag(-1, ncol(A)))
+    A <- rbind(A, diag(ncol(A)))
     b <- c(b, rep(Inf, ncol(A)))
   }
   
