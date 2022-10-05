@@ -47,9 +47,9 @@ chebyCentre <- function(A, b, lower = NULL, upper = NULL) {
     if (length(nonnull) > 0){
       bounds <- matrix(0, length(nonnull), ncol(A))
       bounds[cbind(seq_len(length(nonnull)),
-                   nonnull)] <- - 1
+                   nonnull)] <- 1
       A <- rbind(A, bounds)
-      b <- c(b, -upper[nonnull])
+      b <- c(b, upper[nonnull])
     }
     upper = c(upper, Inf)
   } else{
