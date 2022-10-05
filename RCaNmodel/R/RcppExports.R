@@ -81,32 +81,20 @@ cpgsEquality <- function(N, A, b, C, v, x0, thin = 1L, method = 1L, seed = 1L, s
     .Call(`_RCaNmodel_cpgsEquality`, N, A, b, C, v, x0, thin, method, seed, stream, covMat)
 }
 
-#' Complex Polytope Gibbs Sampling
-#' This function draw uniform samples in a convex polytope with both equality and inequality constraints
+#' degenerateSubSpace
+#' This function reduces the space defined by inequality and unequality 
+#' constraints
 #'
-#' @param N the number of samples to generate
 #' @param A a matrix of coefficients of inequality constants A.x<=b
 #' @param b a vector of length equals to nrow(A)
 #' @param C a matrix of coefficients of inequality constants C.x=v
 #' @param v a vector of length equals to nrow(C)
 #' @param x0 a vector of length equals to ncol(A) that should be in the polytope, for example returned by \code{\link{chebyCentre}}
-#' @param thin the thinning interval
-#' @param method (1 gibbs sampling, 2 hitandrun, 3 chrr)
-#' @param seed seed of the dqrng generator
-#' @param stream stream of the dqrng generator
-#' @param covMat prespecified covmatrix (avoid initialisation and discard) if
-#' prespecified (default null)
 #'
-#' @section Details:
-#' This function is based on an initial matlab code developped called CPRND
-#' (https://ch.mathworks.com/matlabcentral/fileexchange/34208-uniform-distribution-over-a-convex-polytope)
-#' It generates samples within the complex polytope defined by \eqn{A \cdot x \leqslant   b}
-#'
-#' @return a list with two elements: a matrix with one row per sample and one
-#'  column per parameter and a list with the covariance matrix used in the
-#'  algorithm that can be used to resample the model
+#' @return a list with elements A2 and b2 defining the subscape A2 x <= b2 and
+#' Nt that can be used to convert results in appropriate format
+#' 
 #' @examples
-#' n <- 20
 #' A1 <- -diag(n)
 #' b1 <- as.matrix(rep(0,n))
 #' A2 <- diag(n)
@@ -116,7 +104,7 @@ cpgsEquality <- function(N, A, b, C, v, x0, thin = 1L, method = 1L, seed = 1L, s
 #' C <- rbind(c(1,1,rep(0,n-2)),c(0,0,1,1,rep(0,n-4)))
 #' v <- matrix(rep(0.2,2),2)
 #' X0 <- rep(0.1,n)
-#' x <- cpgsEquality(1000,A,b,C,v,X0)
+#' x <- degenerateSubSpace(A,b,C,v,X0)
 #' @export
 degenerateSubSpace <- function(A, b, C, v, z) {
     .Call(`_RCaNmodel_degenerateSubSpace`, A, b, C, v, z)

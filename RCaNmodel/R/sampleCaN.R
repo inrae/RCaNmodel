@@ -169,18 +169,8 @@ sampleCaN <- function(myCaNmod,
       
       
       
-      
-      
-      
-      
-      b3 <- c(b3, -presolved$lower)
-      
-      A3 <- rbind(A3, )
-      
-      x0 <- chebyCenter(presolved$A, 
-                        presolved$b, 
-                        lower = presolved$lower,
-                        upper = presolved$upper)
+      x0 <- chebyCenter(presolved$A3, 
+                        presolved$b3)
       
 
       # res <- ROI_solve(lp_model, solver = "lpsolve",
