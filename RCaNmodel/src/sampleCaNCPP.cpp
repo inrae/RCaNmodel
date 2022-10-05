@@ -920,15 +920,15 @@ void round(MatrixXd &A,
   Rcout<<"##initial solution starts "<<std::endl;
   
   //check that x0 is a good answer, otherwise, finds another one
-  while (((A*x0-b).array()>=0).any()){
+/*  while (((A*x0-b).array()>=0).any()){
     VectorXd xnew(m);
     newSolution(A,b,x0,xnew);
     x0=xnew;
-  }
+}*/
   Rcout<<"##initial solution ends "<<std::endl;
   
   //scale the matrix to help with numerical precision
-  VectorXd cs(m);
+/*  VectorXd cs(m);
   VectorXd rs(n);
   gmscale(A,cs, rs, 0.99);
   Rcout<<"##end scale "<<std::endl;
@@ -937,7 +937,7 @@ void round(MatrixXd &A,
   b=rs.cwiseInverse().asDiagonal()*b;
   x0=cs.asDiagonal()*x0;
   N_total=MatrixXd::Identity(m, m) * cs.cwiseInverse().asDiagonal();
-  
+*/  
   int max_its=20;
   int its=0;
   double reg=1e-3;
@@ -952,11 +952,11 @@ void round(MatrixXd &A,
     ++its;
     Rcout<<"##rounding iteration "<<its<<std::endl;
     
-    while (((A*x0-b).array()>=0).any()){
+  /*  while (((A*x0-b).array()>=0).any()){
       VectorXd xnew(m);
       newSolution(A,b,x0,xnew);
       x0=xnew;
-    }
+  }*/
     Rcout<<"##x0 ok "<<std::endl;
     
     reg=std::max(reg/10., 1e-10);
