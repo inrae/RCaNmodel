@@ -111,6 +111,7 @@ sampleCaN <- function(myCaNmod,
                                    as.matrix(myCaNmod$C),
                                    myCaNmod$v,
                                    solequality)
+    colnames(A2) <- paste("param", seq_len(ncol(A2)))
     A2 <- subspace$A2
     b2 <- subspace$b2
     Nt <- subspace$Nt
@@ -168,7 +169,7 @@ sampleCaN <- function(myCaNmod,
         }
       
 
-    res <- cpgs(N,A3,b3,x0,thin,method,i,i,covMat)
+    res <- cpgs(N, A3, b3, x0, thin, method, i, i, covMat)
     
     #now we turn back result into original format
     res$X <- cbind(res$X, 
@@ -177,7 +178,7 @@ sampleCaN <- function(myCaNmod,
                           length(presolved$fixed),
                           byrow = TRUE))
     colnames(res$X) <- c(colnames(A3), names(presolved$fixed))
-    res$X <- res$X[, sort(colnames(res$X))]
+    res$X <- res$X[, colnames(A2)]
     
     res$X <- t(Nt %*% t(res$X)) + 
       matrix(rep(solequality, nrow(res$X)),
