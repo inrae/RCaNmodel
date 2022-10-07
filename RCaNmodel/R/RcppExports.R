@@ -5,97 +5,6 @@
 #' @useDynLib RCaNmodel
 NULL
 
-#' mve_solver
-#' Find the maximum volume ellipsoid
-#' @param A a matrix of coefficients of inequality constants A.x<=b
-#' @param b a vector of length equals to nrow(A)
-#' @param x0 a solution of the polytope the column scaling vector
-#' @param reg a tuning parameter
-#' @param x vector to store the center of the ellipse
-#' @param E2 matrix to store the ellipse E'E
-#' @param maxiter a tuning parameter
-#' @param tol a tuning parameter
-#'
-#' @section Details:
-#' The CHRR algorithm is a C++ translation of cobratoolbox code written
-#' by Yin Zhang licensed under GNU GPL-3 https://github.com/opencobra/cobratoolbox/ 
-#' and of matlab code written by Ben Cousins 
-#' (https://github.com/Bounciness/Volume-and-Sampling) is a C++ translation of
-#' matlab functions provided in the opencobra toolbox and 
-#' in this github repository % `m x n` sparse matrix `A`.
-#' 
-#'Find the maximum volume ellipsoid
-#'    {v:  v = x + Es, ||s|| <= 1}
-#'  inscribing a full-dimensional polytope
-#'          {v:  Av <= b}
-#'  Input:  A, b --- defining the polytope
-#'          x0 --- interior point (Ax0 < b)
-#'  Output: x --- center of the ellipsoid
-#'          E2 --- E'*E
-NULL
-
-#'--------------------------------------
-#' Yin Zhang, Rice University, 07/29/02
-#'--------------------------------------
-NULL
-
-#' mve_run_cobra
-#' Find the maximum volume ellipsoid
-#' @param A a matrix of coefficients of inequality constants A.x<=b
-#' @param b a vector of length equals to nrow(A)
-#' @param x0 a solution of the polytope the column scaling vector
-#' @param reg a tuning parameter
-#' @param x vector to store the center of the ellipse
-#' @param E matrix to store the ellipse
-#' @param maxiter a tuning parameter
-#'
-#' @section Details:
-#' The CHRR algorithm is a C++ translation of cobratoolbox code written
-#' by Yin Zhang licensed under GNU GPL-3 https://github.com/opencobra/cobratoolbox/ 
-#' and of matlab code written by Ben Cousins 
-#' (https://github.com/Bounciness/Volume-and-Sampling) is a C++ translation of
-#' matlab functions provided in the opencobra toolbox and 
-#' in this github repository % `m x n` sparse matrix `A`.
-#' 
-#'Find the maximum volume ellipsoid
-#'    {v:  v = x + Es, ||s|| <= 1}
-#'  inscribing a full-dimensional polytope
-#'          {v:  Av <= b}
-#'  Input:  A, b --- defining the polytope
-#'          x0 --- interior point (Ax0 < b)
-#'  Output: x --- center of the ellipsoid
-#'          E2 --- E'*E
-NULL
-
-#'--------------------------------------
-#' Yin Zhang, Rice University, 07/29/02
-#'--------------------------------------
-NULL
-
-#' shiftPolytope
-#' shift a polytope and saves into to undo the transformation
-#' @param A a matrix of coefficients of inequality constants A.x<=b
-#' @param b a vector of length equals to nrow(A)
-#' @param N the matrix storing the total transformation 
-#' (including current and previous transformations)
-#' @param p the vector storing the total shift
-#' (including current and previous transformations)
-#' @param T a matrix
-#' @param trans matrix of transformation to be applied
-#' @param shift vector of shift to be applied
-#'
-#' @section Details:
-#' The CHRR algorithm is a C++ translation of cobratoolbox code written
-#' by Yin Zhang licensed under GNU GPL-3 https://github.com/opencobra/cobratoolbox/ 
-#' and of matlab code written by Ben Cousins 
-#' (https://github.com/Bounciness/Volume-and-Sampling) is a C++ translation of
-#' matlab functions provided in the opencobra toolbox and 
-#' in this github repository % `m x n` sparse matrix `A`.
-#' 
-#' shift the polytope by a point and apply a transformation, while retaining
-#'the information to undo the transformation later (to recover the samples)
-NULL
-
 #' Complex Polytope Gibbs Sampling
 #' This function draw uniform samples in a convex polytope with inequality constraints
 #'
@@ -272,18 +181,99 @@ gmscale <- function(A, cscale, rscale, scltol) {
     invisible(.Call(`_RCaNmodel_gmscale`, A, cscale, rscale, scltol))
 }
 
+#' mve_solver
+#' Find the maximum volume ellipsoid
+#' @param A a matrix of coefficients of inequality constants A.x<=b
+#' @param b a vector of length equals to nrow(A)
+#' @param x0 a solution of the polytope the column scaling vector
+#' @param reg a tuning parameter
+#' @param x vector to store the center of the ellipse
+#' @param E2 matrix to store the ellipse E'E
+#' @param maxiter a tuning parameter
+#' @param tol a tuning parameter
+#'
+#' @section Details:
+#' The CHRR algorithm is a C++ translation of cobratoolbox code written
+#' by Yin Zhang licensed under GNU GPL-3 https://github.com/opencobra/cobratoolbox/ 
+#' and of matlab code written by Ben Cousins 
+#' (https://github.com/Bounciness/Volume-and-Sampling) is a C++ translation of
+#' matlab functions provided in the opencobra toolbox and 
+#' in this github repository % `m x n` sparse matrix `A`.
+#' 
+#'Find the maximum volume ellipsoid
+#'    {v:  v = x + Es, ||s|| <= 1}
+#'  inscribing a full-dimensional polytope
+#'          {v:  Av <= b}
+#'  Input:  A, b --- defining the polytope
+#'          x0 --- interior point (Ax0 < b)
+#'  Output: x --- center of the ellipsoid
+#'          E2 --- E'*E
+#'--------------------------------------
+#' Yin Zhang, Rice University, 07/29/02
+#'--------------------------------------
 #'lines modified by me (Ben Cousins) have a %Ben after them
 #' @export
 mve_solver <- function(A, b, x0, reg, x, E2, maxiter = 50L, tol = 1.e-6) {
     .Call(`_RCaNmodel_mve_solver`, A, b, x0, reg, x, E2, maxiter, tol)
 }
 
+#' mve_run_cobra
+#' Find the maximum volume ellipsoid
+#' @param A a matrix of coefficients of inequality constants A.x<=b
+#' @param b a vector of length equals to nrow(A)
+#' @param x0 a solution of the polytope the column scaling vector
+#' @param reg a tuning parameter
+#' @param x vector to store the center of the ellipse
+#' @param E matrix to store the ellipse
+#' @param maxiter a tuning parameter
+#'
+#' @section Details:
+#' The CHRR algorithm is a C++ translation of cobratoolbox code written
+#' by Yin Zhang licensed under GNU GPL-3 https://github.com/opencobra/cobratoolbox/ 
+#' and of matlab code written by Ben Cousins 
+#' (https://github.com/Bounciness/Volume-and-Sampling) is a C++ translation of
+#' matlab functions provided in the opencobra toolbox and 
+#' in this github repository % `m x n` sparse matrix `A`.
+#' 
+#'Find the maximum volume ellipsoid
+#'    {v:  v = x + Es, ||s|| <= 1}
+#'  inscribing a full-dimensional polytope
+#'          {v:  Av <= b}
+#'  Input:  A, b --- defining the polytope
+#'          x0 --- interior point (Ax0 < b)
+#'  Output: x --- center of the ellipsoid
+#'          E2 --- E'*E
+#'--------------------------------------
+#' Yin Zhang, Rice University, 07/29/02
+#'--------------------------------------
 #'lines modified by me (Ben Cousins) have a %Ben after them
 #' @export
 mve_run_cobra <- function(A, b, x0, reg, x, E, maxiter) {
     .Call(`_RCaNmodel_mve_run_cobra`, A, b, x0, reg, x, E, maxiter)
 }
 
+#' shiftPolytope
+#' shift a polytope and saves into to undo the transformation
+#' @param A a matrix of coefficients of inequality constants A.x<=b
+#' @param b a vector of length equals to nrow(A)
+#' @param N the matrix storing the total transformation 
+#' (including current and previous transformations)
+#' @param p the vector storing the total shift
+#' (including current and previous transformations)
+#' @param T a matrix
+#' @param trans matrix of transformation to be applied
+#' @param shift vector of shift to be applied
+#'
+#' @section Details:
+#' The CHRR algorithm is a C++ translation of cobratoolbox code written
+#' by Yin Zhang licensed under GNU GPL-3 https://github.com/opencobra/cobratoolbox/ 
+#' and of matlab code written by Ben Cousins 
+#' (https://github.com/Bounciness/Volume-and-Sampling) is a C++ translation of
+#' matlab functions provided in the opencobra toolbox and 
+#' in this github repository % `m x n` sparse matrix `A`.
+#' 
+#' shift the polytope by a point and apply a transformation, while retaining
+#'the information to undo the transformation later (to recover the samples)
 #'let x denote the original space, y the current space, and z the new space
 #'we have
 #'

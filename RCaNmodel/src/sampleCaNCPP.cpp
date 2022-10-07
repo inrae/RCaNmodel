@@ -679,11 +679,9 @@ void gmscale(Eigen::MatrixXd A,
 //'          x0 --- interior point (Ax0 < b)
 //'  Output: x --- center of the ellipsoid
 //'          E2 --- E'*E
-  
 //'--------------------------------------
 //' Yin Zhang, Rice University, 07/29/02
 //'--------------------------------------
-  
 //'lines modified by me (Ben Cousins) have a %Ben after them
 //' @export
 // [[Rcpp::export]]
@@ -870,11 +868,9 @@ bool mve_solver(Eigen::MatrixXd A,
 //'          x0 --- interior point (Ax0 < b)
 //'  Output: x --- center of the ellipsoid
 //'          E2 --- E'*E
-
 //'--------------------------------------
 //' Yin Zhang, Rice University, 07/29/02
 //'--------------------------------------
-
 //'lines modified by me (Ben Cousins) have a %Ben after them
 //' @export
 // [[Rcpp::export]]
@@ -921,7 +917,6 @@ bool mve_run_cobra(const Eigen::MatrixXd &A,
 //' 
 //' shift the polytope by a point and apply a transformation, while retaining
 //'the information to undo the transformation later (to recover the samples)
-  
 //'let x denote the original space, y the current space, and z the new space
 //'we have
 //'

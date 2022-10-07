@@ -14,7 +14,9 @@ cpgs(
   method = 1L,
   seed = 1L,
   stream = 1L,
-  covMat = NULL
+  covMat = NULL,
+  savedN_total = NULL,
+  savedp_shift = NULL
 )
 }
 \arguments{
@@ -49,6 +51,12 @@ This function draw uniform samples in a convex polytope with inequality constrai
 This function is based on an initial matlab code developped called CPRND
 (https://ch.mathworks.com/matlabcentral/fileexchange/34208-uniform-distribution-over-a-convex-polytope)
 It generates samples within the complex polytope defined by \eqn{A \cdot x \leqslant   b}
+The CHRR algorithm is a C++ translation of cobratoolbox code written
+by Yin Zhang licensed under GNU GPL-3 https://github.com/opencobra/cobratoolbox/ 
+and of matlab code written by Ben Cousins 
+(https://github.com/Bounciness/Volume-and-Sampling) is a C++ translation of
+matlab functions provided in the opencobra toolbox and 
+in this github repository
 }
 
 \examples{
