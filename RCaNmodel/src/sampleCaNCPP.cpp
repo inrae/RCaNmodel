@@ -75,6 +75,12 @@ IntegerVector order_(const NumericVector & x) {
 //' This function is based on an initial matlab code developped called CPRND
 //' (https://ch.mathworks.com/matlabcentral/fileexchange/34208-uniform-distribution-over-a-convex-polytope)
 //' It generates samples within the complex polytope defined by \eqn{A \cdot x \leqslant   b}
+//' The CHRR algorithm is a C++ translation of cobratoolbox code written
+//' by Yin Zhang licensed under GNU GPL-3 https://github.com/opencobra/cobratoolbox/ 
+//' and of matlab code written by Ben Cousins 
+//' (https://github.com/Bounciness/Volume-and-Sampling) is a C++ translation of
+//' matlab functions provided in the opencobra toolbox and 
+//' in this github repository
 //'
 //' @return a matrix with one row per sample and one column per parameter
 //' @examples
@@ -509,67 +515,68 @@ List sampleCaNCPP(const int N,
 
 
 
+//' gmscale
+//' scaling of matrix with a geometric mean procedure
+//'MatrixXd A, VectorXd &cscale, VectorXd &rscale, double scltol
+//' @param A a matrix of coefficients of inequality constants A.x<=b
+//' @param b a vector of length equals to nrow(A)
+//' @param cscale the column scaling vector
+//' @param rscale the row scaling vector
+//' @param scltol tolerance
+//'
+//' @section Details:
+//' The CHRR algorithm is a C++ translation of cobratoolbox code written
+//' by Yin Zhang licensed under GNU GPL-3 https://github.com/opencobra/cobratoolbox/ 
+//' and of matlab code written by Ben Cousins 
+//' (https://github.com/Bounciness/Volume-and-Sampling) is a C++ translation of
+//' matlab functions provided in the opencobra toolbox and 
+//' in this github repository % `m x n` sparse matrix `A`.
+//' 
+//' An iterative procedure based on geometric means is used,
+//' following a routine written by Robert Fourer, 1979.
+//' Several passes are made through the columns and rows of `A`.
+//' The main steps are:
+//'
+//'   1. Compute :math:`aratio = max_j (max_i Aij / min_i Aij)`.
+//'   2. Divide each row `i` by :math:`sqrt( max_j Aij * min_j Aij)`.
+//'   3. Divide each column `j` by :math:`sqrt( max_i Aij * min_i Aij)`.
+//'   4. Compute `sratio` as in Step 1.
+//'   5. If :math:`sratio < aratio * scltol`,
+//'      set :math:`aratio = sratio` and repeat from Step 2.
+//'
+//' To dampen the effect of very small elements, on each pass,
+//' a new row or column scale will not be smaller than sqrt(damp)
+//' times the largest (scaled) element in that row or column.
+//'
+//' Use of the scales:
+//' To apply the scales to a linear program,
+//' :math:`min c^T x` st :math:`A x = b`, :math:`l \leq x \leq u`,
+//' we need to define "barred" quantities by the following relations:
+//' `A = R Abar C`, `b = R bbar`, `C cbar = c`,
+//' `C l = lbar`, `C u = ubar`, `C x = xbar`.
+//'
+//' This gives the scaled problem
+//' :math:`min\ cbar^T xbar` st :math:`Abar\ xbar = bbar`, :math:`lbar \leq xbar \leq ubar`.
+//'
+//' .. Author: - Michael Saunders, Systems Optimization Laboratory, Stanford University.
+//' ..
+//'    07 Jun 1996: First f77 version, based on MINOS 5.5 routine m2scal.
+//'    24 Apr 1998: Added final pass to make column norms = 1.
+//'    18 Nov 1999: Fixed up documentation.
+//'    26 Mar 2006: (Leo Tenenblat) First Matlab version based on Fortran version.
+//'    21 Mar 2008: (MAS) Inner loops j = 1:n optimized.
+//'    09 Apr 2008: (MAS) All loops replaced by sparse-matrix operations.
+//'                 We can't find the biggest and smallest Aij
+//'                 on each scaling pass, so no longer print them.
+//'    24 Apr 2008: (MAS, Kaustuv) Allow for empty rows and columns.
+//'    13 Nov 2009: gmscal.m renamed gmscale.m.
+//' @export
+// [[Rcpp::export]]
+
 
 
 void gmscale(MatrixXd A, VectorXd &cscale, VectorXd &rscale, double scltol){
-  /*% Geometric-Mean Scaling finds the scale values for the
-   % `m x n` sparse matrix `A`.
-   %
-   % USAGE:
-   %
-   %    [cscale, rscale] = gmscale(A, iprint, scltol)
-   %
-   % INPUTS:
-   %    A(i, j):           contains entries of `A`.
-   %    iprint:            > 0 requests messages to the screen (0 means no output).
-   %    scltol:            should be in the range (0.0, 1.0).
-   %                       Typically `scltol` = 0.9.  A bigger value like 0.99 asks
-   %                       `gmscale` to work a little harder (more passes).
-   %
-   % OUTPUTS:
-   %    cscale, rscale:    column vectors of column and row scales such that
-   %                       `R` (inverse) `A` `C` (inverse) should have entries near 1.0,
-   %                       where `R= diag(rscale)`, `C = diag(cscale)`.
-   %
-   % An iterative procedure based on geometric means is used,
-   % following a routine written by Robert Fourer, 1979.
-   % Several passes are made through the columns and rows of `A`.
-   % The main steps are:
-   %
-   %   1. Compute :math:`aratio = max_j (max_i Aij / min_i Aij)`.
-   %   2. Divide each row `i` by :math:`sqrt( max_j Aij * min_j Aij)`.
-   %   3. Divide each column `j` by :math:`sqrt( max_i Aij * min_i Aij)`.
-   %   4. Compute `sratio` as in Step 1.
-   %   5. If :math:`sratio < aratio * scltol`,
-   %      set :math:`aratio = sratio` and repeat from Step 2.
-   %
-   % To dampen the effect of very small elements, on each pass,
-   % a new row or column scale will not be smaller than sqrt(damp)
-   % times the largest (scaled) element in that row or column.
-   %
-   % Use of the scales:
-   % To apply the scales to a linear program,
-   % :math:`min c^T x` st :math:`A x = b`, :math:`l \leq x \leq u`,
-   % we need to define "barred" quantities by the following relations:
-   % `A = R Abar C`, `b = R bbar`, `C cbar = c`,
-   % `C l = lbar`, `C u = ubar`, `C x = xbar`.
-   %
-   % This gives the scaled problem
-   % :math:`min\ cbar^T xbar` st :math:`Abar\ xbar = bbar`, :math:`lbar \leq xbar \leq ubar`.
-   %
-   % .. Author: - Michael Saunders, Systems Optimization Laboratory, Stanford University.
-   % ..
-   %    07 Jun 1996: First f77 version, based on MINOS 5.5 routine m2scal.
-   %    24 Apr 1998: Added final pass to make column norms = 1.
-   %    18 Nov 1999: Fixed up documentation.
-   %    26 Mar 2006: (Leo Tenenblat) First Matlab version based on Fortran version.
-   %    21 Mar 2008: (MAS) Inner loops j = 1:n optimized.
-   %    09 Apr 2008: (MAS) All loops replaced by sparse-matrix operations.
-   %                 We can't find the biggest and smallest Aij
-   %                 on each scaling pass, so no longer print them.
-   %    24 Apr 2008: (MAS, Kaustuv) Allow for empty rows and columns.
-   %    13 Nov 2009: gmscal.m renamed gmscale.m.
-   */
+
 
   int m = A.rows();
   int n = A.cols();
@@ -642,6 +649,41 @@ void gmscale(MatrixXd A, VectorXd &cscale, VectorXd &rscale, double scltol){
 
 
 
+//' mve_solver
+//' Find the maximum volume ellipsoid
+//' @param A a matrix of coefficients of inequality constants A.x<=b
+//' @param b a vector of length equals to nrow(A)
+//' @param x0 a solution of the polytope the column scaling vector
+//' @param reg a tuning parameter
+//' @param x vector to store the center of the ellipse
+//' @param E2 matrix to store the ellipse E'E
+//' @param maxiter a tuning parameter
+//' @param tol a tuning parameter
+//'
+//' @section Details:
+//' The CHRR algorithm is a C++ translation of cobratoolbox code written
+//' by Yin Zhang licensed under GNU GPL-3 https://github.com/opencobra/cobratoolbox/ 
+//' and of matlab code written by Ben Cousins 
+//' (https://github.com/Bounciness/Volume-and-Sampling) is a C++ translation of
+//' matlab functions provided in the opencobra toolbox and 
+//' in this github repository % `m x n` sparse matrix `A`.
+//' 
+//'Find the maximum volume ellipsoid
+//'    {v:  v = x + Es, ||s|| <= 1}
+//'  inscribing a full-dimensional polytope
+//'          {v:  Av <= b}
+//'  Input:  A, b --- defining the polytope
+//'          x0 --- interior point (Ax0 < b)
+//'  Output: x --- center of the ellipsoid
+//'          E2 --- E'*E
+  
+//'--------------------------------------
+//' Yin Zhang, Rice University, 07/29/02
+//'--------------------------------------
+  
+//'lines modified by me (Ben Cousins) have a %Ben after them
+//' @export
+// [[Rcpp::export]]
 
 
 bool mve_solver(MatrixXd A,
@@ -799,7 +841,40 @@ bool mve_solver(MatrixXd A,
 
 
 
+//' mve_run_cobra
+//' Find the maximum volume ellipsoid
+//' @param A a matrix of coefficients of inequality constants A.x<=b
+//' @param b a vector of length equals to nrow(A)
+//' @param x0 a solution of the polytope the column scaling vector
+//' @param reg a tuning parameter
+//' @param x vector to store the center of the ellipse
+//' @param E matrix to store the ellipse
+//' @param maxiter a tuning parameter
+//'
+//' @section Details:
+//' The CHRR algorithm is a C++ translation of cobratoolbox code written
+//' by Yin Zhang licensed under GNU GPL-3 https://github.com/opencobra/cobratoolbox/ 
+//' and of matlab code written by Ben Cousins 
+//' (https://github.com/Bounciness/Volume-and-Sampling) is a C++ translation of
+//' matlab functions provided in the opencobra toolbox and 
+//' in this github repository % `m x n` sparse matrix `A`.
+//' 
+//'Find the maximum volume ellipsoid
+//'    {v:  v = x + Es, ||s|| <= 1}
+//'  inscribing a full-dimensional polytope
+//'          {v:  Av <= b}
+//'  Input:  A, b --- defining the polytope
+//'          x0 --- interior point (Ax0 < b)
+//'  Output: x --- center of the ellipsoid
+//'          E2 --- E'*E
 
+//'--------------------------------------
+//' Yin Zhang, Rice University, 07/29/02
+//'--------------------------------------
+
+//'lines modified by me (Ben Cousins) have a %Ben after them
+//' @export
+// [[Rcpp::export]]
 
 
 bool mve_run_cobra(const MatrixXd &A,
@@ -808,20 +883,6 @@ bool mve_run_cobra(const MatrixXd &A,
                    double reg, VectorXd & x,
                    MatrixXd & E,
                    int maxiter){
-  /*%  Find the maximum volume ellipsoid
-   %     Ell = {v:  v = x + Es, ||s|| <= 1}
-   %  or Ell = {v:  ||E^{-1}(v-x)|| <= 1}
-   %  inscribing a full-dimensional polytope
-   %          {v:  Av <= b}
-   %  Input:  A, b --- defining the polytope
-   %   (Optinal x0 --- interior point, A*x0 < b)
-   %  Output:  x --- center of the ellipsoid
-   %           E --- matrix defining ellipsoid
-   %--------------------------------------
-   % Yin Zhang, Rice University, 07/29/02
-   % Last modified: 09/29/16
-   %--------------------------------------
-   %lines modified by me (Ben Cousins) have a %Ben after them */
   double tol2 = 1.e-6;
   int m=A.rows();
   int n=A.cols();
@@ -835,7 +896,44 @@ bool mve_run_cobra(const MatrixXd &A,
 
 
 
-
+//' shiftPolytope
+//' shift a polytope and saves into to undo the transformation
+//' @param A a matrix of coefficients of inequality constants A.x<=b
+//' @param b a vector of length equals to nrow(A)
+//' @param N the matrix storing the total transformation 
+//' (including current and previous transformations)
+//' @param p the vector storing the total shift
+//' (including current and previous transformations)
+//' @param T a matrix
+//' @param trans matrix of transformation to be applied
+//' @param shift vector of shift to be applied
+//'
+//' @section Details:
+//' The CHRR algorithm is a C++ translation of cobratoolbox code written
+//' by Yin Zhang licensed under GNU GPL-3 https://github.com/opencobra/cobratoolbox/ 
+//' and of matlab code written by Ben Cousins 
+//' (https://github.com/Bounciness/Volume-and-Sampling) is a C++ translation of
+//' matlab functions provided in the opencobra toolbox and 
+//' in this github repository % `m x n` sparse matrix `A`.
+//' 
+//' shift the polytope by a point and apply a transformation, while retaining
+//'the information to undo the transformation later (to recover the samples)
+  
+//'let x denote the original space, y the current space, and z the new space
+//'we have
+//'
+//'   P.A y <= P.b   and x = N*y+p
+//'
+//'  applying the transformation
+//'
+//'   trans * z + shift = y
+//'
+//' yields the system
+//'
+//'  x = (N * trans) * z + N*shift + p
+//'  (P.A * trans) * z <= P.b - P.A * shift
+//' @export
+// [[Rcpp::export]]
 void shiftPolytope(MatrixXd & A, VectorXd & b,
                    MatrixXd & N,
                    VectorXd &p, MatrixXd &T,
@@ -849,76 +947,31 @@ void shiftPolytope(MatrixXd & A, VectorXd & b,
 }
 
 
-
-void newSolution(const Eigen::MatrixXd &A ,
-                 const Eigen::VectorXd &b,
-                 const Eigen::VectorXd &x0,
-                 VectorXd &x) {
-  dqrng::dqRNGkind("Xoroshiro128+");
-  int p=A.cols();
-  int m=A.rows();
-  
-  double inf = std::numeric_limits<double>::max();
-  
-  // Check input arguments
-  if (m < (p+1) || b.size()!=m || x0.size()!=p){
-    throw std::range_error("dimensions mismatch");
-  }
-  // Initialisation
-  Eigen::MatrixXd y(p,1);
-  x=x0;
-  
-  
-  Eigen::MatrixXd T1(p,p);
-  Eigen::MatrixXd T2(p,p);
-  T1.setIdentity();
-  Eigen::VectorXd delta(m); //vector used to store distance to bounds
-  Eigen::MatrixXd d(m,1);
-  Eigen::MatrixXd d2(m,1);
-  Eigen::MatrixXd z(m,1);
-  
-  //std::random_shuffle(index.begin(), index.end()); //we change the order to
-  //limit the influence of initial ordering
-  
-  IntegerVector index=dqrng::dqsample_int(p,p,false);
-  y=x;
-  // compute approximate stochastic transformation
-  // choose p new components
-  for (int ip=0;ip<p;++ip){
-    int i=index[p-ip-1];
-    //Find points where the line with the (p-1) components x_i
-    //fixed intersects the bounding polytope.
-    z = A.col(i); //prevent any divisions by 0
-    if (ip==0)
-      d2=(b - A*y);
-    d=d2.cwiseQuotient(z);
-    double tmin=-inf;
-    double tmax=inf;
-    for (int j=0;j<m;++j){
-      if (z(j)<0 && tmin<d(j)) tmin=d(j);
-      if (z(j)>0 && tmax>d(j)) tmax=d(j);
-    }
-    tmin=std::min(0.0, tmin);
-    tmax=std::max(0.0, tmax);
-    
-    
-    double delta = -y(i);
-    y(i) += (tmin+(tmax-tmin)*.5);
-    y(i)=std::min(std::max(y(i),-inf),inf);
-    //Rcout<<tmin<<" "<<tmax<<" "<<y(i)<<std::endl;
-    delta += y(i);
-    d2 -= A.col(i)*delta; //we do this to avoid making a matrix
-    //multiplication for each parameter (we just update the value of the
-    //constraint with the delta of parameter)
-  }
-  
-  x=y;
-  
-}
+//' round
+//' this function rounds the polytope and is adapted from the preprocess matlab
+//' function
+//' @param A a matrix of coefficients of inequality constants A.x<=b
+//' @param b a vector of length equals to nrow(A)
+//' @param N_total the to store the transformation
+//' @param p_shift the vector storing the total shift
+//' @param T a matrix
+//' @param maxiter a tuning parameter
+//'
+//' @section Details:
+//' The CHRR algorithm is a C++ translation of cobratoolbox code written
+//' by Yin Zhang licensed under GNU GPL-3 https://github.com/opencobra/cobratoolbox/ 
+//' and of matlab code written by Ben Cousins 
+//' (https://github.com/Bounciness/Volume-and-Sampling) is a C++ translation of
+//' matlab functions provided in the opencobra toolbox and 
+//' in this github repository % `m x n` sparse matrix `A`.
+//' 
+//' The algorithms rounds the polytope for
+//' the volume/sampling algorithms to be accurate and efficient.
+//' @export
+// [[Rcpp::export]]
 
 
-//This function is called preprocess in matlab
-
+  
 void round(MatrixXd &A,
            VectorXd &b,
            VectorXd &x0,
