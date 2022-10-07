@@ -1,0 +1,7 @@
+
+Hilaire Drouineau, Benjamin Planque, Christian Mullon wrote the R package 'RCaNmodel.
+
+The CHRR algorithm is a C++ translation of cobratoolbox code written by Yin Zhang licensed under GNU GPL-3 https://github.com/opencobra/cobratoolbox/ 
+and of matlab code written by Ben Cousins (https://github.com/Bounciness/Volume-and-Sampling) 
+
+The gibbs algorithm is a C++ adaptation of a code initilally pusblished online (Tim Benham (2022). Uniform distribution over a convex polytope (https://www.mathworks.com/matlabcentral/fileexchange/34208-uniform-distribution-over-a-convex-polytope), MATLAB Central File Exchange. Retrieved October 7, 2022. .)
