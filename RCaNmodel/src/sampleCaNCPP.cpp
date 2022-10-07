@@ -550,13 +550,13 @@ List sampleCaNCPP(const int N,
 //'
 //' Use of the scales:
 //' To apply the scales to a linear program,
-//' :math:`min c^T x` st :math:`A x = b`, :math:`l \leq x \leq u`,
+//' :math:`min c^T x` st :math:`A x = b`, :math:`l leq x leq u`,
 //' we need to define "barred" quantities by the following relations:
 //' `A = R Abar C`, `b = R bbar`, `C cbar = c`,
 //' `C l = lbar`, `C u = ubar`, `C x = xbar`.
 //'
 //' This gives the scaled problem
-//' :math:`min\ cbar^T xbar` st :math:`Abar\ xbar = bbar`, :math:`lbar \leq xbar \leq ubar`.
+//' :math:`min cbar^T xbar` st :math:`Abar xbar = bbar`, :math:`lbar leq xbar leq ubar`.
 //'
 //' .. Author: - Michael Saunders, Systems Optimization Laboratory, Stanford University.
 //' ..
