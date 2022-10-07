@@ -5,6 +5,97 @@
 #' @useDynLib RCaNmodel
 NULL
 
+#' mve_solver
+#' Find the maximum volume ellipsoid
+#' @param A a matrix of coefficients of inequality constants A.x<=b
+#' @param b a vector of length equals to nrow(A)
+#' @param x0 a solution of the polytope the column scaling vector
+#' @param reg a tuning parameter
+#' @param x vector to store the center of the ellipse
+#' @param E2 matrix to store the ellipse E'E
+#' @param maxiter a tuning parameter
+#' @param tol a tuning parameter
+#'
+#' @section Details:
+#' The CHRR algorithm is a C++ translation of cobratoolbox code written
+#' by Yin Zhang licensed under GNU GPL-3 https://github.com/opencobra/cobratoolbox/ 
+#' and of matlab code written by Ben Cousins 
+#' (https://github.com/Bounciness/Volume-and-Sampling) is a C++ translation of
+#' matlab functions provided in the opencobra toolbox and 
+#' in this github repository % `m x n` sparse matrix `A`.
+#' 
+#'Find the maximum volume ellipsoid
+#'    {v:  v = x + Es, ||s|| <= 1}
+#'  inscribing a full-dimensional polytope
+#'          {v:  Av <= b}
+#'  Input:  A, b --- defining the polytope
+#'          x0 --- interior point (Ax0 < b)
+#'  Output: x --- center of the ellipsoid
+#'          E2 --- E'*E
+NULL
+
+#'--------------------------------------
+#' Yin Zhang, Rice University, 07/29/02
+#'--------------------------------------
+NULL
+
+#' mve_run_cobra
+#' Find the maximum volume ellipsoid
+#' @param A a matrix of coefficients of inequality constants A.x<=b
+#' @param b a vector of length equals to nrow(A)
+#' @param x0 a solution of the polytope the column scaling vector
+#' @param reg a tuning parameter
+#' @param x vector to store the center of the ellipse
+#' @param E matrix to store the ellipse
+#' @param maxiter a tuning parameter
+#'
+#' @section Details:
+#' The CHRR algorithm is a C++ translation of cobratoolbox code written
+#' by Yin Zhang licensed under GNU GPL-3 https://github.com/opencobra/cobratoolbox/ 
+#' and of matlab code written by Ben Cousins 
+#' (https://github.com/Bounciness/Volume-and-Sampling) is a C++ translation of
+#' matlab functions provided in the opencobra toolbox and 
+#' in this github repository % `m x n` sparse matrix `A`.
+#' 
+#'Find the maximum volume ellipsoid
+#'    {v:  v = x + Es, ||s|| <= 1}
+#'  inscribing a full-dimensional polytope
+#'          {v:  Av <= b}
+#'  Input:  A, b --- defining the polytope
+#'          x0 --- interior point (Ax0 < b)
+#'  Output: x --- center of the ellipsoid
+#'          E2 --- E'*E
+NULL
+
+#'--------------------------------------
+#' Yin Zhang, Rice University, 07/29/02
+#'--------------------------------------
+NULL
+
+#' shiftPolytope
+#' shift a polytope and saves into to undo the transformation
+#' @param A a matrix of coefficients of inequality constants A.x<=b
+#' @param b a vector of length equals to nrow(A)
+#' @param N the matrix storing the total transformation 
+#' (including current and previous transformations)
+#' @param p the vector storing the total shift
+#' (including current and previous transformations)
+#' @param T a matrix
+#' @param trans matrix of transformation to be applied
+#' @param shift vector of shift to be applied
+#'
+#' @section Details:
+#' The CHRR algorithm is a C++ translation of cobratoolbox code written
+#' by Yin Zhang licensed under GNU GPL-3 https://github.com/opencobra/cobratoolbox/ 
+#' and of matlab code written by Ben Cousins 
+#' (https://github.com/Bounciness/Volume-and-Sampling) is a C++ translation of
+#' matlab functions provided in the opencobra toolbox and 
+#' in this github repository % `m x n` sparse matrix `A`.
+#' 
+#' shift the polytope by a point and apply a transformation, while retaining
+#'the information to undo the transformation later (to recover the samples)
+NULL
+
 #' Complex Polytope Gibbs Sampling
 #' This function draw uniform samples in a convex polytope with inequality constraints
 #'
@@ -23,6 +114,12 @@ NULL
 #' This function is based on an initial matlab code developped called CPRND
 #' (https://ch.mathworks.com/matlabcentral/fileexchange/34208-uniform-distribution-over-a-convex-polytope)
 #' It generates samples within the complex polytope defined by \eqn{A \cdot x \leqslant   b}
+#' The CHRR algorithm is a C++ translation of cobratoolbox code written
+#' by Yin Zhang licensed under GNU GPL-3 https://github.com/opencobra/cobratoolbox/ 
+#' and of matlab code written by Ben Cousins 
+#' (https://github.com/Bounciness/Volume-and-Sampling) is a C++ translation of
+#' matlab functions provided in the opencobra toolbox and 
+#' in this github repository
 #'
 #' @return a matrix with one row per sample and one column per parameter
 #' @examples
@@ -113,6 +210,121 @@ degenerateSubSpace <- function(A, b, C, v, z) {
 
 sampleCaNCPP <- function(N, A, b, C, v, L, x0, thin, method = 1L, seed = 1L, stream = 1L, covMat = NULL, savedN_total = NULL, savedp_shift = NULL) {
     .Call(`_RCaNmodel_sampleCaNCPP`, N, A, b, C, v, L, x0, thin, method, seed, stream, covMat, savedN_total, savedp_shift)
+}
+
+#' gmscale
+#' scaling of matrix with a geometric mean procedure
+#'MatrixXd A, VectorXd &cscale, VectorXd &rscale, double scltol
+#' @param A a matrix of coefficients of inequality constants A.x<=b
+#' @param b a vector of length equals to nrow(A)
+#' @param cscale the column scaling vector
+#' @param rscale the row scaling vector
+#' @param scltol tolerance
+#'
+#' @section Details:
+#' The CHRR algorithm is a C++ translation of cobratoolbox code written
+#' by Yin Zhang licensed under GNU GPL-3 https://github.com/opencobra/cobratoolbox/ 
+#' and of matlab code written by Ben Cousins 
+#' (https://github.com/Bounciness/Volume-and-Sampling) is a C++ translation of
+#' matlab functions provided in the opencobra toolbox and 
+#' in this github repository % `m x n` sparse matrix `A`.
+#' 
+#' An iterative procedure based on geometric means is used,
+#' following a routine written by Robert Fourer, 1979.
+#' Several passes are made through the columns and rows of `A`.
+#' The main steps are:
+#'
+#'   1. Compute :math:`aratio = max_j (max_i Aij / min_i Aij)`.
+#'   2. Divide each row `i` by :math:`sqrt( max_j Aij * min_j Aij)`.
+#'   3. Divide each column `j` by :math:`sqrt( max_i Aij * min_i Aij)`.
+#'   4. Compute `sratio` as in Step 1.
+#'   5. If :math:`sratio < aratio * scltol`,
+#'      set :math:`aratio = sratio` and repeat from Step 2.
+#'
+#' To dampen the effect of very small elements, on each pass,
+#' a new row or column scale will not be smaller than sqrt(damp)
+#' times the largest (scaled) element in that row or column.
+#'
+#' Use of the scales:
+#' To apply the scales to a linear program,
+#' :math:`min c^T x` st :math:`A x = b`, :math:`l \leq x \leq u`,
+#' we need to define "barred" quantities by the following relations:
+#' `A = R Abar C`, `b = R bbar`, `C cbar = c`,
+#' `C l = lbar`, `C u = ubar`, `C x = xbar`.
+#'
+#' This gives the scaled problem
+#' :math:`min\ cbar^T xbar` st :math:`Abar\ xbar = bbar`, :math:`lbar \leq xbar \leq ubar`.
+#'
+#' .. Author: - Michael Saunders, Systems Optimization Laboratory, Stanford University.
+#' ..
+#'    07 Jun 1996: First f77 version, based on MINOS 5.5 routine m2scal.
+#'    24 Apr 1998: Added final pass to make column norms = 1.
+#'    18 Nov 1999: Fixed up documentation.
+#'    26 Mar 2006: (Leo Tenenblat) First Matlab version based on Fortran version.
+#'    21 Mar 2008: (MAS) Inner loops j = 1:n optimized.
+#'    09 Apr 2008: (MAS) All loops replaced by sparse-matrix operations.
+#'                 We can't find the biggest and smallest Aij
+#'                 on each scaling pass, so no longer print them.
+#'    24 Apr 2008: (MAS, Kaustuv) Allow for empty rows and columns.
+#'    13 Nov 2009: gmscal.m renamed gmscale.m.
+#' @export
+gmscale <- function(A, cscale, rscale, scltol) {
+    invisible(.Call(`_RCaNmodel_gmscale`, A, cscale, rscale, scltol))
+}
+
+#'lines modified by me (Ben Cousins) have a %Ben after them
+#' @export
+mve_solver <- function(A, b, x0, reg, x, E2, maxiter = 50L, tol = 1.e-6) {
+    .Call(`_RCaNmodel_mve_solver`, A, b, x0, reg, x, E2, maxiter, tol)
+}
+
+#'lines modified by me (Ben Cousins) have a %Ben after them
+#' @export
+mve_run_cobra <- function(A, b, x0, reg, x, E, maxiter) {
+    .Call(`_RCaNmodel_mve_run_cobra`, A, b, x0, reg, x, E, maxiter)
+}
+
+#'let x denote the original space, y the current space, and z the new space
+#'we have
+#'
+#'   P.A y <= P.b   and x = N*y+p
+#'
+#'  applying the transformation
+#'
+#'   trans * z + shift = y
+#'
+#' yields the system
+#'
+#'  x = (N * trans) * z + N*shift + p
+#'  (P.A * trans) * z <= P.b - P.A * shift
+#' @export
+shiftPolytope <- function(A, b, N, p, T, trans, shift) {
+    invisible(.Call(`_RCaNmodel_shiftPolytope`, A, b, N, p, T, trans, shift))
+}
+
+#' round
+#' this function rounds the polytope and is adapted from the preprocess matlab
+#' function
+#' @param A a matrix of coefficients of inequality constants A.x<=b
+#' @param b a vector of length equals to nrow(A)
+#' @param N_total the to store the transformation
+#' @param p_shift the vector storing the total shift
+#' @param T a matrix
+#' @param maxiter a tuning parameter
+#'
+#' @section Details:
+#' The CHRR algorithm is a C++ translation of cobratoolbox code written
+#' by Yin Zhang licensed under GNU GPL-3 https://github.com/opencobra/cobratoolbox/ 
+#' and of matlab code written by Ben Cousins 
+#' (https://github.com/Bounciness/Volume-and-Sampling) is a C++ translation of
+#' matlab functions provided in the opencobra toolbox and 
+#' in this github repository % `m x n` sparse matrix `A`.
+#' 
+#' The algorithms rounds the polytope for
+#' the volume/sampling algorithms to be accurate and efficient.
+#' @export
+round <- function(A, b, x0, N_total, p_shift, T, maxiter = 80L) {
+    invisible(.Call(`_RCaNmodel_round`, A, b, x0, N_total, p_shift, T, maxiter))
 }
 
 # Register entry points for exported C++ functions

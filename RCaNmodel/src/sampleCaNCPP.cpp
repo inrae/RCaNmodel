@@ -575,7 +575,10 @@ List sampleCaNCPP(const int N,
 
 
 
-void gmscale(MatrixXd A, VectorXd &cscale, VectorXd &rscale, double scltol){
+void gmscale(Eigen::MatrixXd A, 
+             Eigen::VectorXd &cscale, 
+             Eigen::VectorXd &rscale, 
+             double scltol){
 
 
   int m = A.rows();
@@ -587,24 +590,24 @@ void gmscale(MatrixXd A, VectorXd &cscale, VectorXd &rscale, double scltol){
   double damp=1e-4;
   double small = 1e-8;
   double eps=2.2204e-16;
-  MatrixXd SA;
-  rscale = VectorXd::Constant(m, 1);
-  cscale = VectorXd::Constant(n, 1);
+  Eigen::MatrixXd SA;
+  rscale = Eigen::VectorXd::Constant(m, 1);
+  cscale = Eigen::VectorXd::Constant(n, 1);
   
   /*--------------------------------------------------------------
    Main loop.
    --------------------------------------------------------------*/
-    MatrixXd invSA= MatrixXd::Zero(m,n);
+    Eigen::MatrixXd invSA= Eigen::MatrixXd::Zero(m,n);
   for (int npass = 0; npass <= maxpass; ++ npass){
     // Find the largest column ratio.
     // Also set new column scales (except on pass 0).
     
     rscale = (rscale.array() ==0).select(1, rscale);
-    MatrixXd Rinv    = rscale.cwiseInverse().asDiagonal();
+    Eigen::MatrixXd Rinv    = rscale.cwiseInverse().asDiagonal();
     SA      = Rinv*A;
     invSA= (SA.array()==0).select(1e9,SA.cwiseInverse());
-    VectorXd cmax    = SA.colwise().maxCoeff();   // column vector
-    VectorXd cmin    = invSA.colwise().maxCoeff();   // column vector
+    Eigen::VectorXd cmax    = SA.colwise().maxCoeff();   // column vector
+    Eigen::VectorXd cmin    = invSA.colwise().maxCoeff();   // column vector
     cmin    = (cmin.array() + eps).matrix().cwiseInverse();
     double sratio  = cmax.cwiseProduct(cmin.cwiseInverse()).maxCoeff();   // Max col ratio
     if (npass > 0){
@@ -623,8 +626,8 @@ void gmscale(MatrixXd A, VectorXd &cscale, VectorXd &rscale, double scltol){
     Eigen::DiagonalMatrix<double, Eigen::Dynamic> Cinv = cscale.cwiseInverse().asDiagonal();
     SA      = A*Cinv;                  // Scaled A
     invSA= (SA.array()==0).select(1e9,SA.cwiseInverse());
-    VectorXd rmax    = SA.rowwise().maxCoeff();   // column vector
-    VectorXd rmin    = invSA.rowwise().maxCoeff();   // column vector
+    Eigen::VectorXd rmax    = SA.rowwise().maxCoeff();   // column vector
+    Eigen::VectorXd rmin    = invSA.rowwise().maxCoeff();   // column vector
     rmin    = (rmin.array() + eps).matrix().cwiseInverse();
     rscale  = rmax.cwiseProduct(rmin.cwiseMax(damp*rmax)).array().sqrt().matrix();
   }
@@ -637,7 +640,7 @@ void gmscale(MatrixXd A, VectorXd &cscale, VectorXd &rscale, double scltol){
   // Again, allow for empty rows and columns.
   
   rscale = (rscale.array() ==0).select(1, rscale);
-  MatrixXd Rinv    = rscale.cwiseInverse().asDiagonal();
+  Eigen::MatrixXd Rinv    = rscale.cwiseInverse().asDiagonal();
   SA      = Rinv*A;
   
   cscale  = SA.colwise().maxCoeff();   // column vector
@@ -686,12 +689,12 @@ void gmscale(MatrixXd A, VectorXd &cscale, VectorXd &rscale, double scltol){
 // [[Rcpp::export]]
 
 
-bool mve_solver(MatrixXd A,
-                VectorXd b,
-                const VectorXd &x0,
+bool mve_solver(Eigen::MatrixXd A,
+                Eigen::VectorXd b,
+                const Eigen::VectorXd &x0,
                 double reg,
-                VectorXd & x,
-                MatrixXd & E2,
+                Eigen::VectorXd & x,
+                Eigen::MatrixXd & E2,
                 const int maxiter = 50,
                 const double tol  = 1.e-6){
   bool converged = false;
@@ -704,25 +707,25 @@ bool mve_solver(MatrixXd A,
   double bnrm = A.norm();
   Rcout<<"##starts mve_solver"<<std::endl;
   
-  VectorXd bmAx0 = b - A*x0;
-  MatrixXd tmp=MatrixXd::Zero(m,m);
+  Eigen::VectorXd bmAx0 = b - A*x0;
+  Eigen::MatrixXd tmp=Eigen::MatrixXd::Zero(m,m);
   
   tmp.diagonal()=bmAx0.cwiseInverse();
   A=tmp * A;
   
-  b=VectorXd::Constant(m, 1);
-  x =  VectorXd::Zero(n);
-  VectorXd y = VectorXd::Constant(m, 1);
-  Eigen::DiagonalMatrix<double, Eigen::Dynamic> Y = VectorXd::Zero(m).asDiagonal();
-  VectorXd bmAx = b;
+  b=Eigen::VectorXd::Constant(m, 1);
+  x =  Eigen::VectorXd::Zero(n);
+  Eigen::VectorXd y = Eigen::VectorXd::Constant(m, 1);
+  Eigen::DiagonalMatrix<double, Eigen::Dynamic> Y = Eigen::VectorXd::Zero(m).asDiagonal();
+  Eigen::VectorXd bmAx = b;
   double res = 1;
   int msg = 1;
   
   double astep;
   double prev_obj = -99999999999;
-  VectorXd Adx(m);
+  Eigen::VectorXd Adx(m);
   
-  VectorXd z(m);
+  Eigen::VectorXd z(m);
   
   for (int iter =0; iter < maxiter; ++iter){
     Rcout<<"##iter "<<iter<<std::endl;
@@ -733,8 +736,8 @@ bool mve_solver(MatrixXd A,
     
     Y.diagonal()=y;
     E2 = (A.transpose() * Y* A).inverse();
-    MatrixXd Q = A * E2 * A.transpose();
-    VectorXd h=Q.diagonal().array().sqrt().matrix();
+    Eigen::MatrixXd Q = A * E2 * A.transpose();
+    Eigen::VectorXd h=Q.diagonal().array().sqrt().matrix();
     if (iter == 0){
       double t = bmAx.cwiseProduct(h.cwiseInverse()).minCoeff();
       y /= t*t;
@@ -744,14 +747,14 @@ bool mve_solver(MatrixXd A,
       Y.diagonal() = (Y.diagonal().array()/(t*t)).matrix();
     }
     
-    VectorXd yz = y.cwiseProduct(z);
-    VectorXd yh = y.cwiseProduct(h);
+    Eigen::VectorXd yz = y.cwiseProduct(z);
+    Eigen::VectorXd yh = y.cwiseProduct(h);
     double gap = yz.sum()/((double)m);
     double rmu = std::min(0.5, gap) * gap;
     rmu = std::max(rmu, minmu);
-    VectorXd R1 = - A.transpose()*yh;
-    VectorXd R2 = bmAx - h -z;
-    VectorXd R3 = - yz + VectorXd::Constant(m,rmu);
+    Eigen::VectorXd R1 = - A.transpose()*yh;
+    Eigen::VectorXd R2 = bmAx - h -z;
+    Eigen::VectorXd R3 = - yz + Eigen::VectorXd::Constant(m,rmu);
     double r1 = R1.array().abs().sum();
     double r2 = R2.array().abs().sum();
     double r3 = R3.array().abs().sum();
@@ -762,7 +765,7 @@ bool mve_solver(MatrixXd A,
     
     if (iter%10==0){
       Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> es(E2);
-      VectorXd eigen=es.eigenvalues().real();
+      Eigen::VectorXd eigen=es.eigenvalues().real();
       if (abs((last_r1-r1)/std::min(abs(last_r1),abs(r1)))<1e-2 && abs((last_r2 - r2)/std::min(abs(last_r2),abs(r2)))<1e-2 && eigen.maxCoeff()/eigen.minCoeff() >100 && reg>1e-10){
         break;
       }
@@ -778,42 +781,42 @@ bool mve_solver(MatrixXd A,
       break;
     }
     prev_obj = objval;
-    MatrixXd YQ=Y*Q;
-    MatrixXd YQQY = YQ.cwiseProduct(YQ.transpose());
-    VectorXd y2h= 2*yh;
-    MatrixXd YA=Y*A;
+    Eigen::MatrixXd YQ=Y*Q;
+    Eigen::MatrixXd YQQY = YQ.cwiseProduct(YQ.transpose());
+    Eigen::VectorXd y2h= 2*yh;
+    Eigen::MatrixXd YA=Y*A;
     
     
-    tmp=MatrixXd::Zero(m,m);
+    tmp=Eigen::MatrixXd::Zero(m,m);
     tmp.diagonal()=y2h.cwiseProduct(z).cwiseMax(reg);
     
-    MatrixXd G = YQQY+ tmp ;
+    Eigen::MatrixXd G = YQQY+ tmp ;
     
-    VectorXd rsG = VectorXd::Constant(G.rows(), 1);
-    VectorXd csG = VectorXd::Constant(G.cols(), 1);
+    Eigen::VectorXd rsG = Eigen::VectorXd::Constant(G.rows(), 1);
+    Eigen::VectorXd csG = Eigen::VectorXd::Constant(G.cols(), 1);
     gmscale(G,csG, rsG, .99); //Ben
-    MatrixXd T = (rsG.cwiseInverse().asDiagonal()*G*csG.cwiseInverse().asDiagonal()).inverse() * (rsG.cwiseInverse().asDiagonal()*((h+z).asDiagonal()*YA)); //Ben
+    Eigen::MatrixXd T = (rsG.cwiseInverse().asDiagonal()*G*csG.cwiseInverse().asDiagonal()).inverse() * (rsG.cwiseInverse().asDiagonal()*((h+z).asDiagonal()*YA)); //Ben
     T = csG.cwiseInverse().asDiagonal()*T; //Ben
     
     
     
-    MatrixXd ATP=(y2h.asDiagonal()*T-YA).transpose();
-    VectorXd R3Dy=R3.cwiseProduct(y.cwiseInverse());
+    Eigen::MatrixXd ATP=(y2h.asDiagonal()*T-YA).transpose();
+    Eigen::VectorXd R3Dy=R3.cwiseProduct(y.cwiseInverse());
     
-    VectorXd R23 = R2-R3Dy;
-    MatrixXd ATP_A = ATP*A;
+    Eigen::VectorXd R23 = R2-R3Dy;
+    Eigen::MatrixXd ATP_A = ATP*A;
     
-    ATP_A+=VectorXd::Constant(n,reg).asDiagonal();
+    ATP_A+=Eigen::VectorXd::Constant(n,reg).asDiagonal();
     
     
-    VectorXd dx=ATP_A.inverse() * (R1+ATP*R23); //Ben
+    Eigen::VectorXd dx=ATP_A.inverse() * (R1+ATP*R23); //Ben
     
     //dx = csA.cwiseInverse().asDiagonal() * dx; //Ben
     Adx = A*dx;
-    VectorXd dyDy=(rsG.cwiseInverse().asDiagonal()*G*csG.cwiseInverse().asDiagonal()).inverse()*(rsG.cwiseInverse().asDiagonal()*y2h.cwiseProduct(Adx-R23));
+    Eigen::VectorXd dyDy=(rsG.cwiseInverse().asDiagonal()*G*csG.cwiseInverse().asDiagonal()).inverse()*(rsG.cwiseInverse().asDiagonal()*y2h.cwiseProduct(Adx-R23));
     dyDy=csG.cwiseInverse().asDiagonal()*dyDy;
-    VectorXd dy = y.cwiseProduct(dyDy);
-    VectorXd dz=R3Dy - z.cwiseProduct(dyDy);
+    Eigen::VectorXd dy = y.cwiseProduct(dyDy);
+    Eigen::VectorXd dz=R3Dy - z.cwiseProduct(dyDy);
     double ax=-1/std::min(-(Adx.cwiseProduct(bmAx.cwiseInverse()).eval().maxCoeff()), -.5);
     double ay=-1/std::min(dyDy.minCoeff(), -.5);
     double az = -1/std::min(dz.cwiseProduct(z.cwiseInverse()).eval().minCoeff(), -.5);
@@ -877,16 +880,16 @@ bool mve_solver(MatrixXd A,
 // [[Rcpp::export]]
 
 
-bool mve_run_cobra(const MatrixXd &A,
-                   const VectorXd &b,
-                   const MatrixXd &x0,
-                   double reg, VectorXd & x,
-                   MatrixXd & E,
+bool mve_run_cobra(const Eigen::MatrixXd &A,
+                   const Eigen::VectorXd &b,
+                   const Eigen::MatrixXd &x0,
+                   double reg, Eigen::VectorXd & x,
+                   Eigen::MatrixXd & E,
                    int maxiter){
   double tol2 = 1.e-6;
   int m=A.rows();
   int n=A.cols();
-  MatrixXd E2(n,n);
+  Eigen::MatrixXd E2(n,n);
   
   bool converged=mve_solver(A,b,x0,reg, x, E2, maxiter,tol2);
   
@@ -934,11 +937,11 @@ bool mve_run_cobra(const MatrixXd &A,
 //'  (P.A * trans) * z <= P.b - P.A * shift
 //' @export
 // [[Rcpp::export]]
-void shiftPolytope(MatrixXd & A, VectorXd & b,
-                   MatrixXd & N,
-                   VectorXd &p, MatrixXd &T,
-                   const MatrixXd & trans, 
-                   const VectorXd & shift){
+void shiftPolytope(Eigen::MatrixXd & A, Eigen::VectorXd & b,
+                   Eigen::MatrixXd & N,
+                   Eigen::VectorXd &p, Eigen::MatrixXd &T,
+                   const Eigen::MatrixXd & trans, 
+                   const Eigen::VectorXd & shift){
   p = p + N*shift;
   N = N * trans;
   T = T * trans;
@@ -972,44 +975,44 @@ void shiftPolytope(MatrixXd & A, VectorXd & b,
 
 
   
-void round(MatrixXd &A,
-           VectorXd &b,
-           VectorXd &x0,
-           MatrixXd & N_total,
-           VectorXd & p_shift,
-           MatrixXd & T,
+void round(Eigen::MatrixXd &A,
+           Eigen::VectorXd &b,
+           Eigen::VectorXd &x0,
+           Eigen::MatrixXd & N_total,
+           Eigen::VectorXd & p_shift,
+           Eigen::MatrixXd & T,
            int maxiter = 80){
   
   
   int m=A.cols();
   int n=A.rows();
-  p_shift=VectorXd::Zero(m);
+  p_shift=Eigen::VectorXd::Zero(m);
   
   //check that x0 is a good answer, otherwise, finds another one
 /*  while (((A*x0-b).array()>=0).any()){
-    VectorXd xnew(m);
+    Eigen::VectorXd xnew(m);
     newSolution(A,b,x0,xnew);
     x0=xnew;
 }*/
 
   //scale the matrix to help with numerical precision
-  VectorXd cs(m);
-  VectorXd rs(n);
+  Eigen::VectorXd cs(m);
+  Eigen::VectorXd rs(n);
   gmscale(A,cs, rs, 0.99);
 
   A=rs.cwiseInverse().asDiagonal()*A*cs.cwiseInverse().asDiagonal();
   b=rs.cwiseInverse().asDiagonal()*b;
-  N_total=MatrixXd::Identity(m, m) * cs.cwiseInverse().asDiagonal();
+  N_total=Eigen::MatrixXd::Identity(m, m) * cs.cwiseInverse().asDiagonal();
   
   x0=N_total.inverse()*(x0-p_shift);
   
   int max_its=20;
   int its=0;
   double reg=1e-3;
-  MatrixXd Tmve = MatrixXd::Identity(m, m);
-  T = MatrixXd::Identity(m, m);
+  Eigen::MatrixXd Tmve = Eigen::MatrixXd::Identity(m, m);
+  T = Eigen::MatrixXd::Identity(m, m);
   Eigen::EigenSolver<Eigen::MatrixXd> es;
-  VectorXd eigen=es.compute(Tmve, false).eigenvalues().real();
+  Eigen::VectorXd eigen=es.compute(Tmve, false).eigenvalues().real();
   bool converged=false;
   Rcout<<"##starting loop "<<std::endl;
   
@@ -1018,13 +1021,13 @@ void round(MatrixXd &A,
     Rcout<<"##rounding iteration "<<its<<std::endl;
     
   /*  while (((A*x0-b).array()>=0).any()){
-      VectorXd xnew(m);
+      Eigen::VectorXd xnew(m);
       newSolution(A,b,x0,xnew);
       x0=xnew;
   }*/
 
     reg=std::max(reg/10., 1e-10);
-    VectorXd T_shift(m);
+    Eigen::VectorXd T_shift(m);
     converged=mve_run_cobra(A, b, x0, reg, T_shift, Tmve, maxiter);
     shiftPolytope(A, b, N_total, p_shift, T, Tmve, T_shift);
 
@@ -1032,7 +1035,7 @@ void round(MatrixXd &A,
     //x0=Tmve.inverse()*(x0-T_shift); // we shift x0 to be a solution of the shifted polytope
     x0=N_total.inverse()*(x0-p_shift);
 
-    VectorXd row_norms=A.rowwise().norm();
+    Eigen::VectorXd row_norms=A.rowwise().norm();
     A=row_norms.cwiseInverse().asDiagonal()*A;
     b=row_norms.cwiseInverse().asDiagonal()*b;
 
@@ -1060,8 +1063,8 @@ void round(MatrixXd &A,
  * Unit testing
  ***************************************** */
 
-bool similar(const MatrixXd &A, const MatrixXd&B){
-  MatrixXd diff=(A-B).array().abs().matrix();
+bool similar(const Eigen::MatrixXd &A, const Eigen::MatrixXd&B){
+  Eigen::MatrixXd diff=(A-B).array().abs().matrix();
   return(diff.maxCoeff()<=1e-3);
 }
 
@@ -1070,29 +1073,29 @@ context("test C++ functions") {
   //unit testing of shiftPolytope
   
   test_that("shiftPolytope is ok") {
-    MatrixXd matA(4,2);
+    Eigen::MatrixXd matA(4,2);
     matA << 1, 0, 0, 4, -1, 0, 0, -3;
-    VectorXd b(4);
+    Eigen::VectorXd b(4);
     b<< 1, 3, -2, -6;
-    MatrixXd N(2,2);
-    N = MatrixXd::Identity(2,2);
-    MatrixXd trans(2,2);
+    Eigen::MatrixXd N(2,2);
+    N = Eigen::MatrixXd::Identity(2,2);
+    Eigen::MatrixXd trans(2,2);
     trans << 1,0,1,1;
-    MatrixXd T (2,2);
-    VectorXd Pshift(2);
-    Pshift =VectorXd::Zero(2);
-    VectorXd shift(2);
+    Eigen::MatrixXd T (2,2);
+    Eigen::VectorXd Pshift(2);
+    Pshift =Eigen::VectorXd::Zero(2);
+    Eigen::VectorXd shift(2);
     T=trans;
-    shift=VectorXd::Constant(2,1);
+    shift=Eigen::VectorXd::Constant(2,1);
     shiftPolytope(matA,b, N, Pshift,T, trans,shift);
     
-    MatrixXd Afinal(4,2);
+    Eigen::MatrixXd Afinal(4,2);
     Afinal<<1,0,4,4,-1,0,-3,-3;
-    VectorXd bfinal(4);
+    Eigen::VectorXd bfinal(4);
     bfinal<<0, -1,-1,-3;
-    MatrixXd Nfinal(2,2);
+    Eigen::MatrixXd Nfinal(2,2);
     Nfinal<<1,0,1,1;
-    VectorXd shiftfinal(2);
+    Eigen::VectorXd shiftfinal(2);
     shiftfinal<<1,1;
     
     expect_true(similar(matA, Afinal));
@@ -1101,38 +1104,18 @@ context("test C++ functions") {
     expect_true(similar(Pshift, shiftfinal));
   }
   
-  
-  //unit testing of newSolution
-  
-  test_that("newSolution is in the polytope") {
-    MatrixXd matA(4,2);
-    matA << 1, 0, 0, 1, -1, 0, 0, -1;
-    VectorXd b(4);
-    b<< 1, 1, -1, -1;
-    MatrixXd x0=VectorXd::Zero(2);
-    VectorXd xnew(2);
-    xnew=VectorXd::Zero(2);
-    
-    for (int i=0;i<10;++i){
-      newSolution(matA,b,x0,xnew);
-      expect_true(xnew.minCoeff()>=-1);
-      expect_true(xnew.maxCoeff()<=1);
-      
-    }
-    
-  }
-  
+
   
   //unit testing of gmscale
   test_that("gmscale is ok") {
-    MatrixXd matA(4,2);
+    Eigen::MatrixXd matA(4,2);
     matA << 1.0000,0.0,0,4,-3,0,0,-100;
-    VectorXd cscale = VectorXd(matA.cols());
-    VectorXd rscale = VectorXd(matA.rows());
+    Eigen::VectorXd cscale = Eigen::VectorXd(matA.cols());
+    Eigen::VectorXd rscale = Eigen::VectorXd(matA.rows());
     double scltol=1e-6;
-    VectorXd cscalefinal = VectorXd(matA.cols());
+    Eigen::VectorXd cscalefinal = Eigen::VectorXd(matA.cols());
     cscalefinal <<1.0000000000000002,1.0000000000000002;
-    VectorXd rscalefinal = VectorXd(matA.rows());
+    Eigen::VectorXd rscalefinal = Eigen::VectorXd(matA.rows());
     rscalefinal<<1,4,3,100;
     gmscale(matA,cscale,rscale,scltol);
     expect_true(similar(cscale, cscalefinal));
@@ -1144,16 +1127,16 @@ context("test C++ functions") {
   
   //unit testing of mve_solver
   test_that("mve_solver is ok") {
-    MatrixXd A(4,2);
+    Eigen::MatrixXd A(4,2);
     A <<  1.0000,0.0,0,4,-3,0,0,-100;
-    VectorXd b(4);
+    Eigen::VectorXd b(4);
     b<<100,5,-3,-50;
-    VectorXd x0(2);
+    Eigen::VectorXd x0(2);
     x0 <<75,.75;
-    VectorXd x(2);
-    MatrixXd E2(2,2);
-    VectorXd xfinal(2);
-    MatrixXd E2final(2,2);
+    Eigen::VectorXd x(2);
+    Eigen::MatrixXd E2(2,2);
+    Eigen::VectorXd xfinal(2);
+    Eigen::MatrixXd E2final(2,2);
     E2final<< 632.88,0,0,.191956;
     xfinal << -0.193302,0.0845026;
     mve_solver(A,
@@ -1170,35 +1153,35 @@ context("test C++ functions") {
   
   //unit testing of round
   test_that("round is ok") {
-    MatrixXd matA(4,2);
+    Eigen::MatrixXd matA(4,2);
     matA << 1, 0, 0,1,-1,0,0,-1;
     
-    MatrixXd matAfinal(4,2);
+    Eigen::MatrixXd matAfinal(4,2);
     matAfinal << 1, 0, 0,1,-1,0,0,-1;
     
-    VectorXd b(4);
+    Eigen::VectorXd b(4);
     b<<100,1,100,1;
     
-    VectorXd bfinal(4);
+    Eigen::VectorXd bfinal(4);
     bfinal<<1,1,1,1;
     
     
     //This is a long polytope
-    VectorXd x0(2); //initial solution
-    x0=VectorXd::Constant(2,0);
+    Eigen::VectorXd x0(2); //initial solution
+    x0=Eigen::VectorXd::Constant(2,0);
     
-    VectorXd x0final(2); //initial solution
-    x0final=VectorXd::Zero(2);
+    Eigen::VectorXd x0final(2); //initial solution
+    x0final=Eigen::VectorXd::Zero(2);
     
-    MatrixXd T(2,2);
-    MatrixXd Tfinal(2,2);
+    Eigen::MatrixXd T(2,2);
+    Eigen::MatrixXd Tfinal(2,2);
     Tfinal<<100,0,0,1;
     
-    MatrixXd N(2,2);
-    MatrixXd Nfinal(2,2);
+    Eigen::MatrixXd N(2,2);
+    Eigen::MatrixXd Nfinal(2,2);
     Nfinal<<100,0,0,1;
-    VectorXd p_shift(2);
-    VectorXd p_shiftfinal(2);
+    Eigen::VectorXd p_shift(2);
+    Eigen::VectorXd p_shiftfinal(2);
     p_shiftfinal<< 0,0;
     
     

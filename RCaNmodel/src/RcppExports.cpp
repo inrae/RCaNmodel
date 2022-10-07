@@ -187,6 +187,201 @@ RcppExport SEXP _RCaNmodel_sampleCaNCPP(SEXP NSEXP, SEXP ASEXP, SEXP bSEXP, SEXP
     UNPROTECT(1);
     return rcpp_result_gen;
 }
+// gmscale
+void gmscale(Eigen::MatrixXd A, Eigen::VectorXd& cscale, Eigen::VectorXd& rscale, double scltol);
+static SEXP _RCaNmodel_gmscale_try(SEXP ASEXP, SEXP cscaleSEXP, SEXP rscaleSEXP, SEXP scltolSEXP) {
+BEGIN_RCPP
+    Rcpp::traits::input_parameter< Eigen::MatrixXd >::type A(ASEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd& >::type cscale(cscaleSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd& >::type rscale(rscaleSEXP);
+    Rcpp::traits::input_parameter< double >::type scltol(scltolSEXP);
+    gmscale(A, cscale, rscale, scltol);
+    return R_NilValue;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _RCaNmodel_gmscale(SEXP ASEXP, SEXP cscaleSEXP, SEXP rscaleSEXP, SEXP scltolSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_RCaNmodel_gmscale_try(ASEXP, cscaleSEXP, rscaleSEXP, scltolSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// mve_solver
+bool mve_solver(Eigen::MatrixXd A, Eigen::VectorXd b, const Eigen::VectorXd& x0, double reg, Eigen::VectorXd& x, Eigen::MatrixXd& E2, const int maxiter, const double tol);
+static SEXP _RCaNmodel_mve_solver_try(SEXP ASEXP, SEXP bSEXP, SEXP x0SEXP, SEXP regSEXP, SEXP xSEXP, SEXP E2SEXP, SEXP maxiterSEXP, SEXP tolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< Eigen::MatrixXd >::type A(ASEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type b(bSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type x0(x0SEXP);
+    Rcpp::traits::input_parameter< double >::type reg(regSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< Eigen::MatrixXd& >::type E2(E2SEXP);
+    Rcpp::traits::input_parameter< const int >::type maxiter(maxiterSEXP);
+    Rcpp::traits::input_parameter< const double >::type tol(tolSEXP);
+    rcpp_result_gen = Rcpp::wrap(mve_solver(A, b, x0, reg, x, E2, maxiter, tol));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _RCaNmodel_mve_solver(SEXP ASEXP, SEXP bSEXP, SEXP x0SEXP, SEXP regSEXP, SEXP xSEXP, SEXP E2SEXP, SEXP maxiterSEXP, SEXP tolSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_RCaNmodel_mve_solver_try(ASEXP, bSEXP, x0SEXP, regSEXP, xSEXP, E2SEXP, maxiterSEXP, tolSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// mve_run_cobra
+bool mve_run_cobra(const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const Eigen::MatrixXd& x0, double reg, Eigen::VectorXd& x, Eigen::MatrixXd& E, int maxiter);
+static SEXP _RCaNmodel_mve_run_cobra_try(SEXP ASEXP, SEXP bSEXP, SEXP x0SEXP, SEXP regSEXP, SEXP xSEXP, SEXP ESEXP, SEXP maxiterSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type A(ASEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type b(bSEXP);
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type x0(x0SEXP);
+    Rcpp::traits::input_parameter< double >::type reg(regSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< Eigen::MatrixXd& >::type E(ESEXP);
+    Rcpp::traits::input_parameter< int >::type maxiter(maxiterSEXP);
+    rcpp_result_gen = Rcpp::wrap(mve_run_cobra(A, b, x0, reg, x, E, maxiter));
+    return rcpp_result_gen;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _RCaNmodel_mve_run_cobra(SEXP ASEXP, SEXP bSEXP, SEXP x0SEXP, SEXP regSEXP, SEXP xSEXP, SEXP ESEXP, SEXP maxiterSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_RCaNmodel_mve_run_cobra_try(ASEXP, bSEXP, x0SEXP, regSEXP, xSEXP, ESEXP, maxiterSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// shiftPolytope
+void shiftPolytope(Eigen::MatrixXd& A, Eigen::VectorXd& b, Eigen::MatrixXd& N, Eigen::VectorXd& p, Eigen::MatrixXd& T, const Eigen::MatrixXd& trans, const Eigen::VectorXd& shift);
+static SEXP _RCaNmodel_shiftPolytope_try(SEXP ASEXP, SEXP bSEXP, SEXP NSEXP, SEXP pSEXP, SEXP TSEXP, SEXP transSEXP, SEXP shiftSEXP) {
+BEGIN_RCPP
+    Rcpp::traits::input_parameter< Eigen::MatrixXd& >::type A(ASEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd& >::type b(bSEXP);
+    Rcpp::traits::input_parameter< Eigen::MatrixXd& >::type N(NSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd& >::type p(pSEXP);
+    Rcpp::traits::input_parameter< Eigen::MatrixXd& >::type T(TSEXP);
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type trans(transSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type shift(shiftSEXP);
+    shiftPolytope(A, b, N, p, T, trans, shift);
+    return R_NilValue;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _RCaNmodel_shiftPolytope(SEXP ASEXP, SEXP bSEXP, SEXP NSEXP, SEXP pSEXP, SEXP TSEXP, SEXP transSEXP, SEXP shiftSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_RCaNmodel_shiftPolytope_try(ASEXP, bSEXP, NSEXP, pSEXP, TSEXP, transSEXP, shiftSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+// round
+void round(Eigen::MatrixXd& A, Eigen::VectorXd& b, Eigen::VectorXd& x0, Eigen::MatrixXd& N_total, Eigen::VectorXd& p_shift, Eigen::MatrixXd& T, int maxiter);
+static SEXP _RCaNmodel_round_try(SEXP ASEXP, SEXP bSEXP, SEXP x0SEXP, SEXP N_totalSEXP, SEXP p_shiftSEXP, SEXP TSEXP, SEXP maxiterSEXP) {
+BEGIN_RCPP
+    Rcpp::traits::input_parameter< Eigen::MatrixXd& >::type A(ASEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd& >::type b(bSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd& >::type x0(x0SEXP);
+    Rcpp::traits::input_parameter< Eigen::MatrixXd& >::type N_total(N_totalSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd& >::type p_shift(p_shiftSEXP);
+    Rcpp::traits::input_parameter< Eigen::MatrixXd& >::type T(TSEXP);
+    Rcpp::traits::input_parameter< int >::type maxiter(maxiterSEXP);
+    round(A, b, x0, N_total, p_shift, T, maxiter);
+    return R_NilValue;
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _RCaNmodel_round(SEXP ASEXP, SEXP bSEXP, SEXP x0SEXP, SEXP N_totalSEXP, SEXP p_shiftSEXP, SEXP TSEXP, SEXP maxiterSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_RCaNmodel_round_try(ASEXP, bSEXP, x0SEXP, N_totalSEXP, p_shiftSEXP, TSEXP, maxiterSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
 
 // validate (ensure exported C++ functions exist before calling them)
 static int _RCaNmodel_RcppExport_validate(const char* sig) { 
@@ -196,6 +391,11 @@ static int _RCaNmodel_RcppExport_validate(const char* sig) {
         signatures.insert("List(*cpgsEquality)(const int,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::VectorXd&,const int,const int,const int,const int,Rcpp::Nullable<Eigen::MatrixXd>)");
         signatures.insert("List(*degenerateSubSpace)(const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::VectorXd&)");
         signatures.insert("List(*sampleCaNCPP)(const int,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::MatrixXd&,const Eigen::VectorXd&,const int,const int,const int,const int,Rcpp::Nullable<Eigen::MatrixXd>,Rcpp::Nullable<Eigen::MatrixXd>,Rcpp::Nullable<Eigen::VectorXd>)");
+        signatures.insert("void(*gmscale)(Eigen::MatrixXd,Eigen::VectorXd&,Eigen::VectorXd&,double)");
+        signatures.insert("bool(*mve_solver)(Eigen::MatrixXd,Eigen::VectorXd,const Eigen::VectorXd&,double,Eigen::VectorXd&,Eigen::MatrixXd&,const int,const double)");
+        signatures.insert("bool(*mve_run_cobra)(const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::MatrixXd&,double,Eigen::VectorXd&,Eigen::MatrixXd&,int)");
+        signatures.insert("void(*shiftPolytope)(Eigen::MatrixXd&,Eigen::VectorXd&,Eigen::MatrixXd&,Eigen::VectorXd&,Eigen::MatrixXd&,const Eigen::MatrixXd&,const Eigen::VectorXd&)");
+        signatures.insert("void(*round)(Eigen::MatrixXd&,Eigen::VectorXd&,Eigen::VectorXd&,Eigen::MatrixXd&,Eigen::VectorXd&,Eigen::MatrixXd&,int)");
     }
     return signatures.find(sig) != signatures.end();
 }
@@ -206,6 +406,11 @@ RcppExport SEXP _RCaNmodel_RcppExport_registerCCallable() {
     R_RegisterCCallable("RCaNmodel", "_RCaNmodel_cpgsEquality", (DL_FUNC)_RCaNmodel_cpgsEquality_try);
     R_RegisterCCallable("RCaNmodel", "_RCaNmodel_degenerateSubSpace", (DL_FUNC)_RCaNmodel_degenerateSubSpace_try);
     R_RegisterCCallable("RCaNmodel", "_RCaNmodel_sampleCaNCPP", (DL_FUNC)_RCaNmodel_sampleCaNCPP_try);
+    R_RegisterCCallable("RCaNmodel", "_RCaNmodel_gmscale", (DL_FUNC)_RCaNmodel_gmscale_try);
+    R_RegisterCCallable("RCaNmodel", "_RCaNmodel_mve_solver", (DL_FUNC)_RCaNmodel_mve_solver_try);
+    R_RegisterCCallable("RCaNmodel", "_RCaNmodel_mve_run_cobra", (DL_FUNC)_RCaNmodel_mve_run_cobra_try);
+    R_RegisterCCallable("RCaNmodel", "_RCaNmodel_shiftPolytope", (DL_FUNC)_RCaNmodel_shiftPolytope_try);
+    R_RegisterCCallable("RCaNmodel", "_RCaNmodel_round", (DL_FUNC)_RCaNmodel_round_try);
     R_RegisterCCallable("RCaNmodel", "_RCaNmodel_RcppExport_validate", (DL_FUNC)_RCaNmodel_RcppExport_validate);
     return R_NilValue;
 }
@@ -217,6 +422,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_RCaNmodel_cpgsEquality", (DL_FUNC) &_RCaNmodel_cpgsEquality, 11},
     {"_RCaNmodel_degenerateSubSpace", (DL_FUNC) &_RCaNmodel_degenerateSubSpace, 5},
     {"_RCaNmodel_sampleCaNCPP", (DL_FUNC) &_RCaNmodel_sampleCaNCPP, 14},
+    {"_RCaNmodel_gmscale", (DL_FUNC) &_RCaNmodel_gmscale, 4},
+    {"_RCaNmodel_mve_solver", (DL_FUNC) &_RCaNmodel_mve_solver, 8},
+    {"_RCaNmodel_mve_run_cobra", (DL_FUNC) &_RCaNmodel_mve_run_cobra, 7},
+    {"_RCaNmodel_shiftPolytope", (DL_FUNC) &_RCaNmodel_shiftPolytope, 7},
+    {"_RCaNmodel_round", (DL_FUNC) &_RCaNmodel_round, 7},
     {"_RCaNmodel_RcppExport_registerCCallable", (DL_FUNC) &_RCaNmodel_RcppExport_registerCCallable, 0},
     {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 1},
     {NULL, NULL, 0}
