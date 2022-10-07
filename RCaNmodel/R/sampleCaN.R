@@ -57,7 +57,7 @@ sampleCaN <- function(myCaNmod,
     stop("method should be in 1:3")
   ncore <- min(min(detectCores() - 1, ncore), nchain)
   `%myinfix%` <- `%do%`
-
+  
   if (ncore > 1) {
     cl <- makeCluster(ncore)
     clusterEvalQ(cl, {
@@ -82,7 +82,7 @@ sampleCaN <- function(myCaNmod,
   #we removed parameters that are fixed because of A or almost
   bounds <- getAllBoundsParam(list(A = as.matrix(myCaNmod$A),
                                    b = myCaNmod$b),
-                                   progressBar = TRUE)
+                              progressBar = TRUE)
   
   #if some are fixed, we add them to C
   fixed <- which(abs(bounds[, 2] - bounds[, 3]) < 1e-5)
@@ -111,10 +111,10 @@ sampleCaN <- function(myCaNmod,
                                    as.matrix(myCaNmod$C),
                                    myCaNmod$v,
                                    solequality)
-    colnames(A2) <- paste("param", seq_len(ncol(A2)))
     A2 <- subspace$A2
     b2 <- subspace$b2
     Nt <- subspace$Nt
+    colnames(A2) <- paste("param", seq_len(ncol(A2)))
     
   } else { #no equality constraints, everything remains the same
     A2 <-myCaNmod$A
@@ -125,60 +125,69 @@ sampleCaN <- function(myCaNmod,
   
   #now we presolve the model to simply the polytope
   
+  if (ncore > 1) {
+    clusterExport(cl, c("A2", "b2", "Nt", "solequality"),
+                  envir = environment())
+  }
   
   print("##Sampling")
   
   res <- foreach(i = 1:nchain) %myinfix% {
-
-      # lp_model <- defineLPMod(myCaNmod$A, myCaNmod$b, myCaNmod$C, myCaNmod$v,
-      #                         maximum = FALSE,
-      #                         ob = runif(ncol(myCaNmod$A)))
-      presolved <- presolveLPMod(A2,
-                                 b2,
-                                 lower = rep(-Inf, ncol(A2)),
-                                 upper = rep(Inf, ncol(A2)),
-                                 sense = "min")
-      A3 <- presolved$A
-      b3 <- presolved$b
-      
-      
-      x0 <- chebyCenter(A3, 
-                        b3,
-                        lower = presolved$lower,
-                        upper = presolved$upper)
-      
-      #to avoid computations problems, we slightly shift b3
-      b3 <- b3 + 1e-7
-      #we add the bounds as constraints
-      nonnull <- which(is.finite(presolved$lower))
-      if (length(nonnull) > 0){
-        bounds <- matrix(0, length(nonnull), ncol(A3))
-        bounds[cbind(seq_len(length(nonnull)),
-                     nonnull)] <- - 1
-          A3 <- rbind(A3, bounds)
-          b3 <- c(b3, -presolved$lower[nonnull])
-        }
-     
-        nonnull <- which(is.finite(presolved$upper))
-        if (length(nonnull) > 0){
-          bounds <- matrix(0, length(nonnull), ncol(A3))
-          bounds[cbind(seq_len(length(nonnull)),
-                       nonnull)] <- 1
-          A3 <- rbind(A3, bounds)
-          b3 <- c(b3, presolved$upper[nonnull])
-        }
-      
-
+    
+    # lp_model <- defineLPMod(myCaNmod$A, myCaNmod$b, myCaNmod$C, myCaNmod$v,
+    #                         maximum = FALSE,
+    #                         ob = runif(ncol(myCaNmod$A)))
+    presolved <- presolveLPMod(A2,
+                               b2,
+                               lower = rep(-Inf, ncol(A2)),
+                               upper = rep(Inf, ncol(A2)),
+                               sense = "min")
+    A3 <- presolved$A
+    b3 <- presolved$b
+    
+    
+    x0 <- chebyCenter(A3, 
+                      b3,
+                      lower = presolved$lower,
+                      upper = presolved$upper)
+    
+    #to avoid computations problems, we slightly shift b3
+    b3 <- b3 + 1e-7
+    #we add the bounds as constraints
+    nonnull <- which(is.finite(presolved$lower))
+    if (length(nonnull) > 0){
+      bounds <- matrix(0, length(nonnull), ncol(A3))
+      bounds[cbind(seq_len(length(nonnull)),
+                   nonnull)] <- - 1
+      A3 <- rbind(A3, bounds)
+      b3 <- c(b3, -presolved$lower[nonnull])
+    }
+    
+    nonnull <- which(is.finite(presolved$upper))
+    if (length(nonnull) > 0){
+      bounds <- matrix(0, length(nonnull), ncol(A3))
+      bounds[cbind(seq_len(length(nonnull)),
+                   nonnull)] <- 1
+      A3 <- rbind(A3, bounds)
+      b3 <- c(b3, presolved$upper[nonnull])
+    }
+    
+    
     res <- cpgs(N, A3, b3, x0, thin, method, i, i, covMat)
     
     #now we turn back result into original format
-    res$X <- cbind(res$X, 
-                   matrix(rep(presolved$fixed, nrow(res$X)),
-                          nrow(res$X),
-                          length(presolved$fixed),
-                          byrow = TRUE))
-    colnames(res$X) <- c(colnames(A3), names(presolved$fixed))
-    res$X <- res$X[, colnames(A2)]
+    if (length(presolved$fixed) > 0){
+      res$X <- cbind(res$X, 
+                     matrix(rep(presolved$fixed, nrow(res$X)),
+                            nrow(res$X),
+                            length(presolved$fixed),
+                            byrow = TRUE))
+      colnames(res$X) <- c(colnames(A3), names(presolved$fixed))  
+      res$X <- res$X[, colnames(A2)]
+
+    } else {
+      colnames(res$X) <- colnames(A2)  
+    }
     
     res$X <- t(Nt %*% t(res$X)) + 
       matrix(rep(solequality, nrow(res$X)),
@@ -187,11 +196,11 @@ sampleCaN <- function(myCaNmod,
     colnames(res$X) <- colnames(myCaNmod$A)
     names(res) <- c("F", "covMat")
     res$B <- t(apply(res$F, 1, function(x) as.matrix(myCaNmod$L) %*% x))
-
+    
     res$F <- res$F[, -seq_len(length(myCaNmod$species))]
     #we remove the first column which corresponds to initial biomasses
     colnames(res$F) <- colnames(myCaNmod$A)[-seq_len(length(myCaNmod$species))]
-
+    
     if (!lastF) {#we removed last time step
       lastid <- which(colnames(res$F) %in% paste(myCaNmod$fluxes_def$Flux,
                                                  "[",
@@ -205,15 +214,17 @@ sampleCaN <- function(myCaNmod,
     list(samples = mcmc(cbind(res$F, res$B), 1, nrow(res$F), 1),
          covMat = res$covMat)
   }
-
+  
   if (ncore > 1) {
     stopCluster(cl)
     stopImplicitCluster()
   }
   sampleCaNmod <- list(CaNmod = myCaNmod,
                        mcmc = mcmc.list(lapply(res, function(r) r$samples)),
-                       covMat  = res[[1]]$covMat)
+                       covMat  = res[[1]]$covMat,
+                       N_total = res[[1]]$N_total,
+                       p_shift = res[[1]]$p_shift)
   class(sampleCaNmod) <- "sampleCaNmod"
   return(sampleCaNmod)
-
+  
 }

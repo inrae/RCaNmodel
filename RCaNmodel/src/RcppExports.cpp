@@ -15,8 +15,8 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // cpgs
-List cpgs(const int N, const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const Eigen::VectorXd& x0, const int thin, const int method, const int seed, const int stream, Rcpp::Nullable<Eigen::MatrixXd> covMat);
-static SEXP _RCaNmodel_cpgs_try(SEXP NSEXP, SEXP ASEXP, SEXP bSEXP, SEXP x0SEXP, SEXP thinSEXP, SEXP methodSEXP, SEXP seedSEXP, SEXP streamSEXP, SEXP covMatSEXP) {
+List cpgs(const int N, const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const Eigen::VectorXd& x0, const int thin, const int method, const int seed, const int stream, Rcpp::Nullable<Eigen::MatrixXd> covMat, Rcpp::Nullable<Eigen::MatrixXd> savedN_total, Rcpp::Nullable<Eigen::VectorXd> savedp_shift);
+static SEXP _RCaNmodel_cpgs_try(SEXP NSEXP, SEXP ASEXP, SEXP bSEXP, SEXP x0SEXP, SEXP thinSEXP, SEXP methodSEXP, SEXP seedSEXP, SEXP streamSEXP, SEXP covMatSEXP, SEXP savedN_totalSEXP, SEXP savedp_shiftSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< const int >::type N(NSEXP);
@@ -28,15 +28,17 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const int >::type seed(seedSEXP);
     Rcpp::traits::input_parameter< const int >::type stream(streamSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<Eigen::MatrixXd> >::type covMat(covMatSEXP);
-    rcpp_result_gen = Rcpp::wrap(cpgs(N, A, b, x0, thin, method, seed, stream, covMat));
+    Rcpp::traits::input_parameter< Rcpp::Nullable<Eigen::MatrixXd> >::type savedN_total(savedN_totalSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<Eigen::VectorXd> >::type savedp_shift(savedp_shiftSEXP);
+    rcpp_result_gen = Rcpp::wrap(cpgs(N, A, b, x0, thin, method, seed, stream, covMat, savedN_total, savedp_shift));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _RCaNmodel_cpgs(SEXP NSEXP, SEXP ASEXP, SEXP bSEXP, SEXP x0SEXP, SEXP thinSEXP, SEXP methodSEXP, SEXP seedSEXP, SEXP streamSEXP, SEXP covMatSEXP) {
+RcppExport SEXP _RCaNmodel_cpgs(SEXP NSEXP, SEXP ASEXP, SEXP bSEXP, SEXP x0SEXP, SEXP thinSEXP, SEXP methodSEXP, SEXP seedSEXP, SEXP streamSEXP, SEXP covMatSEXP, SEXP savedN_totalSEXP, SEXP savedp_shiftSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_RCaNmodel_cpgs_try(NSEXP, ASEXP, bSEXP, x0SEXP, thinSEXP, methodSEXP, seedSEXP, streamSEXP, covMatSEXP));
+        rcpp_result_gen = PROTECT(_RCaNmodel_cpgs_try(NSEXP, ASEXP, bSEXP, x0SEXP, thinSEXP, methodSEXP, seedSEXP, streamSEXP, covMatSEXP, savedN_totalSEXP, savedp_shiftSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -139,8 +141,8 @@ RcppExport SEXP _RCaNmodel_degenerateSubSpace(SEXP ASEXP, SEXP bSEXP, SEXP CSEXP
     return rcpp_result_gen;
 }
 // sampleCaNCPP
-List sampleCaNCPP(const int N, const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const Eigen::MatrixXd& C, const Eigen::VectorXd& v, const Eigen::MatrixXd& L, const Eigen::VectorXd& x0, const int thin, const int method, const int seed, const int stream, Rcpp::Nullable<Eigen::MatrixXd> covMat);
-static SEXP _RCaNmodel_sampleCaNCPP_try(SEXP NSEXP, SEXP ASEXP, SEXP bSEXP, SEXP CSEXP, SEXP vSEXP, SEXP LSEXP, SEXP x0SEXP, SEXP thinSEXP, SEXP methodSEXP, SEXP seedSEXP, SEXP streamSEXP, SEXP covMatSEXP) {
+List sampleCaNCPP(const int N, const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const Eigen::MatrixXd& C, const Eigen::VectorXd& v, const Eigen::MatrixXd& L, const Eigen::VectorXd& x0, const int thin, const int method, const int seed, const int stream, Rcpp::Nullable<Eigen::MatrixXd> covMat, Rcpp::Nullable<Eigen::MatrixXd> savedN_total, Rcpp::Nullable<Eigen::VectorXd> savedp_shift);
+static SEXP _RCaNmodel_sampleCaNCPP_try(SEXP NSEXP, SEXP ASEXP, SEXP bSEXP, SEXP CSEXP, SEXP vSEXP, SEXP LSEXP, SEXP x0SEXP, SEXP thinSEXP, SEXP methodSEXP, SEXP seedSEXP, SEXP streamSEXP, SEXP covMatSEXP, SEXP savedN_totalSEXP, SEXP savedp_shiftSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::traits::input_parameter< const int >::type N(NSEXP);
@@ -155,15 +157,17 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const int >::type seed(seedSEXP);
     Rcpp::traits::input_parameter< const int >::type stream(streamSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<Eigen::MatrixXd> >::type covMat(covMatSEXP);
-    rcpp_result_gen = Rcpp::wrap(sampleCaNCPP(N, A, b, C, v, L, x0, thin, method, seed, stream, covMat));
+    Rcpp::traits::input_parameter< Rcpp::Nullable<Eigen::MatrixXd> >::type savedN_total(savedN_totalSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<Eigen::VectorXd> >::type savedp_shift(savedp_shiftSEXP);
+    rcpp_result_gen = Rcpp::wrap(sampleCaNCPP(N, A, b, C, v, L, x0, thin, method, seed, stream, covMat, savedN_total, savedp_shift));
     return rcpp_result_gen;
 END_RCPP_RETURN_ERROR
 }
-RcppExport SEXP _RCaNmodel_sampleCaNCPP(SEXP NSEXP, SEXP ASEXP, SEXP bSEXP, SEXP CSEXP, SEXP vSEXP, SEXP LSEXP, SEXP x0SEXP, SEXP thinSEXP, SEXP methodSEXP, SEXP seedSEXP, SEXP streamSEXP, SEXP covMatSEXP) {
+RcppExport SEXP _RCaNmodel_sampleCaNCPP(SEXP NSEXP, SEXP ASEXP, SEXP bSEXP, SEXP CSEXP, SEXP vSEXP, SEXP LSEXP, SEXP x0SEXP, SEXP thinSEXP, SEXP methodSEXP, SEXP seedSEXP, SEXP streamSEXP, SEXP covMatSEXP, SEXP savedN_totalSEXP, SEXP savedp_shiftSEXP) {
     SEXP rcpp_result_gen;
     {
         Rcpp::RNGScope rcpp_rngScope_gen;
-        rcpp_result_gen = PROTECT(_RCaNmodel_sampleCaNCPP_try(NSEXP, ASEXP, bSEXP, CSEXP, vSEXP, LSEXP, x0SEXP, thinSEXP, methodSEXP, seedSEXP, streamSEXP, covMatSEXP));
+        rcpp_result_gen = PROTECT(_RCaNmodel_sampleCaNCPP_try(NSEXP, ASEXP, bSEXP, CSEXP, vSEXP, LSEXP, x0SEXP, thinSEXP, methodSEXP, seedSEXP, streamSEXP, covMatSEXP, savedN_totalSEXP, savedp_shiftSEXP));
     }
     Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
     if (rcpp_isInterrupt_gen) {
@@ -188,10 +192,10 @@ RcppExport SEXP _RCaNmodel_sampleCaNCPP(SEXP NSEXP, SEXP ASEXP, SEXP bSEXP, SEXP
 static int _RCaNmodel_RcppExport_validate(const char* sig) { 
     static std::set<std::string> signatures;
     if (signatures.empty()) {
-        signatures.insert("List(*cpgs)(const int,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::VectorXd&,const int,const int,const int,const int,Rcpp::Nullable<Eigen::MatrixXd>)");
+        signatures.insert("List(*cpgs)(const int,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::VectorXd&,const int,const int,const int,const int,Rcpp::Nullable<Eigen::MatrixXd>,Rcpp::Nullable<Eigen::MatrixXd>,Rcpp::Nullable<Eigen::VectorXd>)");
         signatures.insert("List(*cpgsEquality)(const int,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::VectorXd&,const int,const int,const int,const int,Rcpp::Nullable<Eigen::MatrixXd>)");
         signatures.insert("List(*degenerateSubSpace)(const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::VectorXd&)");
-        signatures.insert("List(*sampleCaNCPP)(const int,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::MatrixXd&,const Eigen::VectorXd&,const int,const int,const int,const int,Rcpp::Nullable<Eigen::MatrixXd>)");
+        signatures.insert("List(*sampleCaNCPP)(const int,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::MatrixXd&,const Eigen::VectorXd&,const int,const int,const int,const int,Rcpp::Nullable<Eigen::MatrixXd>,Rcpp::Nullable<Eigen::MatrixXd>,Rcpp::Nullable<Eigen::VectorXd>)");
     }
     return signatures.find(sig) != signatures.end();
 }
@@ -209,10 +213,10 @@ RcppExport SEXP _RCaNmodel_RcppExport_registerCCallable() {
 RcppExport SEXP run_testthat_tests(SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_RCaNmodel_cpgs", (DL_FUNC) &_RCaNmodel_cpgs, 9},
+    {"_RCaNmodel_cpgs", (DL_FUNC) &_RCaNmodel_cpgs, 11},
     {"_RCaNmodel_cpgsEquality", (DL_FUNC) &_RCaNmodel_cpgsEquality, 11},
     {"_RCaNmodel_degenerateSubSpace", (DL_FUNC) &_RCaNmodel_degenerateSubSpace, 5},
-    {"_RCaNmodel_sampleCaNCPP", (DL_FUNC) &_RCaNmodel_sampleCaNCPP, 12},
+    {"_RCaNmodel_sampleCaNCPP", (DL_FUNC) &_RCaNmodel_sampleCaNCPP, 14},
     {"_RCaNmodel_RcppExport_registerCCallable", (DL_FUNC) &_RCaNmodel_RcppExport_registerCCallable, 0},
     {"run_testthat_tests", (DL_FUNC) &run_testthat_tests, 1},
     {NULL, NULL, 0}

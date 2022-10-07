@@ -36,8 +36,8 @@ NULL
 #' X0 <- chebyCentre(A,b)
 #' x <- cpgs(1000,A,b,X0)
 #' @export
-cpgs <- function(N, A, b, x0, thin = 1L, method = 1L, seed = 1L, stream = 1L, covMat = NULL) {
-    .Call(`_RCaNmodel_cpgs`, N, A, b, x0, thin, method, seed, stream, covMat)
+cpgs <- function(N, A, b, x0, thin = 1L, method = 1L, seed = 1L, stream = 1L, covMat = NULL, savedN_total = NULL, savedp_shift = NULL) {
+    .Call(`_RCaNmodel_cpgs`, N, A, b, x0, thin, method, seed, stream, covMat, savedN_total, savedp_shift)
 }
 
 #' Complex Polytope Gibbs Sampling
@@ -95,6 +95,7 @@ cpgsEquality <- function(N, A, b, C, v, x0, thin = 1L, method = 1L, seed = 1L, s
 #' Nt that can be used to convert results in appropriate format
 #' 
 #' @examples
+#' n <- 5
 #' A1 <- -diag(n)
 #' b1 <- as.matrix(rep(0,n))
 #' A2 <- diag(n)
@@ -110,8 +111,8 @@ degenerateSubSpace <- function(A, b, C, v, z) {
     .Call(`_RCaNmodel_degenerateSubSpace`, A, b, C, v, z)
 }
 
-sampleCaNCPP <- function(N, A, b, C, v, L, x0, thin, method = 1L, seed = 1L, stream = 1L, covMat = NULL) {
-    .Call(`_RCaNmodel_sampleCaNCPP`, N, A, b, C, v, L, x0, thin, method, seed, stream, covMat)
+sampleCaNCPP <- function(N, A, b, C, v, L, x0, thin, method = 1L, seed = 1L, stream = 1L, covMat = NULL, savedN_total = NULL, savedp_shift = NULL) {
+    .Call(`_RCaNmodel_sampleCaNCPP`, N, A, b, C, v, L, x0, thin, method, seed, stream, covMat, savedN_total, savedp_shift)
 }
 
 # Register entry points for exported C++ functions
