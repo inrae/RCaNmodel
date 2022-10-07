@@ -7,9 +7,12 @@
 #' a biomass)
 #' @param ylab default Biomass Flux
 #' @param plot_series if yes, draw three example of trajectories (default TRUE)
+#' @param facet if TRUE (default), each param is on a specific panel, otherwise
+#' they are combined in a single plot
 #' @return a ggplot
-#' @details the line corresponds to median of the mcmc simulation, the ribbon
-#' corresponds to quantiles 2.5% and 97.5%
+#' @details the 3 lines correspond to 3 random trajectories drawn among the mcmc
+#' iterations, the ribbons correspond to the interval between quantiles
+#' 0%-100%, 2.5%-97.5% and 25%-75%
 #'
 #' @examples
 #' myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
@@ -34,7 +37,8 @@
 ggSeries <- function(mysampleCaNmod,
                      param,
                      plot_series = TRUE,
-                     ylab = "Biomass/Flux") {
+                     ylab = "Biomass/Flux",
+                     facet = TRUE) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("Package ggplot2 needed for this function to work. Please install it.",
          call. = FALSE)
@@ -85,9 +89,11 @@ ggSeries <- function(mysampleCaNmod,
                            ymax = "q75",
                            fill = "series"),
                 alpha = .33) +
-    ylab(ylab) +
+    ylab(ylab) 
+  if (facet){
+    g <- g + 
     facet_wrap(~quantiles$series, scales = "free")
-
+  }
   if (plot_series) {
     fewseries <- do.call("rbind.data.frame", lapply(param, function(p) {
       columns <- which(startsWith(colnames(mat_res), paste(p, "[", sep = "")))

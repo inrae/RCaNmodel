@@ -39,7 +39,7 @@
 #' @importFrom foreach %dopar%
 #' @importFrom foreach %do%
 #' @importFrom stats runif
-#' @importFrom lpSolveAPI get.rhs
+
 sampleCaN <- function(myCaNmod,
                       N,
                       nchain = 1,
@@ -212,7 +212,8 @@ sampleCaN <- function(myCaNmod,
     }
     colnames(res$B) <- rownames(myCaNmod$L)
     list(samples = mcmc(cbind(res$F, res$B), 1, nrow(res$F), 1),
-         covMat = res$covMat)
+         covMat = res$covMat, N_total = res$N_total,
+         p_shift = res$p_shift)
   }
   
   if (ncore > 1) {

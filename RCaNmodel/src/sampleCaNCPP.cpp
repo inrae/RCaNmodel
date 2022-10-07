@@ -303,7 +303,9 @@ List cpgs(const int N, const Eigen::MatrixXd &A ,
     return (List::create(Named("X") = X, 
                          Named("covMat") = covMat,
                          Named("p_shift") = p_shift,
-                         Named("N_total") = N_total));
+                         Named("N_total") = N_total,
+                         Named("W") = W,
+                         Named("b2") = b2));
   }
 }
 
@@ -944,8 +946,9 @@ void round(MatrixXd &A,
 
   A=rs.cwiseInverse().asDiagonal()*A*cs.cwiseInverse().asDiagonal();
   b=rs.cwiseInverse().asDiagonal()*b;
-  x0=cs.asDiagonal()*x0;
   N_total=MatrixXd::Identity(m, m) * cs.cwiseInverse().asDiagonal();
+  
+  x0=N_total.inverse()*(x0-p_shift);
   
   int max_its=20;
   int its=0;
@@ -973,7 +976,8 @@ void round(MatrixXd &A,
     shiftPolytope(A, b, N_total, p_shift, T, Tmve, T_shift);
 
     
-    x0=Tmve.inverse()*(x0-T_shift); // we shift x0 to be a solution of the shifted polytope
+    //x0=Tmve.inverse()*(x0-T_shift); // we shift x0 to be a solution of the shifted polytope
+    x0=N_total.inverse()*(x0-p_shift);
 
     VectorXd row_norms=A.rowwise().norm();
     A=row_norms.cwiseInverse().asDiagonal()*A;
@@ -985,9 +989,9 @@ void round(MatrixXd &A,
     eigen=es.compute(Tmve, false).eigenvalues().real();
 
   }
-  if (b.minCoeff()<=0){
+  /*if (b.minCoeff()<=0){
     shiftPolytope(A, b, N_total, p_shift, T, MatrixXd::Identity(m,m), x0);
-  }
+  }*/
 }
 
 
