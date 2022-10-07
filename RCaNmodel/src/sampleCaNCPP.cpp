@@ -166,6 +166,10 @@ List cpgs(const int N, const Eigen::MatrixXd &A ,
     updatingS = false;
     Rcout<<"using provided S"<<std::endl;
   }
+  if (method == 3) {
+    stage = 2;
+    updatingS=false;
+  }
   int runupmax= p*log2(p); //https://doi.org/10.1021/acs.jproteome.5b01029
   int sampleit=0; //total number of iteration during sampling, useful for thin
   int discardmax=runupmax;
@@ -179,11 +183,10 @@ List cpgs(const int N, const Eigen::MatrixXd &A ,
     N_total = Rcpp::as< Map<MatrixXd> >(savedN_total);
     W = A * N;
     b2 = b - A * p_shift;
-    
-    
   } else if (method == 3 ) {//chrr
     Rcout<<"## rounding polytope"<<std::endl;
     round(W, b2, x, N_total, p_shift, T, 80);
+    Rcout<<"## check "<<(W*x-b2).maxCoeff()<<std::endl;
     Rcout<<"## check "<<W.maxCoeff()<<" "<<W.minCoeff()<<std::endl;
     Rcout<<"## check "<<b2.maxCoeff()<<" "<<b2.minCoeff()<<std::endl;
     Rcout<<"## check "<<N_total.maxCoeff()<<" "<<N_total.minCoeff()<<std::endl;
