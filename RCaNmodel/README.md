@@ -9,7 +9,7 @@ All RCaNmodel dependencies are available on cran so there is no specific require
 Once these packages are installed, the process is easy using the library devtools. On a R console:
 
     > require(devtools)
-    > devtools::install_github("https://github.com/inrae/RCaNmodel.git", subdir="RCaN")
+    > devtools::install_github("https://github.com/inrae/RCaNmodel.git", subdir="RCaNmodel")
     
 We recommend the installation of the package ROI.plugin.cbc which enable the use of the very efficient cbc solver. This need package rcbc and the CBC solver to be installed first. Instructions can be found [here](https://github.com/dirkschumacher/ROI.plugin.cbc).  
     
