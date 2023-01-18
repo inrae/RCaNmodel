@@ -1,5 +1,5 @@
 ---
-title: 'RCaNmodel: a R package for Chance and Necessity modelling'
+title: 'RCaNmodel: An R package for Chance and Necessity modelling'
 tags:
   - R
   - tophic food web model
@@ -32,7 +32,7 @@ bibliography: paper.bib
 # Summary
 
 RCaNmodel is an R package dedicated to the development and exploration of time-dynamic food-web models.
-The associated user-friendly javafx GUI RCaNconstructor is specifically developed to facilitate the
+The associated user-friendly JavaFX graphical user interface (GUI) RCaNconstructor is specifically developed to facilitate the
 co-construction of such models with non-modellers. Together, RCaNmodel and RCaNconstructor ensure the
 traceability and replicability of food-web model developments, and provide a fast and efficient solution
 to handle the complex mathematical steps that arise from dynamic linear inverse modelling and polytope sampling
@@ -45,7 +45,7 @@ Food-web models are widely used to study the functioning of ecosystems and to ex
 different pressures such as fishing or environmental changes [@addison2013; @murphy2012]. Food-web
 models primarily focus on trophic exchanges, also called flows or fluxes, between prey and predators.
 Estimations of trophic flows and of other model parameters is a complex task because the number of field
-observations is generally far smaller than the number of estimates from model outputs. Food-web reconstruction
+observations is generally far smaller than the number of estimates from model outputs. Food-web reconstructions
 have no single best solutions, but rather an infinite number of flow patterns that comply with observational
 data, and food-web models are said to be underdetermined [@niquil2011]. Several strategies have been
 developed to tackle this issue. In Ecopath [@Polovina1984], or in its dynamic extension called Ecosim [@pauly2000; @christensen2004]
@@ -58,7 +58,7 @@ food-web models (e.g., mass conservation) and are constructed using constraints 
 equalities/inequalities) that specify which combinations of flows are possible or not. Mathematically, the
 set of constraints defines a polytope: a fraction of the space that includes all the possible solutions
 satisfying the constraints (i.e. all possible trophic food web states). The polytope can be sampled using
-appropriate MCMC algorithms [@kones2006; @kones2009; @vandenmeersche2009]. Like Ecopath, LIM is a static model
+appropriate Markov chain Monte Carlo (MCMC) algorithms [@kones2006; @kones2009; @vandenmeersche2009]. Like Ecopath, LIM is a static model
 that describe food-webs at equilibrium, but unlike Ecosim, there is no direct dynamic extension of LIM models.
 Recently, Planque and Mullon [@planque2019modelling] have developed a
 time-dynamic food-web modelling approach analogous to LIM, based on a generic approach called "Chance and Necessity” 
@@ -89,7 +89,7 @@ exploration of the outputs (\autoref{fig:approach}), while providing user-friend
 -   To specify the model, the user provides several tables that define the compartments (i.e., trophic groups), their
 ecological properties (species specific input parameters), the flows among the compartments (i.e., trophic
 interactions), observational time-series, and user-defined explicit constraints. Tables can be provided either via
-an RCaN file that consists of several spreadsheets in the xlsx open format (see supplementary material for an example),
+an RCaN file that consists of several spreadsheets in the .xlsx open format (see supplementary material for an example),
 or directly in the form of R data frames. The RCaN file format facilitates data entry for non-expert users, and exchange
 of input files between users. RCaN files can be constructed using the RCaNconstructor GUI, which ensures internal consistency
 between the data tables. Alternatively, data tables can be provided in R dataframe format to facilitate the use of external 
@@ -108,7 +108,7 @@ biomasses at time-step 1. RCaNmodel uses linear programming tools to perform the
 especially efficient to achieve a uniform sampling in high dimensions polytopes [@andersen2007a; @laddha2020a]. The function
 returns an object of class mcmc.list that can be manipulated/explored using the package coda [@plummer2010a],
 e.g. to check the convergence of the MCMC algorithm.
--   Finally, several graphical functions are available to explore the results per trophic groups and time periods, including diagralms describing the dynamics of flows and biomass, relationships among species and trophic controls (\autoref{fig:outupfig}).
+-   Finally, several graphical functions are available to explore the results per trophic groups and time periods, including diagrams describing the dynamics of flows and biomass, relationships among species and trophic controls (\autoref{fig:outupfig}).
 
 All these steps can be done either directly through R scripts or using the RCaNconstructor GUI. An example using R commands
 is presented in the supplementary material. It should be noted that most of the functions to check the status or to sample
