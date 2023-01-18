@@ -1,7 +1,7 @@
 # CaNmodel
 <img src="RCaNmodel/man/figures/logo.png" align="right" width="220" />
 
-## What is CaNmodel aimed at?
+## What is CaNmodel aimed at? Statement of need
 RCaNmodel and RCaNmodelconstructor primarily aim at implenting food-web models based on a
 Chance and Necessity approach. Details and relation with pre-existing tools can be found in 
 the statement of need of this [document](paper/paper.md).
@@ -17,3 +17,12 @@ For RCaNmodel installation, please look [here](RCaNmodel/README.md)
 
 ## RCaNconstructor installation
 For RCaNconstructor installation, please look [here](https://github.com/inrae/RCaNmodel/releases) (click on "Assets" in the section corresponding to your platform)
+
+## Usage
+A vignette is provided with the package to explain how it should be used.
+
+## Bug reporting
+Please report bugs and feature request as [Issues on GitHub](https://github.com/inrae/RCaNmodel/issues).
+
+
+
