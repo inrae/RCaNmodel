@@ -7,7 +7,7 @@ Chance and Necessity approach. Details and relation with pre-existing tools can 
 the statement of need of this [document](paper/paper.md).
 As a summary, those model focus on trophic exchanges between preys and predators while accouting
 for the intrinsic stochasticity of nature and the existence of physical laws. The R package RCaNmodel 
-facilitate the modeling process (model construction and validation, model exploration, output analysis),
+facilitates the modelling process (model construction and validation, model exploration, output analysis),
 while the RCaNconstructor GUI provides an interactive/intuitive interface to support 
 a participatory framework.
  
