@@ -7,7 +7,7 @@ Authors@R: c(person("Hilaire","Drouineau",email="hilaire.drouineau@irstea.fr",ro
     person("Benjamin","Planque",role=c("aut")),
     person("Christian","Mullon",role=c("aut")),
     person("INRAE - Norvegian Institute of Marine Research - IRD",role=("cph")))
-Description: One paragraph description of what the package does as one or more full sentences.
+Description: RCaNmodel facilitates the development and exploration of food-web models, and potentially other models, based on a Chance and Necessity approach.
 License: BSD_3_clause + file LICENSE
 Imports: 
     symengine,
