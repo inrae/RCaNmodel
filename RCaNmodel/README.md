@@ -14,6 +14,7 @@ From an R console:
     > remotes::install_github("https://github.com/inrae/RCaNmodel.git", subdir="RCaNmodel", dependencies = TRUE)
     
 or 
+
     > require(devtools)
     > devtools::install_github("https://github.com/inrae/RCaNmodel.git", subdir="RCaNmodel", dependencies = TRUE)
 
