@@ -1,6 +1,7 @@
 ---
-title: "Tutorial of RCaNmodel"
-output:
+title: 'An application of CaN modelling to the Barents  Sea trophic network'
+date: "5/2/2021"
+output: 
   rmarkdown::html_vignette:
      keep_md: yes
   pdf_document:
@@ -10,184 +11,493 @@ author:
 - "Benjamin Planque - IMR"
 - "Christian Mullon - IRD"
 vignette: >
-  %\VignetteIndexEntry{Tutorial of RCaNmodel}
+  %\VignetteIndexEntry{An application of CaN modelling to the Barents  Sea trophic network}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
+fig_width: 8
+bibliography: CaN.bib
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
+```{r label=setup, include=FALSE}
 
-```{r setup}
-library(RCaNmodel)
-```
-
-This package aims at fitting a chance and necessity ecosystem model. A full description of this kind of model is provided in 
-
-Planque, B., & Mullon, C. (n.d.). Modelling chance and necessity in natural systems. ICES Journal of Marine Science. https://doi.org/10.1093/icesjms/fsz173
-
-
-# Data requirements
-Inputs should be provided in an xlxs data file. This file can be generated using an independent java graphical user interface, but it can be created independently. An artificial file is provided in the package as a template and as an example for this vignette. You can find the path to the file by entering
-
-```{r}
-system.file("extdata", "CaN_template_mini.xlsx", package = "RCaNmodel")
-```
-
-```{r,echo=FALSE,include=FALSE}
-myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx", package = "RCaNmodel"))
-```
-
-There are a few important things to remember:
-* the names of the sheets should match the names of the sheets in the template (i.e. "Components & input parameter", "Fluxes", "Input time-series", "Constraints")
-* the names of the columns in sheets "Components & input parameter", "Fluxes" and "Constraints" and there should be a column "Year" in the sheet "Input time-series"
-* it is worthwile giving as much information as possible in the "Info" sheet
-* you can add other sheets and other columns in your file is needed, as the minimal sets of sheets and columns are provided
-
-Note that the object can also build directly from R using the buildCaN function.
-
-## Sheet "Components & input parameter"
-```{r,echo=FALSE,include=TRUE}
-myCaNmod$components_param
-```
-Components correspond to the boxes of the trophic food web. Most components are internal to the ecosystem (denoted 1), but other can be external, for example to deal with fishery or migrations, and are denoted 0. The definition of the parameters are provided in Planque and Mullon (in press). You can leave some cells empty:
-* if you do not want to use a specific constraint (for example, if you do not want to use a satiety constraint for a component, leave the cell empty)
-* for external component, you can leave all cells empty since the dynamics of external components are not modelled, except digestibility of components that are eated by internal components (for example in the template, we have a digestibility for PhytoAndBacteria).
-
-## Sheet "Fluxes"
-```{r,echo=FALSE,include=TRUE}
-myCaNmod$fluxes_def
-```
-Column "Flux" aims at providing name to identify the differents fluxes. Then, "From" and "To" define the different (oriented) flow in the food web. The names in "From" and "To" should match the names in Components (case sensitive). Trophic is a boolean that indicates whether the flow corresponds to a trophic flow or to a non trophic flow (e.g. migration, fishery etc.). Contrary to non trophic flows, a trophic flow will be submitted to digestibility and assimilation.
-
-
-## Sheet "Input time-series"
-```{r,echo=FALSE,include=TRUE}
-myCaNmod$series
-```
-Here you provide all the time series you have. The first column correspond to years and define the time range of the model. Then following time series correspond to the different time series (observations) that you will use to define constraints. Active can be used to specify whether constraints should be used or not (by default, all constraints are used if no column Active is supplied)
-
-##sheet "Constraints"
-```{r,echo=FALSE,include=TRUE}
-myCaNmod$constraints
-```
-The "Id" correspond to identifiers of the constraints. Then, the constraint correspond to a mathematical linear equation of constraint. You can potentially use "sum" and "mean" to computes sum or means over the time range. Both inequality ("<=" or ">=") and equality ("=") constraints can be used. Time.Range defines the time range of the constraint, they can be denoted either either with "firstyear:lastyear" or as a vector of years "c(year1,year2...)". It is also possible to make a reference to a specific year of a vector by indexing with "_year"; for example a constraint F01<=PrimaryProduction_1988 would mean that flux F01 should always be inferior to the 1988 PrimaryProduction. Users can also add a column "Active" with 1 for constraints that should be used and 0 for constraints to ignore. This possibility aims at facilitating scenario explorations.
-User can also use "sum" and "mean" in their constraints. This may be useful to deal with relative abundance indices. For example, "HerbZooplankton_Biomass/sum(HerbZooplankton_Biomass)=HerbZooplankton/sum(HerbZooplankton)" would ensure that HerbZooplankton variations have the same relative variations as in the observed data series HerbZooplankton_Biomass. In case of missing data, indices should be specified to ignore missing data. For example, considering the previous example, if 1990 is missing, the constraint should be written "HerbZooplankton_Biomass/sum(HerbZooplankton_Biomass[c(1988,1991)])=HerbZooplankton/sum(HerbZooplankton[c(1988,1991)])". Indexing can be specied by using either [c(year1,year2,...)], [yearmin:yearmax] or [year].
-
-It is possible to activate or deactive constraints by using the toggleConstraint function:
-```{r,echo=FALSE,include=TRUE}
-#disactivate constraints C01
-myCaNmod <- toggleConstraint(myCaNmod, "C01")
-
-#reactivate
-myCaNmod <- toggleConstraint(myCaNmod, "C01")
-
-#disactivate constraints c01 for year 1991
-myCaNmod <- toggleConstraint(myCaNmod, "C01 : 1991")
-
-#reactivate 
-myCaNmod <- toggleConstraint(myCaNmod, "C01 : 1991")
-
-```
-
-
-# Building the model
-The first step of the workflow is to build the model. The function buildCaN does this job. It reads the template file and provides a CaNmod object that includes all necessary data to fit the model.  You see here the different elements included in the object.
-
-```{r}
-myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx", package = "RCaNmodel"))
-names(myCaNmod)
-```
-Everything should be all right if your template was well created. The function retrieves meaningful error message if a problem is detected. Two functions can be used to check that the model is correct. The function ggCaNmod draws a graph to show you the trophic food web
-
-```{r}
+require(knitr)
+knitr::opts_chunk$set(echo=TRUE)
+#require(DT)
+require(dplyr)
+require(coda)
 require(ggplot2)
-require(ggraph)
-require(igraph)
-g<-ggNetwork(myCaNmod)
-print(g)
+#library(kableExtra)
+
+
+hook_output <- knit_hooks$get("output")
+knit_hooks$set(output = function(x, options) {
+  lines <- options$output.lines
+  if (is.null(lines)) {
+    return(hook_output(x, options))  # pass to default hook
+  }
+  x <- unlist(strsplit(x, "\n"))
+  more <- "..."
+  if (length(lines)==1) {        # first n lines
+    if (length(x) > lines) {
+      # truncate the output, but add ....
+      x <- c(head(x, lines), more)
+    }
+  } else {
+    x <- c(more, x[lines], more)
+  }
+  # paste these lines together
+  x <- paste(c(x, ""), collapse = "\n")
+  hook_output(x, options)
+})
+
+quiet <- function(x) { 
+  sink(tempfile()) 
+  on.exit(sink()) 
+  invisible(force(x)) 
+} 
 ```
 
 
-# Checking the model configuration
-The set of constraints define a convex polytope, i.e. a conspace subspace of a n-dimensional space (n corresponding to the number of the parameter) with flat sides. Each point inside the polytope is a possible solution of the model. The idea of Chance and Necessity model is to uniformly sample within those polytopes in order to explore the whole space of possible solutions. Nevertheless, the polytope should not be empty (otherwise, there is no solution) and preferentially should be bounded (otherwise a parameter can range to infinity). To check that the polytope is ok, you can use checkPolytopeStatus which will tell you the status of your polytope.
+# Introduction
+This vignette was initially published as a supplementary material of a scientific article.
+We present here an example of RCaNmodel study for the Barents Sea ecosystem. The CaN model has the same structure as the model presented in the main text of the article: same trophic structure, same trophic parameters, same set of time series of observations (@lindstrom2017multiple). Due to data access restriction, the values in the observation times series were slightly modified and do not correspond to the original measurements. Most of the original data can be provided on demand.
 
-```{r}
-checkPolytopeStatus(myCaNmod)
+The network is illustrated in  figure \@ref(fig:network-figure). 
+
+```{r network-figure, echo=TRUE, fig.cap='The Barents Sea tropic network. The dashed-line rectangle separate components that are within the model domain (herbivorous and omnivorous zooplankton, benthos, pelagic and demersal fish, mammals and birds) from those that are outside (primary producers, Norwegian Sea zooplankton and fisheries)', fig.align='center', out.width='60%'}
+knitr::include_graphics(system.file("extdata",
+                                    "BarentsNetwork.png",
+                                    package = "RCaNmodel"))
 ```
 
-If your polytope is not bounded, you should probably add additional constraints on not bounded parameter. To see which parameter is not bounded, you can use the function getAllBoundsParam An Inf in the upperbound column would correspond to a non bounded parameter, otherwise you have lower and upperbounds of each parameter
-```{r}
-getAllBoundsParam(myCaNmod)
-```
-Since this function can be time consuming, we provide a version that focus on a parameter of interest, here for example the first parameter:
 
-```{r}
-getBoundParam(myCaNmod, p="F01[1988]")
-```
+The RCaN-file, constructed with RCaNconstructor, is attached to this supplementary information. 
 
-If your polytope is empty, it means that there is no possible solutions and that some constraints should be relaxed. A function can help you to find which constraint raise problem: findingIncompatibleConstr. For example, here we artificially add a constraint corresponding to a negative flow and look at the result:
-
-```{r}
-myCaNmod2 <- myCaNmod
-#we artificially add incompatible constraints (first flow is negative)
-myCaNmod2$A <- rbind(myCaNmod2$A,c(1,rep(0,ncol(myCaNmod2$A)-1)))
-rownames(myCaNmod2$A)[nrow(myCaNmod2$A)]<-"neg_flow"
-myCaNmod2$b <- c(myCaNmod2$b,-1)
-```
-
-With these lines, we added a constraint telling that F01[1998]<=0. Since by construction of the model, F01[1988]>=0, this imposes F01[1988]. Since it is the only incoming flow for HerbZooplankton, they are only submitted to predation and other mortality and consequently necessarily decrease.
-
-```{r}
-incomp<-findingIncompatibleConstr(myCaNmod2)
-```
-
-Here the first line tells you that the algorithm successfully fit the model by relaxing 4 constraints: "neg_flow" is the one we added, two constraints of biomass positiveness and one constraint of inertia. This is logical: with no incoming flow, the HerbZooplankton biomass decreases below zero and the change of biomass during the first time step is too important. Then the algorithm tell you that "1989 : Biomass positiveness_refuge_HerbZooplankton" appears to be incompatible with "neg_flow", "1990 : Biomass positiveness_refuge_HerbZooplankton" with both "1989 : Biomass positiveness_refuge_HerbZooplankton" and "neg_flow"... Since neg_flow is always listed in the incompabible list, and that neg_flow can not be subtituted by another constraint (neg_flow: ), it would be the first one to be removed.
-
-After this step, you should be able to fit the model.
+We first provide information for the installation of RCaNmodel and RCaNconstructor. 
+We then provide a short description of the content of the Barents Sea RCaN-file.
+Finally, we go through the main steps of the modelling which follow the RCaN file construction: (a) build the polytope, (b) check the polytope status,
+(c) if required, revise the model by adding and removing constraints, (d) sample the polytope, (d) analyze the samples. 
 
 
-# Fitting the model
-The aim of this step is to achieve a uniform sampling within the convex poltyope. To do that, we use the routines from the former cpgsR package. Since the sampling is based on a mcmc algorithm, it can be a good idea to run several independent chains; the library allows you to run several chain in parallel using multicore facility provided by package parallel and doParallel. For example, here is the solution to run 2 chains in parrallel with 1000 samples in each chain:
+# Installing RCaNmodel 
 
-```{r}
-res <- sampleCaN(myCaNmod, 1000,nchain=2,ncore=2)
+RCaNmodel requires R (version 3.2+) to be installed. 
+
+The R library RCaNmodel can be downloaded from https://github.com/inrae/RCaNmodel. This is done by following installation instructions given in the [ReadMe](https://github.com/inrae/RCaNmodel) file of the package .
+
+```{r label=install, echo=TRUE} 
+# if (!require("RCaNmodel")) {
+#  require(devtools)
+#  devtools::install_git(
+#    "https://github.com/inrae/RCaNmodel.git",
+#    subdir="RCaNmodel",
+#    dependencies = TRUE)
+#  }
 ```
 
-The argument ncore allows to use several cores in parallel, however the library ensure that the computation leave one core unused and that the number of cores remain smaller than the number of chains
+Then, the library can be loaded
 
-The return object contains the model description and a  mcmc.list object so that we can use all the diagnostics tools provided in the package coda, such traceplot, summary or gelman and rubin tests or autocorrelograms.
-
-```{r}
-library(coda)
-nchain(res$mcmc)
-summary(res$mcmc)
-traceplot(res$mcmc[,"F01[1988]"])
-gelman.diag(res$mcmc[,"F01[1988]"])
-acfplot(res$mcmc[,"F01[1988]"])
+```{r label=libraries, echo=TRUE, message=FALSE, results='hide'}
+library(RCaNmodel) #the RCaNmodel package itself
 ```
 
-We can also do a posteriori thinning if required, for example if we chose to keep only one iteration on two:
 
-```{r}
-thin(res$mcmc)
-thinned_res <- window(res$mcmc,thin=2)
-thin(thinned_res)
-acfplot(thinned_res[,"F01[1988]"])
+# The RCaNmodel file for the Barents Sea ecosystem {#rcanfile}
+
+The food web structure, biological parameters, observational data-series and model constraints are all provided in the RCaN file in the .xlsx format. A RCaN file can be edited using a spreadsheet editor (e.g. libre office, open office, MS Excel) or with the RCaNconstructor. The use of RCaNconstructor is recommended as it ensures that names of model entities (species, fluxes and observations) are consistent across the different worksheets of the RCaN-file.
+
+```{r label=data}
+#path of the template file
+system.file("extdata", "BarentsSeaDummy.xlsx", package = "RCaNmodel")
+
+
+NAMEFILE <- system.file("extdata",
+                        "BarentsSeaDummy.xlsx",
+                        package = "RCaNmodel")
 ```
 
-The package provides a function that draw a ggplot of time series of biomass or flux. For example, here we draw a combination of time trends of "HerbZooPlankton" and "F01":
+Importing an RCaN-file in the R environment and building the corresponding polytope are done with one single RCaNmodel command:
 
-```{r}
-herbzoo<-ggSeries(res,"HerbZooplankton", TRUE)
-f01<-ggSeries(res,"F01", TRUE)
-require(gridExtra)
-grid.arrange(f01,herbzoo,nrow=1)
 
-#same graph with two series in same plot
-ggSeries(res,c("F01","HerbZooplankton"), TRUE)
+```{r label=build, echo=TRUE}
+POLYTOPE <- buildCaN(NAMEFILE)
 ```
+
+The buildCaN function reads four worksheets from the RCaN-file and uses the information to construct the model, i.e. build the corresponding polytope. The information in these four worksheets pertains to components, fluxes, observational data-series and constraints. These are as follows:
+
+### Components
+
+Components correspond to the tropho-species in the systems (figure \@ref(fig:network-figure)). They are specified in the "Components & input parameter" of the RCaN file, with their names (column Component), a flag to indicate whether they are inside or outside the model domain (column Inside) and their biological parameters. The biological parameters are used in the CaN master equation (which expresses mass conservation and the relationship between fluxes and biomass) and to implement implicit constraints (inertia, satiation and refuge biomass).
+
+The above information is stored in the dataframe 'components_param' in the POLYTOPE object:
+
+```{r label=components, echo=TRUE}
+if (requireNamespace("kableExtra" , quietly = TRUE)) { 
+kable(POLYTOPE$components_param[c(1:8)], caption='Components') %>%
+  kableExtra::kable_styling(latex_options = c("striped", "scale_down"),
+                            font_size = 8)
+} else {
+  kable(POLYTOPE$components_param[c(1:8)], caption='Components')
+}
+```
+
+### Fluxes
+
+Fluxes correspond to the transfer of biomass between food-web components (i.e., arrows in  figure \@ref(fig:network-figure)). They are specified in the "Fluxes" worksheet of the RCaN-file, identified by a name (column Flux), a source component (column From) and a sink component (column To) and a flag that indicates whether the flux is trophic or not (column Trophic). Non-trophic fluxes are typically import/export to/from the model domain and fisheries. The fluxes information is stored in the dataframe 'flux_def' in the POLYTOPE object. 
+
+```{r label=fluxes, echo=TRUE}
+if (requireNamespace("kableExtra" , quietly = TRUE)) { 
+  kable(POLYTOPE$fluxes_def, caption='Fluxes') %>%
+    kableExtra::kable_styling(latex_options = c("striped", "scale_down"),
+                              font_size = 8)
+} else {
+  kable(POLYTOPE$fluxes_def, caption='Fluxes')
+}
+```
+
+## Observational data-series
+
+Observational time-series in the Barents Sea are derived from monitoring programs, mainly for plankton and fish species. In this example, the original data compiled by the ICES Working Group on the Integrated Ecosystem Assessment for the Barents Sea (@WGIBAR2020) have been altered to comply with data access restrictions (not all data is publicly available). They are stored in the "Input time-series" sheet in the RCaN-file. Each row indicate a time-step (year) and each column correspond to a particular data-series. The first row is a header with the name of each date-series. The observational data-series information is stored in the dataframe 'series' in the POLYTOPE object:
+
+```{r label=observations, echo=TRUE}
+if (requireNamespace("kableExtra" , quietly = TRUE)) { 
+  kable(POLYTOPE$series, caption="Observations") %>%
+    kableExtra::kable_styling(latex_options = c("striped", "scale_down"),
+                              font_size = 8)
+} else {
+  kable(POLYTOPE$series,caption="Observations")
+}
+```
+## Constraints {#constraints}
+
+Explicit constraints that relate food-web components, fluxes and observations can be specificied in the RCaN file. These are written in the form of inequalities or equalities and are provided in the worksheet "Constraints". A constraint can be set to apply to every year or to selected years only. A constraint can be set to active/inactive (column 'active'), which is practical for testing different combination of constraints without the need for writing/deleting the constraints in the worksheet. The constraint information is stored in the dataframe 'constraints' in the POLYTOPE object.
+
+
+```{r label=constraints, echo=TRUE}
+if (requireNamespace("kableExtra" , quietly = TRUE)) { 
+  kable(POLYTOPE$constraints[,1:5],
+        caption='Constraints defined by user') %>%
+    kableExtra::kable_styling(latex_options = c("striped", "scale_down"),
+                              font_size = 8)
+} else {
+  kable(POLYTOPE$constraints[,1:5], caption='Constraints defined by user')
+}
+```
+
+# The polytope behind a CaNmod object
+In section \@ref(rcanfile), we used the `buildCaN` function to read the RCaN file, but also to construct the corresponding polytope. The polytope is a multidimensional geometrical object that corresponds to the "space of possibles food-web trajectories". The dimension of the polytope is defined by the number of fluxes times the number of time-steps (years) + the number of components. The different elements of the CaNmod object constructed using the buildCaN function are as follows:
+
+```{r label=canmoddescription, echo=TRUE}
+names(POLYTOPE)
+```
+
+Matrices C and A, and vectors b and v correspond to the matrices of active constraints that define the polytope A X <= b and C X = v (AAll, CAll, bAll and vAll are similar but include all constraints, active or not). Matrices N, H, F and L are matrices that are used to describe the dynamics of the system, more specifically, they describe how biomasses at any time can be derived from flows, using the relationship provided in the supplementary material of Planque and Mullon @planque2019modelling.
+
+## Structure of the polytope
+
+The polytope is defined inside a space with a high number of dimensions. 
+
+For the Barents sea example, we have:
+
+```{r label=dims, echo=TRUE}
+paste("number of inequalities:", nrow(POLYTOPE$A))
+paste("number of equalities:", nrow(POLYTOPE$C))
+paste("number of parameters (dimensions):", ncol(POLYTOPE$C))
+```
+The inequalities and equalities result from both implicit and explicit constraints, each line corresponds to a constraint and a specific year. The number of parameters is the dimension of the polytope.
+
+## Suitability of the polytope
+
+The polytope contains the set of possible food-web trajectories. If some constraints are incompatible, the polytope will be empty, signifying that it is not possible to find any food-web trajectories that can simultaneously satisfy all constraints. When there are too few constraints, the polytope can be unbounded. In such case, some of the fluxes can take an unbounded range of values, a somehow unrealistic situation.
+Checking the polytope is an important step. Users can adopt different strategy: some users try first to specificy as many constraints as possible with the risk of constructing an empty polytope. They then need to relax some of the model constraints in order to find possible solutions. Others tend to start with a reduced set of constraints with the risk of having an unbounded polytope. They then need to add extra constraints to derive possible and plausible food-web trajectories. Both approaches have their pros and cons. Here, we focus on how to identify potential issues with the polytope and the possible ways to resolve them so that the polytope is suitable for sampling. As a recommendation: it is often a good strategy to start working with a limited number of years to limit the dimension of the polytope and decrease computation time. Moreover, it is often convenient to add a temporary constraint that specifies an upper limits to the sum of all flows; it ensures to have a bounded polytope and to carry out some preliminary explorations.
+
+### First step: checking the polytope status
+
+The R command *checkPolytopeStatus* returns the current status of the polytope. In the Barents Sea example, the polytope is 'OK' which means that it is non-empty and bounded. In other words, there is a limited set of possible trajectories.
+
+
+```{r label=rmppcheck, echo=TRUE, warning=FALSE}
+checkPolytopeStatus(POLYTOPE)
+```
+
+In some situations, the function may return 'empty polytope' or 'unbounded polytope'. It might then be necessary to add/activate new constraints or remove/disactivate existing constraints.)
+
+### Toggling constraints 
+Constraints can be activated/deactivate in the RCaN-file, using the 'active' switch in the 'Constraints' worksheet. In addition, it is possible to activate/deactivate constraints directly within R, once the RCaN file has been loaded. We illustrate this below, using the command *toggleConstraint*:
+
+```{r label=rmpp, echo=TRUE, output.lines=1:10}
+
+POLYTOPE <- quiet(toggleConstraint(POLYTOPE,
+                    c("C01","C02","C03","C04","C05","C06",
+                      "C07","C08","C09","C10","C11","C12",
+                      "C15","C16","C19","C21")))
+```
+In this example, we removed constraints C01 to C12 and C15, C16, C19 and C21, which bound the input (primary production), the output of the system (fisheries) and the maximum biomass of top predators (birds and marine mammals).
+
+```{r label=inconsistencheck, echo=TRUE, warning=FALSE}
+checkPolytopeStatus(POLYTOPE)
+
+```
+As a result, the polytope is now unbounded. 
+We therefore reactivate the constraint with the 'toggleConstraint' command.
+
+```{r label=reactpp, echo=TRUE, output.lines=1:10}
+POLYTOPE <- quiet(toggleConstraint(POLYTOPE,
+                        c("C01","C02","C03","C04","C05","C06",
+                          "C07","C08","C09","C10","C11","C12",
+                          "C15","C16","C19","C21")))
+```
+
+### Finding incompatible constraints
+
+We artificially add a new constraint which is incompatible with the existing ones to illustrate a situation where the polytope is empty.
+
+```{r label=addincompatible, output.lines=1:10}
+POLYTOPE<-quiet(toggleConstraint(POLYTOPE, "C35"))
+```
+From section \@ref(constraints), we can see that constraint C35  (the biomass of birds should exceed 33.6) is not compatible with constraints C21 (the biomass of birds should NOT exceed 44.8), i.e. the two can not be fulfilled simultaneously. As a consequence, checking the polytope status returns 'empty polytope': 
+
+```{r label=checkincompatible, warning=FALSE}
+checkPolytopeStatus(POLYTOPE)
+```
+The RCaNmodel function 'findingIncompatibleConstr' is then useful to identify which constraints are incompatible:
+
+```{r inconstistent, output.lines=1:10}
+options(width = 60)
+incomp <- findingIncompatibleConstr(POLYTOPE)
+```
+
+The function returns that constraint C35 is problematic (see ###polytope is ok when following constraints are relaxed) and that it is incompatible with constraints C21 ("####Those constraints seem incompatible with:").
+
+In such situation, it is necessary to relax some of the above constraints (C35, C21) to obtain a non-empty polytope. The choice of the constraint to relax is left to the modeller, based on domain knowledge.
+
+In the following, we revert to a model version in which constraint C35 is inactive and the polytope is OK:
+
+```{r label=disactincompatible, output.lines=1:10}
+quiet(POLYTOPE<-toggleConstraint(POLYTOPE, "C35"))
+```
+
+
+## Bounds of the polytope
+To obtain a first overview of the polytope, it is useful to compute its limits in all dimensions. This can be achieved with the RCaNmodel function *getAllBoundsParam*. The output is a dataframe with a row per parameter/dimension. It is also possible is to compute the bounds for a small set of dimensions only. This can be done using the function *getBoundParam*. This is illustrated below for the two dimensions corresponding to the flux from Omnivorous Zooplankton to Birds in 2017 and 2018: 
+
+```{r label=boundsC}
+getBoundParam(POLYTOPE, which(colnames(POLYTOPE$A)=="Ozoo_Birds[2017]"))
+getBoundParam(POLYTOPE, which(colnames(POLYTOPE$A)=="Ozoo_Birds[2018]"))
+```
+
+## 2D-slices of the polytope
+
+2-dimensional pictures of the polytope are useful to visualise how the bounds of different fluxes are jointly constrained. These are obtained using the RCaNmodel function *plotPolytope2D*: 
+
+```{r label=fig1, out.width='100%'}
+start_time <- Sys.time()
+plotPolytope2D(POLYTOPE,
+               c('PP_Ozoo[1990]', 'Hzoo_Ozoo[1990]'),
+               progressBar=FALSE)
+```
+
+```{r label=fig101, out.width='100%'}
+plotPolytope2D(POLYTOPE,
+               c('Hzoo_PelF[1990]', 'PelF_PelF[1990]'), 
+               progressBar=FALSE)
+
+plotPolytope2D(POLYTOPE,
+               c('Hzoo_PelF[1990]', 'Hzoo_PelF[1991]'), 
+               progressBar=FALSE)
+
+plotPolytope2D(POLYTOPE, 
+               c('Hzoo_PelF[1990]', 'PelF_Fisheries[1991]'),
+               progressBar=FALSE)
+end_time <- Sys.time()
+end_time - start_time
+```
+
+
+# Sampling the polytope
+
+## Sampling
+
+The RCaNmodel function *sampleCaN* is used to sample of the polytope, i.e. to sample several random possible trajectories of the food-web dynamics. The output of this command is a mcmc.list object (defined in package coda). The function parameters include:
+* N: the number of samples
+* thin: the thinning, i.e. the number of samples that are left out from the output
+* nchains: the number of sampling chains
+* ncore: the number of CPU cores used
+* method: one of gibbs (default) or hitandrun
+
+
+With N=100, thin=10, and nchain=2 the *sampleCaN* function will sample two chains of 1,000 values and return one output every 10, that is a total of 200 valid samples
+
+```{r label=sample}
+if (file.exists(system.file("extdata", "sampleCaN.rdata", package = "RCaNmodel"))){
+  system.file("extdata", "sampleCaN.rdata", package = "RCaNmodel")
+} else {
+system.time(SAMPLE <- sampleCaN(POLYTOPE, N=100, thin=10, nchain=2, ncore=2))
+  save(SAMPLE, file = "sampleCaN.rdata")
+}
+```
+
+## Convergence of the sample chains
+
+Check the mixing of the Monte Carlo Marko chain algorithm that is used to build the sample can be achieved with commands from the [coda](https://cran.r-project.org/web/packages/coda/index.html) library. 
+
+```{r label=nchain}
+summ <- summary(SAMPLE$mcmc)
+n = 31
+if (requireNamespace("kableExtra" , quietly = TRUE)) { 
+  kable( head(cbind.data.frame(summ$statistics, summ$quantiles) %>%
+                select('Mean', 'SD', '2.5%', '50%', '97.5%'),
+              n=n),
+         caption=paste("summary of", n, "parameter distributions"),
+         digits=0) %>%
+    kableExtra::kable_styling(latex_options = c("striped", "scale_down"))
+} else {
+  kable( head(cbind.data.frame(summ$statistics, summ$quantiles) %>%
+                select('Mean', 'SD', '2.5%', '50%', '97.5%'),
+              n=n),
+         caption=paste("summary of", n, "parameter distributions"),
+         digits=0)
+}
+```
+
+### Gelman diagnostic 
+
+Gelman and Rubin (1992) proposed a general approach to asses the convergence of MCMC outputs in which $m > 1$ parallel chains are run with starting values that are overdispersed relative to the posterior distribution. Convergence is diagnosed when the chains have 'forgotten' their initial values, and the output from all chains is indistinguishable. The gelman.diag diagnostic is applied to a single variable from the chain. It is based a comparison of within-chain and between-chain variances, and is similar to a classical analysis of variance.
+
+```{r label=gelman, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
+gelman.diag(SAMPLE$mcmc[,c('PP_Benthos[1990]',
+                           'Ozoo_Birds[1990]',
+                           'DemF_Fisheries[1990]',
+                           'PelF_DemF[1990]')],
+            multivariate = FALSE)
+```
+
+Theoretically a statistics below 1.05 suggests an appropriate convergence.
+
+### Autocorrelation function 
+
+The *acfplot* function from the coda library shows the autocorrelation function of sampling chains. It is illustrative of the independence of successive samples. If the samples are not serially correlated (which is desired) the autocorrelation should remain around zero (except for the first value which is always 1). Otherwise, it might be worthwhile to increase the thinning during RCaNmodel sampling and/or to discard the first samples.
+
+```{r label=acf, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
+acfplot(SAMPLE$mcmc[,'PP_Benthos[1990]'],
+        ylim=c(-0.1,0.8),
+        main='PP_Benthos[1990]')
+acfplot(SAMPLE$mcmc[,'Ozoo_Birds[1990]'],
+        ylim=c(-0.1,0.8),
+        main='Ozoo_Birds[1990]')
+```
+
+# Visualisation of the model results
+The graphical representation of the possible dynamics of the food-web is a important output of the model. The RCaNmodel function *ggSeries* produces standardised plots of the time-series of components and/or fluxes. By default, for each component, 3 randomly picked samples/trajectories are plotted (plain, dashed and dotted lines) together with the envelopes containing 100\%, 95\% and 50\% of the sampled trajectories. 
+
+For components, we get:
+
+```{r label=dynamicsComponents, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
+ggSeries(SAMPLE,c('Hzoo_PelF','PelF_PelF','PelF_DemF','Hzoo','PelF','DemF'))+
+  ylab("Biomass (1000 tonnes)")
+```
+
+In this example we observe different situations for the different species: for pelagic fish (PelF) and demersal fish (DemF) the constraints imposed in relation to the observational data-series constrain the trajectories of biomass which are all situated within a narrow band. On the other hand, there is little information provided to constrain directly the trajectories of marine mammal and Birds which leads to large variability between the different samples.
+
+The dynamics of fluxes can be plotted in a similar fashion:
+
+```{r label=dynamicsFluxes, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
+
+
+ggSeries(SAMPLE, POLYTOPE$flow, TRUE) +
+  theme(legend.position = "none") +
+  ylab("Flux (1000 tonnes)")
+
+```
+
+## Empirical distributions of biomass and fluxes 
+
+Exploring the distribution of biomass and fluxes across samples and across years is also a useful output of the model. The RCaNmodel function *ggViolin* produces standardised violin plots of these distributions. By default, these are presented on a log scale which allows for comparison between biomass or fluxes that can span several orders of magnitude. For example, the distribution of species biomass for the year 1990 is obtained as follows:
+
+```{r label=distribComp90, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
+ggViolin(SAMPLE,POLYTOPE$species,year=1990,TRUE) +
+  xlab('Component') +
+  ylab('Biomass')
+```
+The violin plots of all fluxes in 1990 are produced as follows::
+
+```{r label=distribFlux90, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
+ggViolin(SAMPLE,POLYTOPE$flow,year=1990,TRUE) +
+  xlab('Component') +
+  ylab('Biomass') + 
+  theme(axis.text.x=element_text(angle=90))
+```
+
+## Diet composition
+
+The diet matrix is a key parameter of many trophic models, such as e.g. Ecopath (@Christensen2004). In CaN models, diet is non deterministic, in the sense that trophic fluxes are constrained but not determined by biomass. Diets are thus emerging from the model and it is interesting to explore the diets of individual species. A convenient way is to use the RCaNmodel function *ggDiet* to draw the average diet for each predators:
+
+```{r label=diet, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
+ggDiet(SAMPLE, POLYTOPE$species) + ylab('prey proportion in the diet')
+```
+
+## Growth and density-dependence
+
+Density-dependence usually reflects how growth is related to population size In RCaNmodel trajectories this can be expressed as growth in biomass in relation to biomass. The RCaNmodel function *ggGrowth* plots the growth rate (measured as the ratio of biomass at time $t+1$ over the biomass at time $t$) as a function of the biomass (at time $t$). Plotting density-dependence for all species is done as follows: 
+```{r label=growth, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
+ggGrowth(SAMPLE, POLYTOPE$species)
+```
+This illustrates how density-dependence of the food-web components can emerge from the food-web dynamics. The upper and lower red-dotted lines visualise the minimum and maximum growth rates set by the inertia constraints for each component. The thick lines are smoothers which highlight the possible underlying relationship between growth and biomass.
+
+## Trophic functional relationships
+
+The RCaNmodel function *ggTrophicRelation*  plots the empirical trophic functional relationships (TFRs) between the biomass of a prey and the quantity of that prey consumed by a predator. Below is the command for plotting the TFR between benthos, pelagic fishes and demersal fishes in the Barents Sea example.
+
+```{r label=trophicRelationship,echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
+ggTrophicRelation(SAMPLE, POLYTOPE$species[3:5])
+```
+Above, we see that the predation of benthos by demersal fishes does not increase with the biomass of benthos, suggesting that benthos is not a limiting factor in the diet of demersal fishes.
+
+
+## Satiation
+
+The function *ggSatiation* plots the total biomass of prey eaten by a predator, as a function of the biomass of the predator. In addition the plot includes an indication (upper red dotted line) of the maximum possible consumption rate, derived from the satiation parameter of the predator species. An example is illustrated below for all model components and over the entire sampling period. It shows that marine mammals never reach their satiation. On the other hand, demersal fish are often closed to satiation, suggesting that they are not food limited.
+
+```{r label=satiation, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
+ggSatiation(SAMPLE, POLYTOPE$species)
+```
+
+## Feeding and Growth
+
+The RCaNmodel function *ggSatiatInertia* is used to explore the relationships between population growth and feeding. The plot shows standardized total consumption(0=no feeding, 1=feeding to satiation) as a function of standardized population growth/mortality (-1 = maximum mortality, 0 = no change in biomass, 1 = maximum growth). A positive relationship between growth and satiation is indicative of bottom up control.
+
+```{r label=feedingGrowth, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
+ggSatiatInertia(SAMPLE, POLYTOPE$species)
+```
+
+## Pair-plots
+
+The function *ggPairsBiomass* is used to explore the relationships between the biomass of different food-web components/species. The plot shows the individual component density function in the diagonal, the scatterplots of one species against the other in the lower triangle and the Kendall correlation coefficient in the upper triangle. An example is illustrated below for three model components and over the entire sampling period. The function parameter *frac* indicates the fraction of the samples which will be plotted. This is useful for large sample size which can lead to overloaded figures. 
+
+```{r label=plotPairs, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
+ggPairsBiomass(SAMPLE,c("Benthos","PelF","DemF"),logscale=FALSE, frac = .25) + #we only 25% of the point since the function is long
+  scale_y_continuous(n.breaks=3)+
+  scale_x_continuous(breaks=c(1990,2010))
+```
+
+
+## Top-Down and Bottom-Up controls
+
+One important aspect of food-web dynamics is the presence of possible trophic controls (Bottom-up or Top-Down). We define here bottom-up as a situation in which the growth of a species/component is positively correlated to the consumption by this species. Similarly, Top-down control is defined as a situation in which the growth of a species/component is negatively correlated to the predation/fishing on this species. The RCaNmodel function *ggTopDownBottomUp* plots the density function of the correlation coefficients between growth and consumption/predation:
+
+```{r label=bottomup, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
+ggTopDownBottomUp(SAMPLE)
+```
+
+This function display the correlation between the growth of the species with both (1) its total ingestion of prey per unit of biomass (in red) and (2) the how much it is predated per unit of biomass (in green). A red density plot tending to 1 indicates that growth is correlated to feeding, and therefore a bottom up control. Conversely, a green density plot tending towards minus one indicates that growth is negatively correlated to the predation and suggests a top down control. It is possible to select which fluxes are accounted for in this diagram (for example to exclude non-trophic fluxes):
+
+```{r label=bottomupres, echo=TRUE, warning=FALSE, message = FALSE, out.width='100%'}
+# we restrict the analysis to Ozoo and DemF and limit to the predation by
+#respectively DemF/PelF and MM
+ggTopDownBottomUp(SAMPLE, 
+                  species=list(Ozoo=c("DemF","PelF"), 
+                               DemF=c("MM"))) 
+```
+
+
+
