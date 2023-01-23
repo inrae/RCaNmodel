@@ -8,9 +8,14 @@ on:
 
 name: R-CMD-check
 
+
 jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}
+    
+    defaults:
+      run:
+        working-directory: RCaNmodel
 
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
 
