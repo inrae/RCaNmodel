@@ -19,7 +19,6 @@
 #' @importFrom dplyr summarize
 #' @importFrom dplyr select
 #' @importFrom ggplot2 ggplot
-#' @importFrom ggplot2 aes_string
 #' @importFrom ggplot2 aes
 #' @importFrom ggplot2 after_stat
 #' @importFrom ggplot2 guides
@@ -183,7 +182,7 @@ ggSatiatInertia <- function(mysampleCaNmod,
       slice(seq(1, n(),by = round(n() / (frac * n()))))
 
 
-    ggplot(full_tab, aes_string(y = "growth_std", x = "satiation_std")) +
+    ggplot(full_tab, aes(y = !!sym("growth_std"), x = !!sym("satiation_std"))) +
       geom_point(shape=".",col="grey") +
       #geom_density_2d_filled(alpha = .5) +
       geom_density_2d_filled(contour_var = "ndensity",
@@ -194,7 +193,7 @@ ggSatiatInertia <- function(mysampleCaNmod,
       facet_wrap(~ species, ncol = ceiling(length(species)^0.5),
                  scales = "free") +
       guides(colour = FALSE, alpha = FALSE, fill = FALSE) +
-      geom_hline(aes_string(yintercept = 0), lty = 2) +
+      geom_hline(aes(yintercept = 0), lty = 2) +
       ylim(-1,1)+xlim(0,1) + theme_bw()
 
 }

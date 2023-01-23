@@ -20,7 +20,6 @@
 #' @importFrom dplyr summarize
 #' @importFrom dplyr select
 #' @importFrom ggplot2 ggplot
-#' @importFrom ggplot2 aes_string
 #' @importFrom ggplot2 aes
 #' @importFrom ggplot2 after_stat
 #' @importFrom ggplot2 guides
@@ -147,10 +146,10 @@ ggTopDownBottomUp <- function(mysampleCaNmod,
                  values_to="correlation")
 
   ggplot(data = cortable) +
-    geom_vline(xintercept = c(-0.5,0.5), size = 1, alpha = 0.25) +
-    geom_density(aes_string(x = "correlation",
-                            fill = "type",
-                            linetype = 'type'),
+    geom_vline(xintercept = c(-0.5,0.5), linewidth = 1, alpha = 0.25) +
+    geom_density(aes(x = !!sym("correlation"),
+                            fill = !!sym("type"),
+                            linetype = !!sym('type')),
                  alpha=.5) +
     scale_fill_discrete("", labels = c("Growth-Feeding", "Growth-Predation")) +
     scale_linetype_discrete("",

@@ -10,9 +10,8 @@
 #'  package = "RCaNmodel"))
 #' ggNetwork(myCaNmod)
 #' @importFrom ggplot2 arrow
-#' @importFrom ggplot2 aes_
-#' @importFrom ggplot2 aes_string
-#' @importFrom ggplot2 theme
+#' @importFrom rlang !! sym
+#' @importFrom ggplot2 theme aes_
 #' @importFrom ggplot2 unit
 #' @importFrom ggplot2 arrow
 #' @importFrom graphics plot
@@ -66,7 +65,7 @@ ggNetwork <- function(myCaNmod) {
     size = 3,
     alpha = 1) +
     ggraph::geom_edge_arc2(
-      aes_string(label = "Flux", colour = "Trophic"),
+      aes(label = !!sym("Flux"), colour = !!sym("Trophic")),
       strength = 0.1,
       alpha = 0.33,
       width = 1,
@@ -80,11 +79,11 @@ ggNetwork <- function(myCaNmod) {
   if (sum(igraph::which_loop(g)) > 0) {
     gg_foodweb <- gg_foodweb +
       ggraph::geom_edge_loop(
-        aes_string(
+        aes(
           span = 90,
           direction = 90,
-          label = "Flux",
-          colour = "Trophic"
+          label = !!sym("Flux"),
+          colour = !!sym("Trophic")
         ),
         width = 1,
         end_cap = ggraph::circle(0.1, "inches"),

@@ -26,7 +26,7 @@
 #'
 #' @importFrom ggplot2 ggplot
 #' @importFrom ggplot2 geom_path
-#' @importFrom ggplot2 aes_string
+#' @importFrom rlang !! sym
 #' @importFrom ggplot2 geom_ribbon
 #' @importFrom ggplot2 geom_line
 #' @importFrom ggplot2 ylab
@@ -72,22 +72,22 @@ ggSeries <- function(mysampleCaNmod,
   names(quantiles)[1:7] <- c("q0", "q2.5", "q25", "q50", "q75", "q97.5", "q100")
   g <- ggplot() +
     geom_ribbon(data = quantiles,
-                aes_string(x = "year",
-                           ymin = "q0",
-                           ymax = "q100",
-                           fill = "series"),
+                aes(x = !!sym("year"),
+                    ymin = !!sym("q0"),
+                    ymax = !!sym("q100"),
+                    fill = !!sym("series")),
                 alpha = .33) +
     geom_ribbon(data = quantiles,
-                aes_string(x = "year",
-                           ymin = "q2.5",
-                           ymax = "q97.5",
-                           fill = "series"),
+                aes(x = !!sym("year"),
+                    ymin = !!sym("q2.5"),
+                    ymax = !!sym("q97.5"),
+                    fill = !!sym("series")),
                 alpha = .33) +
     geom_ribbon(data = quantiles,
-                aes_string(x = "year",
-                           ymin = "q25",
-                           ymax = "q75",
-                           fill = "series"),
+                aes(x = !!sym("year"),
+                    ymin = !!sym("q25"),
+                    ymax = !!sym("q75"),
+                    fill = !!sym("series")),
                 alpha = .33) +
     ylab(ylab) 
   if (facet){
@@ -113,13 +113,19 @@ ggSeries <- function(mysampleCaNmod,
                                levels = param)
     names(fewseries)[1:3] <- c("S1", "S2", "S3")
     g <- g + geom_path(data = fewseries,
-                       aes_string(x = "year", y = "S1", col = "series"),
+                       aes(x = !!sym("year"),
+                           y = !!sym("S1"),
+                           col = !!sym("series")),
                        lty = "solid") +
       geom_path(data = fewseries,
-                aes_string(x = "year", y = "S2", col = "series"),
+                aes(x = !!sym("year"), 
+                    y = !!sym("S2"),
+                    col = !!sym("series")),
                 lty = "twodash") +
       geom_path(data = fewseries,
-                aes_string(x = "year", y = "S3", col = "series"),
+                aes(x = !!sym("year"),
+                    y = !!sym("S3"),
+                    col = !!sym("series")),
                 lty = "longdash")
   }
   return(g)
