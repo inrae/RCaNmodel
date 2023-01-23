@@ -4,8 +4,6 @@ date: "5/2/2021"
 output: 
   rmarkdown::html_vignette:
      keep_md: yes
-  pdf_document:
-    toc: yes
 author: 
 - "Hilaire Drouineau - INRAE Bordeaux, UR EABX"
 - "Benjamin Planque - IMR"
@@ -298,17 +296,17 @@ plotPolytope2D(POLYTOPE,
 ```
 
 ```{r label=fig101, out.width='100%'}
-plotPolytope2D(POLYTOPE,
-               c('Hzoo_PelF[1990]', 'PelF_PelF[1990]'), 
-               progressBar=FALSE)
-
-plotPolytope2D(POLYTOPE,
-               c('Hzoo_PelF[1990]', 'Hzoo_PelF[1991]'), 
-               progressBar=FALSE)
-
-plotPolytope2D(POLYTOPE, 
-               c('Hzoo_PelF[1990]', 'PelF_Fisheries[1991]'),
-               progressBar=FALSE)
+# plotPolytope2D(POLYTOPE,
+#                c('Hzoo_PelF[1990]', 'PelF_PelF[1990]'), 
+#                progressBar=FALSE)
+# 
+# plotPolytope2D(POLYTOPE,
+#                c('Hzoo_PelF[1990]', 'Hzoo_PelF[1991]'), 
+#                progressBar=FALSE)
+# 
+# plotPolytope2D(POLYTOPE, 
+#                c('Hzoo_PelF[1990]', 'PelF_Fisheries[1991]'),
+#                progressBar=FALSE)
 end_time <- Sys.time()
 end_time - start_time
 ```
@@ -329,11 +327,16 @@ The RCaNmodel function *sampleCaN* is used to sample of the polytope, i.e. to sa
 With N=100, thin=10, and nchain=2 the *sampleCaN* function will sample two chains of 1,000 values and return one output every 10, that is a total of 200 valid samples
 
 ```{r label=sample}
-if (file.exists(system.file("extdata", "sampleCaN.rdata", package = "RCaNmodel"))){
-  system.file("extdata", "sampleCaN.rdata", package = "RCaNmodel")
+if (file.exists(system.file("extdata", "sampleCaNBarents.rdata",
+                            package = "RCaNmodel"))){
+  load(system.file("extdata",
+                   "sampleCaNBarents.rdata",
+                   package = "RCaNmodel"))
 } else {
 system.time(SAMPLE <- sampleCaN(POLYTOPE, N=100, thin=10, nchain=2, ncore=2))
-  save(SAMPLE, file = "sampleCaN.rdata")
+  save(SAMPLE, file = system.file("extdata",
+                                  "sampleCaNBarents.rdata",
+                                  package = "RCaNmodel"))
 }
 ```
 
