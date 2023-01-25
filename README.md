@@ -21,8 +21,14 @@ For RCaNconstructor installation, please look [here](https://github.com/inrae/RC
 ## Usage
 A vignette is provided with the package to explain how it should be used.
 
-## Bug reporting
-Please report bugs and feature request as [Issues on GitHub](https://github.com/inrae/RCaNmodel/issues).
+## Contributing
+Any peoples interested can contribute by filling bug or providing feature request as [Issues on GitHub](https://github.com/inrae/RCaNmodel/issues). 
+If you want to suggest new pieces of code, please fork the project and create a pull request:
+- Fork the Project
+- Create a new branch (git checkout -b feature/mybranch)
+- edit the code and commit the changes (git commit -m 'this is the changes to be reviewed')
+- Push (git push origin feature/mybranch)
+- Open a [Pull Request](https://github.com/inrae/RCaNmodel/pulls).  
 
 
 
