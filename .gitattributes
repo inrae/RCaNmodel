@@ -11,6 +11,5 @@
 *.docx filter=lfs diff=lfs merge=lfs -text
 *.rdata filter=lfs diff=lfs merge=lfs -text
 *.png filter=lfs diff=lfs merge=lfs -text
-*.jmod filter=lfs diff=lfs merge=lfs -text
 RCaNmodel/man/figures/logo.png -filter=lfs -diff=lfs -merge=lfs -text
 RCaNconstructor/app-icon.png -filter=lfs -diff=lfs -merge=lfs -text
