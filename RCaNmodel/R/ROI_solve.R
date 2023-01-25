@@ -39,13 +39,13 @@ ROI_solve <-
         get.primal.solution(lp_model,
                             orig = TRUE)[(dims[1] + 1):(dims[1] +
                                                           dims[2])]
-      if (any(x0 == 1.0e30)) { #this is the infinite bound of lpsolve
+      if (any(x0 == 1e30)) { #this is the infinite bound of lpsolve
         conv <- 3
-        x0[which(x0 == 1.0e30)] <- Inf
+        x0[which(x0 == 1e30)] <- Inf
       }
-      if (any(x0 == - 1.0e30)){ #this is the infinite bound of lpsolve
+      if (any(x0 == - 1e30)){ #this is the infinite bound of lpsolve
         conv <- 3
-        x0[which(x0 == - 1.0e30)] <- -Inf
+        x0[which(x0 == - 1e30)] <- -Inf
       }
       status <- list(code = as.integer(conv != 0),
                      msg = list(solver = "lpsolve",

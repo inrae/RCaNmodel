@@ -146,7 +146,7 @@ ggTopDownBottomUp <- function(mysampleCaNmod,
                  values_to="correlation")
 
   ggplot(data = cortable) +
-    geom_vline(xintercept = c(-0.5,0.5), linewidth = 1, alpha = 0.25) +
+    geom_vline(xintercept = c(-0.5,0.5), size = 1, alpha = 0.25) +
     geom_density(aes(x = !!sym("correlation"),
                             fill = !!sym("type"),
                             linetype = !!sym('type')),
