@@ -4,6 +4,8 @@
 name: Maven Basic Package
 
 on:
+  workflow_dispatch:
+    branches: [ master ]
   push:
     branches: [ master ]
   paths:
