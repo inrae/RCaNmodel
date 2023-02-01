@@ -4,8 +4,6 @@
 name: Build Unix Installer
 
 on:
-  workflow_dispatch:
-    branches: [ master ]
   push:
     branches: [ master ]
   paths:
