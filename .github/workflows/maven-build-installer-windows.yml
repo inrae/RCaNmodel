@@ -6,8 +6,8 @@ name: Build Windows Installer
 on:
   push:
     branches: [ master ]
-  paths:
-    - RCaNconstructor/**
+    paths:
+      - RCaNconstructor/**
 
 jobs:
   build:

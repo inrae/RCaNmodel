@@ -6,8 +6,8 @@ name: Maven Basic Package
 on:
   push:
     branches: [ master ]
-  paths:
-    - RCaNconstructor/**
+    paths:
+      - RCaNconstructor/**
     
 
 jobs:
@@ -16,11 +16,7 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - name: Checkout code
-      uses: rohmanngmbh/action-checkout-repo@v1.3.2
-      with:
-        lfs: true
-        path: RCaNconstructor
+    - uses: actions/checkout@v2
     - name: Set up JDK 17
       uses: actions/setup-java@v2
       with:

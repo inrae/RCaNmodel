@@ -3,8 +3,8 @@
 on:
   push:
     branches: [master]
-  paths:
-    - RCaNmodel/**
+    paths:
+      - RCaNmodel/**
 
 name: R-CMD-check
 
