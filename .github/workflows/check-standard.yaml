@@ -6,7 +6,7 @@ on:
   push:
     branches: [master]
   paths:
-    - RCaNconstructor/**
+    - RCaNmodel/**
 
 name: R-CMD-check
 
