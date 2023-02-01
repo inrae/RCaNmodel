@@ -4,6 +4,8 @@
 name: Build macOS Installer
 
 on:
+  workflow_dispatch:
+    branches: [ master ]
   push:
     branches: [ master ]
     paths:
