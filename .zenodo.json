@@ -2,7 +2,7 @@
     "description": "<p>This release corresponds to the article published in Journal of Open Source Software</p>", 
     "license": "other-open", 
     "title": "inrae/RCaNmodel: RCaNmodel: An R package for Chance and Necessity modelling", 
-    "version": "v2.0", 
+    "version": "v2.0.1", 
     "upload_type": "software", 
     "publication_date": "2023-02-01", 
     "creators": [
@@ -17,19 +17,6 @@
         {
             "affiliation": "IRD", 
             "name": "Christian Mullon"
-        }
-    ], 
-    "access_right": "open", 
-    "related_identifiers": [
-        {
-            "scheme": "url", 
-            "identifier": "https://github.com/inrae/RCaNmodel/tree/v2.0", 
-            "relation": "isSupplementTo"
-        }, 
-        {
-            "scheme": "doi", 
-            "identifier": "10.5281/zenodo.5141140", 
-            "relation": "isVersionOf"
         }
     ]
 }
