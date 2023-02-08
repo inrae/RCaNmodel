@@ -22,7 +22,7 @@
 #' @importFrom ggplot2 geom_violin
 #' @importFrom ggplot2 scale_y_continuous
 #' @importFrom ggplot2 theme_bw
-#' @importFrom ggplot2 aes_string
+#' @importFrom rlang !! sym
 #' @importFrom ggplot2 ggtitle
 #' @importFrom ggplot2 ylab
 #' @importFrom ggplot2 theme_bw
@@ -48,9 +48,9 @@ ggViolin <- function(mysampleCaNmod,
   mat_res <- as.matrix(mysampleCaNmod$mcmc)
   mat_res <- mat_res[, colnames(mat_res) %in% paste0(rep(param,
                                                          each = length(years)),
-                                                    "[",
-                                                    years,
-                                                    "]"),
+                                                     "[",
+                                                     years,
+                                                     "]"),
                      drop = FALSE]
   mat_res <- as.data.frame(mat_res) %>%
     pivot_longer(cols = everything(),
@@ -61,8 +61,10 @@ ggViolin <- function(mysampleCaNmod,
                         levels = param)
   if (nrow(mat_res) < 1)
     stop("no data found")
-  g <- ggplot(mat_res, aes_string(x = "Var", y = "val")) +
-    geom_violin(trim=TRUE,scale="width",aes_string(fill = "Var"))+
+  g <- ggplot(mat_res, aes(x = !!sym("Var"), y = !!sym("val"))) +
+    geom_violin(trim = TRUE,
+                scale = "width",
+                aes(fill = !!sym("Var")))+
     theme_bw()
   if (logscale)
     g <- g + scale_y_continuous(trans='log10')

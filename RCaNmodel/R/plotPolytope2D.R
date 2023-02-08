@@ -11,7 +11,7 @@
 #' @importFrom utils setTxtProgressBar
 #' @importFrom utils txtProgressBar
 #' @importFrom ggplot2 ggplot
-#' @importFrom ggplot2 aes_string
+#' @importFrom rlang !! sym
 #' @importFrom ggplot2 geom_polygon
 #'
 #' @examples
@@ -39,7 +39,7 @@ plotPolytope2D <- function(x,
   b <- x$b
   C <- x$C
   v <- x$v
-
+  
   nbparam <- ncol(A)
   if (length(params) != 2)
     stop("only works for two params")
@@ -66,7 +66,7 @@ plotPolytope2D <- function(x,
                              b = b,
                              C = rbind(C, ifelse((1:nbparam) ==
                                                    params[1], 1, 0
-                                                 )),
+                             )),
                              v = c(v, xi)),
                         params[2]))
   })
@@ -76,8 +76,8 @@ plotPolytope2D <- function(x,
         x[2, ]))))
   names(polygon) <- colnames(A)[params]
   ggplot(polygon,
-         aes_string(x = as.name(colnames(A)[params[1]]),
-                    y = as.name(colnames(A)[params[2]]))) +
+         aes(x = !!sym(as.name(colnames(A)[params[1]])),
+             y = !!sym(as.name(colnames(A)[params[2]])))) +
     geom_polygon()
-
+  
 }

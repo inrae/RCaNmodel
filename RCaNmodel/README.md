@@ -1,23 +1,30 @@
-# CaN
-<img src="RCaNmodel/man/figures/logo.png" align="right" width="220" />
+# RCaNModel
+<img src="./man/figures/logo.png" align="right" width="220" />
 
-## RCaNmodel installation
+## Installation
 ### Requirements
-All RCaNmodel dependencies are available on cran so there is no specific requirements. 
+All RCaNmodel dependencies are available on [CRAN](https://cran.r-project.org/) so there are no specific requirements.
 
 ### Installation
-Once these packages are installed, the process is easy using the library devtools. On a R console:
+Once these packages are installed, the process is easy using the library [remotes](https://cran.r-project.org/package=remotes) or [devtools](https://cran.r-project.org/package=devtools) if already installed 
+
+From an R console:
+
+    > require(remotes)
+    > remotes::install_github("https://github.com/inrae/RCaNmodel.git", subdir="RCaNmodel", dependencies = TRUE)
+    
+or 
 
     > require(devtools)
-    > devtools::install_github("https://github.com/inrae/RCaNmodel.git", subdir="RCaN")
-    
-We recommend the installation of the package ROI.plugin.cbc which enable the use of the very efficient cbc solver. This need package rcbc and the CBC solver to be installed first. Instructions can be found [here](https://github.com/dirkschumacher/ROI.plugin.cbc).  
-    
+    > devtools::install_github("https://github.com/inrae/RCaNmodel.git", subdir="RCaNmodel", dependencies = TRUE)
+
+We recommend the installation of the package [ROI.plugin.cbc](https://github.com/dirkschumacher/ROI.plugin.cbc) which enable the use of the very efficient CBC solver. This needs package [rcbc](https://github.com/dirkschumacher/rcbc) and the CBC solver to be installed first. Instructions can be found at [dirkschumacher/ROI.plugin.cbc](https://github.com/dirkschumacher/ROI.plugin.cbc).
+
 
 ### Usage
 A vignette is provided with the package to explain how it should be used.
 
 ### Bug reporting
-Please, report bugs and feature request on the github site.
+Please report bugs and feature request as [Issues on GitHub](https://github.com/inrae/RCaNmodel/issues).
 
 

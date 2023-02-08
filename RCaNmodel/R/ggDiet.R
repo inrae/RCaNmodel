@@ -19,7 +19,6 @@
 #' @importFrom dplyr sample_n
 #' @importFrom ggplot2 geom_violin
 #' @importFrom ggplot2 geom_bar
-#' @importFrom ggplot2 aes_string
 #' @importFrom ggplot2 ylab
 #' @importFrom ggplot2 xlab
 #' @importFrom dplyr left_join
@@ -78,17 +77,17 @@ ggDiet <- function(mysampleCaNmod,
     summarize("prop_in_diet" = mean(!!sym("prop_in_diet"), na.rm =TRUE))
   mat_res$predator <- factor(as.character(mat_res$predator),
                              levels = species)
-
-
+  
+  
   if (barplot){
-    g <- ggplot(data = mat_res, aes_string(x = "predator",
-                                    y = "prop_in_diet",
-                                    fill = "prey")) +
+    g <- ggplot(data = mat_res, aes(x = !!sym("predator"),
+                                    y = !!sym("prop_in_diet"),
+                                    fill = !!sym("prey"))) +
       geom_bar(position="stack", stat="identity",width=.98,color='black') +
       theme(legend.position = "bottom")
-    } else{
-    g <- ggplot(data = mat_res, aes_string(x = "prey",
-                                    y = "prop_in_diet")) +
+  } else{
+    g <- ggplot(data = mat_res, aes(x = !!sym("prey"),
+                                    y = !!sym("prop_in_diet"))) +
       geom_violin(trim = TRUE, scale = "width", fill = "darkcyan") +
       theme_bw() +
       facet_wrap(~predator, ncol = ceiling(length(species)^0.5)) +

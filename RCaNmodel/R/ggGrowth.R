@@ -17,7 +17,6 @@
 #'
 #' @importFrom ggplot2 ggplot
 #' @importFrom ggplot2 geom_point
-#' @importFrom ggplot2 aes_string
 #' @importFrom ggplot2 scale_y_continuous scale_x_continuous
 #' @importFrom ggplot2 geom_density_2d_filled
 #' @importFrom ggplot2 stat_smooth
@@ -84,13 +83,13 @@ ggGrowth <- function(mysampleCaNmod,
   biomass$species <- factor(biomass$species,
                             levels = species)
   g <- ggplot(na.omit(biomass),
-              aes_string(x = "b_curr", y = "growth")) +
+              aes(x = !!sym("b_curr"), y = !!sym("growth"))) +
     geom_point(size=.1, alpha = 0.5) +
     stat_smooth(method = "gam", colour = "chocolate4") +
     geom_hline(yintercept = 1, colour = 'black', linetype = "dashed") +
-    geom_hline(data = Inertia, aes_string(yintercept = "inertia_low"),
+    geom_hline(data = Inertia, aes(yintercept = !!sym("inertia_low")),
                colour = "firebrick3", linetype = "dashed") +
-    geom_hline(data = Inertia, aes_string(yintercept = "inertia_high"),
+    geom_hline(data = Inertia, aes(yintercept = !!sym("inertia_high")),
                colour = "firebrick3", linetype = "dashed")  +
     scale_x_continuous(trans = 'log10') +
     scale_y_continuous(trans = 'log10')  +

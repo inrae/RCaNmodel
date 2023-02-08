@@ -16,7 +16,6 @@
 #'
 #' @importFrom ggplot2 ggplot
 #' @importFrom ggplot2 geom_point
-#' @importFrom ggplot2 aes_string
 #' @importFrom ggplot2 stat_density_2d
 #' @importFrom ggplot2 scale_y_continuous scale_x_continuous
 #' @importFrom ggplot2 stat_smooth
@@ -96,7 +95,8 @@ ggTrophicRelation <- function(mysampleCaNmod,
 
 
   g <- ggplot(na.omit(biomass),
-              aes_string(x = "b", y = "consumption")) +
+              aes(x = !!sym("b"),
+                  y = !!sym("consumption"))) +
     geom_point(size=.1, alpha = 0.5) +
     stat_smooth(method = "gam", colour = "chocolate4") +
     geom_density_2d_filled(contour_var = "ndensity",

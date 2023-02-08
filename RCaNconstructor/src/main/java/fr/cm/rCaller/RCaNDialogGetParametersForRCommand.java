@@ -1,7 +1,7 @@
 package fr.cm.rCaller;
 
-import fr.cm.canObjects.ProjectListsManager;
-import fr.cm.RCaNMain.Context;
+import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.Context;
 import fr.cm.xmlFiles.RCommandXML;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
@@ -135,13 +135,13 @@ public class RCaNDialogGetParametersForRCommand extends Dialog<ButtonType>  {
         return(nst);
     }
 
-
-
     String getParameterFromRCommand(String typeParameter) {
         String parameter ="";
+        double width = Math.min(400.0, 0.8 * Context.getWindowWidth());
+        double height =  Math.min(400.0, 0.8 * Context.getWindowHeight());
 
         gridPane = new GridPane();
-        gridPane.setPrefSize(0.4 * Context.getWindowWidth(), 0.6 * Context.getWindowHeight());
+        gridPane.setPrefSize(width, height);
         gridPane.setHgap(10);
         gridPane.setVgap(10);
         gridPane.setPadding(new Insets(10, 10, 10, 10));

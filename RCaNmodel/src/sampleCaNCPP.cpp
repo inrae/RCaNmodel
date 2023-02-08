@@ -181,7 +181,7 @@ List cpgs(const int N, const Eigen::MatrixXd &A ,
       NumericVector alea2=dqrng::dqrunif(p);
       // choose p new components
       for (int ip=0;ip<p;++ip){
-        int i=index[p-ip-1];
+        int i=index[ip];
         //Find points where the line with the (p-1) components x_i
         //fixed intersects the bounding polytope.
         z = W.col(i); //prevent any divisions by 0

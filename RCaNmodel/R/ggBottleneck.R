@@ -20,7 +20,6 @@
 #' @importFrom dplyr summarize
 #' @importFrom dplyr select
 #' @importFrom ggplot2 ggplot
-#' @importFrom ggplot2 aes_string
 #' @importFrom ggplot2 aes
 #' @importFrom ggplot2 after_stat
 #' @importFrom ggplot2 guides
@@ -53,7 +52,7 @@ ggBottleneck <- function(mysampleCaNmod,
                          species = NULL,
                          years = NULL,
                          frac = 1){
-
+  
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("Package ggplot2 needed for this function to work.
          Please install it",
@@ -66,8 +65,8 @@ ggBottleneck <- function(mysampleCaNmod,
   if (!all(species %in% mysampleCaNmod$CaNmod$species))
     stop("some species are not recognized")
   species <- factor(species, levels = species)
-
-
+  
+  
   myCaNmodFit_long <- as.data.frame(as.matrix(mysampleCaNmod$mcmc)) %>%
     mutate("Sample_id" = 1:nrow(as.matrix(mysampleCaNmod$mcmc))) %>%
     slice(seq(1, n(),by = round(n() / (frac * n())))) %>%
@@ -75,7 +74,7 @@ ggBottleneck <- function(mysampleCaNmod,
                  names_to = c("Var","Year"),
                  names_pattern = "(.*)\\[(.*)\\]",
                  values_to = 'value')
-
+  
   #table with biomass at time t and t+1
   biomass <- myCaNmodFit_long %>%
     filter(!!sym("Var") %in% species) %>%
@@ -84,13 +83,13 @@ ggBottleneck <- function(mysampleCaNmod,
     filter(!!sym("Year") %in% years) %>%
     rename("predator" = "Var") %>%
     mutate("next_year" = !!sym("Year") + 1)
-
-
+  
+  
   #limit to trophic flows
   trophic_flows <- mysampleCaNmod$CaNmod$fluxes_def$Flux[
     mysampleCaNmod$CaNmod$fluxes_def$Trophic == 1]
-
-
+  
+  
   #table use to see species satiation
   fluxes_to <- myCaNmodFit_long %>%
     filter(!!sym("Var") %in% trophic_flows) %>%
@@ -105,16 +104,16 @@ ggBottleneck <- function(mysampleCaNmod,
              !!sym("predator")) %>%
     summarize("consumption" = sum(!!sym("value"))) %>%
     left_join(biomass)
-
+  
   fluxes_to$predator <- factor(fluxes_to$predator,
                                levels = species)
-
-
-
-
-
-
-
+  
+  
+  
+  
+  
+  
+  
   #table with satiation parameters
   Satiation <- mysampleCaNmod$CaNmod$components_param %>%
     filter(!!sym("Component") %in% species) %>%
@@ -125,7 +124,7 @@ ggBottleneck <- function(mysampleCaNmod,
     select(!!sym("predator"),
            !!sym("Satiation"),
            !!sym("intercept"))
-
+  
   #table with for each species an indicator of satiation of predators
   fluxes_from <- myCaNmodFit_long %>%
     filter(!!sym("Var") %in% trophic_flows) %>%
@@ -141,7 +140,7 @@ ggBottleneck <- function(mysampleCaNmod,
     summarize(sum_in_flux_from = sum(!!sym("value"))) %>%
     left_join(biomass) %>%
     inner_join(Satiation %>%
-                mutate("predator" = as.character(!!sym("predator")))) %>%
+                 mutate("predator" = as.character(!!sym("predator")))) %>%
     mutate(sum_max_in_flux = !!sym("b") * !!sym("Satiation")) %>%
     left_join(mysampleCaNmod$CaNmod$fluxes_def[
       mysampleCaNmod$CaNmod$fluxes_def$Trophic == 1, ],
@@ -153,9 +152,9 @@ ggBottleneck <- function(mysampleCaNmod,
                 sum(!!sym("sum_in_flux_from")) /
                 sum(!!sym("sum_max_in_flux"))) %>%
     rename("species" = !!sym("From"))
-
-
-
+  
+  
+  
   satiation_tab <- merge(fluxes_to, Satiation) %>%
     mutate(satiation_std = !!sym("consumption") /
              (!!sym("b")*!!sym("Satiation"))) %>%
@@ -165,10 +164,11 @@ ggBottleneck <- function(mysampleCaNmod,
            -!!sym("Satiation"),
            -!!sym("intercept")) %>%
     left_join(fluxes_from)
-
-
+  
+  
   ggplot(satiation_tab,
-         aes_string(x = "satiation_std", y = "satiation_std_pred")) +
+         aes(x = !!sym("satiation_std"),
+             y = !!sym("satiation_std_pred"))) +
     geom_point(shape=".",col="grey") +
     #geom_density_2d_filled(alpha = .5) +
     geom_density_2d_filled(contour_var = "ndensity",

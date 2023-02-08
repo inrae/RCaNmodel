@@ -1,9 +1,11 @@
+
+
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- une commande R donne lieu a un noeud rcommand avec les champs -->
 <!-- id : un identifiant simple -->
 <!-- textmenu : ce qui apparaîtra dans le menu -->
-<!-- submenu : dans quel menu du menu principal cela apparaîtra -->
+<!-- menu : dans quel menu du menu principal cela apparaîtra -->
 <!-- condition : ce qui la rend possible; en l'état actuel : connected, built, sampled  -->
 <!-- context change : ce que la command change si elle s'éxécute correctement;  en l'état actuel : connected, built, sampled -->
 <!-- rcompute : une suite de commandes R (n'est pas obligatoire lorsqu'il s'agit de produire un plot)-->
@@ -22,27 +24,17 @@
         <name>
             connect
         </name>
-        <submenu>
-            general
-        </submenu>
+        <menu>
+            build
+        </menu>
         <textmenu>
-            Start R session and load libraries
+            Load libraries
         </textmenu>
-        <conditioncontextchange>
-            R session is started
-        </conditioncontextchange>
-        <contextchange>
-            Libraries loaded
-        </contextchange>
         <rcompute>
             require(ggplot2)
             require(ggraph)
             library(coda)
             library(RCaN)
-            library(dplyr)
-            library(tidyverse)
-            library(lubridate)
-            library(GGally)
             resultR &lt;- 'R session is started'
         </rcompute>
         <help>
@@ -52,42 +44,17 @@
     <!--  +++++++++++++++++++++++++++++ -->
     <rcommand>
         <name>
-            disconnect
-        </name>
-        <submenu>
-            general
-        </submenu>
-        <textmenu>
-            Stop R session
-        </textmenu>
-        <condition>
-            connected
-        </condition>
-        <help>
-            This command stops a R session.
-        </help>
-        <!--  CHECKED -->
-    </rcommand>
-    <!--  +++++++++++++++++++++++++++++ -->
-    <rcommand>
-        <name>
             build
         </name>
-        <submenu>
-            polytope
-        </submenu>
+        <menu>
+            build
+        </menu>
         <textmenu>
             Build polytope
         </textmenu>
         <condition>
             connected
         </condition>
-        <conditioncontextchange>
-            Polytope is built - polytope is ok
-        </conditioncontextchange>
-        <contextchange>
-            built
-        </contextchange>
         <rcompute>
             POLYTOPE &lt;- buildCaN('FILENAME')
             built &lt;- 'Polytope is built'
@@ -110,9 +77,9 @@
         <textmenu>
             Plot polytope in two selected dimensions
         </textmenu>
-        <submenu>
-            analyzePolytope
-        </submenu>
+        <menu>
+            build
+        </menu>
         <condition>
             built
         </condition>
@@ -136,9 +103,9 @@
         <textmenu>
             Plot network
         </textmenu>
-        <submenu>
-            analyzePolytope
-        </submenu>
+        <menu>
+            build
+        </menu>
         <condition>
             built
         </condition>
@@ -158,9 +125,9 @@
         <textmenu>
             Diagnostic polytope
         </textmenu>
-        <submenu>
-            analyzePolytope
-        </submenu>
+        <menu>
+            build
+        </menu>
         <condition>
             built
         </condition>
@@ -184,9 +151,9 @@
         <textmenu>
             Bounds of polytope
         </textmenu>
-        <submenu>
-            analyzePolytope
-        </submenu>
+        <menu>
+            build
+        </menu>
         <condition>
             built
         </condition>
@@ -210,9 +177,9 @@
         <textmenu>
             Bound of polytope (one dimension)
         </textmenu>
-        <submenu>
-            analyzePolytope
-        </submenu>
+        <menu>
+            build
+        </menu>
         <condition>
             built
         </condition>
@@ -238,9 +205,9 @@
         <textmenu>
             Incompatible constraints
         </textmenu>
-        <submenu>
-            analyzePolytope
-        </submenu>
+        <menu>
+            build
+        </menu>
         <condition>
             built
         </condition>
@@ -263,9 +230,9 @@
         <textmenu>
             Sample polytope
         </textmenu>
-        <submenu>
+        <menu>
             sample
-        </submenu>
+        </menu>
         <condition>
             built
         </condition>
@@ -304,9 +271,9 @@
         <textmenu>
             Gelman diagnostic
         </textmenu>
-        <submenu>
-            analyzeSample
-        </submenu>
+        <menu>
+            sample
+        </menu>
         <condition>
             sampled
         </condition>
@@ -334,9 +301,9 @@
         <textmenu>
             Plot autocorrelation of sample
         </textmenu>
-        <submenu>
-            analyzeSample
-        </submenu>
+        <menu>
+            sample
+        </menu>
         <condition>
             sampled
         </condition>
@@ -358,9 +325,9 @@
         <textmenu>
             Plot sample (several fluxes or components)
         </textmenu>
-        <submenu>
-            analyzeSample
-        </submenu>
+        <menu>
+            sample
+        </menu>
         <condition>
             sampled
         </condition>
@@ -383,9 +350,9 @@
         <textmenu>
             Violin plots of biomass distributions
         </textmenu>
-        <submenu>
-            analyzeSample
-        </submenu>
+        <menu>
+            sample
+        </menu>
         <condition>
             sampled
         </condition>
@@ -411,9 +378,9 @@
         <textmenu>
             Violin plots of flux distributions
         </textmenu>
-        <submenu>
-            analyzeSample
-        </submenu>
+        <menu>
+            sample
+        </menu>
         <condition>
             sampled
         </condition>
@@ -436,9 +403,9 @@
         <textmenu>
             Diet fractions (several components)
         </textmenu>
-        <submenu>
-            analyzeSample
-        </submenu>
+        <menu>
+            sample
+        </menu>
         <condition>
             sampled
         </condition>
@@ -460,9 +427,9 @@
         <textmenu>
             Growth / Biomasses (all components)
         </textmenu>
-        <submenu>
-            analyzeSample
-        </submenu>
+        <menu>
+            sample
+        </menu>
         <condition>
             sampled
         </condition>
@@ -481,9 +448,9 @@
         <textmenu>
             Growth / Biomasses (several components)
         </textmenu>
-        <submenu>
-            analyzeSample
-        </submenu>
+        <menu>
+            sample
+        </menu>
         <condition>
             sampled
         </condition>
@@ -505,9 +472,9 @@
         <textmenu>
             Trophic functional relationships (all components)
         </textmenu>
-        <submenu>
-            analyzeSample
-        </submenu>
+        <menu>
+            sample
+        </menu>
         <condition>
             sampled
         </condition>
@@ -528,9 +495,9 @@
         <textmenu>
             Trophic functional relationships (several components)
         </textmenu>
-        <submenu>
-            analyzeSample
-        </submenu>
+        <menu>
+            sample
+        </menu>
         <condition>
             sampled
         </condition>
@@ -556,9 +523,9 @@
         <textmenu>
             Satiation (all components)
         </textmenu>
-        <submenu>
-            analyzeSample
-        </submenu>
+        <menu>
+            sample
+        </menu>
         <condition>
             sampled
         </condition>
@@ -577,9 +544,9 @@
         <textmenu>
             Satiation (several components)
         </textmenu>
-        <submenu>
-            analyzeSample
-        </submenu>
+        <menu>
+            sample
+        </menu>
         <condition>
             sampled
         </condition>
@@ -601,9 +568,9 @@
         <textmenu>
             Bottleneck (all components)
         </textmenu>
-        <submenu>
-            analyzeSample
-        </submenu>
+        <menu>
+            sample
+        </menu>
         <condition>
             sampled
         </condition>
@@ -623,9 +590,9 @@
         <textmenu>
             Bottleneck (several components)
         </textmenu>
-        <submenu>
-            analyzeSample
-        </submenu>
+        <menu>
+            sample
+        </menu>
         <condition>
             sampled
         </condition>
@@ -648,9 +615,9 @@
         <textmenu>
             Satiation/Inertia (all components)
         </textmenu>
-        <submenu>
-            analyzeSample
-        </submenu>
+        <menu>
+            sample
+        </menu>
         <condition>
             sampled
         </condition>
@@ -669,9 +636,9 @@
         <textmenu>
             Satiation/Inertia (several components)
         </textmenu>
-        <submenu>
-            analyzeSample
-        </submenu>
+        <menu>
+            sample
+        </menu>
         <condition>
             sampled
         </condition>
@@ -693,9 +660,9 @@
         <textmenu>
             Pairs of biomass (all components)
         </textmenu>
-        <submenu>
-            analyzeSample
-        </submenu>
+        <menu>
+            sample
+        </menu>
         <condition>
             sampled
         </condition>
@@ -714,9 +681,9 @@
         <textmenu>
             Pairs of biomass (several components)
         </textmenu>
-        <submenu>
-            analyzeSample
-        </submenu>
+        <menu>
+            sample
+        </menu>
         <condition>
             sampled
         </condition>
@@ -737,9 +704,9 @@
         <textmenu>
             experiment
         </textmenu>
-        <submenu>
+        <menu>
             experiment
-        </submenu>
+        </menu>
         <condition>
             connected
         </condition>

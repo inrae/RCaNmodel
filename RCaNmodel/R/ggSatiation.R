@@ -18,7 +18,6 @@
 #' @importFrom ggplot2 ggplot
 #' @importFrom ggplot2 geom_point
 #' @importFrom ggplot2 geom_density_2d_filled
-#' @importFrom ggplot2 aes_string
 #' @importFrom ggplot2 scale_y_continuous scale_x_continuous
 #' @importFrom ggplot2 stat_smooth
 #' @importFrom ggplot2 geom_hline
@@ -40,9 +39,9 @@
 #' @export
 #'
 ggSatiation <- function(mysampleCaNmod,
-                     species = NULL,
-                     years = NULL,
-                     frac = 1) {
+                        species = NULL,
+                        years = NULL,
+                        frac = 1) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("Package ggplot2 needed for this function to work. Please install it.",
          call. = FALSE)
@@ -84,8 +83,8 @@ ggSatiation <- function(mysampleCaNmod,
     left_join(biomass)
   fluxes$predator <- factor(fluxes$predator,
                             levels = species)
-
-
+  
+  
   Satiation <- mysampleCaNmod$CaNmod$components_param %>%
     filter(!!sym("Component") %in% species) %>%
     mutate("predator" = factor(!!sym("Component"),
@@ -94,14 +93,15 @@ ggSatiation <- function(mysampleCaNmod,
     select(!!sym("predator"),
            !!sym("Satiation"),
            !!sym("intercept"))
-
+  
   g <- ggplot(fluxes,
-              aes_string(x = "b", y = "consumption")) +
+              aes(x = !!sym("b"),
+                  y = !!sym("consumption"))) +
     geom_point(size=.1, alpha = 0.5) +
     geom_hline(yintercept = 0, colour = "firebrick3", linetype = "dashed") +
     geom_abline(data = Satiation,
-                aes_string(slope = "Satiation",
-                           intercept = "intercept"),
+                aes(slope = !!sym("Satiation"),
+                    intercept = !!sym("intercept")),
                 colour = "firebrick3",
                 linetype = "dashed") +
     geom_density_2d_filled(contour_var = "ndensity",

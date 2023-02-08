@@ -1,11 +1,10 @@
 package fr.cm.rCaller;
 
 
-import fr.cm.RCaNMain.Context;
-import fr.cm.RCaNMain.MainApplication;
-import fr.cm.parameters.ColorsAndFormats;
+import fr.cm.Main.Context;
+import fr.cm.Main.MainApplication;
+import fr.cm.preferences.ColorsAndFormats;
 import fr.cm.xmlFiles.RCommandXML;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -23,31 +22,27 @@ public class RCaNDialog extends Dialog {
     static ExecutorService executor;
     static ThreadCommandR threadCommandR;
     RCommandXML rCommandXML;
-
-    Button goStop = new Button("Start");
-    Label caution = new Label("If you stop this R computation, results of previous R computations will be lost");
-    Label secondes = new Label("Not started");
-    boolean started;
+    Button goStop = new Button();
+    Label caution = new Label();
+    Label secondes = new Label();
+    boolean commandRunning;
     RTimer rTimer;
 
-
     public RCaNDialog(RCommandXML rCommandXML) {
-        rTimer = new RTimer();
-        rTimer.start();
-        started = false;
         this.rCommandXML = rCommandXML;
+        String stCommandXML = rCommandXML.getStringCommandLine();
+        caution.setText("");
+        secondes.setText("Not running");;
+        goStop.setText("Run R command");
         getParameters(rCommandXML);
-        RCaNCaller.initR();
-        double width = 0.6 * Context.getWindowWidth();
-        double height =  0.7 * Context.getWindowHeight();
+        double width = Math.min(500.0, 0.8 * Context.getWindowWidth());
+        double height =  Math.min(700.0, 0.8 * Context.getWindowHeight());
+        commandRunning = false;
 
-        String stCommandXML = rCommandXML.getSt();
         // --------------------------------------
         final Window window = getDialogPane().getScene().getWindow();
         window.setOnCloseRequest(event -> window.hide());
         setTitle(rCommandXML.getTextMenu());
-
-        ScrollPane scrollPane = new ScrollPane();
 
         Label rHelp = new Label(rCommandXML.getHelp());
         rHelp.setMaxWidth(width);
@@ -59,6 +54,8 @@ public class RCaNDialog extends Dialog {
         rCommands.setStyle(ColorsAndFormats.font);
         rCommands.setWrapText(true);
 
+        rHelp.setStyle(ColorsAndFormats.font);
+        rCommands.setStyle(ColorsAndFormats.font);
         secondes.setStyle(ColorsAndFormats.font);
         goStop.setStyle(ColorsAndFormats.font);
         caution.setStyle(ColorsAndFormats.font);
@@ -80,16 +77,13 @@ public class RCaNDialog extends Dialog {
         vbox.setAlignment(Pos.CENTER);
         vbox.getChildren().addAll(rCommands, goStop, caution, secondes);
 
-        scrollPane.setContent(vbox);
-        scrollPane.setFitToHeight(true);
-        scrollPane.setFitToWidth(true);
         getDialogPane().setMinSize(width, height);
-        getDialogPane().setContent(scrollPane);
+        getDialogPane().setContent(vbox);
         getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
 
         Node closeButton = getDialogPane().lookupButton(ButtonType.CLOSE);
         closeButton.setVisible(false);
-      }
+    }
 
     // ------------------------------------------------------------------------
     public  void getParameters(RCommandXML rCommandXML) {
@@ -100,66 +94,60 @@ public class RCaNDialog extends Dialog {
         }
         RCaNCaller.makeRCommand(rCommandXML);
     }
-
     // --------------------------------------------
 
     private  void goStopR() {
-        if(goStop.getText().equals("OK")){
-            hide();
-            close();
+        if (!commandRunning) {
+            go();
         }
-        // si ce n'est pas demarre, on demarre
-        else if (! started) {
-            rTimer.setStarted(true);
-            rTimer.setLabel(secondes);
-            executor = Executors.newFixedThreadPool(10);
-            threadCommandR = new ThreadCommandR();
-            executor.execute(threadCommandR);
-            goStop.setText("Stop");
-            caution.setVisible(true);
-            secondes.setVisible(true);
-            started = true;
-            MainApplication.updateMenus();
-        }
-        // s c'est demarre, on arrete
         else {
-            rTimer.setStarted(false);
-            executor.shutdownNow();
-            RCaNCaller.stopCommandR();
-            MainApplication.updateMenus();
-            hide();
-            close();
-            started = false;
-            MainApplication.updateMenus();
+            stop();
         }
     }
+    private  void go() {
 
+        rTimer = new RTimer(this,! rCommandXML.isPlot() && !rCommandXML.isTable(), secondes, caution);
+        rTimer.start();
+        goStop.setText("Stop R computation");
+        caution.setText("If you stop this R computation, results of previous R computations will be lost");
+        caution.setVisible(true);
+        secondes.setVisible(true);
+
+        executor = Executors.newFixedThreadPool(10);
+        threadCommandR = new ThreadCommandR();
+        executor.execute(threadCommandR);
+        commandRunning = true;
+        MainApplication.updateMenus();
+    }
+
+    private void stop() {
+        executor.shutdownNow();
+        RCaNCaller.stopCommandR();
+        MainApplication.updateMenus();
+        hide();
+        close();
+        commandRunning = false;
+        MainApplication.updateMenus();
+    }
+
+    public void disparait(){
+        hide();
+        close();
+    }
     // ------------------------------------------------------------------------
-    public  class ThreadCommandR implements Runnable {
+    public class ThreadCommandR implements Runnable {
+
         public void run()  {
             if(rCommandXML.isDisconnect()){
                 RCaNCaller.stopSessionR();
             } else {
                 RCaNCaller.runCommandR();
+                rTimer.setStringResult(RCaNCaller.resultString);
+                rTimer.setCompleted(true);
             }
-            rTimer.setStarted(false);
-            manageDialog();
-        }
+        };
     }
 
-    void manageDialog(){
-        Platform.runLater(() -> {
-            if(rCommandXML.isPlot() || rCommandXML.isTable()) {
-                hide();
-                close();
-            } else {
-                goStop.setText("OK");
-                secondes.setText("");
-                caution.setText(RCaNCaller.resultString);
-            }
-
-        });
-    }
     // ------------------------------------------------------------------------
 }
 
