@@ -121,7 +121,7 @@ treatConstraint <- function(myconstraint,
   } else if (is.na(yr)) {
     yr <- seq_len(nrow(mat))
   } else{
-    yr <- years %in% as.character(eval(parse(text = yr)))
+    yr <- which(years %in% as.character(eval(parse(text = yr))))
   }
   mat <- mat[yr, ,drop=FALSE]
   rownames(mat) <- paste(name_constr, years[yr], sep = " : ")
