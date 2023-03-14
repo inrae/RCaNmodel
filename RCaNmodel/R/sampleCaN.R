@@ -16,6 +16,10 @@
 #'  \item{"covMat"}{the estimate of the covariance matrix in the first chain
 #'  which can be used to samples new iterations without adaptation nor
 #'  discarding phase}
+#'  \item{"N"}{reminder of the set up of the run}
+#'  \item{"thin"}{reminder of the set up of the run}
+#'  \item{"nchain"}{reminder of the set up of the run}
+#'  \item{"method"}{reminder of the set up of the run}
 #' }
 #'
 #' @export
@@ -147,7 +151,11 @@ sampleCaN <- function(myCaNmod,
   }
   sampleCaNmod <- list(CaNmod = myCaNmod,
                        mcmc = mcmc.list(lapply(res, function(r) r$samples)),
-                       covMat  = res[[1]]$covMat)
+                       covMat  = res[[1]]$covMat,
+                       N = N,
+                       thin = thin,
+                       nchain = nchain,
+                       method = method)
   class(sampleCaNmod) <- "sampleCaNmod"
   return(sampleCaNmod)
 
