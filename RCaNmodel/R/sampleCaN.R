@@ -80,26 +80,120 @@ sampleCaN <- function(myCaNmod,
     `%myinfix%` <- `%dopar%`
   }
   i <- NULL
+  
+  print("##Initializing")
+  #we removed parameters that are fixed because of A or almost
+  bounds <- getAllBoundsParam(list(A = as.matrix(myCaNmod$A),
+                                   b = myCaNmod$b),
+                              progressBar = TRUE)
+  
+  #if some are fixed, we add them to C
+  fixed <- which(abs(bounds[, 2] - bounds[, 3]) < 1e-5)
+  if (length(fixed) > 0){
+    myCaNmod$v <- c(myCaNmod$v, rowMeans(bounds[fixed, 2:3, drop = FALSE]))
+    newC <- Matrix(0, length(fixed), ncol(myCaNmod$A))
+    newC[cbind(seq_len(length(fixed)), fixed)] <- 1
+    myCaNmod$C <- rbind(myCaNmod$C, newC)
+  }
+  
+  #now we restrict to the degenerate subspace
+  if (nrow(myCaNmod$C) > 0){
+    lpmod <- defineLPMod(myCaNmod$A,
+                         myCaNmod$b, 
+                         myCaNmod$C, 
+                         myCaNmod$v,
+                         maximum = FALSE)
+    solequality <- ROI_solve(lpmod, 
+                             solver = "lpsolve",
+                             control = list(presolve = c("rows",
+                                                         "lindep",
+                                                         "rowdominate",
+                                                         "mergerows")))$solution
+    subspace <- degenerateSubSpace(as.matrix(myCaNmod$A),
+                                   myCaNmod$b,
+                                   as.matrix(myCaNmod$C),
+                                   myCaNmod$v,
+                                   solequality)
+    A2 <- subspace$A2
+    b2 <- subspace$b2
+    Nt <- subspace$Nt
+    colnames(A2) <- paste("param", seq_len(ncol(A2)))
+    
+  } else { #no equality constraints, everything remains the same
+    A2 <-myCaNmod$A
+    b2 <- myCaNmod$b
+    Nt <- diag(ncol(myCaNmod$A))
+    solequality <- rep(0, ncol(myCaNmod$A))
+  }
+  
+  #now we presolve the model to simply the polytope
+      presolved <- presolveLPMod(A2,
+                               b2,
+                               lower = rep(-Inf, ncol(A2)),
+                               upper = rep(Inf, ncol(A2)),
+                               sense = "min")
+   A3 <- presolved$A
+    b3 <- presolved$b
+   
+#to avoid computations problems, we slightly shift b3
+    b3 <- b3 + 1e-7
+    #to avoid computations problems, we slightly shift b3
+    b3 <- b3 + 1e-7
+    #we add the bounds as constraints
+    nonnull <- which(is.finite(presolved$lower))
+    if (length(nonnull) > 0){
+      bounds <- matrix(0, length(nonnull), ncol(A3))
+      bounds[cbind(seq_len(length(nonnull)),
+                   nonnull)] <- - 1
+      A3 <- rbind(A3, bounds)
+      b3 <- c(b3, -presolved$lower[nonnull])
+    }
+    
+    nonnull <- which(is.finite(presolved$upper))
+    if (length(nonnull) > 0){
+      bounds <- matrix(0, length(nonnull), ncol(A3))
+      bounds[cbind(seq_len(length(nonnull)),
+                   nonnull)] <- 1
+      A3 <- rbind(A3, bounds)
+      b3 <- c(b3, presolved$upper[nonnull])
+    }
+
+  
+  if (ncore > 1) {
+    clusterExport(cl, c("A2", "b2", "Nt", "solequality", "A3", "b3"),
+                  envir = environment())
+  }
+  
+  print("##Sampling")
+  
   res <- foreach(i = 1:nchain) %myinfix% {
-    x0 <- findInitPoint(myCaNmod$A, myCaNmod$b, myCaNmod$C, myCaNmod$v)
+    x0 <- findInitPoint(A3, b3)
     if (any(is.nan(x0)))
       stop("unable to find any suitable solutions after 100 tries")
     res <-
-      sampleCaNCPP(
-        N,
-        A = as.matrix(myCaNmod$A),
-        b = myCaNmod$b,
-        C = as.matrix(myCaNmod$C),
-        v = myCaNmod$v,
-        L = as.matrix(myCaNmod$L),
-        x0 = x0,
-        thin = thin,
-        gibbs = (method == "gibbs"),
-        seed = i,
-        stream = i,
-        covMat = covMat
-      )
-    names(res) <- c("F", "B", "covMat")
+      cpgs(N, A3, b3, x0, thin, method, i, i, covMat)
+    #now we turn back result into original format
+    if (length(presolved$fixed) > 0){
+      res$X <- cbind(res$X, 
+                     matrix(rep(presolved$fixed, nrow(res$X)),
+                            nrow(res$X),
+                            length(presolved$fixed),
+                            byrow = TRUE))
+      colnames(res$X) <- c(colnames(A3), names(presolved$fixed))  
+      res$X <- res$X[, colnames(A2)]
+
+    } else {
+      colnames(res$X) <- colnames(A2)  
+    }
+    
+    res$X <- t(Nt %*% t(res$X)) + 
+      matrix(rep(solequality, nrow(res$X)),
+             nrow(res$X),
+             byrow = TRUE)
+    colnames(res$X) <- colnames(myCaNmod$A)
+    names(res) <- c("F", "covMat")
+    res$B <- t(apply(res$F, 1, function(x) as.matrix(myCaNmod$L) %*% x))
+    
     res$F <- res$F[, -seq_len(length(myCaNmod$species))]
     #we remove the first column which corresponds to initial biomasses
     colnames(res$F) <- colnames(myCaNmod$A)[-seq_len(length(myCaNmod$species))]
