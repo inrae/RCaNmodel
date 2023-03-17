@@ -93,7 +93,7 @@ presolveLPMod <-
     if (all(lower == 0)) lower <- NULL
     upper <- bounds$upper
     if (all(is.infinite(upper))) upper <- NULL
-    fixed <- NA
+    fixed <- integer(0)
     if (ncol(lhs) < ncol(A)){
       sol <- get.primal.solution(lp_model, orig = TRUE)[- (1:(nrow(A)+nrow(C)))]
       fixed <- sol[! colnames(A) %in% colnames(lhs)]
