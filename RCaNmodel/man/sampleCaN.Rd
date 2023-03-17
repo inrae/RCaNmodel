@@ -38,6 +38,10 @@ a sampleCaNmod object which contains three elements
  \item{"covMat"}{the estimate of the covariance matrix in the first chain
  which can be used to samples new iterations without adaptation nor
  discarding phase}
+ \item{"N"}{reminder of the set up of the run}
+ \item{"thin"}{reminder of the set up of the run}
+ \item{"nchain"}{reminder of the set up of the run}
+ \item{"method"}{reminder of the set up of the run}
 }
 }
 \description{

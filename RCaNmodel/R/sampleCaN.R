@@ -81,35 +81,8 @@ sampleCaN <- function(myCaNmod,
   }
   i <- NULL
   res <- foreach(i = 1:nchain) %myinfix% {
-    find_init <- FALSE
-    nbiter <- 0
-    while (nbiter < 100 & !find_init) {
-      lp_model <- defineLPMod(myCaNmod$A, myCaNmod$b, myCaNmod$C, myCaNmod$v,
-                              maximum = FALSE,
-                              ob = runif(ncol(myCaNmod$A)))
-
-      res <- ROI_solve(lp_model, solver = "lpsolve",
-                       control = list(presolve = c("rows",
-                                                   "lindep",
-                                                   "rowdominate",
-                                                   "mergerows"),
-                                      scaling = c("extreme",
-                                                  "equilibrate",
-                                                  "integers")))
-      if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
-          res$status$msg$code == 5){
-        res <- ROI_solve(lp_model,
-                         solver = "cbc",
-                         control = list(logLevel = 0))
-      }
-
-      x0 <- res$solution
-
-      if (res$status$msg$code == 0)
-        find_init <- TRUE
-      nbiter <- nbiter + 1
-    }
-    if (!find_init)
+    x0 <- findInitPoint(myCaNmod$A, myCaNmod$b, myCaNmod$C, myCaNmod$v)
+    if (any(is.nan(x0)))
       stop("unable to find any suitable solutions after 100 tries")
     res <-
       sampleCaNCPP(
