@@ -7,7 +7,12 @@
 #' absence of such constraints
 #' @param v a vector of equality constraints C x = v, should be null in the
 #' absence of such constraints
+#' @param lower minimal bounds for paramaters, by default set to zero
+#' @param upper maximum bounds for paramaters, by default set to Inf
+#' @param progressBar a switch to indicate whether a progress bar is wanted
 #' @return a random initial point or a vector of NA if enable to find a solution
+#' @importFrom utils setTxtProgressBar
+#' @importFrom utils txtProgressBar
 #' @export
 #'
 #' @examples
@@ -22,47 +27,50 @@
 #'
 #' @export
 #'
-#' @importFrom parallel detectCores
-#' @importFrom parallel makeCluster
-#' @importFrom parallel clusterEvalQ
-#' @importFrom parallel clusterExport
-#' @importFrom parallel stopCluster
-#' @importFrom doParallel registerDoParallel
-#' @importFrom doParallel stopImplicitCluster
-#' @importFrom coda mcmc
-#' @importFrom coda mcmc.list
-#' @importFrom foreach foreach
-#' @importFrom foreach %dopar%
-#' @importFrom foreach %do%
 #' @importFrom stats runif
 findInitPoint <- function(A, 
                           b,
                           C = NULL,
-                          v = NULL) {
+                          v = NULL,
+                          lower = NULL,
+                          upper = NULL,
+                          progressBar = FALSE) {
+  if (is.null(lower)) lower <- rep(0, ncol(A))
+  if (is.null(upper)) upper <- rep(Inf, ncol(A))
   
-  
-  X0 <- replicate(100, {
+  print("## searching intial values")
+  if (progressBar)
+    pb <- txtProgressBar(min = 0, max = 10, style = 3)
+  lp_model <- defineLPMod(A, b, C, v,
+                          maximum = FALSE,
+                          lower = lower,
+                          upper = upper,
+                          ob = runif(ncol(A)))
+  X0 <- sapply(seq_len(10), function(i) {
+    if (progressBar)
+      setTxtProgressBar(pb, i)
     find_init <- FALSE
     nbiter <- 0
     x0 <- rep(NA, ncol(A))
     while (nbiter < 100 & !find_init) {
-      lp_model <- defineLPMod(A, b, C, v,
-                              maximum = runif(1) > 0.5,
-                              ob = runif(ncol(A)))
-      
-      res <- RCaNmodel:::ROI_solve(lp_model, solver = "lpsolve",
-                                   control = list(presolve = c("rows",
-                                                               "lindep",
-                                                               "rowdominate",
-                                                               "mergerows"),
-                                                  scaling = c("extreme",
-                                                              "equilibrate",
-                                                              "integers")))
+      lp_model$lp_model <- defineLPSolveMod(A, b, C, v,
+                                            maximum = FALSE,
+                                            lower = lower,
+                                            upper = upper,
+                                            ob = runif(ncol(A), -1, 1))
+      res <- ROI_solve(lp_model, solver = "lpsolve",
+                       control = list(presolve = c("rows",
+                                                   "lindep",
+                                                   "rowdominate",
+                                                   "mergerows"),
+                                      scaling = c("extreme",
+                                                  "equilibrate",
+                                                  "integers")))
       if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
           res$status$msg$code == 5){
-        res <- RCaNmodel:::ROI_solve(lp_model,
-                                     solver = "cbc",
-                                     control = list(logLevel = 0))
+        res <- ROI_solve(lp_model,
+                         solver = "cbc",
+                         control = list(logLevel = 0))
       }
       
       x0 <- res$solution

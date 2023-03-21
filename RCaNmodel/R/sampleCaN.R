@@ -61,7 +61,7 @@ sampleCaN <- function(myCaNmod,
   `%myinfix%` <- `%do%`
   
   if (ncore > 1) {
-    cl <- makeCluster(ncore)
+    cl <- makeCluster(ncore, outfile = "")
     clusterEvalQ(cl, {
       library(RCaNmodel)
     })
@@ -98,17 +98,11 @@ sampleCaN <- function(myCaNmod,
   
   #now we restrict to the degenerate subspace
   if (nrow(myCaNmod$C) > 0){
-    lpmod <- defineLPMod(myCaNmod$A,
-                         myCaNmod$b, 
-                         myCaNmod$C, 
-                         myCaNmod$v,
-                         maximum = FALSE)
-    solequality <- ROI_solve(lpmod, 
-                             solver = "lpsolve",
-                             control = list(presolve = c("rows",
-                                                         "lindep",
-                                                         "rowdominate",
-                                                         "mergerows")))$solution
+    solequality <- findInitPoint(as.matrix(myCaNmod$A),
+                                 myCaNmod$b,
+                                 as.matrix(myCaNmod$C),
+                                 myCaNmod$v,
+                                 progressBar = TRUE)
     subspace <- degenerateSubSpace(as.matrix(myCaNmod$A),
                                    myCaNmod$b,
                                    as.matrix(myCaNmod$C),
@@ -168,7 +162,7 @@ sampleCaN <- function(myCaNmod,
   print("##Sampling")
   
   res <- foreach(i = 1:nchain) %myinfix% {
-    x0 <- findInitPoint(A3, b3)
+    x0 <- findInitPoint(A3, b3, lower = rep(-Inf, ncol(A3)), progressBar = TRUE)
     if (any(is.nan(x0)))
       stop("unable to find any suitable solutions after 100 tries")
     res <-

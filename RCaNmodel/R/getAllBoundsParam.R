@@ -73,7 +73,6 @@ getAllBoundsParam <- function(x,
                                                   presolved$upper,
                                                   maximum,
                                                   ob)
-        set.objfn(presolved$OP$lp_model, ob)
         getParamMinMax(presolved$OP, ip)
       } else {
         presolved$fixed[colnames(A)[p]]
