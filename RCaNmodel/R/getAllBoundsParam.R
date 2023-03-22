@@ -10,6 +10,7 @@
 #' @importFrom utils txtProgressBar
 #' @importFrom ROI objective
 #' @importFrom ROI L_objective
+#' @importFrom lpSolveAPI set.objfn
 #'
 #' @return a datafame with first column corresponding to colnames(A), and
 #' corresponding lower bounds (column 2) and upper bounds (column 3)
@@ -65,14 +66,7 @@ getAllBoundsParam <- function(x,
         ob[ip] <- 1
         ROI::objective(presolved$OP) <- L_objective(ob)
 
-        presolved$OP$lp_model <- defineLPSolveMod(presolved$A,
-                                                  presolved$b,
-                                                  presolved$C,
-                                                  presolved$v,
-                                                  presolved$lower,
-                                                  presolved$upper,
-                                                  maximum,
-                                                  ob)
+        set.objfn(presolved$OP$lp_model, ob)
         getParamMinMax(presolved$OP, ip)
       } else {
         presolved$fixed[colnames(A)[p]]
