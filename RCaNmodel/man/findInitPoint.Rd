@@ -4,7 +4,16 @@
 \alias{findInitPoint}
 \title{findInitPoint}
 \usage{
-findInitPoint(A, b, C = NULL, v = NULL)
+findInitPoint(
+  A,
+  b,
+  C = NULL,
+  v = NULL,
+  lower = NULL,
+  upper = NULL,
+  nbpoints = 100,
+  progressBar = FALSE
+)
 }
 \arguments{
 \item{A}{a matrix of inequality constraints A x <=b}
@@ -16,6 +25,16 @@ absence of such constraints}
 
 \item{v}{a vector of equality constraints C x = v, should be null in the
 absence of such constraints}
+
+\item{lower}{minimal bounds for paramaters, by default set to zero}
+
+\item{upper}{maximum bounds for paramaters, by default set to Inf}
+
+\item{nbpoints}{number of points use build the initial point, each point
+requires the lpsolve run so increases time, but should improve the chain
+exploration}
+
+\item{progressBar}{a switch to indicate whether a progress bar is wanted}
 }
 \value{
 a random initial point or a vector of NA if enable to find a solution

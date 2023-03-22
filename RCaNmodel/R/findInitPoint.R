@@ -9,10 +9,14 @@
 #' absence of such constraints
 #' @param lower minimal bounds for paramaters, by default set to zero
 #' @param upper maximum bounds for paramaters, by default set to Inf
+#' @param nbpoints number of points use build the initial point, each point
+#' requires the lpsolve run so increases time, but should improve the chain
+#' exploration
 #' @param progressBar a switch to indicate whether a progress bar is wanted
 #' @return a random initial point or a vector of NA if enable to find a solution
 #' @importFrom utils setTxtProgressBar
 #' @importFrom utils txtProgressBar
+#' @importFrom lpSolveAPI set.objfn
 #' @export
 #'
 #' @examples
@@ -34,38 +38,28 @@ findInitPoint <- function(A,
                           v = NULL,
                           lower = NULL,
                           upper = NULL,
+                          nbpoints = 100,
                           progressBar = FALSE) {
   if (is.null(lower)) lower <- rep(0, ncol(A))
   if (is.null(upper)) upper <- rep(Inf, ncol(A))
   
   print("## searching intial values")
   if (progressBar)
-    pb <- txtProgressBar(min = 0, max = 10, style = 3)
+    pb <- txtProgressBar(min = 0, max = nbpoints, style = 3)
   lp_model <- defineLPMod(A, b, C, v,
                           maximum = FALSE,
                           lower = lower,
                           upper = upper,
-                          ob = runif(ncol(A)))
-  X0 <- sapply(seq_len(10), function(i) {
+                          ob = runif(ncol(A), -1, 1))
+  X0 <- sapply(seq_len(nbpoints), function(i) {
+    set.objfn(lp_model$lp_model, runif(ncol(A),-1,1))
     if (progressBar)
       setTxtProgressBar(pb, i)
     find_init <- FALSE
     nbiter <- 0
     x0 <- rep(NA, ncol(A))
     while (nbiter < 100 & !find_init) {
-      lp_model$lp_model <- defineLPSolveMod(A, b, C, v,
-                                            maximum = FALSE,
-                                            lower = lower,
-                                            upper = upper,
-                                            ob = runif(ncol(A), -1, 1))
-      res <- ROI_solve(lp_model, solver = "lpsolve",
-                       control = list(presolve = c("rows",
-                                                   "lindep",
-                                                   "rowdominate",
-                                                   "mergerows"),
-                                      scaling = c("extreme",
-                                                  "equilibrate",
-                                                  "integers")))
+      res <- ROI_solve(lp_model, solver = "lpsolve")
       if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
           res$status$msg$code == 5){
         res <- ROI_solve(lp_model,

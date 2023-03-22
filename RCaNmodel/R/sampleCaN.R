@@ -9,6 +9,9 @@
 #' @param thin thinning interval
 #' @param method one of gibbs (default) or hitandrun
 #' @param lastF should flow for last year be simulated (default = FALSE)
+#' @param nbpoints number of points use build the initial point, each point
+#' requires the lpsolve run so increases time, but should improve the chain
+#' exploration
 #' @return a sampleCaNmod object which contains three elements
 #' \itemize{
 #'  \item{"CaNmod"}{the CaNmod object descring the model}
@@ -48,7 +51,8 @@ sampleCaN <- function(myCaNmod,
                       ncore = 1,
                       thin = 1,
                       method = "gibbs",
-                      lastF = FALSE) {
+                      lastF = FALSE,
+                      nbpoints = 100) {
   if (inherits(myCaNmod, "sampleCaNmod")){
     covMat <- myCaNmod$covMat
     myCaNmod <- myCaNmod$CaNmod
@@ -102,7 +106,8 @@ sampleCaN <- function(myCaNmod,
                                  myCaNmod$b,
                                  as.matrix(myCaNmod$C),
                                  myCaNmod$v,
-                                 progressBar = TRUE)
+                                 progressBar = TRUE,
+                                 nbpoints = 10)
     subspace <- degenerateSubSpace(as.matrix(myCaNmod$A),
                                    myCaNmod$b,
                                    as.matrix(myCaNmod$C),
@@ -162,7 +167,11 @@ sampleCaN <- function(myCaNmod,
   print("##Sampling")
   
   res <- foreach(i = 1:nchain) %myinfix% {
-    x0 <- findInitPoint(A3, b3, lower = rep(-Inf, ncol(A3)), progressBar = TRUE)
+    x0 <- findInitPoint(A3,
+                        b3,
+                        lower = rep(-Inf, ncol(A3)),
+                        nbpoints = nbpoints,
+                        progressBar = TRUE)
     if (any(is.nan(x0)))
       stop("unable to find any suitable solutions after 100 tries")
     res <-

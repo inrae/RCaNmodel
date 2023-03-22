@@ -11,7 +11,8 @@ sampleCaN(
   ncore = 1,
   thin = 1,
   method = "gibbs",
-  lastF = FALSE
+  lastF = FALSE,
+  nbpoints = 100
 )
 }
 \arguments{
@@ -29,6 +30,10 @@ phase and discarding phases won't be necessary}
 \item{method}{one of gibbs (default) or hitandrun}
 
 \item{lastF}{should flow for last year be simulated (default = FALSE)}
+
+\item{nbpoints}{number of points use build the initial point, each point
+requires the lpsolve run so increases time, but should improve the chain
+exploration}
 }
 \value{
 a sampleCaNmod object which contains three elements
