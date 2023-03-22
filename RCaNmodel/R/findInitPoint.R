@@ -51,14 +51,22 @@ findInitPoint <- function(A,
                           lower = lower,
                           upper = upper,
                           ob = runif(ncol(A), -1, 1))
+  res <- ROI_solve(lp_model, solver = "lpsolve",
+                   control = list(presolve = c("rows",
+                                               "lindep",
+                                               "rowdominate",
+                                               "mergerows"),
+                                  scaling = c("extreme",
+                                              "equilibrate",
+                                              "integers")))
   X0 <- sapply(seq_len(nbpoints), function(i) {
-    set.objfn(lp_model$lp_model, runif(ncol(A),-1,1))
     if (progressBar)
       setTxtProgressBar(pb, i)
     find_init <- FALSE
     nbiter <- 0
     x0 <- rep(NA, ncol(A))
     while (nbiter < 100 & !find_init) {
+      set.objfn(lp_model$lp_model, runif(ncol(A),-1,1))
       res <- ROI_solve(lp_model, solver = "lpsolve")
       if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
           res$status$msg$code == 5){

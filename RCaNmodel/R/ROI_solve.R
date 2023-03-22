@@ -35,10 +35,9 @@ ROI_solve <-
       do.call(lp.control,
               c(lp_model, control[names(control) %in% valide_names]))
       conv <- solve.lpExtPtr(lp_model)
-      x0 <-
-        get.primal.solution(lp_model,
-                            orig = TRUE)[(dims[1] + 1):(dims[1] +
-                                                          dims[2])]
+      sol <- get.primal.solution(lp_model,
+                            orig = TRUE)
+      x0 <- sol[-(seq_len(length(sol) - dims[2]))]
       if (any(x0 == 1e30)) { #this is the infinite bound of lpsolve
         conv <- 3
         x0[which(x0 == 1e30)] <- Inf
