@@ -77,8 +77,23 @@ findInitPoint <- function(A,
       
       x0 <- res$solution
       
-      if (res$status$msg$code == 0)
+      if (res$status$msg$code == 0){
         find_init <- TRUE
+      } else {
+        lp_model <- defineLPMod(A, b, C, v,
+                                maximum = FALSE,
+                                lower = lower,
+                                upper = upper,
+                                ob = runif(ncol(A), -1, 1))
+        res <- ROI_solve(lp_model, solver = "lpsolve",
+                         control = list(presolve = c("rows",
+                                                     "lindep",
+                                                     "rowdominate",
+                                                     "mergerows"),
+                                        scaling = c("extreme",
+                                                    "equilibrate",
+                                                    "integers")))
+      }
       nbiter <- nbiter + 1
     }
     x0
