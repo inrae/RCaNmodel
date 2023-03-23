@@ -30,15 +30,15 @@ getAllBoundsParam <- function(x,
                               lower = NULL,
                               upper = NULL,
                               progressBar = TRUE) {
-  if (is.null(lower)) lower <- rep(0, ncol(A))
-  if (is.null(upper)) upper <- rep(Inf, ncol(A))
+
   x <- reformatX(x)
   A <- x$A
   b <- x$b
   C <- x$C
   v <- x$v
 
-
+  if (is.null(lower)) lower <- rep(0, ncol(A))
+  if (is.null(upper)) upper <- rep(Inf, ncol(A))
   nbparam <- ncol(A)
   if (is.null(colnames(A))) {
     colnames(A) <- paste("col", seq_len(ncol(A)), sep = "")

@@ -75,10 +75,11 @@ findInitPoint <- function(A,
       #                    control = list(logLevel = 0))
       # }
       
-      x0 <- res$solution
       
-      if (res$status$msg$code == 0){
+      
+      if (res$status$msg$code == 0 & all(A %*% res$solution - b) <= 0){
         find_init <- TRUE
+        x0 <- res$solution
       } else {
         lp_model <- defineLPMod(A, b, C, v,
                                 maximum = FALSE,
