@@ -66,14 +66,14 @@ findInitPoint <- function(A,
     nbiter <- 0
     x0 <- rep(NA, ncol(A))
     while (nbiter < 100 & !find_init) {
-      set.objfn(lp_model$lp_model, runif(ncol(A),-1,1))
+      set.objfn(lp_model$lp_model, runif(ncol(A), -1, 1))
       res <- ROI_solve(lp_model, solver = "lpsolve")
-      if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
-          res$status$msg$code == 5){
-        res <- ROI_solve(lp_model,
-                         solver = "cbc",
-                         control = list(logLevel = 0))
-      }
+      # if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
+      #     res$status$msg$code == 5){
+      #   res <- ROI_solve(lp_model,
+      #                    solver = "cbc",
+      #                    control = list(logLevel = 0))
+      # }
       
       x0 <- res$solution
       

@@ -167,6 +167,7 @@ sampleCaN <- function(myCaNmod,
   print("##Sampling")
   
   res <- foreach(i = 1:nchain) %myinfix% {
+    print(paste("###Start chain",i))
     x0 <- findInitPoint(A3,
                         b3,
                         lower = rep(-Inf, ncol(A3)),
@@ -174,6 +175,8 @@ sampleCaN <- function(myCaNmod,
                         progressBar = TRUE)
     if (any(is.nan(x0)))
       stop("unable to find any suitable solutions after 100 tries")
+    print(paste("###Start cpgs chain",i))
+    
     res <-
       cpgs(N, A3, b3, x0, thin, method == "gibbs", i, i, covMat)
     #now we turn back result into original format
@@ -212,6 +215,7 @@ sampleCaN <- function(myCaNmod,
         res$F <- res$F[, - lastid]
     }
     colnames(res$B) <- rownames(myCaNmod$L)
+    print(paste("###End chain",i))
     list(samples = mcmc(cbind(res$F, res$B), 1, nrow(res$F), 1),
          covMat = res$covMat)
   }
