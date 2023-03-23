@@ -226,7 +226,7 @@ sampleCaN <- function(myCaNmod,
   }
   sampleCaNmod <- list(CaNmod = myCaNmod,
                        mcmc = mcmc.list(lapply(res, function(r) r$samples)),
-                       covMat  = res[[1]]$covMat,
+                       covMat  = lapply(res, function(x) x$covMat),
                        N = N,
                        thin = thin,
                        nchain = nchain,

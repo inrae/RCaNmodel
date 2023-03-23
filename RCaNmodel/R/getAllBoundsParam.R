@@ -3,8 +3,9 @@
 #' A.x<=b and C.x=v or by a CaNmod object
 #' @param x either a CaNmod oject or a named list with at least a matrix A and
 #' a vector b (A.x<=b) and optionnally a matrix C and a vector v (C.x=v)
+#' @param lower minimal bounds for paramaters, by default set to zero
+#' @param upper maximum bounds for paramaters, by default set to Inf
 #' @param progressBar should a progress bar be displayed (default TRUE)
-
 #'
 #' @importFrom utils setTxtProgressBar
 #' @importFrom utils txtProgressBar
@@ -26,7 +27,11 @@
 #' @export
 
 getAllBoundsParam <- function(x,
+                              lower = NULL,
+                              upper = NULL,
                               progressBar = TRUE) {
+  if (is.null(lower)) lower <- rep(0, ncol(A))
+  if (is.null(upper)) upper <- rep(Inf, ncol(A))
   x <- reformatX(x)
   A <- x$A
   b <- x$b
@@ -41,8 +46,13 @@ getAllBoundsParam <- function(x,
   if (is.null(colnames(C)) & !is.null(C))
     colnames(C) <- colnames(A)
 
-  presolvedmin <- presolveLPMod(A, b, C, v, sense = "min")
-  presolvedmax <- presolveLPMod(A, b, C, v, sense = "max")
+  presolvedmin <- presolveLPMod(A, b, C, v, 
+                                sense = "min",
+                                lower = lower,
+                                upper = upper)
+  presolvedmax <- presolveLPMod(A, b, C, v, sense = "max",
+                                lower = lower,
+                                upper = upper)
 
 
 

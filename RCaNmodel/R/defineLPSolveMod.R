@@ -1,5 +1,5 @@
 #' defineLPSolveMod
-#' Specify a lpsolve odel (mainly for internal use)
+#' Specify a lpsolve model (mainly for internal use)
 #'
 #' @param A a matrix of inequality constraints A x <=b
 #' @param b a vector A x <=b
