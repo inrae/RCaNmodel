@@ -217,7 +217,7 @@ sampleCaN <- function(myCaNmod,
     colnames(res$B) <- rownames(myCaNmod$L)
     print(paste("###End chain",i))
     list(samples = mcmc(cbind(res$F, res$B), 1, nrow(res$F), 1),
-         covMat = res$covMat)
+         covMat = res$covMat, x0 = x0)
   }
   
   if (ncore > 1) {
@@ -227,6 +227,7 @@ sampleCaN <- function(myCaNmod,
   sampleCaNmod <- list(CaNmod = myCaNmod,
                        mcmc = mcmc.list(lapply(res, function(r) r$samples)),
                        covMat  = lapply(res, function(x) x$covMat),
+                       x0  = lapply(res, function(x) x$x0),
                        N = N,
                        thin = thin,
                        nchain = nchain,
