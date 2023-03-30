@@ -3,7 +3,7 @@
 \name{defineLPSolveMod}
 \alias{defineLPSolveMod}
 \title{defineLPSolveMod
-Specify a lpsolve odel (mainly for internal use)}
+Specify a lpsolve model (mainly for internal use)}
 \usage{
 defineLPSolveMod(
   A,
@@ -40,5 +40,5 @@ returns an OP object
 }
 \description{
 defineLPSolveMod
-Specify a lpsolve odel (mainly for internal use)
+Specify a lpsolve model (mainly for internal use)
 }
