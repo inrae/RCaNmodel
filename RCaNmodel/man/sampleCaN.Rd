@@ -12,7 +12,8 @@ sampleCaN(
   thin = 1,
   method = "gibbs",
   lastF = FALSE,
-  nbpoints = 100
+  nbpoints = 100,
+  keepCovMat = FALSE
 )
 }
 \arguments{
@@ -34,15 +35,18 @@ phase and discarding phases won't be necessary}
 \item{nbpoints}{number of points use build the initial point, each point
 requires the lpsolve run so increases time, but should improve the chain
 exploration}
+
+\item{keepCovMat}{save or not the covariance matrix (saving can gain time
+if new samples should be run but is very memory consuming - default FALSE)}
 }
 \value{
 a sampleCaNmod object which contains three elements
 \itemize{
  \item{"CaNmod"}{the CaNmod object descring the model}
  \item{"mcmc"}{\code{\link[coda]{mcmc.list}}}
- \item{"covMat"}{the estimate of the covariance matrix in the first chain
- which can be used to samples new iterations without adaptation nor
- discarding phase}
+ \item{"x0"}{average starting point}
+ \item{"covMat"}{average estimated covariance matrix that can be used
+ for other run, if kept}
  \item{"N"}{reminder of the set up of the run}
  \item{"thin"}{reminder of the set up of the run}
  \item{"nchain"}{reminder of the set up of the run}

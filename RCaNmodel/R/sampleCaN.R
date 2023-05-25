@@ -12,13 +12,15 @@
 #' @param nbpoints number of points use build the initial point, each point
 #' requires the lpsolve run so increases time, but should improve the chain
 #' exploration
+#' @param keepCovMat save or not the covariance matrix (saving can gain time
+#' if new samples should be run but is very memory consuming - default FALSE)
 #' @return a sampleCaNmod object which contains three elements
 #' \itemize{
 #'  \item{"CaNmod"}{the CaNmod object descring the model}
 #'  \item{"mcmc"}{\code{\link[coda]{mcmc.list}}}
-#'  \item{"covMat"}{the estimate of the covariance matrix in the first chain
-#'  which can be used to samples new iterations without adaptation nor
-#'  discarding phase}
+#'  \item{"x0"}{average starting point}
+#'  \item{"covMat"}{average estimated covariance matrix that can be used
+#'  for other run, if kept}
 #'  \item{"N"}{reminder of the set up of the run}
 #'  \item{"thin"}{reminder of the set up of the run}
 #'  \item{"nchain"}{reminder of the set up of the run}
@@ -52,7 +54,8 @@ sampleCaN <- function(myCaNmod,
                       thin = 1,
                       method = "gibbs",
                       lastF = FALSE,
-                      nbpoints = 100) {
+                      nbpoints = 100,
+                      keepCovMat = FALSE) {
   if (inherits(myCaNmod, "sampleCaNmod")){
     covMat <- myCaNmod$covMat
     myCaNmod <- myCaNmod$CaNmod
@@ -160,7 +163,9 @@ sampleCaN <- function(myCaNmod,
   
   
   if (ncore > 1) {
-    clusterExport(cl, c("A2", "b2", "Nt", "solequality", "A3", "b3", "fixed"),
+    clusterExport(cl, c("A2", "b2", "Nt",
+                        "solequality", "A3",
+                        "b3", "fixed", "keepCovMat"),
                   envir = environment())
   }
   
@@ -216,18 +221,27 @@ sampleCaN <- function(myCaNmod,
     }
     colnames(res$B) <- rownames(myCaNmod$L)
     print(paste("###End chain",i))
+    covmat <- NULL
+    if (keepCovMat)
+      covmat <- res$covMat
     list(samples = mcmc(cbind(res$F, res$B), 1, nrow(res$F), 1),
-         covMat = res$covMat, x0 = x0)
+         covMat = covmat, x0 = x0)
   }
   
   if (ncore > 1) {
     stopCluster(cl)
     stopImplicitCluster()
   }
+  covmat <- NULL
+  if (keepCovMat)
+    covmat <- Reduce('+',
+                     lapply(res, function(x) x$covMat)) /
+    length(res)
   sampleCaNmod <- list(CaNmod = myCaNmod,
                        mcmc = mcmc.list(lapply(res, function(r) r$samples)),
-                       covMat  = lapply(res, function(x) x$covMat),
-                       x0  = lapply(res, function(x) x$x0),
+                       covMat  = covmat,
+                       x0  = rowMeans(do.call(cbind,
+                                              lapply(res, function(x) x$x0))),
                        N = N,
                        thin = thin,
                        nchain = nchain,
