@@ -53,17 +53,22 @@ generateSymbolicObjects <-
     list_F <- list(eval(parse(text = paste("F", years[1], sep = "_"))))
     list_B <- list(eval(parse(text = paste("B", years[1], sep = "_"))))
 
-    matrices <- createDynamics(dynamics_equation, components, fluxes_def)
+    matrices <- createDynamics(dynamics_equation,
+                               components,
+                               fluxes_def,
+                               series)
     H <- matrices$H
     N <- matrices$N
     Nend <- matrices$Nend
 
-    IE_H <- symengine::Matrix(Ie - H)
-    n <- symengine::Matrix(N)
-    nend <- symengine::Matrix(Nend)
 
     #loop over time step
     for (t in years[-1]) {
+      i <- which(years[-1] == t)
+      IE_H <- symengine::Matrix(Ie - H[[i]])
+      n <- symengine::Matrix(N[[i]])
+      nend <- symengine::Matrix(Nend[[i]])
+      
       for (f in flow) {
         assign(paste(f, t, sep = "_"),
                S(paste(f, t, sep = "_"))) #symbolic fluxes for time step t
