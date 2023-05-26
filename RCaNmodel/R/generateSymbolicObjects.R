@@ -35,7 +35,7 @@ generateSymbolicObjects <-
     years <- series$Year
     nbspec <- length(species)
     Ie <- diag(nbspec) #diagonal_matrix
-
+    
     for (s in species)
       assign(paste(s, years[1], sep = "_"),
              S(paste(s, years[1], sep = "_"))) #initial biomass
@@ -47,12 +47,12 @@ generateSymbolicObjects <-
       assign(paste(f, years[1], sep = "_"),
              S(paste(f, years[1], sep = "_"))) #symbolic flow for time step 0
     assign(paste("F_", years[1], sep = ""),
-      eval(parse(text = paste(
-        "Vector(", paste(flow, years[1], sep = "_", collapse = ","), ")"
-      )))) #symbolic vector F_0 (all fluxes for time step 0)
+           eval(parse(text = paste(
+             "Vector(", paste(flow, years[1], sep = "_", collapse = ","), ")"
+           )))) #symbolic vector F_0 (all fluxes for time step 0)
     list_F <- list(eval(parse(text = paste("F", years[1], sep = "_"))))
     list_B <- list(eval(parse(text = paste("B", years[1], sep = "_"))))
-
+    
     matrices <- createDynamics(dynamics_equation,
                                components,
                                fluxes_def,
@@ -60,8 +60,8 @@ generateSymbolicObjects <-
     H <- matrices$H
     N <- matrices$N
     Nend <- matrices$Nend
-
-
+    
+    
     #loop over time step
     for (t in years[-1]) {
       i <- which(years[-1] == t)
@@ -72,7 +72,7 @@ generateSymbolicObjects <-
       for (f in flow) {
         assign(paste(f, t, sep = "_"),
                S(paste(f, t, sep = "_"))) #symbolic fluxes for time step t
-
+        
       }
       assign(paste("F", t, sep = "_"), eval(parse(text = paste(
         "Vector(", paste(flow, t, sep = "_", collapse = ","), ")"
@@ -82,14 +82,14 @@ generateSymbolicObjects <-
       )))[, 1,drop=FALSE] + (n %*% eval(parse(
         text = paste("F", t - 1, sep = "_")
       )))[, 1]) # biomass at time t+1 is B_t+1=(Ie-H)%*%B_t+N%*%F_t
-
+      
       #biomass at the end of the time step
       assign(paste("BEnd", t - 1, sep = "_"), (IE_H %*% eval(parse(
         text = paste("B", t - 1, sep = "_")
       )))[, 1,drop=FALSE] + (nend %*% eval(parse(
         text = paste("F", t - 1, sep = "_")
       )))[, 1]) # biomass at time t+1 is B_t+1=(Ie-H)%*%B_t+N%*%F_t
-
+      
       list_F <- c(list_F, eval(parse(text = paste("F", t, sep = "_"))))
       list_B <- c(list_B, eval(parse(text = paste("B", t, sep = "_"))))
       if ((t - 1) == years[1]){
@@ -99,23 +99,23 @@ generateSymbolicObjects <-
                        eval(parse(text = paste("BEnd", t - 1, sep = "_"))))
       }
     }
-
-
+    
+    
     assign("Fmat", do.call("cbind", list_F))
     colnames(Fmat) <- years
     assign("param",
            c(eval(parse(text = paste("B_", years[1], sep = ""))),
              do.call("c", list_F))) #vector of parameters
-                                    #on which we will sample
+    #on which we will sample
     assign("Bmat", do.call("cbind", list_B))
     colnames(Bmat) <- years
-
+    
     assign("BmatEnd", do.call("cbind", list_BEnd))
     colnames(BmatEnd) <- years
-
+    
     param <- c(V(1), param) #we add an intercept
-
-
+    
+    
     for (sp in species) {
       isp <- which(sp == species)
       inflow <- which(fluxes_def$To == sp)
@@ -143,8 +143,8 @@ generateSymbolicObjects <-
                                      delta = TRUE,
                                      deltaM = TRUE)
     }
-
-
+    
+    
     for (sp in species) {
       for (p in names(fluxes_def)[-(1:3)]){
         isp <- which(sp == species)
@@ -166,7 +166,7 @@ generateSymbolicObjects <-
                                        ratioM = TRUE,
                                        delta = TRUE,
                                        deltaM = TRUE)
-
+        
         assign(paste0(p, "Outflows", sp),
                outtemp)
         generateDerivedSymbolicObjects(paste0(p, "Outflows", sp),
@@ -179,18 +179,18 @@ generateSymbolicObjects <-
                                        deltaM = TRUE)
       }
     }
-
-
-
-
-
-
-
-
-
+    
+    
+    
+    
+    
+    
+    
+    
+    
     for (is in seq_len(nbspec)) {
       assign(species[is], Bmat[is, ]) #vectors of biomass named by species name
-
+      
       #vectors of biomass named by species name at end of tstep
       #we add a nan since the vector has no element for last time step
       assign(paste0(species[is],
@@ -213,7 +213,7 @@ generateSymbolicObjects <-
                                      delta = TRUE,
                                      deltaM = TRUE)
     }
-
+    
     for (f in seq_len(length(flow))) {
       assign(flow[f], Fmat[f, ]) #vectors of flow named by flow name
       generateDerivedSymbolicObjects(flow[f],
@@ -225,7 +225,17 @@ generateSymbolicObjects <-
                                      delta = TRUE,
                                      deltaM = TRUE)
     }
-
+    
+    # this will be useful to have time varying parameters: they come either
+    # from the component sheet or can be overwritten by the time series sheet
+    for (sp in components$Component){
+      for (p in names(components)[-1]){
+        assign(paste0(sp, p),
+               rep(components[components$Component == sp, p],
+                   nrow(series)))
+      }
+    }
+    
     for (s in names(series)[-1]) {
       ser <- pull(series, s)
       ser[is.na(ser)] <- NaN
@@ -251,7 +261,7 @@ generateSymbolicObjects <-
                                        ratioM = TRUE,
                                        delta = TRUE,
                                        deltaM = TRUE)
-
+        
       }
     }
     rm(list = c(
@@ -273,7 +283,7 @@ generateSymbolicObjects <-
       "i",
       "n",
       "nbspec"
-
+      
     ))
     return(environment())
   }

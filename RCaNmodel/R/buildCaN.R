@@ -299,8 +299,7 @@ buildCaN <- function(x, generic = FALSE) {
           components_param$Component[components_param$Component %in% species],
           function(sp){
             if (! generic) {
-              refuge <- components_param$RefugeBiomass[
-                components_param$Component == sp]
+              refuge <- paste0(sp, "RefugeBiomass")
               refuge <- ifelse(is.na(refuge), 0, refuge)
             } else{
               refuge <- 0
@@ -330,7 +329,7 @@ buildCaN <- function(x, generic = FALSE) {
                   paste(fluxes_def$Flux[fluxes_def$To == sp &
                                           is_trophic_flux], collapse = "+"),
                   "<=",
-                  components_param$Satiation[components_param$Component == sp],
+                  paste0(sp, "Satiation"),
                   "*",
                   sp
                 ),
@@ -361,8 +360,8 @@ buildCaN <- function(x, generic = FALSE) {
                         "[1:(length(",
                         sp,
                         ")-1)]*exp(-",
-                        components_param$Inertia[
-                          components_param$Component == sp],
+                        paste0("head(", sp, "Inertia, -1)"), #we remove the last
+                                                             #inertia
                         ")",
                         sep = ""
                       ),
@@ -380,8 +379,7 @@ buildCaN <- function(x, generic = FALSE) {
                           components_param$Component %in% species &
                             !is.na(components_param$Inertia)],
                         function(sp) {
-                          mu <- components_param$Inertia[
-                            components_param$Component == sp]
+                          mu <- paste0("head(", sp, "Inertia, -1)")
                           #decrease
                           immigrants <-
                             as.character(fluxes_def$Flux)[
