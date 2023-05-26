@@ -30,7 +30,7 @@ createDynamics <- function(dynamics_equation = NULL,
   
   # this will be useful to have time varying parameters: they come either
   # from the component sheet or can be overwritten by the time series sheet
-  for (sp in species){
+  for (sp in components$Component){
     for (param in names(components)[-1]){
       assign(paste0(sp, param),
              rep(components[components$Component == sp, param],
@@ -47,12 +47,20 @@ createDynamics <- function(dynamics_equation = NULL,
                        otherLosses <- sapply(species, function(s){
                          get(paste0(s, "OtherLosses"))[y]
                        })
-                       assimE <- sapply(fluxes$To, function(s){
-                         get(paste0(s, "AssimilationE"))[y]
-                       })
-                       digetib <- sapply(fluxes$From, function(s){
-                         get(paste0(s, "Digestibility"))[y]
-                       })
+                       assimE <- mapply(function(tro, s){
+                         if (!tro) {
+                           return (1)
+                         } else {
+                           get(paste0(s, "AssimilationE"))[y]
+                         }
+                       }, is_trophic_flux, fluxes$To)
+                       digestib <- mapply(function(tro, s){
+                         if (!tro) {
+                           return (1)
+                         } else {
+                           get(paste0(s, "Digestibility"))[y]
+                         }
+                       }, is_trophic_flux, fluxes$From)
                        
                        H <- diag(1,
                                  nrow=length(species))
@@ -64,8 +72,8 @@ createDynamics <- function(dynamics_equation = NULL,
                        colnames(H) <- rownames(H) <- species
                        
                        if (is.null(dynamics_equation)) {
-                         H <- diag(1 - exp(-otherLosses,
-                                           nrow=length(index_species)))
+                         H <- diag(1 - exp(-otherLosses),
+                                   nrow=length(index_species))
                          N[cbind(fluxes_from, 1:nbfluxes)] <- -1 #this is an outgoing flow
                          N[na.omit(cbind(fluxes_to, 1:nbfluxes))] <-
                            na.omit(

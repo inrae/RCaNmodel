@@ -4,7 +4,7 @@
 \alias{createDynamics}
 \title{createDynamics}
 \usage{
-createDynamics(dynamics_equation = NULL, components, fluxes)
+createDynamics(dynamics_equation = NULL, components, fluxes, series)
 }
 \arguments{
 \item{dynamics_equation}{a string that specifies the dynamics equation (NULL
@@ -13,6 +13,8 @@ if trophic model)}
 \item{components}{the components data frame}
 
 \item{fluxes}{the fluxes data frame}
+
+\item{series}{the series can be useful to specify time varying parameters}
 }
 \value{
 a list with H and N matrices

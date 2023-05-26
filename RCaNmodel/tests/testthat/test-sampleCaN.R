@@ -7,7 +7,14 @@ test_that("sampleCaN objects with good names", {
   res <- sampleCaN(myCaNmod, 100)
   res2 <- sampleCaN(res, 100)
   expect_equal(all(names(res) == names(res2)) &
-                all(names(res) == c("CaNmod", "mcmc", "covMat")),
+                all(sort(names(res)) == sort(c("CaNmod", 
+                                               "mcmc", 
+                                               "covMat", 
+                                               "x0", 
+                                               "N", 
+                                               "thin", 
+                                               "nchain", 
+                                               "method"))),
               TRUE)
 })
 

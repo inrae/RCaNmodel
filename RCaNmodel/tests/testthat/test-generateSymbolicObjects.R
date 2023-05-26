@@ -27,8 +27,9 @@ test_that("classes and dims of outputs objects are correct", {
   expect_s4_class(symbo$IE_H, "DenseMatrix")
   expect_equal(dim(symbo$IE_H), rep(length(myCaNmod$species), 2))
 
-  expect_type(symbo$N, "double")
-  expect_equal(dim(symbo$N), c(length(myCaNmod$species),
+  expect_type(symbo$N, "list")
+  expect_type(symbo$N[[1]], "double")
+  expect_equal(dim(symbo$N[[1]]), c(length(myCaNmod$species),
                                nrow(myCaNmod$fluxes_def)))
 
 })
@@ -45,8 +46,10 @@ test_that("classes and dims of outputs objects are correct with generic", {
   expect_s4_class(symbo$IE_H, "DenseMatrix")
   expect_equal(dim(symbo$IE_H), rep(length(myCaNmod_generic$species), 2))
 
-  expect_type(symbo$N, "double")
-  expect_equal(dim(symbo$N), c(length(myCaNmod_generic$species),
+  expect_type(symbo$N, "list")
+  expect_equal(length(symbo$N), nrow(myCaNmod_generic$series))
+  expect_type(symbo$N[[1]], "double")
+  expect_equal(dim(symbo$N[[1]]), c(length(myCaNmod_generic$species),
                                nrow(myCaNmod_generic$fluxes_def)))
 
 })

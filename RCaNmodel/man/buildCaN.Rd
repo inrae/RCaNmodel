@@ -72,6 +72,9 @@ myCaNmod <- buildCaN(list(components_param = components_param,
                                series = series,
                                constraints = constraints))
 
+#this can be done directly with
+myCaNmod <- buildCaN(file)
+
 #example with a template under the generic format
 file <- system.file("extdata",
  "CaN_template_mini_generic.xlsx", package = "RCaNmodel")
