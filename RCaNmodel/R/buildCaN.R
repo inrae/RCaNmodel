@@ -379,7 +379,9 @@ buildCaN <- function(x, generic = FALSE) {
                           components_param$Component %in% species &
                             !is.na(components_param$Inertia)],
                         function(sp) {
-                          mu <- paste0("head(", sp, "Inertia, -1)")
+                          mu <- eval(parse(
+                            text = paste0("head(", sp, "Inertia, -1)")),
+                            envir = symbolic_enviro)
                           #decrease
                           immigrants <-
                             as.character(fluxes_def$Flux)[
