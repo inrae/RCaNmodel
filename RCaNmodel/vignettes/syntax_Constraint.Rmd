@@ -1,0 +1,114 @@
+---
+title: "RCaNmodel constraints"
+output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+     keep_md: yes
+author: 
+- "Hilaire Drouineau - INRAE Bordeaux, UR EABX"
+- "Benjamin Planque - IMR"
+- "Christian Mullon - IRD"
+vignette: >
+  %\VignetteIndexEntry{RCaNmodel constraint}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+bibliography: CaN.bib
+
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+Constraints are at the heart of the Chance and Necessity modelling. They relate fluxes and biomass on the trophic network. The basis is a mass balance equation for a trophic compartment, assimilated input fluxes plus import fluxes equals output fluxes due to predation plus losses due to somatic maintenance plus export fluxes
+As somatic maintenance losses depend linearly on biomass, this constraint is a linear one. Its parameters: assimilation efficiency, trophic maintenance are given for all compartments in the RCaN-file. All linear constraints on fluxes and biomass can be expressed as constraints on trophic fluxes only. See @planque2019modelling for precise formulation.
+Constraints. 
+There are two kinds of constraints.
+1. Standard constraints: we define constraints by giving values to the parameters in the Components sheet of the RCaN-file. They are 
+ * biomass must be positive and above the refuge biomass, 
+ * fluxes between two compartments are always positive, 
+ * the sum of fluxes into a compartment, from time t to t+1, cannot exceed B(t) ∗ σ, where B(t) is the biomass at time t and σ is the satiation parameter, 
+ * the biomass of a compartment at time t+1 cannot be greater than B(t)exp(ρ) or lower than B(t)exp(−ρ), 20 where rho is the inertia coefficient.
+2. Explicit constraints: we create new constraints by directly expressing them according to syntax rules. This is the objective of this section to give details about this syntax. They include constraints that relate flux or biomass to observations.
+
+# Syntax
+Constraints are symbolic expressions. To interpret them in a numerical framework, RCaN uses the symengine R package (@ma2020), which is an interface to the symengine, a fast symbolic manipulation library. A constraint is the expression, as a string, of a mathematical formula.
+
+## Examples. 
+Here are a few examples or formula for constraints written to be interpreted by the symengine R package.
+
+`DemF_Fishery = DemersalFish_Landings`
+
+means that the value of the flux from demersal fish to fisheries denoted DemF_Fishery in the RCaN file should be equal to the time series DemersalFish_Landings defined in the same file for all time steps.
+
+`(PP_HZoo + PP_OZoo + PP_Bent) <= PP`
+
+means that the total consumption of primary production cannot be greater 38 than the observed primary production.
+
+`Hzoo/sum(Hzoo[1988 : 2012])`
+
+refers to the level of biomass of herbivorous zooplankton relatively to the sum over the reference period 1988 to 2012 (we can have used mean instead of sum) and the same is done for the time series to use the same period as a reference. This kind of constraint is useful because most surveys provide relative abundance, i.e. they inform on the temporal trend but not on the absolute value.
+
+`HerbZooplankton − Biomass/sum(HerbZooplankton − Biomass[1988 : 2012])`
+is another example of such a constraint.
+
+## Principles. 
+Rules to write constraints explicitly are as follows.
+1. Constraints are written in the form of inequalities or equalities. 51 
+2. The left side of the (in)equality must contain a reference to one or several compartments or fluxes.
+3. The right side of the (in)equality can contain fixed values, compartments, fluxes, data time series.
+In the following constraints: spA and spB are the names (in the RCaN file) of two compartments, fluxA_B is the name of a trophic flux between the two compartments, obsA is the name of an observational time series of species spA. 
+
+Here are some examples of standard constraints:
+
+* `spA <= 100` the biomass of species A must be lower or equal to 100. 
+* `spA+spB <= 100` : the combined biomasses of species A an B must be lower or equal to 100.
+* `fluxA_B <= 50` the flux from species A to species B must be lower or equal to 50.
+* `spA = obsA` the biomass of species A must equate the observational time series of species A
+* `spA <= spB` the biomass of species A must be lower or equal to the biomass of speciesB
+
+## Constraints using timeless absolute bounds.
+If there are no data series available to inform on the temporal variations in certain biomass or fluxes but there is some knowledge about the maximum or minimum values that a compartment or a flux may take.
+For example, if the total biomass of species A (spA) is expected to lie between 100 and 1000 tons for the whole time series, one can write the following constraints:
+* `spA >= 100`
+* `spA <= 1000`
+
+## Fisheries catches. 
+The specific case of fisheries catches can be handled in the following way. Consider a species A (spA) ; a fishery on species A (compartment outside the model) with the name FA. Catches are a flux from the species to the fishery (non-trophic flux): spA_FA. There is a time series of reported catches of species A by the fishery (data series); its name is CatchA. All are expressed in the same units (e.g. tons).
+* If we assume that the reported catches reflect the true catches exactly, we can write the model constraint `spA_FA = CatchA`
+* If we assume that the reported catches are uncertain by 10% we can write the model constraints `spA_FA >= CatchA/1.1` and `spA_FA <= CatchA ∗ 1.1`
+* If we assume that the catches are under-reported and that the true catches are somewhere between what is reported and twice this amount, we can write `spA_FA >= CatchA` and `spA_FA <= CatchA ∗ 2`
+
+## Biomass indices 
+Constraints using biomass time series, absolute estimates When times-series of absolute biomass estimates are available (e.g. from stock assessments), these can be used to constraint the corresponding modelled biomass. Consider a compartment inside the model (spA); a series of absolute biomass estimate with name obsA.
+* If we assume the observation to precisely reflect the true biomass, we can write the model constraint: `spA = obsA`
+* If we assume that the observed biomass is uncertain by 10% we can write the two model constraints `spA >= obsA/1.1` and `spA <= obsA ∗ 1.1`
+* If we assume that the observed biomass only represents a fraction of the population and the true biomass lies somewhere between what is estimated and twice this amount, we can write `spA >= obsA` and `spA <= obsA ∗ 2`
+
+## Relative biomass indices 
+When times-series of relative biomass estimates are available (e.g. from surveys) these can be used to constraint the corresponding modelled biomass. Consider compartment A (spA); a series of relative biomass estimate (data series) with name surveyA. 
+* If we assume the observation to precisely reflect the relative variations in biomass over time, we can write the model constraint `spA/mean(spA) = obsA/mean(obsA)`
+* If we assume that the observed relative changes in biomass are uncertain  by 10% we can write the 2 model constraints:
+`spA/mean(spA)) >= (obsA/mean(obsA))/1.1` and `(spA/mean(spA)) <= (obsA/mean(obsA)) ∗ 1.1`
+
+## Fluxes. 
+Changes in biomass in the model and in the data are calculated relative to the reference period indicated in square bracket Note that this does not necessarily need to run from the first to the last year. When times series of consumption rates are available, these can be used to constrain the corresponding trophic fluxes. As before, we consider, as before, a compartment A (spA); a predator species (B); a trophic flux from A to B (fluxA_B); a time series of estimated consumption of A by B (ConsA_B). 
+* If we assume the observation to precisely reflect the consumption of species A by species B over time, we can write the model constraint `fluxA_B = ConsA_B`
+* The same logic as above can apply if one want to model uncertainties in the reported consumptions. 
+* If the consumption estimates are relative (rather than absolute), it is possible to write the constraint as follows `(fluxA_B/sum(fluxA_B)) = (ConsA_B/sum(ConsA_B))`
+
+## Structural constraints (independent of observations)
+In addition to constraining compartments/fluxes based on data or absolute bounds, it is also possible to express structural constraints within the model that are independent of observational time series or absolute bounds. For example, if species C (spC) can feed on species A and B (spA and spB), but we know that species A is always more abundant in the diet of species C, we can write.
+
+`spA_spC >= spB_spC`
+
+which expresses that the flux from spA to spC is always greater than the flux from spB to spC.
+
+## Applying constraints. over limited time span 
+A time period is associated with each constraint. By default, this is the period from the first year of observation to the last. However, constrained can be applied to restricted time periods or specific years (or even a single year) when necessary. The selected years are indicated in the third column of the constraint table. 
+
+
