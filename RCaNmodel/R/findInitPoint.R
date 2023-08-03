@@ -17,6 +17,8 @@
 #' @importFrom utils setTxtProgressBar
 #' @importFrom utils txtProgressBar
 #' @importFrom lpSolveAPI set.objfn
+#' @importFrom lpSolveAPI lp.control
+#' @importFrom ROI objective
 #' @export
 #'
 #' @examples
@@ -45,30 +47,40 @@ findInitPoint <- function(A,
   
   print("## searching intial values")
   if (progressBar)
-    pb <- txtProgressBar(min = 0, max = nbpoints, style = 3)
+    pb <- txtProgressBar(min = 0, max = 2 * ncol(A), style = 3)
   lp_model <- defineLPMod(A, b, C, v,
                           maximum = FALSE,
                           lower = lower,
                           upper = upper,
                           ob = runif(ncol(A), -1, 1))
-  res <- ROI_solve(lp_model, solver = "lpsolve",
-                   control = list(presolve = c("lindep",
-                                               "rowdominate",
-                                               "mergerows"),
-                                  scaling = c("extreme",
-                                              "equilibrate",
-                                              "integers")))
+  lp.control(lp_model$lp_model, scaling = c("extreme",
+                                            "equilibrate",
+                                            "integers"))
   X0 <- sapply(seq_len(ncol(A)), function(i) {
     if (progressBar)
       setTxtProgressBar(pb, i)
     find_init <- FALSE
     nbiter <- 0
     x0 <- rep(NA, ncol(A))
-    while (nbiter < 100 & !find_init) {
+    while (nbiter < 3 & !find_init) {
       ob <- rep(0, ncol(A))
       ob[i] <- 1
       set.objfn(lp_model$lp_model, ob)
-      res <- ROI_solve(lp_model, solver = "lpsolve")
+      res <- ROI_solve(lp_model, 
+                       solver = "lpsolve", 
+                       control = list(presolve = c("rows",
+                                                   "lindep",
+                                                   "rowdominate",
+                                                   "mergerows")))
+      if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
+          res$status$msg$code != 0){
+        objective(lp_model) <- ob
+        res2 <- ROI_solve(lp_model,
+                          solver = "cbc",
+                          control = list(logLevel = 0))
+        if (res2$status$msg$code == 0)
+          res <- res2
+      }
       if (res$status$msg$code == 0) {
         find_init <- TRUE
         x0 <- res$solution
@@ -78,7 +90,8 @@ findInitPoint <- function(A,
                                 lower = lower,
                                 upper = upper,
                                 ob = runif(ncol(A), -1, 1))
-        res <- ROI_solve(lp_model, solver = "lpsolve",
+        res <- ROI_solve(lp_model, 
+                         solver = "lpsolve",
                          control = list(presolve = c("rows",
                                                      "lindep",
                                                      "rowdominate",
@@ -86,6 +99,14 @@ findInitPoint <- function(A,
                                         scaling = c("extreme",
                                                     "equilibrate",
                                                     "integers")))
+        if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
+            res$status$msg$code != 0){
+          res2 <- ROI_solve(lp_model,
+                            solver = "cbc",
+                            control = list(logLevel = 0))
+          if (res2$status$msg$code == 0)
+            res <- res2
+        }
       }
       nbiter <- nbiter + 1
     }
@@ -97,11 +118,24 @@ findInitPoint <- function(A,
     find_init <- FALSE
     nbiter <- 0
     x0 <- rep(NA, ncol(A))
-    while (nbiter < 100 & !find_init) {
+    while (nbiter < 3 & !find_init) {
       ob <- rep(0, ncol(A))
       ob[i] <- -1
       set.objfn(lp_model$lp_model, ob)
-      res <- ROI_solve(lp_model, solver = "lpsolve")
+      res <- ROI_solve(lp_model, 
+                       solver = "lpsolve", 
+                       control = list(presolve = c("rows",
+                                                   "lindep",
+                                                   "rowdominate",
+                                                   "mergerows")))
+      if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
+          res$status$msg$code != 0){
+        res2 <- ROI_solve(lp_model,
+                          solver = "cbc",
+                          control = list(logLevel = 0))
+        if (res2$status$msg$code == 0)
+          res <- res2
+      }
       if (res$status$msg$code == 0) {
         find_init <- TRUE
         x0 <- res$solution
@@ -111,7 +145,8 @@ findInitPoint <- function(A,
                                 lower = lower,
                                 upper = upper,
                                 ob = runif(ncol(A), -1, 1))
-        res <- ROI_solve(lp_model, solver = "lpsolve",
+        res <- ROI_solve(lp_model, 
+                         solver = "lpsolve",
                          control = list(presolve = c("rows",
                                                      "lindep",
                                                      "rowdominate",
@@ -119,6 +154,14 @@ findInitPoint <- function(A,
                                         scaling = c("extreme",
                                                     "equilibrate",
                                                     "integers")))
+        if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
+            res$status$msg$code != 0){
+          res2 <- ROI_solve(lp_model,
+                            solver = "cbc",
+                            control = list(logLevel = 0))
+          if (res2$status$msg$code == 0)
+            res <- res2
+        }
       }
       nbiter <- nbiter + 1
     }

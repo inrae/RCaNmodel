@@ -25,8 +25,10 @@ ROI_solve <-
         res$status$msg$code <- 3
       } else if (res$status$msg$symbol == "Numerical instability"){
         res$status$msg$code <- 5
-      } else if (res$status$msg$symbol== "infeasible"){
+      } else if (res$status$msg$symbol == "infeasible"){
         res$status$msg$code <- 2
+      } else if (res$status$msg$message == "Solution is optimal."){
+        res$status$msg$code <- 0
       }
     } else {
       lp_model <- x$lp_model

@@ -10,7 +10,7 @@
 getParamMinMax <- function(OP, p) {
   solved <- FALSE
   ntry <- 0
-  while (ntry < 3) {
+  while (ntry < 3 & !solved) {
     res <- ROI_solve(OP,
                      solver = "lpsolve",
                      control = list(
@@ -18,21 +18,23 @@ getParamMinMax <- function(OP, p) {
                                    "equilibrate",
                                    "integers")))
     if (requireNamespace("ROI.plugin.cbc", quietly = TRUE)
-        & res$status$msg$code == 5){
-      res <- ROI_solve(OP,
-                       solver = "cbc",
-                       control = list(logLevel = 0))
+        & res$status$msg$code != 0){
+      res2 <- ROI_solve(OP,
+                        solver = "cbc",
+                        control = list(logLevel = 0))
+      if (res2$status$msg$code == 0)
+        res <- res2
     }
-
+    
     if (res$status$msg$code == 0) {
       bound <- res$solution[p]
-      solved[1] <- TRUE
+      solved <- TRUE
     } else  {
       bound <- NA
     }
     ntry <- ntry + 1
   }
   res <- bound
-
+  
   return (res)
 }

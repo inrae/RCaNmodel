@@ -30,13 +30,13 @@ getAllBoundsParam <- function(x,
                               lower = NULL,
                               upper = NULL,
                               progressBar = TRUE) {
-
+  
   x <- reformatX(x)
   A <- x$A
   b <- x$b
   C <- x$C
   v <- x$v
-
+  
   if (is.null(lower)) lower <- rep(0, ncol(A))
   if (is.null(upper)) upper <- rep(Inf, ncol(A))
   nbparam <- ncol(A)
@@ -45,7 +45,7 @@ getAllBoundsParam <- function(x,
   }
   if (is.null(colnames(C)) & !is.null(C))
     colnames(C) <- colnames(A)
-
+  
   presolvedmin <- presolveLPMod(A, b, C, v, 
                                 sense = "min",
                                 lower = lower,
@@ -53,10 +53,10 @@ getAllBoundsParam <- function(x,
   presolvedmax <- presolveLPMod(A, b, C, v, sense = "max",
                                 lower = lower,
                                 upper = upper)
-
-
-
-
+  
+  
+  
+  
   if (progressBar)
     pb <- txtProgressBar(min = 0, max = nbparam, style = 3)
   bounds <- sapply(1:nbparam, function(p) {
@@ -75,7 +75,7 @@ getAllBoundsParam <- function(x,
         ob <- rep(0, ncol(presolved$A))
         ob[ip] <- 1
         ROI::objective(presolved$OP) <- L_objective(ob)
-
+        
         set.objfn(presolved$OP$lp_model, ob)
         getParamMinMax(presolved$OP, ip)
       } else {

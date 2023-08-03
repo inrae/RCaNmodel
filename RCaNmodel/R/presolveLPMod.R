@@ -47,8 +47,7 @@ presolveLPMod <-
     presolve <- c("rows",
                   "lindep",
                   "rowdominate",
-                  "mergerows",
-                  "coldominate")
+                  "mergerows")
     if (is.null(lower)) lower <- rep(0, ncol(A))
     if (is.null(upper)) upper <- rep(Inf, ncol(A))
     if (is.null(C)) {

@@ -33,7 +33,7 @@ findingIncompatibleConstr <- function(x) {
   b <- x$b
   C <- x$C
   v <- x$v
-
+  
   nbparam <- ncol(A)
   nbineq <- nrow(A)
   if (is.null(C)) {
@@ -60,7 +60,7 @@ findingIncompatibleConstr <- function(x) {
   Cslacked <- cbind(C, matrix(0, ncol = nbineq, nrow = nbeq))
   param_name <- c(param_name,
                   paste("slack", rownames(A)))
-
+  
   # for (s in seq_len(nrow(A))) {
   #   slack <- rep(0, nbineq)
   #   slack[s] <- -1
@@ -69,7 +69,7 @@ findingIncompatibleConstr <- function(x) {
   #   param_name <- c(param_name,
   #                   paste("slack", rownames(A)[s]))
   # }
-
+  
   slack <- -diag(nbeq)
   Aslacked <- cbind(Aslacked, matrix(0, nrow = nbineq, ncol = 2 * nbeq))
   Cslacked <- cbind(Cslacked, slack, -slack)
@@ -78,7 +78,7 @@ findingIncompatibleConstr <- function(x) {
                     paste("slack", rownames(C)),
                     paste("slackbis", rownames(C)))
   colnames(Aslacked) <- colnames(Cslacked) <- param_name
-
+  
   # for (s in seq_len(nrow(C))) {
   #   slack <- rep(0, nbeq)
   #   slack[s] <- -1
@@ -88,24 +88,26 @@ findingIncompatibleConstr <- function(x) {
   #                   paste("slack", rownames(C)[s]),
   #                   paste("slackbis", rownames(C)[s]))
   # }
-
+  
   lp_model <- defineLPMod(Aslacked, bslacked, Cslacked, vslacked,
                           ob = c(rep(1, nbparam), rep(1000, nbineq + 2 * nbeq)),
                           maximum = FALSE)
-
+  
   res <- ROI_solve(lp_model, solver = "lpsolve",
                    control = list(presolve = c("rows",
                                                "lindep",
                                                "rowdominate",
                                                "mergerows")))
   if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
-      res$status$msg$code == 5){
-    res <- ROI_solve(lp_model,
-                     solver = "cbc",
-                     control = list(logLevel = 0))
+      res$status$msg$code != 0){
+    res2 <- ROI_solve(lp_model,
+                      solver = "cbc",
+                      control = list(logLevel = 0))
+    if (res2$status$msg$code == 0)
+      res <- res2
   }
-
-
+  
+  
   solutions <- res$solution
   problematic <-
     param_name[which(solutions > 0 & (seq_len(length(solutions))) > (nbparam))]
@@ -148,19 +150,21 @@ findingIncompatibleConstr <- function(x) {
                                     rep(1000,
                                         ncol(Aslacked) - nbparam)),
                               maximum = FALSE)
-
+      
       res <- ROI_solve(lp_model, solver = "lpsolve",
                        control <- list(presolve = c("rows",
                                                     "lindep",
                                                     "rowdominate",
                                                     "mergerows")))
       if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
-          res$status$msg$code == 5){
-        res <- ROI_solve(lp_model,
-                         solver = "cbc",
-                         control = list(logLevel = 0))
+          res$status$msg$code != 0){
+        res2 <- ROI_solve(lp_model,
+                          solver = "cbc",
+                          control = list(logLevel = 0))
+        if (res2$status$msg$code == 0)
+          res <- res2
       }
-
+      
       solutions <- res$solution
       c(gsub("^\\s*\\w*", "", problematic[p]),
         gsub("^\\s*\\w*", "",

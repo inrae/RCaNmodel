@@ -65,34 +65,36 @@ chebyCentre <- function(A, b, lower = NULL, upper = NULL) {
                nrow = n,
                ncol = p + 1)
   A1[, 1:p] <- A
-
+  
   A1[, p + 1] <- an
-
+  
   f <- rep(0, p + 1)
   f[p + 1] <- -1
-
+  
   lp_mod <- defineLPMod(A1,
                         b,
                         lower = lower,
                         upper = upper,
                         maximum = FALSE,
                         ob = f)
-
+  
   res <- ROI_solve(lp_mod, solver = "lpsolve",
                    control = list(presolve = c("rows",
                                                "lindep",
                                                "rowdominate",
                                                "mergerows")))
-
+  
   if (requireNamespace("ROI.plugin.cbc", quietly = TRUE)
-      & res$status$code == 5){
-    res <- ROI_solve(lp_mod,
-                     solver = "cbc",
-                     control = list(logLevel = 0))
+      & res$status$msg$code != 0){
+    res2 <- ROI_solve(lp_mod,
+                      solver = "cbc",
+                      control = list(logLevel = 0))
+    if (res2$status$msg$code == 0)
+      res <- res
   }
-
+  
   x <- res$solution
-
+  
   return(x[-p - 1])
 }
 
