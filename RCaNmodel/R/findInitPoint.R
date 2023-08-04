@@ -114,7 +114,7 @@ findInitPoint <- function(A,
   })
   X02 <- sapply(seq_len(ncol(A)), function(i) {
     if (progressBar)
-      setTxtProgressBar(pb, i)
+      setTxtProgressBar(pb, i + ncol(A))
     find_init <- FALSE
     nbiter <- 0
     x0 <- rep(NA, ncol(A))
