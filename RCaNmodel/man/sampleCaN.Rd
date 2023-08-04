@@ -12,7 +12,6 @@ sampleCaN(
   thin = 1,
   method = "gibbs",
   lastF = FALSE,
-  nbpoints = 100,
   keepCovMat = FALSE
 )
 }
@@ -31,10 +30,6 @@ phase and discarding phases won't be necessary}
 \item{method}{one of gibbs (default) or hitandrun}
 
 \item{lastF}{should flow for last year be simulated (default = FALSE)}
-
-\item{nbpoints}{number of points use build the initial point, each point
-requires the lpsolve run so increases time, but should improve the chain
-exploration}
 
 \item{keepCovMat}{save or not the covariance matrix (saving can gain time
 if new samples should be run but is very memory consuming - default FALSE)}

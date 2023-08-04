@@ -91,5 +91,5 @@ degenerateSubSpace <- function(A, b, C, v, z) {
 
 # Register entry points for exported C++ functions
 methods::setLoadAction(function(ns) {
-    .Call('_RCaNmodel_RcppExport_registerCCallable', PACKAGE = 'RCaNmodel')
+    .Call(`_RCaNmodel_RcppExport_registerCCallable`)
 })

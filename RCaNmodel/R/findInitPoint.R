@@ -9,9 +9,6 @@
 #' absence of such constraints
 #' @param lower minimal bounds for paramaters, by default set to zero
 #' @param upper maximum bounds for paramaters, by default set to Inf
-#' @param nbpoints number of points use build the initial point, each point
-#' requires the lpsolve run so increases time, but should improve the chain
-#' exploration
 #' @param progressBar a switch to indicate whether a progress bar is wanted
 #' @return a random initial point or a vector of NA if enable to find a solution
 #' @importFrom utils setTxtProgressBar
@@ -40,7 +37,6 @@ findInitPoint <- function(A,
                           v = NULL,
                           lower = NULL,
                           upper = NULL,
-                          nbpoints = 100,
                           progressBar = FALSE) {
   if (is.null(lower)) lower <- rep(0, ncol(A))
   if (is.null(upper)) upper <- rep(Inf, ncol(A))
