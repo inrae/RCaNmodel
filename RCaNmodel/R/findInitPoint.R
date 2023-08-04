@@ -90,23 +90,6 @@ findInitPoint <- function(A,
                                 lower = lower,
                                 upper = upper,
                                 ob = runif(ncol(A), -1, 1))
-        res <- ROI_solve(lp_model, 
-                         solver = "lpsolve",
-                         control = list(presolve = c("rows",
-                                                     "lindep",
-                                                     "rowdominate",
-                                                     "mergerows"),
-                                        scaling = c("extreme",
-                                                    "equilibrate",
-                                                    "integers")))
-        if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
-            res$status$msg$code != 0){
-          res2 <- ROI_solve(lp_model,
-                            solver = "cbc",
-                            control = list(logLevel = 0))
-          if (res2$status$msg$code == 0)
-            res <- res2
-        }
       }
       nbiter <- nbiter + 1
     }
@@ -130,6 +113,7 @@ findInitPoint <- function(A,
                                                    "mergerows")))
       if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
           res$status$msg$code != 0){
+        objective(lp_model) <- ob
         res2 <- ROI_solve(lp_model,
                           solver = "cbc",
                           control = list(logLevel = 0))
@@ -145,23 +129,6 @@ findInitPoint <- function(A,
                                 lower = lower,
                                 upper = upper,
                                 ob = runif(ncol(A), -1, 1))
-        res <- ROI_solve(lp_model, 
-                         solver = "lpsolve",
-                         control = list(presolve = c("rows",
-                                                     "lindep",
-                                                     "rowdominate",
-                                                     "mergerows"),
-                                        scaling = c("extreme",
-                                                    "equilibrate",
-                                                    "integers")))
-        if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
-            res$status$msg$code != 0){
-          res2 <- ROI_solve(lp_model,
-                            solver = "cbc",
-                            control = list(logLevel = 0))
-          if (res2$status$msg$code == 0)
-            res <- res2
-        }
       }
       nbiter <- nbiter + 1
     }
