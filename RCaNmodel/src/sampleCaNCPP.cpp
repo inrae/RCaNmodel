@@ -378,7 +378,7 @@ using Eigen::FullPivLU;
  //' @param b a vector of length equals to nrow(A)
  //' @param C a matrix of coefficients of inequality constants C.x=v
  //' @param v a vector of length equals to nrow(C)
- //' @param x0 a vector of length equals to ncol(A) that should be in the 
+ //' @param z a vector of length equals to ncol(A) that should be in the 
  //' polytope, for example returned by \code{\link{chebyCentre}}
  //'
  //' @return a list with elements A2 and b2 defining the subscape A2 x <= b2 and
