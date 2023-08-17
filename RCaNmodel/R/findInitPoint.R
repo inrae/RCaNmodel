@@ -41,7 +41,7 @@ findInitPoint <- function(A,
   if (is.null(lower)) lower <- rep(0, ncol(A))
   if (is.null(upper)) upper <- rep(Inf, ncol(A))
   
-  print("## searching intial values")
+  writeLines("## searching intial values")
   if (progressBar)
     pb <- txtProgressBar(min = 0, max = 2 * ncol(A), style = 3)
   lp_model <- defineLPMod(A, b, C, v,

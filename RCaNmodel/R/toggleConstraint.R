@@ -58,28 +58,28 @@ toggleConstraint <- function(myCaNmod, constr){
       if (length(subactiveA) > 0){
         myCaNmod$b <- myCaNmod$b[!rownames(myCaNmod$A) %in% subactiveA]
         myCaNmod$A <- myCaNmod$A[!rownames(myCaNmod$A) %in% subactiveA, ]
-        print(paste("disactivate inequality", subactiveA))
+        writeLines(paste("disactivate inequality", subactiveA))
       }
       if (length(inactiveA) > 0){
         myCaNmod$A <- rbind2(myCaNmod$A,
                              myCaNmod$AAll[inactiveA, ])
         myCaNmod$b <- c(myCaNmod$b,
                         myCaNmod$bAll[rownames(myCaNmod$AAll) %in% inactiveA])
-        print(paste("activate inequality", inactiveA))
+        writeLines(paste("activate inequality", inactiveA))
       }
     }
     if (length(suballC) > 0){
       if (length(subactiveC) > 0){
         myCaNmod$v <- myCaNmod$v[!rownames(myCaNmod$C) %in% subactiveC]
         myCaNmod$C <- myCaNmod$C[!rownames(myCaNmod$C) %in% subactiveC, ]
-        print(paste("disactivate equality", subactiveC))
+        writeLines(paste("disactivate equality", subactiveC))
       }
       if (length(inactiveC) > 0){
         myCaNmod$C <- rbind2(myCaNmod$C,
                              myCaNmod$CAll[inactiveC, ])
         myCaNmod$v <- c(myCaNmod$v,
                         myCaNmod$vAll[rownames(myCaNmod$CAll) %in% inactiveC])
-        print(paste("activate equality", inactiveC))
+        writeLines(paste("activate equality", inactiveC))
       }
     }
   }

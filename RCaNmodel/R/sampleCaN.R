@@ -84,7 +84,7 @@ sampleCaN <- function(myCaNmod,
   }
   i <- NULL
   
-  print("##Initializing")
+  writeLines("##Initializing")
   #we removed parameters that are fixed because of A or almost
   bounds <- getAllBoundsParam(list(A = as.matrix(myCaNmod$A),
                                    b = myCaNmod$b),
@@ -164,17 +164,17 @@ sampleCaN <- function(myCaNmod,
                   envir = environment())
   }
   
-  print("##Sampling")
+  writeLines("##Sampling")
   
   res <- foreach(i = 1:nchain) %myinfix% {
-    print(paste("###Start chain",i))
+    writeLines(paste("###Start chain",i))
     x0 <- findInitPoint(A3,
                         b3,
                         lower = rep(-Inf, ncol(A3)),
                         progressBar = TRUE)
     if (any(is.nan(x0)))
       stop("unable to find any suitable solutions after 100 tries")
-    print(paste("###Start cpgs chain",i))
+    writeLines(paste("###Start cpgs chain",i))
     
     res <-
       cpgs(N, A3, b3, x0, thin, method == "gibbs", i, i, covMat)
@@ -214,7 +214,7 @@ sampleCaN <- function(myCaNmod,
         res$F <- res$F[, - lastid]
     }
     colnames(res$B) <- rownames(myCaNmod$L)
-    print(paste("###End chain",i))
+    writeLines(paste("###End chain",i))
     covmat <- NULL
     if (keepCovMat)
       covmat <- res$covMat

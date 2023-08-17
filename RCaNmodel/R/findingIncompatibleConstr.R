@@ -171,9 +171,9 @@ findingIncompatibleConstr <- function(x) {
              param_name[which(solutions > 0 &
                                 (seq_len(length(solutions))) > (nbparam))]))
     })
-    print("###polytope is ok when following constraints are relaxed:")
-    print(paste(gsub("^\\s*\\w*", "", problematic), collapse = ", "))
-    print("####Those constraints seem incompatible with:")
+    writeLines("###polytope is ok when following constraints are relaxed:")
+    writeLines(paste(gsub("^\\s*\\w*", "", problematic), collapse = ", "))
+    writeLines("####Those constraints seem incompatible with:")
     print(lapply(results, function(x)
       paste(x[1], ": ", paste(x[-1], collapse = ", "), sep = "")))
     return(results)
