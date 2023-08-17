@@ -48,6 +48,9 @@ presolveLPMod <-
                   "lindep",
                   "rowdominate",
                   "mergerows")
+    scaling <- c("extreme",
+                 "equilibrate",
+                 "integers")
     if (is.null(lower)) lower <- rep(0, ncol(A))
     if (is.null(upper)) upper <- rep(Inf, ncol(A))
     if (is.null(C)) {
@@ -71,12 +74,12 @@ presolveLPMod <-
     set.rhs(lp_model, c(b, v))
     set.constr.type(lp_model, c(rep("<=", nrow(A)), rep("=", nrow(C))))
     dimnames(lp_model) <- list(c(rownames(A), rownames(C)), colnames(A))
-
-    lp.control(lp_model, sense = sense, presolve = presolve)
+    
+    lp.control(lp_model, sense = sense, presolve = presolve, scaling = scaling)
     set.objfn(lp_model, rep(1, nbparam))
     res <- solve.lpExtPtr(lp_model)
-
-
+    
+    
     dir <- get.constr.type(lp_model)
     rhs <- get.rhs(lp_model)
     lhs <- matrix(0,length(rhs), dim(lp_model)[2])
@@ -98,9 +101,9 @@ presolveLPMod <-
       fixed <- sol[! colnames(A) %in% colnames(lhs)]
       names(fixed) <- colnames(A)[! colnames(A) %in% colnames(lhs)]
     }
-
-
-
+    
+    
+    
     A2 <- lhs[dir == "<=", ]
     b2 <- rhs[dir == "<="]
     C2 <- lhs[dir == "=", ]

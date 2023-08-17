@@ -64,10 +64,11 @@ findInitPoint <- function(A,
       set.objfn(lp_model$lp_model, ob)
       res <- ROI_solve(lp_model, 
                        solver = "lpsolve", 
-                       control = list(presolve = c("rows",
-                                                   "lindep",
-                                                   "rowdominate",
-                                                   "mergerows")))
+                       control = list(
+                         presolve = c( #rows not added to avoid removing a var
+                           "lindep",
+                           "rowdominate",
+                           "mergerows")))
       if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
           res$status$msg$code != 0){
         objective(lp_model) <- ob

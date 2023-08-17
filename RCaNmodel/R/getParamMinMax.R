@@ -14,6 +14,10 @@ getParamMinMax <- function(OP, p) {
     res <- ROI_solve(OP,
                      solver = "lpsolve",
                      control = list(
+                       presolve = c( #rows not added to avoid removing a var
+                       "lindep",
+                       "rowdominate",
+                       "mergerows"),
                        scaling = c("extreme",
                                    "equilibrate",
                                    "integers")))
