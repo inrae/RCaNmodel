@@ -100,12 +100,12 @@ sampleCaN <- function(myCaNmod,
   }
   
   #now we restrict to the degenerate subspace
+  solequality <- findInitPoint(as.matrix(myCaNmod$A),
+                               myCaNmod$b,
+                               as.matrix(myCaNmod$C),
+                               myCaNmod$v,
+                               progressBar = TRUE)
   if (nrow(myCaNmod$C) > 0){
-    solequality <- findInitPoint(as.matrix(myCaNmod$A),
-                                 myCaNmod$b,
-                                 as.matrix(myCaNmod$C),
-                                 myCaNmod$v,
-                                 progressBar = TRUE)
     subspace <- degenerateSubSpace(as.matrix(myCaNmod$A),
                                    myCaNmod$b,
                                    as.matrix(myCaNmod$C),
@@ -118,9 +118,8 @@ sampleCaN <- function(myCaNmod,
     
   } else { #no equality constraints, everything remains the same
     A2 <-myCaNmod$A
-    b2 <- myCaNmod$b
+    b2 <- myCaNmod$b - myCaNmod$A %*% solequality
     Nt <- diag(ncol(myCaNmod$A))
-    solequality <- rep(0, ncol(myCaNmod$A))
   }
   
   #now we presolve the model to simply the polytope
@@ -168,10 +167,7 @@ sampleCaN <- function(myCaNmod,
   
   res <- foreach(i = 1:nchain) %myinfix% {
     writeLines(paste("###Start chain",i))
-    x0 <- findInitPoint(A3,
-                        b3,
-                        lower = rep(-Inf, ncol(A3)),
-                        progressBar = TRUE)
+    x0 <- rep(0, ncol(A3))
     if (any(is.nan(x0)))
       stop("unable to find any suitable solutions after 100 tries")
     writeLines(paste("###Start cpgs chain",i))
