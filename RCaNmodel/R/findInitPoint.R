@@ -49,7 +49,14 @@ findInitPoint <- function(A,
                           lower = lower,
                           upper = upper,
                           ob = runif(ncol(A), -1, 1))
-  lp.control(lp_model$lp_model)
+  lp.control(lp_model$lp_model, 
+             scaling = c("extreme",
+                         "equilibrate",
+                         "integers"),
+             presolve = c( #rows not added to avoid removing a var
+               "lindep",
+               "rowdominate",
+               "mergerows"))
   X0 <- sapply(seq_len(ncol(A)), function(i) {
     if (progressBar)
       setTxtProgressBar(pb, i)
@@ -61,15 +68,7 @@ findInitPoint <- function(A,
       ob[i] <- 1
       set.objfn(lp_model$lp_model, ob)
       res <- ROI_solve(lp_model, 
-                       solver = "lpsolve", 
-                       control = list(
-                         presolve = c( #rows not added to avoid removing a var
-                           "lindep",
-                           "rowdominate",
-                           "mergerows"),
-                         scaling = c("extreme",
-                                     "equilibrate",
-                                     "integers")))
+                       solver = "lpsolve")
       if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
           res$status$msg$code != 0){
         objective(lp_model) <- ob
@@ -88,6 +87,14 @@ findInitPoint <- function(A,
                                 lower = lower,
                                 upper = upper,
                                 ob = runif(ncol(A), -1, 1))
+        lp.control(lp_model$lp_model, 
+                   scaling = c("extreme",
+                               "equilibrate",
+                               "integers"),
+                   presolve = c( #rows not added to avoid removing a var
+                     "lindep",
+                     "rowdominate",
+                     "mergerows"))     
       }
       nbiter <- nbiter + 1
     }
@@ -104,15 +111,7 @@ findInitPoint <- function(A,
       ob[i] <- -1
       set.objfn(lp_model$lp_model, ob)
       res <- ROI_solve(lp_model, 
-                       solver = "lpsolve", 
-                       control = list(
-                         presolve = c(#rows not added to avoid removing a var
-                           "lindep",
-                           "rowdominate",
-                           "mergerows"),
-                         scaling = c("extreme",
-                                     "equilibrate",
-                                     "integers")))
+                       solver = "lpsolve")
       if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
           res$status$msg$code != 0){
         objective(lp_model) <- ob
@@ -131,7 +130,14 @@ findInitPoint <- function(A,
                                 lower = lower,
                                 upper = upper,
                                 ob = runif(ncol(A), -1, 1))
-      }
+        lp.control(lp_model$lp_model, 
+                   scaling = c("extreme",
+                               "equilibrate",
+                               "integers"),
+                   presolve = c( #rows not added to avoid removing a var
+                     "lindep",
+                     "rowdominate",
+                     "mergerows"))      }
       nbiter <- nbiter + 1
     }
     x0
