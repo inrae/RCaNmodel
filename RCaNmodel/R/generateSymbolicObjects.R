@@ -115,7 +115,7 @@ generateSymbolicObjects <-
     
     param <- c(V(1), param) #we add an intercept
     
-    
+    ## alias for inflows and outflows
     for (sp in species) {
       isp <- which(sp == species)
       inflow <- which(fluxes_def$To == sp)
@@ -144,7 +144,7 @@ generateSymbolicObjects <-
                                      deltaM = TRUE)
     }
     
-    
+    ## alias for trophic inflows and trophic outflows
     for (sp in species) {
       for (p in names(fluxes_def)[-(1:3)]){
         isp <- which(sp == species)
@@ -180,8 +180,20 @@ generateSymbolicObjects <-
       }
     }
     
-    
-    
+    ## alias for all flows
+    allflow <- rep(0, length(years))
+    for (i in seq_len(nrow(Fmat))){
+      allflow <- allflow + Fmat[i, ]
+    }
+    assign("Allflows", allflow)
+    generateDerivedSymbolicObjects("Allflows",
+                                   environment(),
+                                   M = TRUE,
+                                   P = TRUE,
+                                   ratio = TRUE,
+                                   ratioM = TRUE,
+                                   delta = TRUE,
+                                   deltaM = TRUE)
     
     
     
@@ -192,7 +204,7 @@ generateSymbolicObjects <-
       assign(species[is], Bmat[is, ]) #vectors of biomass named by species name
       
       #vectors of biomass named by species name at end of tstep
-      #we add a nan since the vector has no element for last time step
+      #we add a NaN since the vector has no element for last time step
       assign(paste0(species[is],
                     "End"),
              c(BmatEnd[is, ], NaN))
