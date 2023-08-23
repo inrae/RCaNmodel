@@ -133,15 +133,15 @@ generateSymbolicObjects <-
       generateDerivedSymbolicObjects(paste0("Inflows", sp),
                                      environment(),
                                      ratio = TRUE,
-                                     ratioM = TRUE,
+                                     beforeratio = TRUE,
                                      delta = TRUE,
-                                     deltaM = TRUE)
+                                     beforedelta = TRUE)
       generateDerivedSymbolicObjects(paste0("Outflows", sp),
                                      environment(),
                                      ratio = TRUE,
-                                     ratioM = TRUE,
+                                     beforeratio = TRUE,
                                      delta = TRUE,
-                                     deltaM = TRUE)
+                                     beforedelta = TRUE)
     }
     
     ## alias for trophic inflows and trophic outflows
@@ -160,23 +160,23 @@ generateSymbolicObjects <-
                intemp)
         generateDerivedSymbolicObjects(paste0(p, "Inflows", sp),
                                        environment(),
-                                       M = TRUE,
-                                       P = TRUE,
+                                       before = TRUE,
+                                       after = TRUE,
                                        ratio = TRUE,
-                                       ratioM = TRUE,
+                                       beforeratio = TRUE,
                                        delta = TRUE,
-                                       deltaM = TRUE)
+                                       beforedelta = TRUE)
         
         assign(paste0(p, "Outflows", sp),
                outtemp)
         generateDerivedSymbolicObjects(paste0(p, "Outflows", sp),
                                        environment(),
-                                       M = TRUE,
-                                       P = TRUE,
+                                       before = TRUE,
+                                       after = TRUE,
                                        ratio = TRUE,
-                                       ratioM = TRUE,
+                                       beforeratio = TRUE,
                                        delta = TRUE,
-                                       deltaM = TRUE)
+                                       beforedelta = TRUE)
       }
     }
     
@@ -188,12 +188,12 @@ generateSymbolicObjects <-
     assign("Allflows", allflow)
     generateDerivedSymbolicObjects("Allflows",
                                    environment(),
-                                   M = TRUE,
-                                   P = TRUE,
+                                   before = TRUE,
+                                   after = TRUE,
                                    ratio = TRUE,
-                                   ratioM = TRUE,
+                                   beforeratio = TRUE,
                                    delta = TRUE,
-                                   deltaM = TRUE)
+                                   beforedelta = TRUE)
     
     
     
@@ -210,20 +210,20 @@ generateSymbolicObjects <-
              c(BmatEnd[is, ], NaN))
       generateDerivedSymbolicObjects(species[is],
                                      environment(),
-                                     M = TRUE,
-                                     P = TRUE,
+                                     before = TRUE,
+                                     after = TRUE,
                                      ratio = TRUE,
-                                     ratioM = TRUE,
+                                     beforeratio = TRUE,
                                      delta = TRUE,
-                                     deltaM = TRUE)
+                                     beforedelta = TRUE)
       generateDerivedSymbolicObjects(paste0(species[is], "End"),
                                      environment(),
-                                     M = TRUE,
-                                     P = TRUE,
+                                     before = TRUE,
+                                     after = TRUE,
                                      ratio = TRUE,
-                                     ratioM = TRUE,
+                                     beforeratio = TRUE,
                                      delta = TRUE,
-                                     deltaM = TRUE)
+                                     beforedelta = TRUE)
     }
     
     for (f in seq_len(length(flow))) {

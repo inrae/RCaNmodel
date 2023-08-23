@@ -7,12 +7,12 @@
 generateDerivedSymbolicObjects(
   param,
   env,
-  M = FALSE,
-  P = FALSE,
+  before = FALSE,
+  after = FALSE,
   delta = FALSE,
-  deltaM = FALSE,
+  beforedelta = FALSE,
   ratio = FALSE,
-  ratioM = FALSE
+  beforeratio = FALSE
 )
 }
 \arguments{
@@ -20,17 +20,17 @@ generateDerivedSymbolicObjects(
 
 \item{env}{the environment to be updated}
 
-\item{M}{whether to generate vector 2:T NA}
+\item{before}{whether to generate vector NA 1:T-1}
 
-\item{P}{whether to generate vector NA 1:t-1}
+\item{after}{whether to generate vector 2:T NA}
 
 \item{delta}{whether to generate Yt+1-Yt}
 
-\item{deltaM}{whether to generate Yt-Yt-1}
+\item{beforedelta}{whether to generate Yt-Yt-1}
 
 \item{ratio}{whether to generate Yt+1/Yt}
 
-\item{ratioM}{whether to generate Yt/Yt-1}
+\item{beforeratio}{whether to generate Yt/Yt-1}
 }
 \value{
 nothing but update the environment
