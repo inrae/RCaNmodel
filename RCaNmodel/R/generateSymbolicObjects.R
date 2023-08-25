@@ -194,9 +194,23 @@ generateSymbolicObjects <-
                                    beforeratio = TRUE,
                                    delta = TRUE,
                                    beforedelta = TRUE)
-    
-    
-    
+    for (p in names(fluxes_def)[-(1:3)]){
+      allflow <- rep(0, length(years))
+      for (i in which(fluxes_def[, p])){
+        allflow <- allflow + Fmat[i, ]
+      }
+      assign(paste0(p, "Allflows"), allflow)
+      generateDerivedSymbolicObjects(paste0(p, "Allflows"),
+                                     environment(),
+                                     before = TRUE,
+                                     after = TRUE,
+                                     ratio = TRUE,
+                                     beforeratio = TRUE,
+                                     delta = TRUE,
+                                     beforedelta = TRUE)
+      
+      
+    }
     
     
     
