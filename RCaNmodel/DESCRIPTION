@@ -40,7 +40,8 @@ Suggests:
     ggraph,
     igraph,
     testthat (>= 3.0.0),
-    ROI.plugin.cbc
+    ROI.plugin.cbc,
+    openxlsx
 RdMacros: Rdpack
 VignetteBuilder: knitr
 RoxygenNote: 7.2.3
