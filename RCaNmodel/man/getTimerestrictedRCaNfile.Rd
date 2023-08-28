@@ -4,9 +4,11 @@
 \alias{getTimerestrictedRCaNfile}
 \title{getTimerestrictedRCaNfile}
 \usage{
-getTimerestrictedRCaNfile(path, outfile, from = NULL, to = NULL)
+getTimerestrictedRCaNfile(infile, outfile, from = NULL, to = NULL)
 }
 \arguments{
+\item{infile}{path to the orginal RCaN file}
+
 \item{outfile}{where to write the resulting RCaNfile}
 
 \item{from}{first year of the restricted range, if NULL (default), the same
@@ -14,8 +16,6 @@ as the initial model year}
 
 \item{to}{last year of the restricted range, if NULL (default), the same
 as the last model year}
-
-\item{file}{path to the orginal RCaN file}
 }
 \value{
 nothing but writes the file where specified

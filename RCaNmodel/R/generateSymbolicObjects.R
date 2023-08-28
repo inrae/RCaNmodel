@@ -196,7 +196,7 @@ generateSymbolicObjects <-
                                    beforedelta = TRUE)
     for (p in names(fluxes_def)[-(1:3)]){
       allflow <- rep(0, length(years))
-      for (i in which(fluxes_def[, p])){
+      for (i in which(fluxes_def[, p] == 1)){
         allflow <- allflow + Fmat[i, ]
       }
       assign(paste0(p, "Allflows"), allflow)
@@ -244,12 +244,12 @@ generateSymbolicObjects <-
       assign(flow[f], Fmat[f, ]) #vectors of flow named by flow name
       generateDerivedSymbolicObjects(flow[f],
                                      environment(),
-                                     M = TRUE,
-                                     P = TRUE,
+                                     before = TRUE,
+                                     after = TRUE,
                                      ratio = TRUE,
-                                     ratioM = TRUE,
+                                     beforeratio = TRUE,
                                      delta = TRUE,
-                                     deltaM = TRUE)
+                                     beforedelta = TRUE)
     }
     
     # this will be useful to have time varying parameters: they come either
@@ -268,12 +268,12 @@ generateSymbolicObjects <-
       assign(s, ser)
       generateDerivedSymbolicObjects(s,
                                      environment(),
-                                     M = TRUE,
-                                     P = TRUE,
+                                     before = TRUE,
+                                     after = TRUE,
                                      ratio = TRUE,
-                                     ratioM = TRUE,
+                                     beforeratio = TRUE,
                                      delta = TRUE,
-                                     deltaM = TRUE)
+                                     beforedelta = TRUE)
     }
     if (!is.null(aliases)){
       for (i in seq_len(nrow(aliases))){
@@ -281,12 +281,12 @@ generateSymbolicObjects <-
                aliases[i, 2])
         generateDerivedSymbolicObjects(aliases[i, 1],
                                        environment(),
-                                       M = TRUE,
-                                       P = TRUE,
+                                       before = TRUE,
+                                       after = TRUE,
                                        ratio = TRUE,
-                                       ratioM = TRUE,
+                                       beforeratio = TRUE,
                                        delta = TRUE,
-                                       deltaM = TRUE)
+                                       beforedelta = TRUE)
         
       }
     }

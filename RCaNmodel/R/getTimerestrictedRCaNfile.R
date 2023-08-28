@@ -2,7 +2,7 @@
 #'
 #' This function generates a RCaN file restricted to a specific time range
 #' based on another RCaN file
-#' @param file path to the orginal RCaN file
+#' @param infile path to the orginal RCaN file
 #' @param outfile where to write the resulting RCaNfile
 #' @param from first year of the restricted range, if NULL (default), the same
 #' as the initial model year
@@ -12,7 +12,7 @@
 #' @importFrom readxl excel_sheets
 #' @importFrom dplyr filter mutate bind_rows
 #' @importFrom magrittr %>%
-#' @importFrom stringr str_match str_replace_all
+#' @importFrom stringr str_match_all str_replace_all
 #' @importFrom rlang !! sym
 #' @return nothing but writes the file where specified
 #'
@@ -21,13 +21,12 @@
 #'  package = "RCaNmodel")
 #' outfile <- paste0(tempfile(), ".xlsx")
 #' getTimerestrictedRCaNfile(infile, outfile, from = 1989)
-
 #' @export
 #' 
 
 getTimerestrictedRCaNfile <-
-  function(path, outfile, from = NULL, to = NULL) {
-    if (!file.exists(path)) stop("input file does not exist")
+  function(infile, outfile, from = NULL, to = NULL) {
+    if (!file.exists(infile)) stop("input file does not exist")
     if (file.exists(outfile) && !dir.exists(outfile))
       stop("outfile already exists")
     if (!dir.exists(dirname(outfile))) 
@@ -39,28 +38,28 @@ getTimerestrictedRCaNfile <-
       return()
     }
     components_param <- as.data.frame(
-      read_excel(path, sheet = "Components & input parameter")
+      read_excel(infile, sheet = "Components & input parameter")
     )
     
     #read Fluxes
     fluxes_def <- as.data.frame(
-      read_excel(path, sheet = "Fluxes")
+      read_excel(infile, sheet = "Fluxes")
     )
     
     #read Times series
     series <- as.data.frame(
-      read_excel(path, sheet = "Input time-series")
+      read_excel(infile, sheet = "Input time-series")
     )
     
     #read constraints
     constraints <- as.data.frame(
-      read_excel(path, sheet = "Constraints")
+      read_excel(infile, sheet = "Constraints")
     )
     
     aliases <- NULL
-    if ("Aliases" %in% excel_sheets(path)) {
+    if ("Aliases" %in% excel_sheets(infile)) {
       aliases <-  as.data.frame(
-        read_excel(path, sheet = "Aliases")
+        read_excel(infile, sheet = "Aliases")
       )
     }
     y0 <- min(series$Year)
@@ -88,7 +87,7 @@ getTimerestrictedRCaNfile <-
                       }
       )
       times <- as.character(sapply(times, dput))
-      constraintsrestricted <- constaintsrestricted %>%
+      constraintsrestricted <- constraintsrestricted %>%
         mutate(`Time-range` = times) %>%
         filter(!!sym("Time-range") != "numeric(0)")
       constraints <- bind_rows(constraintsallyears, constraintsrestricted)
