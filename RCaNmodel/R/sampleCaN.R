@@ -91,7 +91,7 @@ sampleCaN <- function(myCaNmod,
                               progressBar = TRUE)
   
   #if some are fixed, we add them to C
-  fixed <- which(abs(bounds[, 2] - bounds[, 3]) < 1e-5)
+  fixed <- which(abs(bounds[, 2] - bounds[, 3]) <= 0)
   if (length(fixed) > 0){
     myCaNmod$v <- c(myCaNmod$v, rowMeans(bounds[fixed, 2:3, drop = FALSE]))
     newC <- Matrix(0, length(fixed), ncol(myCaNmod$A))

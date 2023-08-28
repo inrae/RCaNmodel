@@ -1,7 +1,3 @@
-myCaNmod <- buildCaN(system.file("extdata", "CaN_template_mini.xlsx",
-                                  package = "RCaNmodel"))
-
-
 
 test_that("sampleCaN objects with good names", {
   res <- sampleCaN(myCaNmod, 100)

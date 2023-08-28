@@ -1,11 +1,3 @@
-file1 <- system.file("extdata",
-                     "CaN_template_mini.xlsx", package = "RCaNmodel")
-file_generic <- system.file("extdata",
-                            "CaN_template_mini_generic.xlsx", package = "RCaNmodel")
-
-
-myCaNmod <- buildCaN(file1)
-myCaNmod_generic <- buildCaN(file_generic, generic = TRUE)
 
 as.double_matrix <- function(x){
   x2 <- matrix(ncol = ncol(x),
