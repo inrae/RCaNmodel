@@ -89,7 +89,7 @@ getTimerestrictedRCaNfile <-
       times <- as.character(sapply(times, dput))
       constraintsrestricted <- constraintsrestricted %>%
         mutate(`Time-range` = times) %>%
-        filter(!!sym("Time-range") != "numeric(0)")
+        filter(!(!!sym("Time-range") %in% c("numeric(0)", "integer(0)")))
       constraints <- bind_rows(constraintsallyears, constraintsrestricted)
     }
     
@@ -104,7 +104,7 @@ getTimerestrictedRCaNfile <-
         })
         names(newyears) <- years[, 1]
         cons <- str_replace_all(cons, fixed(newyears))
-        if (any(newyears == "[numeric(0)]")) cons <- NA
+        if (any(newyears %in% c("[numeric(0)]", "[integer(0)]"))) cons <- NA
       }
       cons
     }
