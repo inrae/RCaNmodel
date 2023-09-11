@@ -25,3 +25,10 @@ test_that("sampleCaN mcmc with good dim", {
                nrow(myCaNmod$fluxes_def) * (nrow(myCaNmod$series) - 1) +
                  length(myCaNmod$species) * nrow(myCaNmod$series))
 })
+
+
+test_that("sampleCaN works when there is no C", {
+  myCaNmod$C <- matrix(0, 0, ncol(myCaNmod$A))
+  myCaNmod$v <- numeric(0)
+  expect_no_error(sampleCaN(myCaNmod, 50, thin = 2, nchain = 2, ncore = 2))
+})
