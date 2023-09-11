@@ -118,7 +118,7 @@ sampleCaN <- function(myCaNmod,
     
   } else { #no equality constraints, everything remains the same
     A2 <-myCaNmod$A
-    b2 <- myCaNmod$b - myCaNmod$A %*% solequality
+    b2 <- myCaNmod$b - as.vector(myCaNmod$A %*% solequality)
     Nt <- diag(ncol(myCaNmod$A))
   }
   
