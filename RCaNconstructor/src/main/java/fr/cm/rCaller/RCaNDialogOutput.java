@@ -2,7 +2,6 @@ package fr.cm.rCaller;
 
 import fr.cm.Main.Context;
 import fr.cm.Main.MainApplication;
-import fr.cm.xmlFiles.RCommandXML;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -24,14 +23,14 @@ import java.io.IOException;
 public class RCaNDialogOutput extends Dialog {
 
     boolean typeOutput = true;
-    public RCaNDialogOutput(RCommandXML rCommandXML, String txt){
+    public RCaNDialogOutput(RCaNScript rCaNScriptXML, String txt){
         double width = Math.min(800.0, 0.8 * Context.getWindowWidth());
         double height =  Math.min(500.0, 0.8 * Context.getWindowHeight());
 
         // --------------------------------------
         final Window window = getDialogPane().getScene().getWindow();
         window.setOnCloseRequest(event -> window.hide());
-        setTitle(rCommandXML.getTextMenu());
+        setTitle(rCaNScriptXML.getTextMenu());
 
         HBox  hbox = RCaNBox(txt);
 
@@ -41,14 +40,14 @@ public class RCaNDialogOutput extends Dialog {
         this.showAndWait();
 
     }
-    public RCaNDialogOutput(RCommandXML rCommandXML, Image imageR){
+    public RCaNDialogOutput(RCaNScript rCaNScriptXML, Image imageR){
         double width = Math.min(800.0, 0.8 * Context.getWindowWidth());
         double height =  Math.min(500.0, 0.8 * Context.getWindowHeight());
 
         // --------------------------------------
         final Window window = getDialogPane().getScene().getWindow();
         window.setOnCloseRequest(event -> window.hide());
-        setTitle(rCommandXML.getTextMenu());
+        setTitle(rCaNScriptXML.getTextMenu());
 
         HBox  hbox = RCaNBox(imageR);
         getDialogPane().setMinSize(width, height);
@@ -76,7 +75,6 @@ public class RCaNDialogOutput extends Dialog {
 
     // ------------------------------------------------------------------------
     static HBox RCaNBox(Image imageR)  {
-            RCaNDialogOutput.filePlot = filePlot;
             ImageView viewR = new ImageView();
             double iw = imageR.getWidth();
             double ih = imageR.getHeight();

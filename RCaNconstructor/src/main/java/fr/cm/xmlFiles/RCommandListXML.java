@@ -7,6 +7,7 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 
+import fr.cm.rCaller.RCaNScript;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
@@ -15,9 +16,9 @@ import org.xml.sax.InputSource;
 
 public class RCommandListXML {
 
-    static List<RCommandXML> listOfRCommandXML;
+    static List<RCaNScript> listOfRCaNScriptXML;
     public static void init(){
-        listOfRCommandXML = new ArrayList<>();
+        listOfRCaNScriptXML = new ArrayList<>();
 
         // String fileName = "project/Project.txt";
         // InputStream inst = MetaInformation.class.getClassLoader().getResourceAsStream(fileName);
@@ -44,9 +45,9 @@ public class RCommandListXML {
                     String condition = getByTag(node,"condition");
                     String parameter = getByTag(node,"parameter");
                     String table = getByTag(node,"table");
-                    RCommandXML rCommandXML = new RCommandXML(name, textmenu, menu, rcompute,
+                    RCaNScript rCaNScriptXML = new RCaNScript(name, textmenu, menu, rcompute,
                             rplots, help, condition,  parameter, table);
-                    listOfRCommandXML.add(rCommandXML);
+                    listOfRCaNScriptXML.add(rCaNScriptXML);
                 }
             }
         }
@@ -69,16 +70,16 @@ public class RCommandListXML {
         return(false);
     }
 
-    public static RCommandXML getRCommandByMenu(String menu) {
-        for(RCommandXML rCommandXML : listOfRCommandXML)
-            if (rCommandXML.getTextMenu().equals(menu)) {
-                return (rCommandXML);
+    public static RCaNScript getRCommandByMenu(String menu) {
+        for(RCaNScript rCaNScriptXML : listOfRCaNScriptXML)
+            if (rCaNScriptXML.getTextMenu().equals(menu)) {
+                return (rCaNScriptXML);
             }
         return (null);
     }
 
-    public static List<RCommandXML> getListOfRCommandXML() {
-        return listOfRCommandXML;
+    public static List<RCaNScript> getListOfRCommandXML() {
+        return listOfRCaNScriptXML;
     }
 }
 

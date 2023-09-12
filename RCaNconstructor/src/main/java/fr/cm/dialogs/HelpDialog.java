@@ -9,7 +9,7 @@ import fr.cm.Main.Context;
 import fr.cm.preferences.ColorsAndFormats;
 
 import fr.cm.xmlFiles.HelpXML;
-import fr.cm.xmlFiles.RCommandXML;
+import fr.cm.rCaller.RCaNScript;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
@@ -50,11 +50,11 @@ public class HelpDialog extends Alert {
     }
 
     // --------------------------------------------
-    public HelpDialog(RCommandXML rCommandXMl) {
+    public HelpDialog(RCaNScript rCaNScriptXMl) {
         super(Alert.AlertType.INFORMATION);
-        String content = rCommandXMl.getHelp();
-        String enTete = rCommandXMl.getTextMenu();
-        String title = rCommandXMl.getTextMenu();
+        String content = rCaNScriptXMl.getHelp();
+        String enTete = rCaNScriptXMl.getTextMenu();
+        String title = rCaNScriptXMl.getTextMenu();
         String type = "Information";
         String image = "No";
         this.getDialogPane().setStyle(ColorsAndFormats.font);

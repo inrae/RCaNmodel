@@ -2,7 +2,6 @@ package fr.cm.rCaller;
 
 import fr.cm.project.ProjectListsManager;
 import fr.cm.Main.Context;
-import fr.cm.xmlFiles.RCommandXML;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
@@ -16,20 +15,16 @@ import java.util.Optional;
 public class RCaNDialogGetParametersForRCommand extends Dialog<ButtonType>  {
 
     final Window window;
-
     int ncol;
-    ListView cYear = null;
-    ListView cFlux = null;
-    ListView cYear2 = null;
-    ListView cFlux2 = null;
-    ListView cComponent = null;
+    ListView cYear = null, cFlux = null, cYear2 = null, cFlux2 = null, cComponent = null;
     GridPane gridPane = null;
 
-    public RCaNDialogGetParametersForRCommand(RCommandXML rCommandXML) {
+    // ----------------------------------
+    public RCaNDialogGetParametersForRCommand(RCaNScript rCaNScript) {
         window = this.getDialogPane().getScene().getWindow();
         window.setOnCloseRequest(event -> window.hide());
-        String typeParameter = rCommandXML.getTypeParameter();
-        String parameter = "";
+        String typeParameter = rCaNScript.getTypeParameter();
+        String parameterValue = "";
 
         if (typeParameter.equals("ALLCOMPONENTS")) {
             List<String> components = ProjectListsManager.getNamesOfComponentsIn();
@@ -41,16 +36,16 @@ public class RCaNDialogGetParametersForRCommand extends Dialog<ButtonType>  {
                 sb.append(", ");
             }
             sb.append(")");
-            parameter = sb.toString();
+            parameterValue = sb.toString();
         }
         else{
             if (typeParameter.length() > 0) {
-                parameter = getParameterFromRCommand(typeParameter);
+                parameterValue = getParameterFromRCommand(typeParameter);
             }
         }
-        rCommandXML.setParameter(clean(parameter));
+        rCaNScript.setCommandParameters(trim(parameterValue));
     }
-
+    // ----------------------------------
     private void addYear(SelectionMode sm){
         List<String> years = new ArrayList<>();
         for (int i = Context.getFirstYear(); i <= Context.getLastYear(); i++) {
@@ -83,7 +78,7 @@ public class RCaNDialogGetParametersForRCommand extends Dialog<ButtonType>  {
         gridPane.add(cYear2, ncol, 2);
         ncol ++;
     }
-
+    // ----------------------------------
     private void addFlux(SelectionMode sm) {
         List<String> flux = ProjectListsManager.getNamesOfLinks();
         cFlux = new ListView(FXCollections.observableArrayList(flux));
@@ -98,7 +93,7 @@ public class RCaNDialogGetParametersForRCommand extends Dialog<ButtonType>  {
         gridPane.add(cFlux, ncol, 2);
         ncol++;
     }
-
+    // ----------------------------------
     private void addFlux2(SelectionMode sm) {
         List<String> flux = ProjectListsManager.getNamesOfLinks();
         cFlux2 = new ListView(FXCollections.observableArrayList(flux));
@@ -112,7 +107,7 @@ public class RCaNDialogGetParametersForRCommand extends Dialog<ButtonType>  {
         gridPane.add(cFlux2, ncol, 2);
         ncol++;
     }
-
+    // ----------------------------------
     private void addComponent(SelectionMode sm) {
         List<String> components = ProjectListsManager.getNamesOfComponentsIn();
         cComponent = new ListView(FXCollections.observableArrayList(components));
@@ -126,17 +121,16 @@ public class RCaNDialogGetParametersForRCommand extends Dialog<ButtonType>  {
         gridPane.add(cComponent, ncol, 2);
         ncol++;
     }
-
-    private String clean(String st){
+    // ----------------------------------
+    private String trim(String st){
         String nst = st.replace(",)",")")
                 .replace(", )",")")
                 .replace(", ,'",",")
                 .replace(",,'",",");
         return(nst);
     }
-
     String getParameterFromRCommand(String typeParameter) {
-        String parameter ="";
+        String parameterValue ="";
         double width = Math.min(400.0, 0.8 * Context.getWindowWidth());
         double height =  Math.min(400.0, 0.8 * Context.getWindowHeight());
 
@@ -205,12 +199,12 @@ public class RCaNDialogGetParametersForRCommand extends Dialog<ButtonType>  {
                         case "FLUX[YEAR]":
                             year = (String) cYear.getSelectionModel().getSelectedItems().get(0);
                             flux = (String) cFlux.getSelectionModel().getSelectedItems().get(0);
-                            parameter = "'" + flux + "[" + year + "]'";
+                            parameterValue = "'" + flux + "[" + year + "]'";
                             break;
                         case "COMPONENT[YEAR]":
                             year = (String) cYear.getSelectionModel().getSelectedItems().get(0);
                             component = (String) cComponent.getSelectionModel().getSelectedItems().get(0);
-                            parameter = "'" + component + "[" + year + "]'";
+                            parameterValue = "'" + component + "[" + year + "]'";
                             break;
                         case "FLUXES":
                             sFlux = cFlux.getSelectionModel().getSelectedItems();
@@ -222,7 +216,7 @@ public class RCaNDialogGetParametersForRCommand extends Dialog<ButtonType>  {
                                 sb.append(", ");
                             }
                             sb.append(")");
-                            parameter = sb.toString();
+                            parameterValue = sb.toString();
                             break;
                         case "COMPONENTS":
                             sComponent = cComponent.getSelectionModel().getSelectedItems();
@@ -234,7 +228,7 @@ public class RCaNDialogGetParametersForRCommand extends Dialog<ButtonType>  {
                                 sb.append(", ");
                             }
                             sb.append(")");
-                            parameter = sb.toString();
+                            parameterValue = sb.toString();
                             break;
                         case "FLUXESYEAR":
                             year = (String) cYear.getSelectionModel().getSelectedItems().get(0);
@@ -247,7 +241,7 @@ public class RCaNDialogGetParametersForRCommand extends Dialog<ButtonType>  {
                                 sb.append(", ");
                             }
                             sb.append("), year = " + year);
-                            parameter = sb.toString();
+                            parameterValue = sb.toString();
                             break;
                         case "COMPONENTSYEAR":
                             year = (String) cYear.getSelectionModel().getSelectedItems().get(0);
@@ -260,7 +254,7 @@ public class RCaNDialogGetParametersForRCommand extends Dialog<ButtonType>  {
                                 sb.append(", ");
                             }
                             sb.append("), year = " + year);
-                            parameter = sb.toString();
+                            parameterValue = sb.toString();
                             break;
                         case "FLUXESCOMPONENTS":
                             sFlux = cFlux.getSelectionModel().getSelectedItems();
@@ -281,28 +275,28 @@ public class RCaNDialogGetParametersForRCommand extends Dialog<ButtonType>  {
                                 }
                             }
                             sb.append(")");
-                            parameter = sb.toString();
+                            parameterValue = sb.toString();
                             break;
                         case "FLUX[YEAR]FLUX[YEAR]":
                             year = (String) cYear.getSelectionModel().getSelectedItems().get(0);
                             flux = (String) cFlux.getSelectionModel().getSelectedItems().get(0);
                             String year2 = (String) cYear2.getSelectionModel().getSelectedItems().get(0);
                             String flux2 = (String) cFlux2.getSelectionModel().getSelectedItems().get(0);
-                            parameter = "c('" + flux + "[" + year + "]'" + ","
+                            parameterValue = "c('" + flux + "[" + year + "]'" + ","
                                     + "'" + flux2 + "[" + year2 + "]'" + ")";
                             break;
                         case "FLUX":
                             flux = (String) cFlux.getSelectionModel().getSelectedItems().get(0);
-                            parameter = "'" + flux + "'";
+                            parameterValue = "'" + flux + "'";
                             break;
                         case "COMPONENT":
                             component = (String) cComponent.getSelectionModel().getSelectedItems().get(0);
-                            parameter = "'" + component + "'";
+                            parameterValue = "'" + component + "'";
                             break;
                     }
                 }
             }
         }
-        return (parameter);
+        return (parameterValue);
     }
 }

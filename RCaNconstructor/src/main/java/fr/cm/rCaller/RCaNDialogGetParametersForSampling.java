@@ -1,7 +1,6 @@
 package fr.cm.rCaller;
 
 import fr.cm.Main.Context;
-import fr.cm.xmlFiles.RCommandXML;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
@@ -23,7 +22,7 @@ public class RCaNDialogGetParametersForSampling extends Dialog<ButtonType> {
 
     final Window window;
 
-    public RCaNDialogGetParametersForSampling(RCommandXML rCommandXML) {
+    public RCaNDialogGetParametersForSampling(RCaNScript rCaNScript) {
         window = this.getDialogPane().getScene().getWindow();
         window.setOnCloseRequest(event -> window.hide());
 
@@ -64,9 +63,11 @@ public class RCaNDialogGetParametersForSampling extends Dialog<ButtonType> {
         Optional<ButtonType> result = this.showAndWait();
         if (result.isPresent()) {
             if (result.get() == buttonTypeOk) {
-                RCaNCommon.setParameterSizeSample((String)cSizeSample.getSelectionModel().getSelectedItem());
-                RCaNCommon.setParameterNChain((String)cNChain.getSelectionModel().getSelectedItem());
-                RCaNCommon.setParameterThin((String)cThin.getSelectionModel().getSelectedItem());
+                rCaNScript.setSamplingParameters(
+                        (String)cSizeSample.getSelectionModel().getSelectedItem(),
+                        (String)cNChain.getSelectionModel().getSelectedItem(),
+                        (String)cThin.getSelectionModel().getSelectedItem()
+                );
             }
         }
     }

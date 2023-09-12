@@ -3,7 +3,7 @@ package fr.cm.Main;
 
 import fr.cm.project.ProjectListsManager;
 import fr.cm.preferences.ColorsAndFormats;
-import fr.cm.rCaller.RCaNStartR;
+import fr.cm.rCaller.RCaNCaller;
 import fr.cm.xmlFiles.HelpListXML;
 import fr.cm.xmlFiles.RCommandListXML;
 import javafx.application.Application;
@@ -37,6 +37,7 @@ public class MainApplication extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        RCaNCaller.initRCaN();
 
         stage = primaryStage;
         stage.widthProperty().addListener(changeSizelistener);
@@ -63,7 +64,6 @@ public class MainApplication extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        new RCaNStartR().start();
     }
 
     static void setFirstPage(){

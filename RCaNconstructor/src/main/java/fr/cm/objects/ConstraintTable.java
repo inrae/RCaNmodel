@@ -5,6 +5,7 @@
  */
 package fr.cm.objects;
 
+import fr.cm.excel.ConstraintEditCell;
 import fr.cm.project.ProjectListsManager;
 import fr.cm.Main.Context;
 import fr.cm.preferences.ColorsAndFormats;

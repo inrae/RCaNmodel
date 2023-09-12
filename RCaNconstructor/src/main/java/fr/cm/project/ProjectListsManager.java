@@ -288,12 +288,13 @@ public class ProjectListsManager {
 
    public static boolean containsObservation(String observationName) {
         boolean contain = false;
-        for (Observation observation : listOfObservations)
+       for (Observation observation : listOfObservations){
             if (observationName.equals(observation.getObsName())) {
                 contain = true;
                 break;
             }
-        return contain;
+        }
+       return contain;
     }
     public static Observation getObservationByName(String observationName) {
         Observation observationS = null;

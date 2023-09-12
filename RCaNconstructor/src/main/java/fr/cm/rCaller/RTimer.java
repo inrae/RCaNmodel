@@ -44,7 +44,7 @@ public  class RTimer extends AnimationTimer {
                     secondes.setText(stringResult);
                 }
             else {
-                 rCaNDialog.disparait();
+                rCaNDialog.clearDialog();
                 this.stop();
             }
         }

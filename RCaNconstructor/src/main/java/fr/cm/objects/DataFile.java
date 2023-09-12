@@ -16,9 +16,9 @@ public class DataFile {
     private final StringProperty shortName = new SimpleStringProperty(this, "name");
     private final StringProperty fullFileName = new SimpleStringProperty(this, "fullFileName");
     String owner;
-    boolean stillExisting;
+    boolean correctlyRead;
     String metaInformation;
-    List<Observation> addedAsObservations;
+    List<Observation> addedObservations;
     private List<String> namesColumnInFile;
     String[][] dataInFile;
 
@@ -30,14 +30,16 @@ public class DataFile {
                     String fullFileName,
                     String metaInformationAboutDataFile,
                     String owner,
-                    String codedObservations) {
+                    List<Observation> addedObservations) {
         this.id = id;
         this.owner = owner;
         this.metaInformation = metaInformationAboutDataFile;
         setShortName(shortName);
         setFullFileName(fullFileName);
-        addedAsObservations = new ArrayList<>();
-        decodeAddedObservations(codedObservations);
+        this.addedObservations = addedObservations;
+        for (Observation observation : addedObservations) {
+            observation.setOriginalFile(this);
+            }
         readData();
     }
 
@@ -50,7 +52,7 @@ public class DataFile {
             setShortName(file.getName());
             owner = "Owner";
             metaInformation = "Information about dataFile";
-            addedAsObservations = new ArrayList<>();
+            addedObservations = new ArrayList<>();
             readData();
         }
         catch(Exception ex){}
@@ -65,7 +67,7 @@ public class DataFile {
     // --------------------------------------------
     void readData() {
         namesColumnInFile = new ArrayList<>();
-        stillExisting = false;
+        correctlyRead = false;
         String [][] valuesCSV = ExcelManagerCSV.importCSV(fullFileName.get());
         if (valuesCSV != null) {
             int nl, nc;
@@ -81,7 +83,7 @@ public class DataFile {
                 }
                 firstYear = Integer.parseInt(dataInFile[1][0]);
                 lastYear = Integer.parseInt(dataInFile[nl - 2][0]);
-                stillExisting = true;
+                correctlyRead = true;
             }
             catch (Exception ex) {
                 HelpDialog.warning("Problem in reading file " + fullFileName.get(), "Warning", ex);
@@ -95,15 +97,15 @@ public class DataFile {
     }
     // --------------------------------------------
 
-    public void removeObservationFromColumn(Observation observation) {
+    public void removeAddedObservation(Observation observation) {
 
-        addedAsObservations.remove(observation);
+        addedObservations.remove(observation);
         ProjectListsManager.removeObservation(observation);
     }
 
     public Observation makeObservationFromColumn(String nameColumn) {
-        if (!ProjectListsManager.containsObservation(nameColumn)) {
-            String nameObs = id + "_" + nameColumn;
+        String nameObs = id + "_" + nameColumn;
+        if ( ! ProjectListsManager.containsObservation(nameObs)) {
             int numObs = namesColumnInFile.indexOf(nameColumn);
             int ny = dataInFile.length - 1;
             double[] values = new double[ny];
@@ -112,35 +114,12 @@ public class DataFile {
             }
             Observation observation = new Observation(this, nameObs, values, firstYear, lastYear);
             ProjectListsManager.addObservation(observation,true);
-            addedAsObservations.add(observation);
+            addedObservations.add(observation);
             return(observation);
         }
         else {
             HelpDialog.warning("An observation with name " + nameColumn + " already exists", "Warning");
             return(null);
-        }
-    }
-
-    // --------------------------------------------
-    public String codeAddedObservations() {
-        StringBuilder bo = new StringBuilder("");
-        for (Observation observation : addedAsObservations) {
-            bo.append(observation.codeInDataFile());
-            bo.append(";");
-        }
-        return bo.toString();
-    }
-
-    // --------------------------------------------
-    public void decodeAddedObservations(String codeObservations) {
-        addedAsObservations = new ArrayList<>();
-        String[] stObservations = codeObservations.split(";");
-        for (String stObservation : stObservations) {
-            if (!stObservation.equals("")) {
-                Observation observation = Observation.codeFromDataFile(stObservation);
-                observation.setOriginalFile(this);
-                addedAsObservations.add(observation);
-            }
         }
     }
 
@@ -165,7 +144,7 @@ public class DataFile {
     // --------------------------------------------------
     public String getStringAddedObservations() {
         StringBuilder bo = new StringBuilder("");
-        for (Observation observation : addedAsObservations) {
+        for (Observation observation : addedObservations) {
             bo.append(observation.getObsName());
             bo.append("\n");
         }
@@ -203,8 +182,8 @@ public class DataFile {
         this.owner = owner;
     }
 
-    public boolean isStillExisting() {
-        return stillExisting;
+    public boolean isCorrectlyRead() {
+        return correctlyRead;
     }
 
     public String getMetaInformation() {
@@ -216,7 +195,7 @@ public class DataFile {
     }
 
     public List<Observation> getAddedAsObservations() {
-        return addedAsObservations;
+        return addedObservations;
     }
 
     public List<String> getNamesColumnInFile() {
