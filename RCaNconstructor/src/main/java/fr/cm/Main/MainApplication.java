@@ -26,9 +26,11 @@ import java.util.TimerTask;
  *
  */
 public class MainApplication extends Application {
+
     public static void main(String[] args) {
         launch(args);
     }
+
     public static Stage stage;
     static BorderPane borderPaneRacine;
     static FirstPage firstPage;
@@ -86,7 +88,7 @@ public class MainApplication extends Application {
 
         MenuBar menuBar = new MenuBar();
         Menu fileMenu = new Menu("File");
-        Menu viewMenu = new Menu("Set up a trophic network");
+        Menu viewMenu = new Menu("Set up trophic network");
         Menu documentMenu = new Menu("Document project");
         Menu rcanMenuBuild = new Menu("Build polytope");
         Menu rcanMenuSample = new Menu("Sample trajectories");
