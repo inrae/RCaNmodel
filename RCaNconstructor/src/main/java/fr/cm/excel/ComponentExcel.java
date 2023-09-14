@@ -2,7 +2,7 @@ package fr.cm.excel;
 
 import fr.cm.objects.Component;
 import fr.cm.preferences.Strings;
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import org.apache.poi.ss.usermodel.*;
 
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public class ComponentExcel {
         cell = row.createCell(np + 3);
         cell.setCellValue("Y");
 
-        for (Component component : ProjectListsManager.getListOfComponents()) {
+        for (Component component : ObjectsManager.getListOfComponents()) {
             row = sheet.createRow(liP);
             liP++;
             cell = row.createCell(0);
@@ -103,7 +103,7 @@ public class ComponentExcel {
                 y = 0.2 + 0.4 * Math.random();
             }
             Component component = new Component(nameComponent, parameters, typeComponent, x, y);
-            ProjectListsManager.addComponent(component, false);
+            ObjectsManager.addComponent(component, false);
         }
     }
     static boolean getBoolean(Cell cell){

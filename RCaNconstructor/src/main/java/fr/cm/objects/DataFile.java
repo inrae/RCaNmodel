@@ -1,7 +1,7 @@
 package fr.cm.objects;
 
 import fr.cm.dialogs.HelpDialog;
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import fr.cm.excel.ExcelManagerCSV;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -12,18 +12,14 @@ import java.util.List;
 
 public class DataFile {
 
-    private String id;
-    private final StringProperty shortName = new SimpleStringProperty(this, "name");
-    private final StringProperty fullFileName = new SimpleStringProperty(this, "fullFileName");
-    String owner;
+    private String id, owner, metaInformation;
+    private final StringProperty shortName = new SimpleStringProperty(this, "name"),
+            fullFileName = new SimpleStringProperty(this, "fullFileName");
     boolean correctlyRead;
-    String metaInformation;
     List<Observation> addedObservations;
     private List<String> namesColumnInFile;
     String[][] dataInFile;
-
     int firstYear, lastYear;
-
     // --------------------------------------------
     public DataFile(String id,
                     String shortName,
@@ -46,7 +42,7 @@ public class DataFile {
     // --------------------------------------------
     public DataFile(String fullFileName) {
         try {
-            id = ProjectListsManager.getDataFileId();
+            id = ObjectsManager.getDataFileId();
             setFullFileName(fullFileName);
             File file = new File(fullFileName);
             setShortName(file.getName());
@@ -100,12 +96,12 @@ public class DataFile {
     public void removeAddedObservation(Observation observation) {
 
         addedObservations.remove(observation);
-        ProjectListsManager.removeObservation(observation);
+        ObjectsManager.removeObservation(observation);
     }
 
     public Observation makeObservationFromColumn(String nameColumn) {
         String nameObs = id + "_" + nameColumn;
-        if ( ! ProjectListsManager.containsObservation(nameObs)) {
+        if ( ! ObjectsManager.containsObservation(nameObs)) {
             int numObs = namesColumnInFile.indexOf(nameColumn);
             int ny = dataInFile.length - 1;
             double[] values = new double[ny];
@@ -113,7 +109,7 @@ public class DataFile {
                 values[y] = correct(dataInFile[y][numObs]);
             }
             Observation observation = new Observation(this, nameObs, values, firstYear, lastYear);
-            ProjectListsManager.addObservation(observation,true);
+            ObjectsManager.addObservation(observation,true);
             addedObservations.add(observation);
             return(observation);
         }

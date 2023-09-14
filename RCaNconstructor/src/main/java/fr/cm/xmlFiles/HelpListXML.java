@@ -18,14 +18,14 @@ public class HelpListXML {
 
     public static void init(){
         listOfHelpXML = new ArrayList<>();
-        String fileName = "help/Helps.xml";
+        String fileName = "scripts/Helps.xml";
         try {
             InputStream inst = HelpListXML.class.getClassLoader().getResourceAsStream(fileName);
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document doc = db.parse(new InputSource(inst));
             doc.getDocumentElement().normalize();
-            NodeList nodeList = doc.getElementsByTagName("help");
+            NodeList nodeList = doc.getElementsByTagName("scripts");
             for (int itr = 0; itr < nodeList.getLength(); itr++) {
                 Node node = nodeList.item(itr);
                 if (node.getNodeType() == Node.ELEMENT_NODE) {

@@ -5,7 +5,7 @@
  */
 package fr.cm.objects;
 
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import fr.cm.preferences.Strings;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
@@ -57,7 +57,7 @@ public class FluxEditDialog extends Dialog<ButtonType> {
                  flux.setTypeTrophic(buttonTrophic.isSelected());
             }
             if (result.get() == buttonTypeDelete) {
-                ProjectListsManager.removeLink(flux);
+                ObjectsManager.removeLink(flux);
             }
         }
     }

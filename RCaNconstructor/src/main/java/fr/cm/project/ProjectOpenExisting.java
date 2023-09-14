@@ -6,6 +6,7 @@
 package fr.cm.project;
 
 import fr.cm.Main.Context;
+import fr.cm.Main.Logg;
 import fr.cm.Main.MainApplication;
 
 import java.io.File;
@@ -35,6 +36,7 @@ public class ProjectOpenExisting extends Dialog<ButtonType> {
                 Context.setFileName(fileName);
                 Context.setDirName(dirName);
                 Context.setStarted(true);
+                Logg.addLog("Opening "+dirName+"/"+fileName);
             }
         }
     }

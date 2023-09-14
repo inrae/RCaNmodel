@@ -2,6 +2,7 @@ package fr.cm.rCaller;
 
 
 import fr.cm.Main.Context;
+import fr.cm.Main.Logg;
 import fr.cm.Main.MainApplication;
 import fr.cm.preferences.ColorsAndFormats;
 import javafx.event.ActionEvent;
@@ -21,6 +22,7 @@ public class RCaNDialog extends Dialog {
     boolean commandRunning  = false;
     public RCaNDialog(RCaNScript rCaNScript) {
         // --------------------------------------
+        Logg.addLog(rCaNScript.getScriptString());
         this.rCaNScript = rCaNScript;
         this.rCaNScript.setScriptParameters();
         RCaNCaller.makeRCommand(rCaNScript);

@@ -1,6 +1,7 @@
 package fr.cm.rCaller;
 
 import fr.cm.Main.Context;
+import fr.cm.Main.Logg;
 import fr.cm.Main.MainApplication;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -12,70 +13,77 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 
 public class RCaNDialogOutput extends Dialog {
 
-    boolean typeOutput = true;
-    public RCaNDialogOutput(RCaNScript rCaNScriptXML, String txt){
-        double width = Math.min(800.0, 0.8 * Context.getWindowWidth());
-        double height =  Math.min(500.0, 0.8 * Context.getWindowHeight());
-
-        // --------------------------------------
-        final Window window = getDialogPane().getScene().getWindow();
-        window.setOnCloseRequest(event -> window.hide());
-        setTitle(rCaNScriptXML.getTextMenu());
-
-        HBox  hbox = RCaNBox(txt);
-
-        getDialogPane().setMinSize(width, height);
-        getDialogPane().setContent(hbox);
-        getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
-        this.showAndWait();
-
-    }
-    public RCaNDialogOutput(RCaNScript rCaNScriptXML, Image imageR){
-        double width = Math.min(800.0, 0.8 * Context.getWindowWidth());
-        double height =  Math.min(500.0, 0.8 * Context.getWindowHeight());
-
-        // --------------------------------------
-        final Window window = getDialogPane().getScene().getWindow();
-        window.setOnCloseRequest(event -> window.hide());
-        setTitle(rCaNScriptXML.getTextMenu());
-
-        HBox  hbox = RCaNBox(imageR);
-        getDialogPane().setMinSize(width, height);
-        getDialogPane().setContent(hbox);
-        getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
-
-        this.showAndWait();
-    }
     static File filePlot;
+    static String output;
+    boolean typeOutput = true;
+    public RCaNDialogOutput(RCaNScript rCaNScriptXML, String output){
+        this.output = output;
+        double width = Math.min(800.0, 0.6 * Context.getWindowWidth());
+        double height =  Math.min(500.0, 0.6 * Context.getWindowHeight());
+        // --------------------------------------
+        final Window window = getDialogPane().getScene().getWindow();
+        window.setOnCloseRequest(event -> window.hide());
+        setTitle(rCaNScriptXML.getTextMenu());
+        VBox  vbox = RCaNBox(output);
+        getDialogPane().setMinSize(width, height);
+        getDialogPane().setContent(vbox);
+        getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+        this.showAndWait();
+    }
+
+
+    public RCaNDialogOutput(RCaNScript rCaNScriptXML, File filePlot){
+        this.filePlot = filePlot;
+        double width = Math.min(800.0, 0.8 * Context.getWindowWidth());
+        double height =  Math.min(500.0, 0.8 * Context.getWindowHeight());
+        // --------------------------------------
+        final Window window = getDialogPane().getScene().getWindow();
+        window.setOnCloseRequest(event -> window.hide());
+        setTitle(rCaNScriptXML.getTextMenu());
+        VBox  vbox = RCaNBox(filePlot);
+        getDialogPane().setMinSize(width, height);
+        getDialogPane().setContent(vbox);
+        getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+        this.showAndWait();
+    }
     // ------------------------------------------------------------------------
-    static HBox RCaNBox(String txt){
-        HBox hbox = new HBox();
+    static VBox RCaNBox(String txt){
         Label outputR = new Label(txt);
-        outputR.setTextFill(Color.DARKBLUE);
-        outputR.setFont(new Font("Courier", 14));
+        outputR.setFont(Font.font("Monospaced", FontWeight.BOLD, FontPosture.REGULAR, 20));
         ScrollPane scrollOutputR;
         scrollOutputR = new ScrollPane(outputR);
-        double cw = 0.9 * Context.getWindowWidth();
-        double ch = 0.9 * Context.getWindowHeight();
+        double cw = 0.5 * Context.getWindowWidth();
+        double ch = 0.5 * Context.getWindowHeight();
         scrollOutputR.setPrefSize(cw, ch);
-        hbox.setAlignment(Pos.CENTER);
-        hbox.getChildren().add(scrollOutputR);
-        return(hbox);
+
+        Button buttonSave = new Button("Save Result");
+        buttonSave.setOnAction(buttonSaveText);
+        VBox vBox = new VBox();
+        vBox.getChildren().addAll(scrollOutputR, buttonSave);
+        return (vBox);
     }
 
+
     // ------------------------------------------------------------------------
-    static HBox RCaNBox(Image imageR)  {
-            ImageView viewR = new ImageView();
+    static VBox RCaNBox(File filePlot)  {
+        VBox vBox = new VBox();
+        ImageView viewR = new ImageView();
+        try {
+            FileInputStream inputstream = new FileInputStream(filePlot);
+            Image imageR = new Image(inputstream);
             double iw = imageR.getWidth();
             double ih = imageR.getHeight();
             double cw = 0.9 * Context.getWindowWidth();
@@ -89,36 +97,60 @@ public class RCaNDialogOutput extends Dialog {
             viewR.setImage(imageR);
             viewR.setFitHeight(rh);
             viewR.setFitWidth(rw);
-            HBox hbox = new HBox();
             Button buttonSave = new Button("Save Image");
-            buttonSave.setOnAction(buttonSaveListener);
-            VBox vBox = new VBox();
+            buttonSave.setOnAction(buttonSaveImage);
             vBox.getChildren().addAll(viewR, buttonSave);
-            hbox.setAlignment(Pos.CENTER);
-            hbox.getChildren().add(vBox);
-            return (hbox);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return (vBox);
      }
     // ------------------------------------------------------------------------
-    static final EventHandler<ActionEvent> buttonSaveListener = e -> handle(e);
-    private static void handle(ActionEvent e) {
+    static final EventHandler<ActionEvent> buttonSaveImage = e -> handleImage(e);
+    private static void handleImage(ActionEvent e) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Name of file : ");
         fileChooser.setInitialDirectory(new File(Context.getDirName()));
-        String nextImageName = fileChooser.showSaveDialog(MainApplication.stage).getAbsolutePath();
-        if (nextImageName != null) {
-            if(nextImageName.length()>0) {
-                if (!nextImageName.contains(".png")) {
-                    nextImageName = nextImageName + ".png";
+        String fileName = fileChooser.showSaveDialog(MainApplication.stage).getAbsolutePath();
+        if (fileName != null) {
+            if(fileName.length()>0) {
+                if (!fileName.contains(".png")) {
+                    fileName = fileName + ".png";
                 }
                 try {
                     BufferedImage bufferedImage = ImageIO.read(filePlot);
-                    ImageIO.write(bufferedImage, "png", new File(nextImageName));
-                    System.out.println(" saved " + nextImageName);
+                    ImageIO.write(bufferedImage, "png", new File(fileName));
+                    Logg.addLog("Saved " + fileName);
                 } catch (IOException ioException) {
-                    System.out.println(" pb saving file " + nextImageName);
+                    Logg.addLog("Issue saving file " + fileName);
                     ioException.printStackTrace();
                 }
+            }
+        }
+    }
 
+    static final EventHandler<ActionEvent> buttonSaveText = e -> handleText(e);
+    private static void handleText(ActionEvent e) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Name of file : ");
+        fileChooser.setInitialDirectory(new File(Context.getDirName()));
+        String fileName = fileChooser.showSaveDialog(MainApplication.stage).getAbsolutePath();
+        if (fileName != null) {
+            if(fileName.length()>0) {
+                if (!fileName.contains(".txt")) {
+                    fileName = fileName + ".txt";
+                }
+                try {
+                    File file = new File(fileName);
+                    FileWriter writer = new FileWriter(file);
+                    writer.write(output);
+                    writer.flush();
+                    writer.close();
+                    Logg.addLog("Saved " + fileName);
+                } catch (IOException ioException) {
+                    Logg.addLog("Issue saving file " + fileName);
+                    ioException.printStackTrace();
+                }
             }
         }
     }

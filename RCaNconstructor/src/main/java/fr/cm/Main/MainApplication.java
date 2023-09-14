@@ -1,7 +1,6 @@
 
 package fr.cm.Main;
 
-import fr.cm.project.ProjectListsManager;
 import fr.cm.preferences.ColorsAndFormats;
 import fr.cm.rCaller.RCaNCaller;
 import fr.cm.xmlFiles.HelpListXML;
@@ -17,6 +16,7 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
+import java.io.FileWriter;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -34,21 +34,20 @@ public class MainApplication extends Application {
     public static Stage stage;
     static BorderPane borderPaneRacine;
     static FirstPage firstPage;
-
+    FileWriter logWriter;
     @Override
     public void start(Stage primaryStage) {
         RCaNCaller.initRCaN();
-
+        Logg.createLog();
         stage = primaryStage;
         stage.widthProperty().addListener(changeSizelistener);
         stage.heightProperty().addListener(changeSizelistener);
         setOnClose();
-
         RCommandListXML.init();
         HelpListXML.init();
         Context.init();
-        ProjectListsManager.init();
-        ProjectListsManager.getNetworkView().update();
+        ObjectsManager.init();
+        ObjectsManager.getNetworkView().update();
 
         borderPaneRacine = new BorderPane();
 
@@ -63,8 +62,8 @@ public class MainApplication extends Application {
         primaryStage.setY(0.05 * Context.getWindowHeight());
         primaryStage.setScene(scene);
         primaryStage.show();
-
     }
+
 
     static void setFirstPage(){
         firstPage = new FirstPage();
@@ -72,18 +71,18 @@ public class MainApplication extends Application {
     }
     public static void updateMenus() {
         MenuFile.updateMenus();
-        MenuSetUp.updateMenus();
+        MenuTrophicNetwork.updateMenus();
         MenuDocument.updateMenus();
         MenuRCaNBuild.updateMenus();
         MenuRCaNSample.updateMenus();
     }
 
     static MenuBar setMenus() {
+        new MenuFile(borderPaneRacine);
         new MenuRCaNBuild(borderPaneRacine);
         new MenuRCaNSample(borderPaneRacine);
-        new MenuFile(borderPaneRacine);
         new MenuHelp(borderPaneRacine);
-        new MenuSetUp(borderPaneRacine);
+        new MenuTrophicNetwork(borderPaneRacine);
         new MenuDocument(borderPaneRacine);
 
         MenuBar menuBar = new MenuBar();
@@ -95,34 +94,30 @@ public class MainApplication extends Application {
         Menu helpMenu = new Menu("Information and help");
 
         fileMenu.getItems().addAll(MenuFile.getMenuItems());
-        viewMenu.getItems().addAll(MenuSetUp.getMenuItems());
+        viewMenu.getItems().addAll(MenuTrophicNetwork.getMenuItems());
         documentMenu.getItems().addAll(MenuDocument.getMenuItems());
         rcanMenuBuild.getItems().addAll(MenuRCaNBuild.getMenuItems());
         rcanMenuSample.getItems().addAll(MenuRCaNSample.getMenuItems());
         helpMenu.getItems().addAll(MenuHelp.getMenus());
 
-        menuBar.getMenus().addAll(fileMenu, viewMenu, documentMenu, rcanMenuBuild, rcanMenuSample, helpMenu);
+        menuBar.getMenus().addAll(fileMenu, viewMenu, rcanMenuBuild, rcanMenuSample, documentMenu, helpMenu);
         updateMenus();
         return menuBar;
     }
-
     public static void exit() {
         Platform.exit();
         System.exit(0);
     }
-
     static void setOnClose() {
-
+        Logg.addLog("Exit");
         stage.setOnCloseRequest((WindowEvent t) -> exit());
     }
-
     // -------------------------------------------------------------------------------------
     final ChangeListener<Number> changeSizelistener = new ChangeListener<>() {
         // on observe si l'utilisateur est en train de changer la taille de la fenetre principale
         final Timer timer = new Timer();
         TimerTask task = null;
         final long delayTime = 100;
-
         @Override
         public void changed(ObservableValue<? extends Number> observable, Number oldValue, final Number newValue) {
             if (task != null) {
@@ -136,20 +131,17 @@ public class MainApplication extends Application {
                     Context.setWindowWidth(nw);
                     Context.setWindowHeight(nh);
                     if (nw > 1.0 && nh > 1.0) {
-                           Platform.runLater(() -> ProjectListsManager.getNetworkView().redrawChangingSize());
+                           Platform.runLater(() -> ObjectsManager.getNetworkView().redrawChangingSize());
                     }
                 }
             };
             timer.schedule(task, delayTime);
         }
     };
-
     // ------------------------------------------------------------------------
     public static void setTitle(String fileName) {
-
         stage.setTitle(" RCaN - " + fileName.replace(".xlsx", " "));
     }
-
     public static Stage getStage() {
         return stage;
     }

@@ -1,7 +1,7 @@
 package fr.cm.excel;
 
 import fr.cm.objects.Flux;
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import org.apache.poi.ss.usermodel.*;
 
 import java.util.Iterator;
@@ -25,7 +25,7 @@ public class FluxExcel {
         cell.setCellValue("To");
         cell = row.createCell(3);
         cell.setCellValue("Trophic");
-        for (Flux flux : ProjectListsManager.getListOfFluxes()) {
+        for (Flux flux : ObjectsManager.getListOfFluxes()) {
             row = sheet.createRow(liL);
             liL++;
             cell = row.createCell(0);
@@ -57,7 +57,7 @@ public class FluxExcel {
             cell = row.getCell(3);
             boolean stype = getBoolean(cell);
             Flux newFlux = new Flux(in, out, stype);
-            ProjectListsManager.addLink(newFlux, false);
+            ObjectsManager.addLink(newFlux, false);
         }
     }
 

@@ -6,7 +6,7 @@
 package fr.cm.objects;
 
 import fr.cm.excel.ConstraintEditCell;
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import fr.cm.Main.Context;
 import fr.cm.preferences.ColorsAndFormats;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -29,17 +29,10 @@ public class ConstraintTable extends Pane {
 
     final TableView<Constraint> constraintTable;
     ObservableList<Constraint> list;
-    final Button editC = new Button("Edit");
-    final Button newC = new Button("Add");
-    final Button buttonUp = new Button("Up");
-    final Button buttonDown = new Button("Down");
-    final Button deleteC = new Button("Delete");
-
+    final Button editC = new Button("Edit"), newC = new Button("Add"), buttonUp = new Button("Up"), buttonDown = new Button("Down"), deleteC = new Button("Delete");
     final HBox hboxButtons = new HBox();
     final VBox vbox = new VBox();
-
-    double width = Context.getWindowWidth();
-    double height = Context.getWindowHeight();
+    double width = Context.getWindowWidth(),  height = Context.getWindowHeight();
 
     public ConstraintTable() {
         constraintTable = new TableView<>();
@@ -102,8 +95,7 @@ public class ConstraintTable extends Pane {
         constraintTable.setPrefHeight(0.7 * height);
         constraintTable.setPrefWidth(0.8 * width);
 
-
-        list = FXCollections.observableArrayList(ProjectListsManager.getListOfConstraints());
+        list = FXCollections.observableArrayList(ObjectsManager.getListOfConstraints());
         constraintTable.setItems(list);
 
         constraintTable.getSelectionModel().selectFirst();
@@ -121,20 +113,20 @@ public class ConstraintTable extends Pane {
 
         buttonUp.setOnAction((ActionEvent e) -> {
             Constraint constraint = constraintTable.getSelectionModel().getSelectedItem();
-            ProjectListsManager.upConstraint(constraint);
+            ObjectsManager.upConstraint(constraint);
             updateTable();
         });
 
         buttonDown.setOnAction((ActionEvent e) -> {
             Constraint constraint = constraintTable.getSelectionModel().getSelectedItem();
-            ProjectListsManager.downConstraint(constraint);
+            ObjectsManager.downConstraint(constraint);
             updateTable();
         });
 
         deleteC.setOnAction((ActionEvent e) -> {
             if (constraintTable.getSelectionModel().getSelectedItem() != null) {
                 Constraint constraint = constraintTable.getSelectionModel().getSelectedItem();
-                ProjectListsManager.removeConstraints(constraint);
+                ObjectsManager.removeConstraints(constraint);
                 list.removeAll(constraint);
                 updateTable();
             }
@@ -159,7 +151,7 @@ public class ConstraintTable extends Pane {
     public void updateTable() {
         Constraint constraint = constraintTable.getSelectionModel().getSelectedItem();
         constraintTable.getItems().removeAll(list);
-        list = FXCollections.observableArrayList(ProjectListsManager.getListOfConstraints());
+        list = FXCollections.observableArrayList(ObjectsManager.getListOfConstraints());
         constraintTable.setItems(list);
         constraintTable.getSelectionModel().select(constraint);
     }

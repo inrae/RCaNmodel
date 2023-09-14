@@ -1,9 +1,8 @@
 package fr.cm.objects;
 
-import fr.cm.dialogs.HelpDialog;
 import fr.cm.Main.Context;
 import fr.cm.Main.MainApplication;
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import fr.cm.preferences.ColorsAndFormats;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -21,15 +20,15 @@ import static javafx.collections.FXCollections.observableArrayList;
 public class DataFileTable extends Pane {
 // ---------------------------------
 
-    double width = Context.getWindowWidth();
-    double height =  Context.getWindowHeight();
+    double width = Context.getWindowWidth(),
+            height =  Context.getWindowHeight();
     DataFile selectedDataFile;
     // GAUCHE
     Label leftTitle = new Label("Project data files");
     ObservableList<DataFile> listOfFiles;
-    Button buttonNewFile = new Button("Add a datafile to above list");
-    Button buttonObservations = new Button("Add or remove observations in selected datafile");
-    Button buttonCharacteristics = new Button("Edit annotations of selected datafile");
+    Button buttonNewFile = new Button("Add a datafile to above list"),
+            buttonObservations = new Button("Add or remove observations in selected datafile"),
+            buttonCharacteristics = new Button("Edit annotations of selected datafile");
     VBox leftBox = new VBox();
 
     public DataFileTable(){
@@ -73,7 +72,7 @@ public class DataFileTable extends Pane {
         commentsCol.setEditable(false);
         tableOfFiles.getColumns().add(commentsCol);
 
-        listOfFiles = observableArrayList(ProjectListsManager.getListOfDataFiles());
+        listOfFiles = observableArrayList(ObjectsManager.getListOfDataFiles());
         tableOfFiles.setItems(listOfFiles);
         tableOfFiles.getSelectionModel().selectFirst();
         @SuppressWarnings("rawtypes")
@@ -97,10 +96,10 @@ public class DataFileTable extends Pane {
                     // ADDING A FILE
                     String newFileName = observationFileChooser();
                     DataFile dataFile = new DataFile(newFileName);
-                    ProjectListsManager.addDataFile(dataFile, true);
+                    ObjectsManager.addDataFile(dataFile, true);
                     selectedDataFile = dataFile;
                     tableOfFiles.getSelectionModel().selectLast();
-                    listOfFiles = observableArrayList(ProjectListsManager.getListOfDataFiles());
+                    listOfFiles = observableArrayList(ObjectsManager.getListOfDataFiles());
                     tableOfFiles.setItems(listOfFiles);
                     tableOfFiles.getSelectionModel().selectLast();
                 }
@@ -110,7 +109,7 @@ public class DataFileTable extends Pane {
                 (ActionEvent e) -> {
                     if (selectedDataFile != null) {
                         new DataFileSetCharacteristicsDialog(selectedDataFile);
-                        listOfFiles = observableArrayList(ProjectListsManager.getListOfDataFiles());
+                        listOfFiles = observableArrayList(ObjectsManager.getListOfDataFiles());
                         tableOfFiles.setItems(listOfFiles);
                         tableOfFiles.getSelectionModel().selectLast();
                         tableOfFiles.refresh();
@@ -122,7 +121,7 @@ public class DataFileTable extends Pane {
                 (ActionEvent e) -> {
                     if (selectedDataFile != null) {
                         new DataFileAddObservationDialog(selectedDataFile);
-                        listOfFiles = observableArrayList(ProjectListsManager.getListOfDataFiles());
+                        listOfFiles = observableArrayList(ObjectsManager.getListOfDataFiles());
                         tableOfFiles.setItems(listOfFiles);
                         tableOfFiles.getSelectionModel().selectLast();
                         tableOfFiles.refresh();

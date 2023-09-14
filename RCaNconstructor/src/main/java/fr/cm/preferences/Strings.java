@@ -90,8 +90,9 @@ public class Strings {
     public static String cancelConstraint = "Cancel";
 
     public static String clearFormula = "Clear Formula";
-    public static String helpFormula = " - Click on one the above and left symbols or variables names" +
-            "\n to add a first token or to add a token after the selected token (in red)," +
+    public static String helpFormula = " Build fomula for constraint" +
+            "\n - Click on one the above symbols or variables names" +
+            " to add a first token or to add a token after the selected token (in red)," +
             "\n - Double click on a token to delete it" +
             "\n - Click on a token to select it." +
             "\n - Select years range of the constraint";

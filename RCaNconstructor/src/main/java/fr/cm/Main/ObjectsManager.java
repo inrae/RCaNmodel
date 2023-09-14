@@ -1,4 +1,4 @@
-package fr.cm.project;
+package fr.cm.Main;
 
 import fr.cm.network.NetworkView;
 import fr.cm.dialogs.HelpDialog;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class ProjectListsManager {
+public class ObjectsManager {
 // ---------------------------------
 
     private static List<Component> listOfComponents;
@@ -46,45 +46,32 @@ public class ProjectListsManager {
     }
     // ------------------------------------------------------------------------------
     // ACTIONS
-
     public static void addTimeLine(TimeLine timeLine, boolean save) {
-
         listOfTimeLines.add(timeLine);
         if(save) saveExcel();
-
     }
     public static void addTimeLine(String comment, boolean save) {
         TimeLine timeLine = new TimeLine(comment);
         listOfTimeLines.add(timeLine);
         if(save) saveExcel();
     }
-
     public static List<TimeLine> getListOfTimeLines() {
-
         return listOfTimeLines;
     }
-
     public static void initListOfTimeLines() {
-
         listOfTimeLines = new ArrayList<>();
     }
-
-    public static void setListOfTimeLines(List<TimeLine> listOfTimeLines) {
-        ProjectListsManager.listOfTimeLines = listOfTimeLines;
-    }
-
     public static void updateAction(int nu, String comment) {
         TimeLine timeLine = listOfTimeLines.get(nu);
         timeLine.setCommentAuthor(comment);
         saveExcel();
     }
-
     // ------------------------------------------------------------------------------
     // META INFORMATION
     public static void makeMetaElementsList(){
         listOfMetaElements = new ArrayList<>();
         String fileName = "project/Project.txt";
-        InputStream inst = ProjectListsManager.class.getClassLoader().getResourceAsStream(fileName);
+        InputStream inst = ObjectsManager.class.getClassLoader().getResourceAsStream(fileName);
         if(inst != null){
             List<String> elementsResource = new ArrayList<>();
             try {
@@ -104,7 +91,7 @@ public class ProjectListsManager {
     }
 
     public static void setListOfMetaElements(List<MetaElement> listOfMetaElements) {
-        ProjectListsManager.listOfMetaElements = listOfMetaElements;
+        ObjectsManager.listOfMetaElements = listOfMetaElements;
     }
 
     public static void updateMetaElement(int nu, String comment) {
@@ -136,6 +123,7 @@ public class ProjectListsManager {
             listOfComponents.add(component);
         }
         addTimeLine("Added component: "+component.getName(),save);
+        Logg.addLog("Added component: "+component.getName());
     }
     public static void removeComponent(Component component) {
         listOfConstraints.removeIf(constraint -> constraint.involve(component));
@@ -149,6 +137,7 @@ public class ProjectListsManager {
         }
         listOfComponents.remove(component);
         addTimeLine("Removed component: "+component.getName(),true);
+        Logg.addLog("Removed component: "+component.getName());
     }
     public static boolean containsComponent(String groupName) {
         boolean contain = false;
@@ -215,6 +204,7 @@ public class ProjectListsManager {
             flux.define(networkView.getMouseDoubleClickOnLineEventHandler());
             listOfFluxes.add(flux);
             addTimeLine("Added Flux: "+ flux.getName(),save);
+            Logg.addLog("Added Flux: "+flux.getName());
         }
     }
     public static List<String> getNamesOfLinks() {
@@ -237,6 +227,7 @@ public class ProjectListsManager {
         listOfConstraints.removeIf(constraint -> constraint.involve(flux));
         listOfFluxes.remove(flux);
         addTimeLine("Removed Flux: "+ flux.getName(),true);
+        Logg.addLog("Removed Flux: "+flux.getName());
     }
     public static void permuteListOfLinks(int rowA, int rowB) {
         Flux fluxA = listOfFluxes.get(rowA);
@@ -271,6 +262,7 @@ public class ProjectListsManager {
             else {
             listOfObservations.add(observation);
             addTimeLine("Added Observation: "+ observation.getObsName(),save);
+            Logg.addLog("Added Observation: "+observation.getObsName());
         }
     }
      public static void removeObservation(String observationName){
@@ -278,6 +270,7 @@ public class ProjectListsManager {
             if (observationName.equals(observation.getObsName())) {
                 listOfObservations.remove(observation);
                 addTimeLine("Removed Observation: "+ observation.getObsName(),true);
+                Logg.addLog("Removed Observation: "+observation.getObsName());
                 break;
             }
     }
@@ -317,7 +310,7 @@ public class ProjectListsManager {
     }
 
     public static void setListOfObservations(List<Observation> listOfObservations) {
-        ProjectListsManager.listOfObservations = listOfObservations;
+        ObjectsManager.listOfObservations = listOfObservations;
     }
 
     // ------------------------------------------------------------------------------
@@ -325,15 +318,18 @@ public class ProjectListsManager {
     public static void addConstraint(Constraint constraint, boolean save) {
         listOfConstraints.add(constraint);
         addTimeLine("Added Constraint: "+ constraint.getName(),save);
+        Logg.addLog("Added constraint: "+constraint.getName()+ ": "+ constraint.getFormula());
     }
     public static void removeConstraints(Constraint constraint) {
         listOfConstraints.remove(constraint);
         addTimeLine("Removed Constraint: "+ constraint.getName(),true);
+        Logg.addLog("Removed constraint: "+constraint.getName()+ ": "+ constraint.getFormula());
     }
     public static void updateConstraint(Constraint oldC, Constraint newC) {
         int pos = listOfConstraints.indexOf(oldC);
         listOfConstraints.set(pos,newC);
-        addTimeLine("Updated Constraint: "+ oldC.getName()+ "-W" + newC.getName(),true);
+        addTimeLine("Updated Constraint: "+ oldC.getFormula()+  " -> " + newC.getFormula(),true);
+        Logg.addLog("Updated Constraint: "+ oldC.getFormula()+  " -> " + newC.getFormula());
     }
     public static void upConstraint(Constraint constraint) {
         int numConstraint = listOfConstraints.indexOf(constraint);
@@ -370,6 +366,7 @@ public class ProjectListsManager {
         if(! in) {
             listOfDataFiles.add(newDataFile);
             addTimeLine("Added Data File: "+ newDataFile.getShortName(),save);
+            Logg.addLog("Added Data File: "+ newDataFile.getShortName());
         }
         else {
             HelpDialog.warning("File has already been introduced","Warning");

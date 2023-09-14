@@ -3,10 +3,10 @@ package fr.cm.rCaller;
 import com.github.rcaller.graphics.SkyTheme;
 import com.github.rcaller.rstuff.*;
 import fr.cm.Main.Context;
+import fr.cm.Main.Logg;
 import fr.cm.Main.MainApplication;
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import javafx.application.Platform;
-import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 
 import java.io.*;
@@ -72,6 +72,7 @@ public class RCaNCaller {
             }
             runOk = true;
         } catch (Exception ex) {
+            Logg.addLog(ex.getMessage());
             ex.printStackTrace();
             runOk = false;
             StringWriter sw = new StringWriter();
@@ -114,24 +115,14 @@ public class RCaNCaller {
     // ------------------------------------------------------------------------
     public static HBox getResultsR() {
         if(runOk){
-            if( ! rCaNScript.getName().equals("connect")) {
-                ProjectListsManager.addTimeLine(rCaNScript.getShortScript(), true);
-            }
+            if( ! rCaNScript.getName().equals("connect"))
+                ObjectsManager.addTimeLine(rCaNScript.getShortScript(), true);
             rCaNScript.setState(true);
             MainApplication.updateMenus();
-            if(rCaNScript.isPlot()){
-                try {
-                    FileInputStream inputstream = new FileInputStream(filePlot);
-                    Image imageR = new Image(inputstream);
-                    new RCaNDialogOutput(rCaNScript, imageR);
-                }
-                catch (FileNotFoundException ex){
-                    return(null);
-                }
-            }
-            else if(rCaNScript.isTable()){
+            if(rCaNScript.isPlot())
+                new RCaNDialogOutput(rCaNScript, filePlot);
+            else if(rCaNScript.isTable())
                 new RCaNDialogOutput(rCaNScript, resultString);
-            }
         }
         return(null);
     }

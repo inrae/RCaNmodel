@@ -5,7 +5,7 @@
  */
 package fr.cm.objects;
 
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -15,11 +15,9 @@ import javafx.beans.property.StringProperty;
  * @author christianmullon
  */
 public class MetaElement {
-
     final String metaName;
-
-     final StringProperty metaContent = new SimpleStringProperty();
-    final StringProperty metaHint = new SimpleStringProperty();
+     final StringProperty metaContent = new SimpleStringProperty(),
+             metaHint = new SimpleStringProperty();
     final BooleanProperty metaType = new SimpleBooleanProperty();
     // --------------------------------------------
     public MetaElement(String elementR) {
@@ -37,53 +35,30 @@ public class MetaElement {
             setMetaHint(element[1]);
         }
     }
-
-
     // --------------------------------------------
     public void print(){
         System.out.println("META : "+ metaType + " -- "+ metaName + " -- " +  getMetaContent() + " -- " + getMetaHint());
     }
     // ---------------------------------------------------------------------------------
-    public String getMetaName() {
-
-        return metaName;
-    }
-
-    public boolean isMetaType() {
-
-        return metaType.get();
-    }
-
+    public String getMetaName() {return metaName;}
+    public boolean isMetaType() {return metaType.get();}
     public StringProperty carContentProperty() {
         return metaContent;
     }
-
     public final String getMetaContent() {
         return carContentProperty().get() ;
     }
-
     public final void setMetaContent(String carContent) {
         carContentProperty().set(carContent);
     }
-
     public String getMetaHint() {
         return metaHint.get();
     }
-
     public StringProperty metaHintProperty() {
         return metaHint;
     }
-
     public void setMetaHint(String metaHint) {
         this.metaHint.set(metaHint);
-    }
-
-    public void changeMetaContent(String newMetaContent){
-        if(! getMetaName().equals(newMetaContent)){
-            ProjectListsManager.addTimeLine(
-                    "Change meta information content of  : " + metaName + " -> "+ getMetaName(),true);
-            carContentProperty().set(newMetaContent);
-        }
     }
 
 }

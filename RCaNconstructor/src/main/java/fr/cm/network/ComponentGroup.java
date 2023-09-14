@@ -1,6 +1,6 @@
 package fr.cm.network;
 
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import fr.cm.Main.Context;
 import fr.cm.preferences.ColorsAndFormats;
 import javafx.event.EventHandler;
@@ -183,13 +183,13 @@ public class ComponentGroup extends Group {
         // --------------------------------------------
         public void changeName(String newName){
             if(!name.equals(newName)){
-                ProjectListsManager.addTimeLine("Change component name : " + name + " -> "+ newName, true);
+                ObjectsManager.addTimeLine("Change component name : " + name + " -> "+ newName, true);
                 name = newName;
             }
         }
         public void changeInside(boolean newInside){
             if(!inside==newInside){
-                ProjectListsManager.addTimeLine(
+                ObjectsManager.addTimeLine(
                         "Change position of component  " + name + " : inside "+ inside +" -> "+ newInside,true);
                 inside = newInside;
             }

@@ -3,7 +3,7 @@ package fr.cm.excel;
 import fr.cm.dialogs.HelpDialog;
 import fr.cm.objects.DataFile;
 import fr.cm.objects.Observation;
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -59,8 +59,8 @@ public class DataFileExcel {
         cell = row.createCell(5);
         cell.setCellValue("Selected columns");
         lig++;
-        for (int c = 0; c < ProjectListsManager.getListOfDataFiles().size(); c++) {
-            DataFile dataFile = ProjectListsManager.getListOfDataFiles().get(c);
+        for (int c = 0; c < ObjectsManager.getListOfDataFiles().size(); c++) {
+            DataFile dataFile = ObjectsManager.getListOfDataFiles().get(c);
             row = sheet.createRow(lig);
             cell = row.createCell(0);
             cell.setCellValue(dataFile.getId());
@@ -103,7 +103,7 @@ public class DataFileExcel {
                 List<Observation> addedObservations = decodeAddedObservations(codeObservations);
                 DataFile dataFile = new DataFile(id, shortName, fullFileName, metaInformation, owner, addedObservations);
                 if(dataFile.isCorrectlyRead()){
-                    ProjectListsManager.addDataFile(dataFile, false);
+                    ObjectsManager.addDataFile(dataFile, false);
                 }
             }
         }
@@ -115,7 +115,7 @@ public class DataFileExcel {
 
     private static void oldGetExcelFileWithObservation(Workbook workbook) {
         try {
-            String id = ProjectListsManager.getDataFileId();
+            String id = ObjectsManager.getDataFileId();
             Sheet sheet = workbook.getSheet("FileWithObservation");
             Row row;
             Cell cell;
@@ -137,7 +137,7 @@ public class DataFileExcel {
                 List<Observation> addedObservations = decodeAddedObservations(codeObservations);
                 DataFile dataFile = new DataFile(id, shortName, fullFileName, metaInformation, owner, addedObservations);
                 if(dataFile.isCorrectlyRead()){
-                    ProjectListsManager.addDataFile(dataFile, false);
+                    ObjectsManager.addDataFile(dataFile, false);
                 }
             }
         }

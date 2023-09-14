@@ -1,7 +1,7 @@
 package fr.cm.objects;
 
 import fr.cm.dialogs.HelpDialog;
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import fr.cm.preferences.Strings;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
@@ -22,10 +22,8 @@ import java.util.Optional;
  */
 
 public class ComponentEditDialog extends Dialog<ButtonType> {
-
     final TextField[] fieldCaracteristiques;
     final Window window;
-
     public ComponentEditDialog(Component component) {
         window = this.getDialogPane().getScene().getWindow();
         window.setOnCloseRequest(event -> window.hide());
@@ -103,7 +101,7 @@ public class ComponentEditDialog extends Dialog<ButtonType> {
                 }
             }
             if (result.get() == buttonTypeDelete) {
-                ProjectListsManager.removeComponent(component);
+                ObjectsManager.removeComponent(component);
             }
         }
     }
