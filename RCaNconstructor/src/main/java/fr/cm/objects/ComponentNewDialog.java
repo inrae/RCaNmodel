@@ -2,7 +2,7 @@ package fr.cm.objects;
 
 import java.util.Optional;
 
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import fr.cm.preferences.Strings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -26,9 +26,7 @@ import javafx.stage.Window;
  * @author christianmullon
  */
 public class ComponentNewDialog extends Dialog<ButtonType>{
-
     final Window window;
-
     public ComponentNewDialog(double wx, double hy) {
         window = this.getDialogPane().getScene().getWindow();
         window.setOnCloseRequest(event -> window.hide());
@@ -70,7 +68,7 @@ public class ComponentNewDialog extends Dialog<ButtonType>{
                 component.setInside(type);
                 component.setText();
                 component.setWH(wx, hy);
-                ProjectListsManager.addComponent(component, true);
+                ObjectsManager.addComponent(component, true);
             }
          }
     }

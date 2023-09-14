@@ -2,7 +2,7 @@ package fr.cm.excel;
 
 import fr.cm.dialogs.HelpDialog;
 import fr.cm.objects.TimeLine;
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -27,7 +27,7 @@ public class TimeLineExcel {
         cell = row.createCell(2);
         cell.setCellValue("Annotation");
 
-        List<TimeLine> listOfTimeLines = ProjectListsManager.getListOfTimeLines();
+        List<TimeLine> listOfTimeLines = ObjectsManager.getListOfTimeLines();
         int c = 0;
         for (TimeLine timeLine : listOfTimeLines) {
             c++;
@@ -44,7 +44,7 @@ public class TimeLineExcel {
     // -------------------------------------------------------------------------
     public static void getExcelFileTimeLines(Workbook workbook) {
         try {
-            ProjectListsManager.initListOfTimeLines();
+            ObjectsManager.initListOfTimeLines();
             Sheet sheet = workbook.getSheet("TimeLines");
             Row row;
             Cell cell;
@@ -59,7 +59,7 @@ public class TimeLineExcel {
                 cell = row.getCell(2);
                 String commentAuthor = cell.getStringCellValue();
                 TimeLine newTimeLine = new TimeLine(date, comment, commentAuthor);
-                ProjectListsManager.addTimeLine(newTimeLine, false);
+                ObjectsManager.addTimeLine(newTimeLine, false);
             }
         } catch (Exception ex) {
             HelpDialog.warning("Sheet TimeLine does not exist", "Warning ", ex);

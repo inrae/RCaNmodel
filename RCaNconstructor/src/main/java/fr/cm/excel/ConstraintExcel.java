@@ -1,7 +1,7 @@
 package fr.cm.excel;
 
 import fr.cm.objects.Constraint;
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import org.apache.poi.ss.usermodel.*;
 
 import java.util.Iterator;
@@ -26,8 +26,8 @@ public class ConstraintExcel {
         cell = row.createCell(4);
         cell.setCellValue("Comment");
         lig++;
-        for (int c = 0; c < ProjectListsManager.getListOfConstraints().size(); c++) {
-            Constraint constraint = ProjectListsManager.getListOfConstraints().get(c);
+        for (int c = 0; c < ObjectsManager.getListOfConstraints().size(); c++) {
+            Constraint constraint = ObjectsManager.getListOfConstraints().get(c);
             row = sheet.createRow(lig);
             cell = row.createCell(0);
             cell.setCellValue(constraint.getName());
@@ -73,7 +73,7 @@ public class ConstraintExcel {
                     comment = cell.getStringCellValue();
                 }
                 Constraint constraint = new Constraint(name, formula, years, active, comment);
-                ProjectListsManager.addConstraint(constraint, false);
+                ObjectsManager.addConstraint(constraint, false);
             } catch (Exception e) {
                 // le champ active n'existe pas encore
             }

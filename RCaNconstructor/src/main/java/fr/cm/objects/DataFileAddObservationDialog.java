@@ -21,18 +21,15 @@ import static javafx.collections.FXCollections.observableArrayList;
 public class DataFileAddObservationDialog extends Dialog <ButtonType> {
 
     double width = Context.getWindowWidth();
-    double height =  Context.getWindowHeight();
     DataFile selectedDataFile = null;
-    // DROITE
     Label rightTitle,  systemTitle;
     TableView<String[]> tableOfDataValues ;
     TableView<Observation> tableOfOfAlreadyExtractedObservations;
     ObservableList<String[]> listOfDataValues;
     Text textAddObservation, textRemoveObservation;
     Button buttonRemove = new Button("Remove selected observation");
-
-    int rightWidth = (int)(0.3 * width);
-    int leftWidth = (int)(0.7 * width);
+    int rightWidth = (int)(0.3 * width),
+            leftWidth = (int)(0.7 * width);
 
     public DataFileAddObservationDialog(DataFile selectedDataFile){
         this.selectedDataFile = selectedDataFile;

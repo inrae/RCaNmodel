@@ -1,7 +1,7 @@
 package fr.cm.objects;
 
 import fr.cm.dialogs.HelpDialog;
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import fr.cm.Main.Context;
 import fr.cm.Main.MainApplication;
 import javafx.stage.FileChooser;
@@ -18,7 +18,7 @@ public class MetaInformationSaveTextDialog {
 
         StringBuilder sB = new StringBuilder("PROJECT");
         sB.append("\n");
-        List<MetaElement> elements = ProjectListsManager.getListOfMetaElements();
+        List<MetaElement> elements = ObjectsManager.getListOfMetaElements();
 
         for (MetaElement metaElement : elements) {
             sB.append(metaElement.getMetaName().toUpperCase());
@@ -32,7 +32,7 @@ public class MetaInformationSaveTextDialog {
         sB.append("DATA FILES");
         sB.append("\n");
 
-        List<DataFile> listOfDataFiles = ProjectListsManager.getListOfDataFiles() ;
+        List<DataFile> listOfDataFiles = ObjectsManager.getListOfDataFiles() ;
         for (DataFile dataFile : listOfDataFiles) {
             sB.append(dataFile.getShortName().toUpperCase());
             sB.append("\n    ");
@@ -45,7 +45,7 @@ public class MetaInformationSaveTextDialog {
         sB.append("CONSTRAINTS");
         sB.append("\n");
 
-        List<Constraint> listOfConstraint = ProjectListsManager.getListOfConstraints() ;
+        List<Constraint> listOfConstraint = ObjectsManager.getListOfConstraints() ;
         for ( Constraint constraint : listOfConstraint) {
             if(constraint.isActive()) {
                 sB.append(constraint.getName().toUpperCase());

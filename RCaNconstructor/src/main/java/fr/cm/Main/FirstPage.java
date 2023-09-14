@@ -4,7 +4,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 
-
 public class FirstPage extends Pane {
     public FirstPage(){
         ImageView imageView = new ImageView();

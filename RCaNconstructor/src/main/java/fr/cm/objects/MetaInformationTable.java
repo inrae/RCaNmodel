@@ -2,7 +2,7 @@ package fr.cm.objects;
 
 import fr.cm.dialogs.TextAreaDialog;
 import fr.cm.Main.Context;
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import fr.cm.preferences.ColorsAndFormats;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -27,10 +27,8 @@ public class MetaInformationTable extends Pane {
 // ---------------------------------
 
     double width = Context.getWindowWidth(), height =  Context.getWindowHeight();
-
     final TableView<MetaElement> table;
     ObservableList<MetaElement> list;
-
     public MetaInformationTable() {
         super();
         table = new TableView<>();
@@ -47,11 +45,11 @@ public class MetaInformationTable extends Pane {
                 @SuppressWarnings("rawtypes")
                 TableColumn column = pos.getTableColumn();
                 String oComment = column.getCellData(row).toString();
-                if(col==1 && ProjectListsManager.metaInformationType(row)){
+                if(col==1 && ObjectsManager.metaInformationType(row)){
                     new TextAreaDialog("Edit annotation",oComment);
                     String nComment = Context.getTextAreaContent();
                     if(!nComment.equals(oComment)) {
-                        ProjectListsManager.updateMetaElement(row, nComment);
+                        ObjectsManager.updateMetaElement(row, nComment);
                         table.refresh();
                     }
                 }
@@ -127,7 +125,7 @@ public class MetaInformationTable extends Pane {
         table.getColumns().add(metaContentCol);
         // ------------------------------------------------------------------------
         // -------------------------------------------------------------------------
-        list = FXCollections.observableArrayList(ProjectListsManager.getListOfMetaElements());
+        list = FXCollections.observableArrayList(ObjectsManager.getListOfMetaElements());
         table.setItems(list);
         table.getSelectionModel().selectFirst();
         table.setPrefWidth(0.8*width);

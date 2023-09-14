@@ -2,7 +2,7 @@ package fr.cm.excel;
 
 import fr.cm.Main.Context;
 import fr.cm.objects.MetaElement;
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -27,7 +27,7 @@ public class MetaExcel {
         cell = row.createCell(1);
         cell.setCellValue("Value");
 
-        List<MetaElement> elements = ProjectListsManager.getListOfMetaElements();
+        List<MetaElement> elements = ObjectsManager.getListOfMetaElements();
         for (int c = 0; c < elements.size(); c++) {
             MetaElement element = elements.get(c);
             row = sheet.createRow(c + 2);
@@ -45,8 +45,8 @@ public class MetaExcel {
         Sheet sheet = workbook.getSheet("INFO");
         Row row;
         Cell cell;
-        ProjectListsManager.makeMetaElementsList();
-        List<MetaElement> elements = ProjectListsManager.getListOfMetaElements();
+        ObjectsManager.makeMetaElementsList();
+        List<MetaElement> elements = ObjectsManager.getListOfMetaElements();
         try {
             for (int r = 0; r < elements.size(); r++) {
                 row = sheet.getRow(r + 2);
@@ -54,9 +54,9 @@ public class MetaExcel {
                 String content = cell.getStringCellValue();
                 elements.get(r).setMetaContent(content);
             }
-            ProjectListsManager.setListOfMetaElements(elements);
+            ObjectsManager.setListOfMetaElements(elements);
         } catch (Exception e) {
-            ProjectListsManager.makeMetaElementsList();
+            ObjectsManager.makeMetaElementsList();
         }
     }
 

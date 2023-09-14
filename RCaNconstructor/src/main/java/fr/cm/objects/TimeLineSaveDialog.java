@@ -2,7 +2,7 @@
 package fr.cm.objects;
 
 import fr.cm.dialogs.HelpDialog;
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import fr.cm.Main.Context;
 import fr.cm.Main.MainApplication;
 import javafx.stage.FileChooser;
@@ -13,13 +13,12 @@ import java.io.IOException;
 import java.util.List;
 
 public class TimeLineSaveDialog {
-
     // --------------------------------------------
     public TimeLineSaveDialog() {
 
         StringBuilder sB = new StringBuilder("PROJECT TRACKING");
         sB.append("\n");
-        List<TimeLine> listOfTimeLines = ProjectListsManager.getListOfTimeLines() ;
+        List<TimeLine> listOfTimeLines = ObjectsManager.getListOfTimeLines() ;
 
 
         for (TimeLine timeLine : listOfTimeLines) {

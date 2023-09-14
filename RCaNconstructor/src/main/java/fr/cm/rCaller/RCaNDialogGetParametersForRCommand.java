@@ -1,6 +1,6 @@
 package fr.cm.rCaller;
 
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import fr.cm.Main.Context;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
@@ -27,7 +27,7 @@ public class RCaNDialogGetParametersForRCommand extends Dialog<ButtonType>  {
         String parameterValue = "";
 
         if (typeParameter.equals("ALLCOMPONENTS")) {
-            List<String> components = ProjectListsManager.getNamesOfComponentsIn();
+            List<String> components = ObjectsManager.getNamesOfComponentsIn();
             StringBuilder sb = new StringBuilder("c(");
             for (Object sC : components) {
                 sb.append("'");
@@ -80,7 +80,7 @@ public class RCaNDialogGetParametersForRCommand extends Dialog<ButtonType>  {
     }
     // ----------------------------------
     private void addFlux(SelectionMode sm) {
-        List<String> flux = ProjectListsManager.getNamesOfLinks();
+        List<String> flux = ObjectsManager.getNamesOfLinks();
         cFlux = new ListView(FXCollections.observableArrayList(flux));
         cFlux.setPrefHeight(0.4 * Context.getWindowHeight());
         cFlux.getSelectionModel().select(0);
@@ -95,7 +95,7 @@ public class RCaNDialogGetParametersForRCommand extends Dialog<ButtonType>  {
     }
     // ----------------------------------
     private void addFlux2(SelectionMode sm) {
-        List<String> flux = ProjectListsManager.getNamesOfLinks();
+        List<String> flux = ObjectsManager.getNamesOfLinks();
         cFlux2 = new ListView(FXCollections.observableArrayList(flux));
         cFlux2.setPrefHeight(0.4 * Context.getWindowHeight());
         cFlux2.getSelectionModel().setSelectionMode(sm);
@@ -109,7 +109,7 @@ public class RCaNDialogGetParametersForRCommand extends Dialog<ButtonType>  {
     }
     // ----------------------------------
     private void addComponent(SelectionMode sm) {
-        List<String> components = ProjectListsManager.getNamesOfComponentsIn();
+        List<String> components = ObjectsManager.getNamesOfComponentsIn();
         cComponent = new ListView(FXCollections.observableArrayList(components));
         cComponent.setPrefHeight(0.4 * Context.getWindowHeight());
         cComponent.getSelectionModel().setSelectionMode(sm);

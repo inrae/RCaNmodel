@@ -5,12 +5,13 @@
  */
 package fr.cm.objects;
 
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import fr.cm.Main.Context;
 import fr.cm.preferences.ColorsAndFormats;
 import fr.cm.preferences.Strings;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -27,55 +28,19 @@ public class ConstraintNewOrEditDialog extends Dialog<ButtonType> {
 
     ConstraintFormula formula ;
     List<Label> tokensOfFormula = new ArrayList<>();
-
-    double width = 0.9 * Context.getWindowWidth();
-    double height =  Context.getWindowHeight();
-
+    double width = 0.7 * Context.getWindowWidth(), height =  Context.getWindowHeight();
     boolean editCst;
-
     final Window window;
-
     Constraint previousConstraint;
-
-    Button buttonClear = new Button(Strings.clearFormula);
-    Button buttonAddEditCst = new Button(Strings.addConstraint);
-    Button buttonCancelCst = new Button(Strings.cancelConstraint);
-
-    final ListView<String> listViewYears = new ListView<>();
-    final ListView<String> listViewComponents = new ListView<>();
-    final ListView<String> listViewLinks = new ListView<>();
-    final ListView<String> listViewObservations = new ListView<>();
-
+    Button buttonClear = new Button(Strings.clearFormula), buttonAddEditCst = new Button(Strings.addConstraint), buttonCancelCst = new Button(Strings.cancelConstraint);
+    final ListView<String> listViewYears = new ListView<>(), listViewComponents = new ListView<>(),  listViewLinks = new ListView<>(),  listViewObservations = new ListView<>();
     boolean selectAllYears;
-
-    final Label labelTokenYears = new Label("");
-    final Label labelTokenValidityOfFormula = new Label("");
-    final Label helpFormula = new Label(Strings.helpFormula);
-
-    final Label cstNameLabel = new Label("Name of constraint");
+    final Label labelTokenYears = new Label(""),  labelTokenValidityOfFormula = new Label("");
     final TextArea cstNameTextArea = new TextArea("");
-
-    final Label componentLabel = new Label("Components");
-    final Label linkLabel = new Label("Links");
-    final Label observationLabel = new Label("Observations");
-
-    final GridPane boxSymbols = new GridPane();
-    ToggleGroup toggleGroup = new ToggleGroup();
-    ToggleButton toggleButtonAllYears = new ToggleButton("All years");
-    ToggleButton toggleButtonSelectedYears = new ToggleButton("Select years");
-
     // ----------------------------------------------------------------------------------
-    final VBox vboxVariables = new VBox();
-    final VBox vboxYears = new VBox();
-    final HBox hboxTables = new HBox();
-    final HBox hboxToggle = new HBox();
-    final HBox hboxTokensLabels = new HBox();
-    final HBox hboxFormulaStuff = new HBox();
-    final HBox hboxButtons = new HBox();
-    final VBox vboxContent = new VBox();
-
+     final HBox boxToggle = new HBox();
     String cstName;
-
+    Insets insets = new Insets(10, 0, 0, 10);
     public ConstraintNewOrEditDialog() {
         editCst = false;
         buttonAddEditCst.setText(Strings.addConstraint);
@@ -91,7 +56,6 @@ public class ConstraintNewOrEditDialog extends Dialog<ButtonType> {
         labelTokenValidityOfFormula.setText(Strings.validityOfFormula + "?");
         initDialog();
      }
-
     // --------------------------------------------
     public ConstraintNewOrEditDialog(Constraint constraint) {
         this.previousConstraint = constraint;
@@ -111,16 +75,70 @@ public class ConstraintNewOrEditDialog extends Dialog<ButtonType> {
         initDialog();
     }
 
-    // --------------------------------------------
-    void initDialog(){
-        cstNameTextArea.setText(cstName);
-        helpFormula.setWrapText(true);
+    VBox initLeft() {
         // ----------------------------------------------------------------------------------
-        labelTokenYears.setFont(new Font("Arial", 15));
-        labelTokenYears.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(2))));
-        labelTokenYears.setBackground(new Background(new BackgroundFill(Color.LIGHTGREY, CornerRadii.EMPTY, Insets.EMPTY)));
-        setLabelYears();
+        Label componentLabel = new Label("Components");
+        Label linkLabel = new Label("Links");
+        Label observationLabel = new Label("Observations");
+        Label cstNameLabel = new Label("Name of constraint");
+        // COMPONENTS ----------------------------------------------------------------------------------
+        VBox boxTableLeft = new VBox();
+        List<String> namesComponents = new ArrayList<>();
+        namesComponents.addAll(ObjectsManager.getNamesOfComponents());
+        listViewComponents.getSelectionModel().selectFirst();
+        listViewComponents.setOnMouseClicked(evt -> {
+            String token = listViewComponents.getSelectionModel().getSelectedItem();
+            formula.append(token);
+            String fOk = formula.check();
+            labelTokenValidityOfFormula.setText(Strings.validityOfFormula + fOk);
+            updateTokens();
+        });
+        listViewComponents.getItems().addAll(namesComponents);
+        // LINKS ----------------------------------------------------------------------------------
+        List<String> namesLinks = new ArrayList<>();
+        namesLinks.addAll(ObjectsManager.getNamesOfLinks());
+        listViewLinks.getSelectionModel().selectFirst();
+        listViewLinks.setOnMouseClicked(evt -> {
+            String token = listViewLinks.getSelectionModel().getSelectedItem();
+            formula.append(token);
+            String fOk = formula.check();
+            labelTokenValidityOfFormula.setText(Strings.validityOfFormula + fOk);
+            updateTokens();
+        });
+        listViewLinks.getItems().addAll(namesLinks);
+        // OBSERVATIONS ----------------------------------------------------------------------------------
+        List<String> namesObservations = new ArrayList<>();
+        namesObservations.addAll(ObjectsManager.getNamesOfObservations());
+        listViewObservations.getSelectionModel().selectFirst();
+        listViewObservations.setOnMouseClicked(evt -> {
+            String token = listViewObservations.getSelectionModel().getSelectedItem();
+            formula.append(token);
+            String fOk = formula.check();
+            labelTokenValidityOfFormula.setText(Strings.validityOfFormula + fOk);
+            updateTokens();
+        });
+        listViewObservations.getItems().addAll(namesObservations);
+        boxTableLeft.setSpacing(10);
+        boxTableLeft.setPadding(insets);
+        boxTableLeft.setMinWidth((0.6 * width));
+        boxTableLeft.setMinHeight((0.7 * height));
+        boxTableLeft.getChildren().addAll(
+                cstNameLabel,
+                cstNameTextArea,
+                componentLabel,
+                listViewComponents,
+                linkLabel,
+                listViewLinks,
+                observationLabel,
+                listViewObservations);
+        return(boxTableLeft);
+    }
+    VBox initRight(){
         // ----------------------------------------------------------------------------------
+        VBox boxTableRight = new VBox();
+        GridPane boxSymbols = new GridPane();
+        GridPane boxShortcuts = new GridPane();
+        // SYMBOLES ----------------------------------------------------------------------------------
         List<String> allSymbols = new ArrayList<>();
         allSymbols.addAll(ConstraintFormula.nombres);
         allSymbols.addAll(ConstraintFormula.symbolsAndOperators);
@@ -136,64 +154,45 @@ public class ConstraintNewOrEditDialog extends Dialog<ButtonType> {
             int lig = s % 5;
             boxSymbols.add(button, lig, col);
         }
-        // ----------------------------------------------------------------------------------
-        List<String> namesComponents = new ArrayList<>();
-        namesComponents.addAll(ProjectListsManager.getNamesOfComponents());
-        listViewComponents.getSelectionModel().selectFirst();
-        listViewComponents.setOnMouseClicked(evt -> {
-            String token = listViewComponents.getSelectionModel().getSelectedItem();
-            formula.append(token);
-            String fOk = formula.check();
-            labelTokenValidityOfFormula.setText(Strings.validityOfFormula + fOk);
-            updateTokens();
-        });
-        listViewComponents.getItems().addAll(namesComponents);
-        // ----------------------------------------------------------------------------------
-        List<String> namesLinks = new ArrayList<>();
-        namesLinks.addAll(ProjectListsManager.getNamesOfLinks());
-        listViewLinks.getSelectionModel().selectFirst();
-        listViewLinks.setOnMouseClicked(evt -> {
-            String token = listViewLinks.getSelectionModel().getSelectedItem();
-            formula.append(token);
-            String fOk = formula.check();
-            labelTokenValidityOfFormula.setText(Strings.validityOfFormula + fOk);
-            updateTokens();
-        });
-        listViewLinks.getItems().addAll(namesLinks);
-        // ----------------------------------------------------------------------------------
-        List<String> namesObservations = new ArrayList<>();
-        namesObservations.addAll(ProjectListsManager.getNamesOfObservations());
-        listViewObservations.getSelectionModel().selectFirst();
-        listViewObservations.setOnMouseClicked(evt -> {
-            String token = listViewObservations.getSelectionModel().getSelectedItem();
-            formula.append(token);
-            String fOk = formula.check();
-            labelTokenValidityOfFormula.setText(Strings.validityOfFormula + fOk);
-            updateTokens();
-        });
-        listViewObservations.getItems().addAll(namesObservations);
-        // ----------------------------------------------------------------------------------
-        labelTokenValidityOfFormula.setMinWidth(0.45 * width);
-        // ----------------------------------------------------------------------------------
-        buttonClear.setOnAction((ActionEvent e) -> {
-            formula.clear();
-            labelTokenValidityOfFormula.setText(Strings.validityOfFormula + false);
-            updateTokens();
-        });
-        buttonAddEditCst.setOnAction((ActionEvent e) -> addEditConstraint());
-        buttonCancelCst.setOnAction((ActionEvent e) -> cancelConstraint());
-        // ----------------------------------------------------------------------------------
-        Insets insets = new Insets(10, 0, 0, 10);
-        // ----------------------------------------------------------------------------------
+        // SHORTCUTS ----------------------------------------------------------------------------------
+        List<String> allShortcuts = new ArrayList<>();
+        allShortcuts.addAll(ConstraintFormula.shortcuts);
+
+        for (int s = 0; s < allShortcuts.size(); s++) {
+            Button button = new Button(allShortcuts.get(s));
+            button.setOnAction((ActionEvent e) -> {
+                String token = button.getText();
+                addToken(token);
+            });
+            button.setMinWidth(180);
+            int col = s % 2 ;
+            int lig = s / 2;
+            boxShortcuts.add(button, col, lig);
+        }
+        // YEARS ----------------------------------------------------------------------------------
+        labelTokenYears.setFont(new Font("Arial", 15));
+        labelTokenYears.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(2))));
+        labelTokenYears.setBackground(new Background(new BackgroundFill(Color.LIGHTGREY, CornerRadii.EMPTY, Insets.EMPTY)));
+
+        setLabelYears();
         listViewYears.setDisable(selectAllYears);
         listViewYears.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         listViewYears.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> setLabelYears());
         listViewYears.getItems().addAll(Context.getObservationsYears());
-        // ----------------------------------------------------------------------------------
+
+        ToggleGroup toggleGroup = new ToggleGroup();
+        ToggleButton toggleButtonAllYears = new ToggleButton("All years");
+        ToggleButton toggleButtonSelectedYears = new ToggleButton("Select years");
         toggleButtonAllYears.setToggleGroup(toggleGroup);
         toggleButtonSelectedYears.setToggleGroup(toggleGroup);
         toggleButtonAllYears.setSelected(true);
         toggleButtonSelectedYears.setSelected(false);
+
+        boxToggle.setSpacing(10);
+        boxToggle.setPadding(insets);
+        boxToggle.getChildren().addAll(
+                toggleButtonAllYears,
+                toggleButtonSelectedYears);
 
         toggleButtonAllYears.selectedProperty().addListener(
                 (obs, wasPreviouslySelected, isNowSelected) -> {
@@ -211,85 +210,83 @@ public class ConstraintNewOrEditDialog extends Dialog<ButtonType> {
                     setLabelYears();
                 }
         );
-        // ----------------------------------------------------------------------------------
-        vboxVariables.setSpacing(10);
-        vboxVariables.setPadding(insets);
-        vboxVariables.getChildren().addAll(
-                cstNameLabel,
-                cstNameTextArea,
-                componentLabel,
-                listViewComponents,
-                linkLabel,
-                listViewLinks,
-                observationLabel,
-                listViewObservations);
-        // ----------------------------------------------------------------------------------
-        hboxToggle.setSpacing(10);
-        hboxToggle.setPadding(insets);
-        hboxToggle.getChildren().addAll(
-                toggleButtonAllYears,
-                toggleButtonSelectedYears);
-        // ----------------------------------------------------------------------------------
-        vboxYears.setSpacing(10);
-        vboxYears.setPadding(insets);
-        vboxYears.getChildren().addAll(
+        // TOGETHER ----------------------------------------------------------------------------------
+        boxTableRight.setSpacing(10);
+        boxTableRight.setPadding(insets);
+        boxTableRight.setMinWidth((0.4 * width));
+        boxTableRight.setMinHeight((0.7 * height));
+        boxTableRight.getChildren().addAll(
                 boxSymbols,
-                hboxToggle,
+                // boxShortcuts,
+                boxToggle,
                 listViewYears,
-                labelTokenYears,
-                helpFormula
+                labelTokenYears
         );
+        return(boxTableRight);
+
+    }
+    // --------------------------------------------
+    void initDialog(){
         // ----------------------------------------------------------------------------------
-        hboxTables.setSpacing(30);
-        hboxTables.setPadding(insets);
-        hboxTables.getChildren().addAll(vboxVariables, vboxYears);
+        VBox boxTableLeft = initLeft();
+        VBox boxTableRight = initRight();
+        HBox boxTables = new HBox();
+        HBox boxTokens = new HBox();
+        HBox boxButtons = new HBox();
+        VBox boxContent = new VBox();
         // ----------------------------------------------------------------------------------
-        hboxTokensLabels.setSpacing(5);
-        hboxTokensLabels.setPadding(insets);
-        hboxTokensLabels.getChildren().addAll(tokensOfFormula);
+        boxTables.setSpacing(30);
+        boxTables.setPadding(insets);
+        boxTables.setAlignment(Pos.CENTER);
+        boxTables.getChildren().addAll(boxTableLeft, boxTableRight);
         // ----------------------------------------------------------------------------------
-        hboxFormulaStuff.setSpacing(5);
-        hboxFormulaStuff.setPadding(insets);
-        hboxFormulaStuff.getChildren().addAll(labelTokenValidityOfFormula);
+        cstNameTextArea.setText(cstName);
+        cstNameTextArea.setMaxHeight(80);
         // ----------------------------------------------------------------------------------
-        hboxButtons.setSpacing(5);
-        hboxButtons.setPadding(insets);
-        hboxButtons.getChildren().addAll(
+        Label helpFormula = new Label(Strings.helpFormula);
+        helpFormula.setWrapText(true);
+        helpFormula.setMinWidth((0.7 * width));
+        helpFormula.setMinHeight(150);
+        helpFormula.setAlignment(Pos.CENTER);
+        // ----------------------------------------------------------------------------------
+        boxTokens.setSpacing(5);
+        boxTokens.setPadding(insets);
+        boxTokens.setMinWidth((0.7 * width));
+        boxTokens.setAlignment(Pos.CENTER);
+        boxTokens.getChildren().addAll(tokensOfFormula);
+        // ----------------------------------------------------------------------------------
+        labelTokenValidityOfFormula.setMinWidth(0.7 * width);
+        labelTokenValidityOfFormula.setPadding(insets);
+        labelTokenValidityOfFormula.setAlignment(Pos.CENTER);
+        // ----------------------------------------------------------------------------------
+        // ----------------------------------------------------------------------------------
+        buttonClear.setOnAction((ActionEvent e) -> {
+            formula.clear();
+            labelTokenValidityOfFormula.setText(Strings.validityOfFormula + false);
+            updateTokens();
+        });
+        buttonAddEditCst.setOnAction((ActionEvent e) -> addEditConstraint());
+        buttonCancelCst.setOnAction((ActionEvent e) -> cancelConstraint());
+        boxButtons.setSpacing(5);
+        boxButtons.setPadding(insets);
+        boxButtons.setMinWidth((0.7 * width));
+        boxButtons.setAlignment(Pos.CENTER);
+        boxButtons.getChildren().addAll(
                 buttonClear,
                 buttonAddEditCst,
                 buttonCancelCst);
         // ----------------------------------------------------------------------------------
-        vboxContent.setSpacing(10);
-        vboxContent.getChildren().addAll(
-                hboxTables,
-                hboxTokensLabels,
-                hboxFormulaStuff,
-                hboxButtons);
-        vboxContent.setPadding(insets);
-        // ----------------------------------------------------------------------------------
-        labelTokenYears.setMinWidth(0.4 * width);
-        listViewYears.setMinWidth(0.4 * width);
-        boxSymbols.setMinWidth(0.4 * width);
-        listViewComponents.setMinWidth(0.4 * width);
-        listViewLinks.setMinWidth(0.4 * width);
-        listViewObservations.setMinWidth(0.4 * width);
-        buttonClear.setMinWidth(200);
-        buttonAddEditCst.setMinWidth(200);
-        toggleButtonAllYears.setMinWidth(100);
-        toggleButtonSelectedYears.setMinWidth(100);
-        hboxButtons.setMinWidth(0.8 * width);
-
-        cstNameTextArea.setMaxHeight(80);
-        helpFormula.setMinHeight(100);
-        boxSymbols.setMinHeight(0.15 * height);
-        listViewComponents.setMinHeight(0.15 * height);
-        listViewLinks.setMinHeight(0.15 * height);
-        listViewObservations.setMinHeight(0.15 * height);
-        listViewYears.setPrefHeight(0.15 * height);
-        vboxContent.setMinHeight(height);
+        boxContent.setSpacing(10);
+        boxContent.getChildren().addAll(
+                boxTables,
+                helpFormula,
+                boxTokens,
+                labelTokenValidityOfFormula,
+                boxButtons);
+        boxContent.setPadding(insets);
         // ----------------------------------------------------------------------------------
         this.setTitle("Constraint");
-        this.getDialogPane().getChildren().addAll(vboxContent);
+        this.getDialogPane().getChildren().addAll(boxContent);
         this.getDialogPane().setMinWidth(width);
         this.getDialogPane().setMinHeight(height);
         this.getDialogPane().setStyle(ColorsAndFormats.font);
@@ -302,11 +299,11 @@ public class ConstraintNewOrEditDialog extends Dialog<ButtonType> {
         if (formula.check().equals("Ok")) {
             if(editCst){
                 Constraint constraint =  new Constraint(cstNameTextArea.getText(),formula.fromTokensToString(), labelTokenYears.getText(), true, "");
-                ProjectListsManager.updateConstraint(previousConstraint, constraint);
+                ObjectsManager.updateConstraint(previousConstraint, constraint);
             }
             else {
                 Constraint constraint = new Constraint(cstNameTextArea.getText(),formula.fromTokensToString(), labelTokenYears.getText(), true, "");
-                ProjectListsManager.addConstraint(constraint, true);
+                ObjectsManager.addConstraint(constraint, true);
             }
             window.hide();
         }

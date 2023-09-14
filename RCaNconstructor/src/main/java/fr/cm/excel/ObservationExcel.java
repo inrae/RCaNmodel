@@ -2,7 +2,7 @@ package fr.cm.excel;
 
 import fr.cm.Main.Context;
 import fr.cm.objects.Observation;
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import org.apache.poi.ss.usermodel.*;
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ public class ObservationExcel {
         cell = row.createCell(0);
         cell.setCellValue("Year");
         o = 0;
-        for (Observation observation : ProjectListsManager.getListOfObservations()) {
+        for (Observation observation : ObjectsManager.getListOfObservations()) {
             o++;
             cell = row.createCell(o);
             cell.setCellValue(observation.getObsName());
@@ -36,7 +36,7 @@ public class ObservationExcel {
             row = sheet.createRow(y + 1);
             cell = row.createCell(0);
             cell.setCellValue(y + first);
-            for (Observation observation : ProjectListsManager.getListOfObservations()) {
+            for (Observation observation : ObjectsManager.getListOfObservations()) {
                 o++;
                 double val = observation.getValues()[y];
                 if (val >= 0.0) {
@@ -121,7 +121,7 @@ public class ObservationExcel {
             }
             for (int o = 0; o < nbo; o++) {
                 Observation observation = new Observation(idObs.get(o), values[o]);
-                ProjectListsManager.addObservation(observation, false);
+                ObjectsManager.addObservation(observation, false);
             }
         }
     }
