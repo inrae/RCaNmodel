@@ -9,8 +9,5 @@
         <module name="RCaNconstructor" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="RCaNconstructor" target="17" />
-    </bytecodeTargetLevel>
   </component>
 </project>
