@@ -65,7 +65,7 @@ ggPairsBiomass <- function(mysampleCaNmod,
 
   myCaNmodFit_long <- as.data.frame(as.matrix(mysampleCaNmod$mcmc)) %>%
     mutate("Sample_id" = 1:nrow(as.matrix(mysampleCaNmod$mcmc))) %>%
-    slice(seq(1, n(), by=round(n() / (frac * n())))) %>%
+    slice(round(seq(1, nrow(.), length.out = round(frac * nrow(.))))) %>%
     pivot_longer(cols = -!!sym("Sample_id"),
                  names_to = c("Var","Year"),
                  names_pattern = "(.*)\\[(.*)\\]",
@@ -84,7 +84,7 @@ ggPairsBiomass <- function(mysampleCaNmod,
   biomass <- pivot_wider(biomass,
                          names_from = !!sym("species"),
                          values_from = !!sym("b")) %>%
-    slice(seq(1, n(), by=round(n() / (frac * n()))))
+    slice(round(seq(1, nrow(.), length.out = round(frac * nrow(.)))))
   g <- ggpairs(biomass,
                columns = 3:ncol(biomass),
                lower = list(continuous = wrap("smooth",

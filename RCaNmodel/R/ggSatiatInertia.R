@@ -179,8 +179,7 @@ ggSatiatInertia <- function(mysampleCaNmod,
 
 
   full_tab <- merge(inertia_tab, satiation_tab) %>%
-      slice(seq(1, n(),by = round(n() / (frac * n()))))
-
+    slice(round(seq(1, nrow(.), length.out = round(frac * nrow(.)))))
 
     ggplot(full_tab, aes(y = !!sym("growth_std"), x = !!sym("satiation_std"))) +
       geom_point(shape=".",col="grey") +
@@ -192,7 +191,7 @@ ggSatiatInertia <- function(mysampleCaNmod,
       scale_fill_viridis_d() +
       facet_wrap(~ species, ncol = ceiling(length(species)^0.5),
                  scales = "free") +
-      guides(colour = FALSE, alpha = FALSE, fill = FALSE) +
+      guides(colour = "none", alpha = "none", fill = "none") +
       geom_hline(aes(yintercept = 0), lty = 2) +
       ylim(-1,1)+xlim(0,1) + theme_bw()
 

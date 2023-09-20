@@ -52,9 +52,9 @@ ggTrophicRelation <- function(mysampleCaNmod,
     stop("some species are not recognized")
   species <- factor(species, levels = species)
   myCaNmodFit_long <- as.data.frame(as.matrix(mysampleCaNmod$mcmc)) %>%
-    slice(seq(1, n(),by = round(n() / (frac * n())))) %>%
-    mutate("Sample_id" = 1:nrow(as.matrix(mysampleCaNmod$mcmc))) %>%
-    sample_n(min(1000, nrow(as.matrix(mysampleCaNmod$mcmc))), replace = FALSE) %>%
+    mutate("Sample_id" = seq_len(nrow(.))) %>%
+    slice(round(seq(1, nrow(.), length.out = round(frac * nrow(.))))) %>%
+    sample_n(min(1000, nrow(.)), replace = FALSE) %>%
     pivot_longer(cols = -!!sym("Sample_id"),
                  names_to = c("Var","Year"),
                  names_pattern = "(.*)\\[(.*)\\]",
@@ -106,7 +106,7 @@ ggTrophicRelation <- function(mysampleCaNmod,
     scale_fill_viridis_d() +
     facet_grid(predator ~  prey,
                scales = "free") +
-    guides(colour = FALSE, alpha = FALSE, fill = FALSE) +
+    guides(colour = "none", alpha = "none", fill = "none") +
     xlab('Biomass prey') +
     ylab('Flux to predator') +
     theme(legend.position = "none") +

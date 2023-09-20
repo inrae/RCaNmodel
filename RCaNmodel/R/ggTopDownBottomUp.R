@@ -84,8 +84,8 @@ ggTopDownBottomUp <- function(mysampleCaNmod,
   # Transform the mcmc output into a 4 col vector with simulation id, year, variable and value
   mcmc <- mysampleCaNmod$mcmc
   myCaNmodFit_long <- as.data.frame(as.matrix(mcmc)) %>%
-    mutate(Sample_id = 1:dim(as.matrix(mcmc))[1]) %>%
-    slice(seq(1, n(),by = round(n() / (frac * n())))) %>%
+    mutate(Sample_id = seq_len(nrow(.))) %>%
+    slice(round(seq(1, nrow(.), length.out = round(frac * nrow(.))))) %>%
     pivot_longer(cols = -!!sym("Sample_id"),
                  names_to = c("Var","Year"),
                  names_pattern = "(.*)\\[(.*)\\]",
