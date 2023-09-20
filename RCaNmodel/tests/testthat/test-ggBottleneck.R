@@ -1,11 +1,14 @@
 test_that("ggBottleneck works", {
-  expect_true(inherits(ggBottleneck(sampleCaNmod),
+  expect_true(inherits(ggBottleneck(sampleCaNmod,
+                                    "HerbZooplankton"),
                        "ggplot"))
 })
 
 
 test_that("frac works in ggBottleneck", {
-  expect_no_error(ggBottleneck(sampleCaNmod,"HerbZooplankton", frac = .5))
+  expect_no_error(ggBottleneck(sampleCaNmod,
+                               "HerbZooplankton",
+                               frac = .5))
 })
 
 test_that("years works in ggBottleneck", {
