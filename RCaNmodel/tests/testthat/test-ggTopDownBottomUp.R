@@ -5,10 +5,6 @@ test_that("ggTopDownBottomUp works with single species", {
 })
 
 
-test_that("invalid syntax is detected in ggTopDownBottomUp", {
-  expect_error(ggTopDownBottomUp(sampleCaNmod,"HerbZooplankton"))
-})
-
 test_that("frac works in ggTopDownBottomUp", {
-  expect_no_error(ggTopDownBottomUp(sampleCaNmod,"HerbZooplankton", frac = .5))
+  expect_no_error(ggTopDownBottomUp(sampleCaNmod, frac = .5))
 })

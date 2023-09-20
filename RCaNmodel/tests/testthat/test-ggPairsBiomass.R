@@ -1,6 +1,6 @@
 test_that("ggPairsBiomass works", {
   expect_true(inherits(ggPairsBiomass(sampleCaNmod),
-                       "ggplot"))
+                       "ggmatrix"))
 })
 
 

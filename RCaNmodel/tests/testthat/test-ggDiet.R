@@ -1,5 +1,5 @@
 test_that("ggDiet works", {
-  expect_true(inherits(ggDiet(sampleCaNmod),
+  expect_true(inherits(ggDiet(sampleCaNmod, "HerbZooplankton"),
                        "ggplot"))
 })
 
