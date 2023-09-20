@@ -32,11 +32,12 @@
         <!-- Set the project to UTF-8, avoiding warnings in the build logs -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
 
-        <!-- Used to set both the path to find the JavaFX modules and also the versions for Maven dependencies -->
-        <javafx.version>16</javafx.version>
+        <!-- needs to be consistent with github actions -->
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+
+
         
         <!-- Replace this UUID with a custom one for your project. This ID is used by the Windows installer system
         to know that an installer is intended to replace/upgrade an earlier version. The easiest thing to do is
@@ -57,32 +58,17 @@
             <artifactId>javafaker</artifactId>
             <version>1.0.2</version>
         </dependency>
+        <!-- Modern JavaFX Look and Feel -->
+        <!-- https://github.com/mkpaz/atlantafx -->
+        <dependency>
+            <groupId>io.github.mkpaz</groupId>
+            <artifactId>atlantafx-base</artifactId>
+            <version>1.1.0</version>
+        </dependency>        
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.4</version>
-        </dependency>
-        <!-- Javafx -->
-        <!-- This downloads the platform specific JavaFX libraries used by the project. -->
-        <!-- For the final installable, the JavaFX dependencies are provided via modules, but by including these here
-         they work nicely with with IDEs and other Maven plugins (e.g. the javafx:run). -->
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-controls</artifactId>
-            <version>${javafx.version}</version>
-            <classifier>${platform}</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics</artifactId>
-            <version>${javafx.version}</version>
-            <classifier>${platform}</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-fxml</artifactId>
-            <version>${javafx.version}</version>
-            <classifier>${platform}</classifier>
         </dependency>
         <!-- excel java -->
         <dependency>
@@ -194,8 +180,6 @@
                         <configuration>
                             <toolName>jlink</toolName>
                             <removeDirectories>${project.build.directory}/jvm-image/</removeDirectories>
-                            <modulePath>${project.basedir}/${platform}-javafx/javafx-jmods-${javafx.version}/
-                            </modulePath>
                             <addModules>${jvm.modules}</addModules>
                             <output>${project.build.directory}/jvm-image</output>
                             <args>
@@ -250,7 +234,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.1</version>
+                    <version>3.13.0</version>
+                    <configuration>
+                    	<source>21</source> <!-- JDK source version -->
+                    	<target>21</target> <!-- JDK target version -->
+                    	<release>21</release> <!-- Use this for JDK 9+ to ensure API compatibility -->
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -375,14 +364,27 @@
             </build>
         </profile>
         <profile>
-            <id>mac-active</id>
+            <id>macx64-active</id>
             <activation>
                 <os>
                     <family>mac</family>
+                    <arch>x64</arch>
                 </os>
             </activation>
             <properties>
                 <platform>mac</platform>
+            </properties>
+        </profile>
+        <profile>
+            <id>macaarch64-active</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                    <arch>aarch64</arch>
+                </os>
+            </activation>
+            <properties>
+                <platform>macaarch64</platform>
             </properties>
         </profile>
     </profiles>
