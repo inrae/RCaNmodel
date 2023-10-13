@@ -3,11 +3,11 @@
 #' by+A.x<=b and C.x=v or by the polytope of the CaNmod object
 #' @param OP an OP object
 #' @param p index of the parameter
-#'
+#' @param solution if TRUE, returns a list with the vector of solution
 #' @return a vector with lower bounds and upper bounds
 #'
 
-getParamMinMax <- function(OP, p) {
+getParamMinMax <- function(OP, p, solution = FALSE) {
   solved <- FALSE
   ntry <- 0
   while (ntry < 3 & !solved) {
@@ -32,13 +32,16 @@ getParamMinMax <- function(OP, p) {
     
     if (res$status$msg$code == 0) {
       bound <- res$solution[p]
+      sol <- res$solution  
       solved <- TRUE
     } else  {
+      sol <- rep(NA, length(res$solution))
       bound <- NA
     }
     ntry <- ntry + 1
   }
   res <- bound
-  
+  if (solution)
+    return (sol)
   return (res)
 }

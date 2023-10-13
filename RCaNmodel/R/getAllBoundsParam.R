@@ -6,7 +6,7 @@
 #' @param lower minimal bounds for paramaters, by default set to zero
 #' @param upper maximum bounds for paramaters, by default set to Inf
 #' @param progressBar should a progress bar be displayed (default TRUE)
-#'
+#' @param solution if TRUE returns vectors of solutions
 #' @importFrom utils setTxtProgressBar
 #' @importFrom utils txtProgressBar
 #' @importFrom ROI objective
@@ -29,7 +29,8 @@
 getAllBoundsParam <- function(x,
                               lower = NULL,
                               upper = NULL,
-                              progressBar = TRUE) {
+                              progressBar = TRUE,
+                              solution = FALSE) {
   
   x <- reformatX(x)
   A <- x$A
@@ -70,6 +71,7 @@ getAllBoundsParam <- function(x,
         maximum <- TRUE
         presolved <- presolvedmax
       }
+      copy_lp_mod <- copy.lp(presolved$OP$lp_model)
       if (!colnames(A)[p] %in% names(presolved$fixed)){
         ip <- match(colnames(A)[p], colnames(presolved$A))
         ob <- rep(0, ncol(presolved$A))
@@ -77,15 +79,32 @@ getAllBoundsParam <- function(x,
         ROI::objective(presolved$OP) <- L_objective(ob)
         
         set.objfn(presolved$OP$lp_model, ob)
-        getParamMinMax(presolved$OP, ip)
+        res <- getParamMinMax(presolved$OP, ip, solution)
+        if (solution) {
+          res2 <- rep(NA, ncol(A))
+          res2[colnames(A) %in% names(presolved$fixed)] <- presolved$fixed
+          res2[!colnames(A) %in% names(presolved$fixed)] <- res
+          res <- res2
+        }
       } else {
-        presolved$fixed[colnames(A)[p]]
+        res <- presolved$fixed[colnames(A)[p]]
+        if (solution) {
+          res2 <- rep(NA, ncol(A))
+          res2[colnames(A) %in% names(presolved$fixed)] <- presolved$fixed
+          res <- res2
+        }
       }
+      presolved$OP$lp_model <- copy_lp_mod
+      res
     })
   })
-  data.frame(
-    param = colnames(A),
-    lowerbound = bounds[1, ],
-    upperbound = bounds[2, ]
-  )
+  if (!solution){
+    return(data.frame(
+      param = colnames(A),
+      lowerbound = bounds[1, ],
+      upperbound = bounds[2, ]))
+  } else {
+    return(bounds)
+  }
+  
 }
