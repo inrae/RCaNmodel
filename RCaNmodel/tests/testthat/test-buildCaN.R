@@ -1,4 +1,3 @@
-
 test_that("class of outputs objects are correct", {
   for (i in seq_along(templatefiles)){
     myCaNmod <- buildCaN(templatefiles[[i]], generic = generictemplate[i])

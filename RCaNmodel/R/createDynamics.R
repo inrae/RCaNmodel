@@ -8,7 +8,9 @@
 #' @param components the components data frame
 #' @param fluxes the fluxes data frame
 #' @param series the series can be useful to specify time varying parameters
-#'
+#' @param stanza_species a vector with the names of multistazas component
+#' @param stanzas a list with the parameters of the stanzas
+#' 
 #' @return a list with H and N matrices
 #' @importFrom symengine expand
 #' @importFrom symengine S
@@ -18,9 +20,16 @@
 createDynamics <- function(dynamics_equation = NULL,
                            components,
                            fluxes,
-                           series) {
-  species <- components$Component[which(components$Inside == 1)]
-  index_species <- which(components$Inside == 1)
+                           series,
+                           stanza_species,
+                           stanza) {
+  #we add the stanza groups
+  componentsall <- components
+  if (length(stanza) > 0)
+    componentsall <- dplyr::bind_rows(components,
+                                      do.call(bind_rows, stanza))
+  species <- componentsall$Component[which(componentsall$Inside == 1)]
+  index_species <- which(componentsall$Inside == 1)
   fluxes_to <- match(fluxes$To, species)
   fluxes_from <- match(fluxes$From, species)
   
@@ -28,15 +37,7 @@ createDynamics <- function(dynamics_equation = NULL,
   
   nbfluxes <- nrow(fluxes)
   
-  # this will be useful to have time varying parameters: they come either
-  # from the component sheet or can be overwritten by the time series sheet
-  for (sp in components$Component){
-    for (param in names(components)[-1]){
-      assign(paste0(sp, param),
-             rep(components[components$Component == sp, param],
-                 nrow(series)))
-    }
-  }
+  
   
   for (s in names(series)){
     assign(s, series[, s])
