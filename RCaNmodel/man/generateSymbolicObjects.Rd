@@ -10,7 +10,10 @@ generateSymbolicObjects(
   ntstep,
   series,
   aliases,
-  dynamics_equation = NULL
+  dynamics_equation = NULL,
+  stanza_species,
+  stanza,
+  fluxes_stanza
 )
 }
 \arguments{
@@ -26,16 +29,15 @@ generateSymbolicObjects(
 
 \item{dynamics_equation}{a string that specifies the dynamics equation (NULL
 if trophic model)}
+
+\item{stanza_species}{a vector with the names of multistazas component}
+
+\item{stanza}{a list with the parameters of the stanzas}
+
+\item{fluxes_stanza}{a list with the flow names and the subflows for stanzas}
 }
 \value{
-en environment storing all symbolic elements including among others
-\itemize{
- \item{"IE_H"}{identity- H the matrix of the equation (Bt+1=(I-H).B+N.F)}
- \item{"n"}{the N matrix of the equation (Bt+1=(I-H).B+N.F)}
- \item{"B_0"}{initial biomasses}
- \item{"species"}{a vector of biomasse per time step for each species}
- \item{"flow"}{a vector of biomasse per time step for each flow}
-}
+en environment storing all symbolic elements
 }
 \description{
 This is an internal function that builds all the required symbolic objects
