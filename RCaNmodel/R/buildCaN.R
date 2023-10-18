@@ -90,9 +90,10 @@ buildCaN <- function(x, generic = FALSE) {
     stanza_species <- character(0)
     if ("Stanza" %in% names(components_param)){
       stanza_species <- components_param$Component[as.logical(
-        components_param$Stanza)]
+        components_param$Stanza) & !is.na(components_param$Stanza)]
+      components_param$Stanza[is.na(components_param$Stanza)] <- 0
       sheet_list <- readxl::excel_sheets(x)
-      if (!all(stanza_species) %in% sheet_list)
+      if (!all(stanza_species %in% sheet_list))
         stop(paste("stanza",
                    stanza_species[!stanza_species %in% sheet_list],
                    "should have a dedicated worksheet"))
@@ -102,10 +103,18 @@ buildCaN <- function(x, generic = FALSE) {
     names(stanzas) <- stanza_species
     
     ##for stanzas we create a fake external component to deal with recruitment
+    componentsall <- components_param
     for (s in stanza_species){
       components_param <- components_param %>%
         dplyr::bind_rows(data.frame(Component =  paste0("Recruitment", s),
                                     Inside = 0))
+      componentsall <- componentsall %>%
+        dplyr::bind_rows(stanzas[[s]]) %>%
+        dplyr::bind_rows(data.frame(Component =  paste0("Recruitment", s),
+                                    Inside = 0))
+    }
+    if (length(stanzas) > 0){
+      componentsall[is.na(componentsall)] <- 0
     }
 
     #read Fluxes
@@ -121,12 +130,12 @@ buildCaN <- function(x, generic = FALSE) {
       froms <- fluxes_def$From[ifl]
       stanza <- FALSE
       if (froms %in% stanza_species){
-        froms <- stanzas[fluxes_def$From[ifl]]$Component
+        froms <- stanzas[[fluxes_def$From[ifl]]]$Component
         stanza <- TRUE
       }
       tos <- fluxes_def$To[ifl]
       if (tos %in% stanza_species){
-        tos <- stanzas[fluxes_def$To[ifl]]$Component
+        tos <- stanzas[[fluxes_def$To[ifl]]]$Component
         stanza <- TRUE
       }
       if (stanza){
@@ -140,19 +149,20 @@ buildCaN <- function(x, generic = FALSE) {
         fluxes_def <- fluxes_def %>%
           dplyr::filter(Flux != f) %>%
           dplyr::bind_rows(new_fluxes)
-        fluxes_stanza[f] <- new_fluxes$Flux
+        fluxes_stanza[[f]] <- new_fluxes$Flux
       }
     }
     
     ##for stanzas we create a fake inflow towards first group for recruitment
     for (is in seq_len(length(stanza_species))){
-      firstgroup <- stanzas[[is]][1, "Component"]
+      firstgroup <- dplyr::pull(stanzas[[is]][1, "Component"])
       fluxes_def <- fluxes_def %>%
         dplyr::bind_rows(data.frame(Flux =  paste0("Recruitment",
-                                                   stanza_species[is]),
+                                                   firstgroup),
                                     From = paste0("Recruitment",
                                                   stanza_species[is]),
-                                    To = firstgroup,
+                                    To = paste0("Recruitment",
+                                                stanza_species[is]),
                                     Trophic = 0))
     }
     
@@ -220,19 +230,20 @@ buildCaN <- function(x, generic = FALSE) {
   fluxes_def <-
     fluxes_def[!rowSums(is.na(fluxes_def)) ==
                  ncol(fluxes_def), ]
-  flow <- as.character(fluxes_def$Flux)
   nbfluxes <- nrow(fluxes_def)
-  if (!all(fluxes_def$From %in% components))
+  if (!all(fluxes_def$From %in% componentsall$Component))
     stop(paste(
       "In sheet fluxes, column From, not recognized:",
-      fluxes_def$From[!(fluxes_def$From %in% components)]
+      fluxes_def$From[!(fluxes_def$From %in% componentsall$Component)]
     ))
-  if (!all(fluxes_def$To %in% components))
+  if (!all(fluxes_def$To %in% componentsall$Component))
     stop(paste("In sheet fluxes, column To, not recognized:",
-               fluxes_def$To[!(fluxes_def$To %in% components)]))
+               fluxes_def$To[!(fluxes_def$To %in% componentsall$Component)]))
   fluxes_from <- match(fluxes_def$From, species)
   fluxes_to <- match(fluxes_def$To, species)
 
+  flow <- as.character(fluxes_def$Flux)
+  
   if (! generic) {
     if (!all(fluxes_def$Trophic %in% c(0, 1)))
       stop("In sheet fluxes, Trophic should be 0 or 1")
@@ -365,7 +376,8 @@ buildCaN <- function(x, generic = FALSE) {
   if (length(stanzas) > 0)
     componentsall <- dplyr::bind_rows(componentsall,
                                       do.call(bind_rows, stanzas))
-  speciesall <- components_param$Component[which(componentsall$Inside  == 1)]
+  speciesall <- componentsall$Component[which(componentsall$Inside  == 1)]
+  groups <- speciesall[!speciesall %in% stanza_species]
   if (! generic) {#add implicit constraints for non generic model
     ####add refuge biomasses/biomass positiveness
     A <-
@@ -515,10 +527,10 @@ buildCaN <- function(x, generic = FALSE) {
 
   }
   b <- -A[, 1]
-  A <- A [, -1]
+  A <- A [, -1, drop = FALSE]
 
   tmp <- expand.grid(flow, series$Year)
-  colnames(A) <- c(paste(species, "[", series$Year[1], "]", sep = ""),
+  colnames(A) <- c(paste(groups, "[", series$Year[1], "]", sep = ""),
                    paste(tmp[, 1], "[", tmp[, 2], "]", sep = ""))
 
 
@@ -570,9 +582,8 @@ buildCaN <- function(x, generic = FALSE) {
                    0,
                    length(symbolic_enviro$param),
                    sparse = TRUE) #first column stores -b
-  biomasses <- speciesall[!speciesall %in% stanza_species]
   L <-
-    rbind(L, do.call("rbind", lapply(biomasses , function(sp)
+    rbind(L, do.call("rbind", lapply(groups , function(sp)
       do.call(
         "rbind",
         lapply(as.vector(expand(eval(
@@ -580,7 +591,7 @@ buildCaN <- function(x, generic = FALSE) {
         ))), function(s)
           buildVectorConstraint(s, symbolic_enviro))
       ))))
-  tmp <- expand.grid(series$Year, biomasses)
+  tmp <- expand.grid(series$Year, groups)
   rownames(L) <- paste(tmp[, 2], "[", tmp[, 1], "]", sep = "")
   L <- L[, -1]
   colnames(L) <- colnames(A)

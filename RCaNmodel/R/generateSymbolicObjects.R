@@ -10,7 +10,7 @@
 #' @param dynamics_equation a string that specifies the dynamics equation (NULL
 #' if trophic model)
 #' @param stanza_species a vector with the names of multistazas component
-#' @param stanzas a list with the parameters of the stanzas
+#' @param stanza a list with the parameters of the stanzas
 #' @param fluxes_stanza a list with the flow names and the subflows for stanzas
 #'
 #' @return en environment storing all symbolic elements 
@@ -39,7 +39,7 @@ generateSymbolicObjects <-
     if (length(stanza) > 0)
       componentsall <- dplyr::bind_rows(componentsall,
                                         do.call(bind_rows, stanza))
-    speciesall <- components$Component[which(componentsall$Inside  == 1)]
+    speciesall <- componentsall$Component[which(componentsall$Inside  == 1)]
     
     flow <- fluxes_def$Flux
     nbfluxes <- length(flow)
@@ -58,15 +58,15 @@ generateSymbolicObjects <-
     previousgroups <- list()
     for (s in species){
       if (s %in% stanza_species){
-        gcomponents <- stanza[s]$Component
+        gcomponents <- stanza[[s]]$Component
         for (igs in seq_len(length(gcomponents))){
           gs <- gcomponents[igs]
           if (igs == 1){
-            previousgroups[gs] <- paste0("Recruitment", s)
+            previousgroups[gs] <- paste0("Recruitment", gs)
           } else if (igs == length(gs)){
-            previousgroups[gs] <- c(gs, gcompontents[igs-1])
+            previousgroups[gs] <- c(gs, gcomponents[igs-1])
           } else {
-            previousgroups[gs] <- gcompontents[igs-1]
+            previousgroups[gs] <- gcomponents[igs-1]
           }
         }
       } else {
@@ -125,7 +125,7 @@ generateSymbolicObjects <-
       for (p in names(fluxes_def)[-(1:3)]){
         spgroups <- sp
         if (sp %in% stanza_species)
-          sggroups <- stanza[sp]$Component
+          spgroups <- stanza[[sp]]$Component
         inflow <- which(fluxes_def$To %in% spgroups & fluxes_def[, p])
         outflow <- which(fluxes_def$From %in% spgroups & fluxes_def[, p])
         intemp <- rep(0, length(years))
@@ -203,7 +203,7 @@ generateSymbolicObjects <-
     }
     
     for (f in names(fluxes_stanza)){
-      assign(f, eval(parste(text = paste(fluxes_stanza[f], sep = "+"))))
+      assign(f, eval(parse(text = paste(fluxes_stanza[[f]], collapse = "+"))))
       generateDerivedSymbolicObjects(f,
                                      environment(),
                                      before = TRUE,
@@ -223,7 +223,7 @@ generateSymbolicObjects <-
                rep(components[components$Component == sp, param],
                    nrow(series)))
         if (sp %in% stanza_species){
-          for (sp2 in stanza[sp]$Component){
+          for (sp2 in stanza[[sp]]$Component){
             assign(paste0(sp2, param),
                    rep(components[components$Component == sp, param],
                        nrow(series)))
@@ -235,11 +235,11 @@ generateSymbolicObjects <-
     #for stanza group if a parameter is defined at the group level, we overwrite
     #the general parameter
     for (sp in stanza_species){
-      for (param in names(stanza[sp])[-1]){
-        for (isp2 in seq_len(nrow(stanza[sp]))){
-          if (!is.na(stanza[sp][isp2,param])){
-            assign(paste0(stanza[sp][isp2, "Component"], param),
-                   rep(stanza[sp][isp2, param],
+      for (param in names(stanza[[sp]])[-1]){
+        for (isp2 in seq_len(nrow(stanza[[sp]]))){
+          if (!is.na(stanza[[sp]][isp2,param])){
+            assign(paste0(stanza[[sp]][isp2, "Component"], param),
+                   rep(dplyr::pull(stanza[[sp]][isp2, param]),
                        nrow(series)))
           }
         }
@@ -248,7 +248,7 @@ generateSymbolicObjects <-
     
     #series can overwrite parameters values
     for (s in names(series)[-1]) {
-      ser <- pull(series, s)
+      ser <- dplyr::pull(series, s)
       ser[is.na(ser)] <- NaN
       assign(s, ser)
       generateDerivedSymbolicObjects(s,
@@ -271,7 +271,12 @@ generateSymbolicObjects <-
         for (ig in seq_len(nrow(Bmat))){
           g <- groups[ig]
           or <- which(groups %in% previousgroups[g])
-          Bmat[ig ,i] <- sum(Bend[or, i-1])
+          if (length(or) == 0) {
+            #no origin, so biomass comes from recruitment
+            Bmat[ig ,i] <- eval(parse(text = paste0("Recruitment", g)))[i]
+          } else { 
+            Bmat[ig ,i] <- sum(Bend[or, i-1])
+          }
         }
       }
       
@@ -486,14 +491,14 @@ generateSymbolicObjects <-
     }
     #we assign aliases for biomass of stanza component
     for (s in stanza_species){
-      assign(s, eval(parse(text=paste(stanza[s]$Component,
-                                      sep = "+")))) #vectors of biomass named by species name
+      assign(s, eval(parse(text=paste(stanza[[s]]$Component,
+                                      collapse = "+")))) #vectors of biomass named by species name
       
       #vectors of biomass named by species name at end of tstep
       #we add a NaN since the vector has no element for last time step
       assign(paste0(s,
                     "End"),
-             eval(parse(text=paste(paste0(stanza[s]$Component,"End"),
+             eval(parse(text=paste(paste0(stanza[[s]]$Component,"End"),
                                    sep = "+"))))
       generateDerivedSymbolicObjects(s,
                                      environment(),
