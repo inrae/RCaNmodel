@@ -84,7 +84,7 @@ getAllBoundsParam <- function(x,
   
   if (progressBar)
     pb <- txtProgressBar(min = 0, max = nbparam, style = 3)
-  bounds <- sapply(1:nbparam, function(p) {
+  bounds <- lapply(1:nbparam, function(p) {
     if (progressBar)
       setTxtProgressBar(pb, p)
     sapply(c("min", "max"), function(s){
@@ -123,11 +123,13 @@ getAllBoundsParam <- function(x,
     })
   })
   if (!solution){
+    bounds <- do.call(cbind, bounds)
     return(data.frame(
       param = colnames(A),
       lowerbound = bounds[1, ],
       upperbound = bounds[2, ]))
   } else {
+    bounds <- do.call(cbind, bounds)
     return(bounds)
   }
   
