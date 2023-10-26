@@ -54,9 +54,33 @@ getAllBoundsParam <- function(x,
   presolvedmax <- presolveLPMod(A, b, C, v, sense = "max",
                                 lower = lower,
                                 upper = upper)
+  if (nrow(presolvedmin$A) == 0){
+    presolvedmin <- list(A = A,
+                         b = b,
+                         C = C,
+                         V = v,
+                         lower = lower,
+                         upper = upper,
+                         fixed = integer(0),
+                         OP = defineLPMod(A, b, C, v, 
+                                          maximum = FALSE,
+                                          lower = lower,
+                                          upper = upper))
+  }
   
-  
-  
+  if (nrow(presolvedmax$A) == 0){
+    presolvedmax <- list(A = A,
+                         b = b,
+                         C = C,
+                         V = v,
+                         lower = lower,
+                         upper = upper,
+                         fixed = integer(0),
+                         OP = defineLPMod(A, b, C, v, 
+                                          maximum = TRUE,
+                                          lower = lower,
+                                          upper = upper))
+  }
   
   if (progressBar)
     pb <- txtProgressBar(min = 0, max = nbparam, style = 3)
