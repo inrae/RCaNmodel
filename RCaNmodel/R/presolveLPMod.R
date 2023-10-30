@@ -76,7 +76,7 @@ presolveLPMod <-
     dimnames(lp_model) <- list(c(rownames(A), rownames(C)), colnames(A))
     
     lp.control(lp_model, sense = sense, presolve = presolve, scaling = scaling)
-    set.objfn(lp_model, rep(1, nbparam))
+    set.objfn(lp_model, runif(nbparam))
     res <- solve.lpExtPtr(lp_model)
     
     
@@ -110,7 +110,7 @@ presolveLPMod <-
     v2 <- rhs[dir == "="]
     if (nrow(lhs) > 0){
       OP <- defineLPMod(A2, b2, C2, v2, bounds$lower, bounds$upper,
-                        maximum = maximum, ob = rep(1, ncol(lhs)))
+                        maximum = maximum, ob = runif(ncol(lhs)))
     } else {
       OP <- NULL
     }

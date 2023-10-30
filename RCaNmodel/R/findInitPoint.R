@@ -50,6 +50,6 @@ findInitPoint <- function(A,
                               upper = upper,
                               progressBar = progressBar,
                               solution = TRUE)
-  return (colMeans(angles, na.rm = TRUE))
+  return (rowMeans(angles, na.rm = TRUE))
   
 }
