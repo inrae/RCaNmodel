@@ -618,7 +618,7 @@ buildCaN <- function(x, generic = FALSE) {
     L2biom <- L2biom[, -1]
     colnames(L2biom) <- colnames(A)
   }
-  if (length(stanza_species) > 0){
+  if (length(fluxes_stanza) > 0){
     L2fluxes <-
       rbind(L2fluxes, do.call("rbind", lapply(names(fluxes_stanza) , function(sp)
         do.call(
