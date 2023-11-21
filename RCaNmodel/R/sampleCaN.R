@@ -195,21 +195,35 @@ sampleCaN <- function(myCaNmod,
     colnames(res$X) <- colnames(myCaNmod$A)
     names(res) <- c("F", "covMat")
     res$B <- t(apply(res$F, 1, function(x) as.matrix(myCaNmod$L) %*% x))
+
+    stanzaF <- matrix(0,nrow(res$F),0)
+    #we compute stanza fluxes
+    if (nrow(myCaNmod$L2fluxes) > 0)
+      stanzaF <- res$F %*% t(as.matrix(myCaNmod$L2fluxes))
+    
+    #we compute stanza biomasses
+    stanzaB <- matrix(0,nrow(res$F),0)
+    if (nrow(myCaNmod$L2biom) > 0)
+      stanzaB <- res$F %*% t(as.matrix(myCaNmod$L2biom))
     
     res$F <- res$F[, -seq_len(length(myCaNmod$species))]
     #we remove the first column which corresponds to initial biomasses
     colnames(res$F) <- colnames(myCaNmod$A)[-seq_len(length(myCaNmod$species))]
     
+    #we add stanza F
+    res$F <- cbind(res$F, stanzaF)
     if (!lastF) {#we removed last time step
-      lastid <- which(colnames(res$F) %in% paste(myCaNmod$fluxes_def$Flux,
+      lastid <- which(endsWith(colnames(res$F), paste0(
                                                  "[",
                                                  max(myCaNmod$series$Year),
-                                                 "]",
-                                                 sep = ""))
+                                                 "]")))
       if (length(lastid) > 0)
         res$F <- res$F[, - lastid]
     }
     colnames(res$B) <- rownames(myCaNmod$L)
+    
+    #we add stanza B
+    res$B <- cbind(res$B, stanzaB) 
     writeLines(paste("###End chain",i))
     covmat <- NULL
     if (keepCovMat)

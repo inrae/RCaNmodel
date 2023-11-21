@@ -116,7 +116,7 @@ buildCaN <- function(x, generic = FALSE) {
     if (length(stanzas) > 0){
       componentsall[is.na(componentsall)] <- 0
     }
-
+    
     #read Fluxes
     fluxes_def <- as.data.frame(
       read_excel(x, sheet = "Fluxes")
@@ -172,21 +172,21 @@ buildCaN <- function(x, generic = FALSE) {
     )
     
     
-
+    
     #read constraints
     constraints <- as.data.frame(
       read_excel(x, sheet = "Constraints")
     )
-
+    
     if ("Aliases" %in% excel_sheets(x)) {
       aliases <-  as.data.frame(
         read_excel(x, sheet = "Aliases")
       )
     }
-
+    
     dynamics <- NULL
     dynamics_equation <- NULL
-
+    
     if (generic) {
       dynamics <- as.data.frame(
         read_excel(x, sheet = "Dynamics")
@@ -224,7 +224,7 @@ buildCaN <- function(x, generic = FALSE) {
   components <- components_param$Component
   species <- as.character(components_param$Component[index_species])
   nbspecies <- length(species)
-
+  
   #Fluxes
   #remove totally empty rows that sometimes happen with xlsx
   fluxes_def <-
@@ -241,7 +241,7 @@ buildCaN <- function(x, generic = FALSE) {
                fluxes_def$To[!(fluxes_def$To %in% componentsall$Component)]))
   fluxes_from <- match(fluxes_def$From, species)
   fluxes_to <- match(fluxes_def$To, species)
-
+  
   flow <- as.character(fluxes_def$Flux)
   
   if (! generic) {
@@ -249,7 +249,7 @@ buildCaN <- function(x, generic = FALSE) {
       stop("In sheet fluxes, Trophic should be 0 or 1")
     is_trophic_flux <- fluxes_def$Trophic == 1
   }
-
+  
   # Times series
   #remove totally empty rows that sometimes happen with xlsx
   series <-
@@ -257,8 +257,8 @@ buildCaN <- function(x, generic = FALSE) {
              ncol(series), ]
   ntstep <- nrow(series)
   data_series_name <- names(series)[-1]
-
-
+  
+  
   #dynamics
   dyn_eq <- NULL
   if (generic) {
@@ -275,8 +275,8 @@ buildCaN <- function(x, generic = FALSE) {
       dynamics_word <- dynamics_word[dynamics_word != ""] #empty words
       #remove double
       dynamics_word <- dynamics_word[!grepl(".*?([0-9]+).*", dynamics_word)]
-
-
+      
+      
       not_recognized <-
         which(
           !dynamics_word %in% c(
@@ -303,11 +303,11 @@ buildCaN <- function(x, generic = FALSE) {
   #we keep only active constraints
   if (! "Active" %in% names(constraints))
     constraints$Active <- TRUE
-
+  
   lessthan <- grep("<", constraints$Constraint)
   greaterthan <- grep(">", constraints$Constraint)
   equality <- grep("^[^<>]+$", constraints$Constraint)
-
+  
   pattern_indices <- "(\\[[[:digit:]]*:[[:digit:]]*\\])"
   pattern_indices <- paste(pattern_indices,
                            "(\\[c\\(([[:digit:]]*,)+[[:digit:]]*\\)\\])",
@@ -315,10 +315,10 @@ buildCaN <- function(x, generic = FALSE) {
   pattern_indices <- paste(pattern_indices,
                            "(\\[[[:digit:]]*\\])",
                            sep = "|")
-
-
+  
+  
   #build matrices H and N
-
+  
   #build symbolic objects in a specific environment
   symbolic_enviro <-
     generateSymbolicObjects(components_param,
@@ -330,7 +330,7 @@ buildCaN <- function(x, generic = FALSE) {
                             stanza_species,
                             stanzas,
                             fluxes_stanza)
-
+  
   constraints_word <-
     unlist(sapply(as.character(constraints$Constraint), function(x)
       strsplit(x, split = ",|/|\\+|=|<|\\*|>|\\-|\\)|\\(|[[:space:]]")))
@@ -354,14 +354,14 @@ buildCaN <- function(x, generic = FALSE) {
   if (length(not_recognized) > 0)
     stop(paste("words not recognized in constraints:",
                constraints_word[not_recognized]))
-
+  
   #build A matrix and b corresponding to constraints A.x<=b
   nbparam <- length(symbolic_enviro$param)
   A <-
     Matrix::Matrix(0, 0, length(symbolic_enviro$param), sparse = TRUE)
   #first column stores -b
   colnames(A) <- as.character(symbolic_enviro$param)
-
+  
   ####add flow positiveness
   A <-
     rbind(A, cbind(rep(0, nbparam - 1), diag(-1, nbparam - 1, nbparam -
@@ -369,7 +369,7 @@ buildCaN <- function(x, generic = FALSE) {
   rownames(A) <- paste("Flow positiveness",
                        gsub( "_"," : ", colnames(A)[-1]),
                        sep = "_")
-
+  
   
   #we add subgruops to the components table
   componentsall <- components_param
@@ -398,7 +398,7 @@ buildCaN <- function(x, generic = FALSE) {
               name_constr = paste("Biomass positiveness_refuge", sp, sep = "_")
             )})
       ))
-
+    
     ####add satiation
     if (! generic){
       species_flow_to <-
@@ -432,8 +432,8 @@ buildCaN <- function(x, generic = FALSE) {
                 rbind,
                 lapply(
                   componentsall$Component[componentsall$Component %in%
-                                               speciesall &
-                                               !is.na(componentsall$Inertia)],
+                                            speciesall &
+                                            !is.na(componentsall$Inertia)],
                   function(sp) {
                     #increase
                     emigrants <-
@@ -449,7 +449,7 @@ buildCaN <- function(x, generic = FALSE) {
                         sp,
                         ")-1)]*exp(-",
                         paste0("head(", sp, "Inertia, -1)"), #we remove the last
-                                                             #inertia
+                        #inertia
                         ")",
                         sep = ""
                       ),
@@ -508,7 +508,7 @@ buildCaN <- function(x, generic = FALSE) {
                                                 sep = "_")
                           )
                         })))
-
+      
     }
   }
   ####add constraint provided by user
@@ -524,16 +524,16 @@ buildCaN <- function(x, generic = FALSE) {
           as.character(constraints$Id[c(lessthan, greaterthan)])
         )
       ))
-
+    
   }
   b <- -A[, 1]
   A <- A [, -1, drop = FALSE]
-
+  
   tmp <- expand.grid(flow, series$Year)
   colnames(A) <- c(paste(groups, "[", series$Year[1], "]", sep = ""),
                    paste(tmp[, 1], "[", tmp[, 2], "]", sep = ""))
-
-
+  
+  
   ####build matrix for equality constraint  C x = v and fill it
   C <-
     Matrix::Matrix(0, 0, length(symbolic_enviro$param), sparse = TRUE)
@@ -554,28 +554,28 @@ buildCaN <- function(x, generic = FALSE) {
   v <- -C[, 1]
   C <- C[, -1]
   colnames(C) <- colnames(A)
-
-
+  
+  
   AAll <- A
   bAll <- b
   CAll <- C
   vAll <- v
-
+  
   notactiveconstr <- subset(constraints, !as.logical(constraints$Active))
   notactiveconstr <- as.vector(
     outer(paste(notactiveconstr$Id, " : ", sep = ""),
           series$Year,
           paste,
           sep = ""))
-
+  
   b <- b[! rownames(A) %in% notactiveconstr]
   A <- A[! rownames(A) %in% notactiveconstr, ]
   v <- v[! rownames(C) %in% notactiveconstr]
   C <- C[! rownames(C) %in% notactiveconstr, ]
-
-
+  
+  
   #we remove inactive constraint
-
+  
   ####build matrix L and M of B=L.F+M
   L <-
     Matrix::Matrix(0,
@@ -595,8 +595,45 @@ buildCaN <- function(x, generic = FALSE) {
   rownames(L) <- paste(tmp[, 2], "[", tmp[, 1], "]", sep = "")
   L <- L[, -1]
   colnames(L) <- colnames(A)
-
-
+  
+  
+  #in case of stanza, we build matrices to reconstruct
+  #aggregated biomasses and fluxes
+  L2biom <- L2fluxes <- Matrix::Matrix(0,
+                                       0,
+                                       length(symbolic_enviro$param),
+                                       sparse = TRUE) #first column stores -b
+  if (length(stanza_species) > 0){
+    L2biom <-
+      rbind(L2biom, do.call("rbind", lapply(stanza_species , function(sp)
+        do.call(
+          "rbind",
+          lapply(as.vector(expand(eval(
+            parse(text = sp), symbolic_enviro
+          ))), function(s)
+            buildVectorConstraint(s, symbolic_enviro))
+        ))))
+    tmp <- expand.grid(series$Year, stanza_species)
+    rownames(L2biom) <- paste(tmp[, 2], "[", tmp[, 1], "]", sep = "")
+    L2biom <- L2biom[, -1]
+    colnames(L2biom) <- colnames(A)
+  }
+  if (length(stanza_species) > 0){
+    L2fluxes <-
+      rbind(L2fluxes, do.call("rbind", lapply(names(fluxes_stanza) , function(sp)
+        do.call(
+          "rbind",
+          lapply(as.vector(expand(eval(
+            parse(text = sp), symbolic_enviro
+          ))), function(s)
+            buildVectorConstraint(s, symbolic_enviro))
+        ))))
+    tmp <- expand.grid(series$Year, names(fluxes_stanza))
+    rownames(L2fluxes) <- paste(tmp[, 2], "[", tmp[, 1], "]", sep = "")
+    L2fluxes <- L2fluxes[, -1]
+    colnames(L2fluxes) <- colnames(A)
+  }
+  
   myCaNmod <- list(
     components_param = components_param,
     species = species,
@@ -618,6 +655,8 @@ buildCaN <- function(x, generic = FALSE) {
     v = v,
     vAll=vAll,
     L = L,
+    L2biom = L2biom,
+    L2fluxes = L2fluxes,
     b = b,
     bAll= bAll,
     stanza_species = stanza_species,
@@ -626,7 +665,7 @@ buildCaN <- function(x, generic = FALSE) {
     symbolic_enviro = symbolic_enviro
   )
   class(myCaNmod) <- "CaNmod"
-
-
+  
+  
   return(myCaNmod)
 }
