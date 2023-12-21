@@ -82,7 +82,8 @@ chebyCentre <- function(A, b, lower = NULL, upper = NULL) {
                    control = list(presolve = c("rows",
                                                "lindep",
                                                "rowdominate",
-                                               "mergerows")))
+                                               "mergerows"),
+                                  timeout = 30))
   
   if (requireNamespace("ROI.plugin.cbc", quietly = TRUE)
       & res$status$msg$code != 0){

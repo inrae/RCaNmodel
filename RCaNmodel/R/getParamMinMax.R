@@ -20,7 +20,8 @@ getParamMinMax <- function(OP, p, solution = FALSE) {
                        "mergerows"),
                        scaling = c("extreme",
                                    "equilibrate",
-                                   "integers")))
+                                   "integers"),
+                       timeout = 30))
     if (requireNamespace("ROI.plugin.cbc", quietly = TRUE)
         & res$status$msg$code != 0){
       res2 <- ROI_solve(OP,

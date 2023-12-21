@@ -50,7 +50,8 @@ checkPolytopeStatus <- function(x) {
                                                "mergerows"),
                                   scaling = c("extreme",
                                               "equilibrate",
-                                              "integers")))
+                                              "integers"),
+                                  timeout = 30))
   if (requireNamespace("ROI.plugin.cbc", quietly = TRUE)
       & res$status$msg$code == 5){
     res <- ROI_solve(lp_model,
@@ -68,7 +69,8 @@ checkPolytopeStatus <- function(x) {
                                                  "mergerows"),
                                     scaling = c("extreme",
                                                 "equilibrate",
-                                                "integers")))
+                                                "integers"),
+                                    timeout = 30))
     if (requireNamespace("ROI.plugin.cbc", quietly = TRUE)
         & res$status$msg$code ==5){
       res <- ROI_solve(lp_model,

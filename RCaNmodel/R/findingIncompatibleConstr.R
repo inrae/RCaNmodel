@@ -97,7 +97,8 @@ findingIncompatibleConstr <- function(x) {
                    control = list(presolve = c("rows",
                                                "lindep",
                                                "rowdominate",
-                                               "mergerows")))
+                                               "mergerows"),
+                                  timeout = 30))
   if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
       res$status$msg$code != 0){
     res2 <- ROI_solve(lp_model,
@@ -155,7 +156,8 @@ findingIncompatibleConstr <- function(x) {
                        control <- list(presolve = c("rows",
                                                     "lindep",
                                                     "rowdominate",
-                                                    "mergerows")))
+                                                    "mergerows"),
+                                       timeout = 30))
       if (requireNamespace("ROI.plugin.cbc", quietly = TRUE) &
           res$status$msg$code != 0){
         res2 <- ROI_solve(lp_model,
