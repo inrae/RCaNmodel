@@ -104,9 +104,9 @@ presolveLPMod <-
     
     
     
-    A2 <- lhs[dir == "<=", ]
+    A2 <- lhs[dir == "<=", , drop = FALSE]
     b2 <- rhs[dir == "<="]
-    C2 <- lhs[dir == "=", ]
+    C2 <- lhs[dir == "=", , drop = FALSE]
     v2 <- rhs[dir == "="]
     if (nrow(lhs) > 0){
       OP <- defineLPMod(A2, b2, C2, v2, bounds$lower, bounds$upper,
