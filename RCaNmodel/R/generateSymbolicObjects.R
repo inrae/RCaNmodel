@@ -93,7 +93,7 @@ generateSymbolicObjects <-
       list_F <- c(list_F, eval(parse(text = paste("F", t, sep = "_"))))
       list_B <- c(list_B, eval(parse(text = paste("B", t, sep = "_"))))
       if ((t - 1) == years[1]){
-        list_BEnd <- eval(parse(text = paste("BEnd", t - 1, sep = "_")))
+        list_BEnd <- list(eval(parse(text = paste("BEnd", t - 1, sep = "_"))))
       } else {
         list_BEnd <- c(list_BEnd,
                        eval(parse(text = paste("BEnd", t - 1, sep = "_"))))
