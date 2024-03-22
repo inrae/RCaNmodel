@@ -121,7 +121,7 @@ getTimerestrictedRCaNfile <-
       names(aliases) <- c("Alias", "Formula")
       if (nrow(aliases > 0)){
         for (i in seq_len(nrow(aliases))){
-          aliases[i, 2] <- replaceformula(aliases$aliases[i, 2])
+          aliases[i, 2] <- replaceformula(aliases[i, 2])
         }
         aliases <- aliases %>%
           filter(!is.na(!!sym("Formula")))
