@@ -12,7 +12,7 @@ import fr.cm.objects.MetaElement;
 import fr.cm.objects.Observation;
 import fr.cm.preferences.Strings;
 import org.apache.commons.io.IOUtils;
-
+import java.io.UncheckedIOException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -76,7 +76,7 @@ public class ObjectsManager {
             List<String> elementsResource = new ArrayList<>();
             try {
                 elementsResource = IOUtils.readLines(inst, StandardCharsets.UTF_8.name());
-            } catch (IOException e) {
+            } catch (UncheckedIOException e) {
                 e.printStackTrace();
             }
             for(String elementR : elementsResource){
