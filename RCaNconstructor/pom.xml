@@ -369,7 +369,8 @@
             <activation>
                 <os>
                     <family>mac</family>
-                    <arch>x86_64</arch>
+                    <arch>x64</arch>
+                    <!--<arch>x86_64</arch>-->
                 </os>
             </activation>
             <properties>
@@ -381,7 +382,8 @@
             <activation>
                 <os>
                     <family>mac</family>
-                    <arch>aarch64</arch>
+                    <arch>x64</arch>
+                    <!--<arch>aarch64</arch>-->
                 </os>
             </activation>
             <properties>
