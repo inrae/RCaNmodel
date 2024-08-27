@@ -45,7 +45,7 @@ jobs:
 
 
       - name: Build with Maven
-        run: mvn -B clean install --file RCaNconstructor/pom.xml
+        run: mvn -X -B clean install --file RCaNconstructor/pom.xml
       - name: Update Automatic Release
         uses: marvinpinto/action-automatic-releases@latest
         with:
