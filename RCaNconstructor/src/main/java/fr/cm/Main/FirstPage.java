@@ -10,7 +10,7 @@ public class FirstPage extends Pane {
         double he = Context.getWindowHeight();
         double wi = Context.getWindowWidth();
         try {
-            Image image = new Image("/img/CaN2020.png");
+            Image image = new Image("/CaN2020.png");
             double iw = image.getWidth();
             double ih = image.getHeight();
             double ratio = Math.min(he/ih, wi/iw);

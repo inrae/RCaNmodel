@@ -70,7 +70,7 @@ public class ObjectsManager {
     // META INFORMATION
     public static void makeMetaElementsList(){
         listOfMetaElements = new ArrayList<>();
-        String fileName = "project/Project.txt";
+        String fileName = "Project.txt";
         InputStream inst = ObjectsManager.class.getClassLoader().getResourceAsStream(fileName);
         if(inst != null){
             List<String> elementsResource = new ArrayList<>();

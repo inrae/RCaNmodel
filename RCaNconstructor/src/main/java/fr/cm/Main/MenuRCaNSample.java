@@ -21,7 +21,6 @@ public class MenuRCaNSample {
         MenuRCaNSample.borderPaneRacine = borderPaneRacine;
         menuItems = new ArrayList<>();
         MenuItem test = new MenuItem("TEST SAMPLE");
-        menuItems.add(test);
         for (RCaNScript rCaNScript : RCommandListXML.getListOfRCommandXML()) {
             if (rCaNScript.getMenu().equals("sample")) {
                 MenuItem menuItem = new MenuItem(rCaNScript.getTextMenu());

@@ -43,12 +43,11 @@ public class MainApplication extends Application {
         stage.widthProperty().addListener(changeSizelistener);
         stage.heightProperty().addListener(changeSizelistener);
         setOnClose();
-        RCommandListXML.init();
         HelpListXML.init();
+        RCommandListXML.init();
         Context.init();
         ObjectsManager.init();
         ObjectsManager.getNetworkView().update();
-
         borderPaneRacine = new BorderPane();
 
         setFirstPage();

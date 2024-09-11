@@ -18,7 +18,7 @@ public class HelpListXML {
 
     public static void init(){
         listOfHelpXML = new ArrayList<>();
-        String fileName = "scripts/Helps.xml";
+        String fileName = "Helps.xml";
         try {
             InputStream inst = HelpListXML.class.getClassLoader().getResourceAsStream(fileName);
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

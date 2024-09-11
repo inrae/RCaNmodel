@@ -20,7 +20,6 @@ public class MenuRCaNBuild {
         MenuRCaNBuild.borderPaneRacine = borderPaneRacine;
         menuItems = new ArrayList<>();
         MenuItem test = new MenuItem("TEST BUILD");
-        menuItems.add(test);
         for (RCaNScript rCaNScriptXML : RCommandListXML.getListOfRCommandXML()) {
             if (rCaNScriptXML.getMenu().equals("build")) {
                 MenuItem menuItem = new MenuItem(rCaNScriptXML.getTextMenu());

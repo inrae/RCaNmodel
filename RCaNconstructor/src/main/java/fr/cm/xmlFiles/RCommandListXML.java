@@ -24,7 +24,7 @@ public class RCommandListXML {
     public static void init(){
         listOfRCaNScripts = new ArrayList<>();
 
-        String fileName = "scripts/RCommands.xml";
+        String fileName = "RCommands.xml";
         StringBuilder sb = new StringBuilder("Scripts R");
         try {
             InputStream inst = RCommandListXML.class.getClassLoader().getResourceAsStream(fileName);
