@@ -268,7 +268,7 @@
                     <version>3.0.0</version>
                     <configuration>
                         <nonFilteredFileExtensions>
-                            <nonFilteredFileExtension>pdf</nonFilteredFileExtension>
+                            <nonFilteredFileExtension>icns</nonFilteredFileExtension>
                         </nonFilteredFileExtensions>
                     </configuration>                    
                 </plugin>
