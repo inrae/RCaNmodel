@@ -387,8 +387,8 @@
             <activation>
                 <os>
                     <family>mac</family>
-                    <arch>x64</arch>
-                    <!--<arch>aarch64</arch>-->
+                    <!--<arch>x64</arch>-->
+                    <arch>aarch64</arch>
                 </os>
             </activation>
             <properties>
