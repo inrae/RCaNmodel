@@ -28,7 +28,8 @@ visNetworkServer <- function(id, datanet){
                         drawNet <- function(){
 
                           visNetwork(nodes = currentnet$components %>%
-                                       dplyr::mutate(label = .data[["component"]]) %>%
+                                       dplyr::mutate(label = .data[["component"]],
+                                                     groups = as.character(In)) %>%
                                        dplyr::mutate(color = ifelse(
                                          currentnet$components$In,
                                          "orange",
@@ -41,6 +42,9 @@ visNetworkServer <- function(id, datanet){
                                            "red",
                                            "blue"))) %>%
                             visNodes() %>%
+                            visGroups(groupname = "1", shape = "triangle") %>%
+                            visGroups(groupname = "0", shape = "circle") %>%
+                            visClusteringByGroup(groups= c("1","0")) %>%
                             visEdges(arrows = "to") %>%
                             visOptions(manipulation = list(enabled = TRUE,
                                                            editEdgeCols = c("label", "Trophic"),
@@ -56,9 +60,11 @@ visNetworkServer <- function(id, datanet){
 
 
                         observe({
+
+
+                          newnodes <- input$networkviz_proxy_nodes
+                          req(!is.null(newnodes))
                           shinyCatch({
-                            newnodes <- input$networkviz_proxy_nodes
-                            req(!is.null(newnodes))
                             tmpcomponents <- do.call(
                               bind_rows,
                               lapply(newnodes,
@@ -83,9 +89,10 @@ visNetworkServer <- function(id, datanet){
                         })
 
                         observe({
+                          newfluxes <- input$networkviz_proxy_edges
+                          req(!is.null(newfluxes))
                           shinyCatch({
-                            newfluxes <- input$networkviz_proxy_edges
-                            req(!is.null(newfluxes))
+
                             tmpfluxes <- do.call(
                               bind_rows,
                               lapply(newfluxes,
