@@ -5,8 +5,9 @@
 #'
 #' @return updated newtork
 #'
-#' @importFrom visNetwork renderVisNetwork visNetwork
-#' @importFrom visNetwork visOptions visEdges visNetworkProxy visNodes
+#' @importFrom visNetwork renderVisNetwork visNetwork visGroups
+#' @importFrom visNetwork visOptions visEdges visNetworkProxy
+#' @importFrom visNetwork visNodes visClusteringByGroup
 #' @importFrom dplyr bind_rows
 #' @importFrom magrittr %>%
 #' @importFrom spsComps shinyCatch
@@ -29,7 +30,7 @@ visNetworkServer <- function(id, datanet){
 
                           visNetwork(nodes = currentnet$components %>%
                                        dplyr::mutate(label = .data[["component"]],
-                                                     groups = as.character(In)) %>%
+                                                     groups = as.character(.data[["In"]])) %>%
                                        dplyr::mutate(color = ifelse(
                                          currentnet$components$In,
                                          "orange",
