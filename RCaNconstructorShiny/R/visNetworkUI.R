@@ -14,5 +14,5 @@ visNetworkUI <- function(id){
   tagList(useShinyjs(),
           fluidRow(visNetworkOutput(ns("networkviz_proxy"),
                                     width = "100%",
-                                    height = "400px")))
+                                    height = "800px")))
 }
