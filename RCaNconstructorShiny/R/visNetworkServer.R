@@ -6,8 +6,8 @@
 #' @return updated newtork
 #'
 #' @importFrom visNetwork renderVisNetwork visNetwork visGroups
-#' @importFrom visNetwork visOptions visEdges visNetworkProxy
-#' @importFrom visNetwork visNodes visClusteringByGroup
+#' @importFrom visNetwork visOptions visEdges visNetworkProxy visUpdateEdges
+#' @importFrom visNetwork visNodes visClusteringByGroup visUpdateNodes
 #' @importFrom dplyr bind_rows
 #' @importFrom magrittr %>%
 #' @importFrom spsComps shinyCatch
@@ -32,20 +32,33 @@ visNetworkServer <- function(id, datanet){
 
                         drawNet <- function(){
 
-                          visNetwork(nodes = currentnet$components %>%
-                                       dplyr::mutate(label = .data[["Component"]],
-                                                     groups = as.character(.data[["Inside"]])) %>%
-                                       dplyr::mutate(color = ifelse(
-                                         currentnet$components$Inside,
-                                         "orange",
-                                         "grey")),
-                                     edges = currentnet$fluxes %>%
-                                       dplyr::mutate(
-                                         label = .data[["Flux"]],
-                                         color = ifelse(
-                                           currentnet$fluxes$Trophic,
-                                           "red",
-                                           "blue"))) %>%
+                          nodes <- isolate(currentnet$components) %>%
+                            dplyr::mutate(groups = as.character(.data[["Inside"]])) %>%
+                            dplyr::mutate(color = ifelse(
+                              .data[["Inside"]],
+                              "orange",
+                              "grey"))
+                          if (isolate(input$shownodes)){
+                            nodes <- nodes %>%
+                              mutate(label = .data[["Component"]])
+                          }
+
+                          edges <- currentnet$fluxes %>%
+                            dplyr::mutate(
+                              color = ifelse(
+                                .data[["Trophic"]],
+                                "red",
+                                "blue"))
+
+
+
+                          if (isolate(input$showedges)){
+                            edges <- edges %>%
+                              mutate(label = .data[["Flux"]])
+                          }
+
+                          visNetwork(nodes =  nodes,
+                                     edges = edges) %>%
                             visNodes() %>%
                             visGroups(groupname = "1", shape = "triangle") %>%
                             visGroups(groupname = "0", shape = "circle") %>%
@@ -81,8 +94,8 @@ visNetworkServer <- function(id, datanet){
                                      data.frame(id = n$id,
                                                 Component = n$label,
                                                 Inside = ifelse(is.null(n$Inside),
-                                                            1,
-                                                            as.integer(n$Inside)))}))
+                                                                1,
+                                                                as.integer(n$Inside)))}))
                             if (max(table(c(tmpcomponents$Component,
                                             isolate(currentnet$fluxes$Flux)))) > 1){
                               output$networkviz_proxy <- renderVisNetwork(drawNet())
@@ -151,6 +164,21 @@ visNetworkServer <- function(id, datanet){
                           }
 
                         })
+
+
+                        observeEvent(input$shownodes, {
+                          req(nrow(isolate(currentnet$components)) >0)
+                          output$networkviz_proxy <- renderVisNetwork(drawNet())
+                        })
+
+
+
+                        observeEvent(input$showedges, {
+                          req(nrow(isolate(currentnet$components)) >0)
+                          output$networkviz_proxy <- renderVisNetwork(drawNet())
+                        })
+
+
                         return(currentnet)
 
                       }
