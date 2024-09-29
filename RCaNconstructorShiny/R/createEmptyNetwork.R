@@ -1,0 +1,15 @@
+#' createEmptyNetwork
+#'
+#' @return a reactive network with empty components
+#' @importFrom shiny reactiveValues
+#' @export
+#'
+
+createEmptyNetwork <- function(){
+  reactiveValues(
+    model = NULL,
+    components = createEmptyComponents(),
+    fluxes = createEmptyFluxes(),
+    dictionary = character()
+  )
+}

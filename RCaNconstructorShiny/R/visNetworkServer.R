@@ -20,24 +20,28 @@
 visNetworkServer <- function(id, datanet){
   shiny::moduleServer(id,
                       function(input, output, session) {
-                        currentnet <- reactiveValues()
+                        currentnet <- createEmptyNetwork()
                         observe({
-                          currentnet$components <- datanet$components
-                          currentnet$fluxes <- datanet$fluxes
+                          datanet$components
+                          datanet$fluxes
+                          datanet$model
+                          datanet$dictionary
+                          for (n in names(currentnet))
+                            currentnet[[n]] <- isolate(datanet[[n]])
                         })
 
                         drawNet <- function(){
 
                           visNetwork(nodes = currentnet$components %>%
-                                       dplyr::mutate(label = .data[["component"]],
-                                                     groups = as.character(.data[["In"]])) %>%
+                                       dplyr::mutate(label = .data[["Component"]],
+                                                     groups = as.character(.data[["Inside"]])) %>%
                                        dplyr::mutate(color = ifelse(
-                                         currentnet$components$In,
+                                         currentnet$components$Inside,
                                          "orange",
                                          "grey")),
                                      edges = currentnet$fluxes %>%
                                        dplyr::mutate(
-                                         label = .data[["flux"]],
+                                         label = .data[["Flux"]],
                                          color = ifelse(
                                            currentnet$fluxes$Trophic,
                                            "red",
@@ -49,8 +53,8 @@ visNetworkServer <- function(id, datanet){
                             visEdges(arrows = "to") %>%
                             visOptions(manipulation = list(enabled = TRUE,
                                                            editEdgeCols = c("label", "Trophic"),
-                                                           editNodeCols = c("label","In"),
-                                                           addNodeCols = c("label", "In")))
+                                                           editNodeCols = c("label","Inside"),
+                                                           addNodeCols = c("label", "Inside")))
 
                         }
 
@@ -70,19 +74,19 @@ visNetworkServer <- function(id, datanet){
                               bind_rows,
                               lapply(newnodes,
                                      function(n)
-                                     { if (is.null(n$In))
-                                       n$In <- 1
-                                     if (!n$In %in% c(0,1))
-                                       stop(paste("In should be 0 or 1 for", n$label))
+                                     { if (is.null(n$Inside))
+                                       n$Inside <- 1
+                                     if (!n$Inside %in% c(0,1))
+                                       stop(paste("Inside should be 0 or 1 for", n$label))
                                      data.frame(id = n$id,
-                                                component = n$label,
-                                                In = ifelse(is.null(n$In),
+                                                Component = n$label,
+                                                Inside = ifelse(is.null(n$Inside),
                                                             1,
-                                                            as.integer(n$In)))}))
-                            if (max(table(c(tmpcomponents$component,
-                                            isolate(currentnet$fluxes$flux)))) > 1){
+                                                            as.integer(n$Inside)))}))
+                            if (max(table(c(tmpcomponents$Component,
+                                            isolate(currentnet$fluxes$Flux)))) > 1){
                               output$networkviz_proxy <- renderVisNetwork(drawNet())
-                              stop("component names should be unique")
+                              stop("Component names should be unique")
                             }
                             currentnet$components <<- tmpcomponents
                           }
@@ -107,7 +111,7 @@ visNetworkServer <- function(id, datanet){
                                                           isolate(datanet$dictionary[n$to]),
                                                           sep = "_")
                                        data.frame(id = n$id,
-                                                  flux = n$label,
+                                                  Flux = n$label,
                                                   from = n$from,
                                                   to = n$to,
                                                   From = isolate(datanet$dictionary[n$from]),
@@ -117,8 +121,8 @@ visNetworkServer <- function(id, datanet){
                                                                    as.integer(n$Trophic)))
                                      }
                               ))
-                            if (max(table(c(tmpfluxes$flux,
-                                            isolate(currentnet$components$component)))) > 1){
+                            if (max(table(c(tmpfluxes$Flux,
+                                            isolate(currentnet$components$Component)))) > 1){
                               output$networkviz_proxy <- renderVisNetwork(drawNet())
                               stop("fluxes names should be unique")
                             }

@@ -1,0 +1,11 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^devtools_history\.R$
+^CaN\.R$
+^CaN_input_template\.xlsx$
+^CaN_input_template3\.xlsx$
+cran-comments.md
+^CaN_input_WGIBAR2020\.xlsx$
+^CaN_input_WGIBAR2020b\.xlsx$
+^doc$
+^Meta$

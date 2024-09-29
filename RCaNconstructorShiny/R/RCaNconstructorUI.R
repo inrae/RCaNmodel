@@ -21,11 +21,7 @@ RCaNconstructorUI <- function(){
                       useShinyjs(), # to be able to use shiny js
                       tabsetPanel(
                         tabPanel("Model",
-                                 fluidRow(
-                                   actionButton("new", "new"),
-                                   actionButton("open", "open"),
-                                   actionButton("save", "save"),
-                                   actionButton("close", "close"))),
+                                 fileInteractionUI("files")),
 
 
 

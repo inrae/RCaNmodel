@@ -10,52 +10,39 @@
 #' @export
 #'
 RCaNconstructorServer <- function(input, output, session){
-  network <- reactiveValues(
-    file = NULL,
-    components = data.frame(id = character(),
-                            component = character(),
-                            In = integer(),
-                            AssimilationE = numeric(),
-                            Digestibility = numeric(),
-                            OtherLosses = numeric(),
-                            Inertia = numeric(),
-                            Satiation = numeric(),
-                            RefugeBiomass = numeric()),
-    fluxes = data.frame(id = character(),
-                        flux = character(),
-                        to = character(),
-                        from = character(),
-                        From = character(),
-                        To = character(),
-                        Trophic = integer()),
-    dictionary = character()
-  )
+  network <- createEmptyNetwork()
 
 
   updateNetwork <- function(newnetwork){
-    if (nrow(isolate(network$components)) > 0 |
-        nrow((newnetwork$components)) > 0) {
-      if (!identical(isolate(network$components),
-                     (newnetwork$components))){
-        network$components <<- (newnetwork$components)
-        network$dictionary <<- c(isolate(network$fluxes$flux),
-                                 isolate(network$components$component))
-        names(network$dictionary) <<- c(isolate(network$fluxes$id),
-                                        isolate(network$components$id))
+    varnames <- setdiff(isolate(names(newnetwork)), "dictionary")
+    if (any(sapply(varnames, function(v) isolate(!identical(network[[v]],
+                                                            newnetwork[[v]]))
+    ))){
+      for (v in varnames){
+        network[[v]] <<- isolate(newnetwork[[v]])
       }
-    }
-    if (nrow(isolate(network$fluxes)) > 0 |
-        nrow((newnetwork$fluxes)) > 0) {
-      if (!identical(isolate(network$fluxes),
-                     (newnetwork$fluxes))){
-        network$fluxes <<- (newnetwork$fluxes)
-        network$dictionary <<- c(isolate(network$fluxes$flux),
-                                 isolate(network$components$component))
-        names(network$dictionary) <<- c(isolate(network$fluxes$id),
-                                        isolate(network$components$id))
-      }
+      network$dictionary <<- c(isolate(network$fluxes$Flux),
+                               isolate(network$components$Component))
+      names(network$dictionary) <<- c(isolate(network$fluxes$id),
+                                      isolate(network$components$id))
     }
   }
+
+  newnetwork_file <- fileInteractionServer("files", network)
+  observe({
+    newnetwork_file$components
+    newnetwork_file$fluxes
+    newnetwork_file$model
+    updateNetwork(isolate(newnetwork_file))
+
+  })
+  observe({
+    newnetwork_file$model
+    req(!is.null(newnetwork_file$model))
+    if (newnetwork_file$model != isolate(network$model))
+      network$model <- newnetwork_file$model
+  })
+
 
   newnetworkviz <- visNetworkServer("visnetwork", network)
   observe({
@@ -83,6 +70,9 @@ RCaNconstructorServer <- function(input, output, session){
     updateNetwork(isolate(newnetwork_fluxes))
 
   })
+
+
+
 
 
 
