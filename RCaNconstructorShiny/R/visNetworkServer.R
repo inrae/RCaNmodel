@@ -26,12 +26,28 @@ visNetworkServer <- function(id, datanet){
                           datanet$fluxes
                           datanet$model
                           datanet$dictionary
+                          updateVis <- TRUE
+                          if (identical(isolate(datanet$components),
+                                        isolate(currentnet$components)) &
+                              identical(isolate(datanet$fluxes),
+                                        isolate(currentnet$fluxes)))
+                            upateVis <- FALSE
                           for (n in names(currentnet))
                             currentnet[[n]] <- isolate(datanet[[n]])
+
+                          if (updateVis){
+                            nodes <- createNodes()
+                            edges <- createEdges()
+                            #output$networkviz_proxy <- renderVisNetwork(drawNet())
+                            visNetworkProxy(session$ns("networkviz_proxy")) %>%
+                              visNetwork::visUpdateEdges(edges = edges) %>%
+                              visNetwork::visUpdateNodes(nodes = nodes)
+                          }
                         })
 
-                        drawNet <- function(){
 
+
+                        createNodes <- function(){
                           nodes <- isolate(currentnet$components) %>%
                             dplyr::mutate(groups = as.character(.data[["Inside"]])) %>%
                             dplyr::mutate(color = ifelse(
@@ -42,20 +58,27 @@ visNetworkServer <- function(id, datanet){
                             nodes <- nodes %>%
                               mutate(label = .data[["Component"]])
                           }
+                          return (nodes)
+                        }
 
+                        createEdges <- function(){
                           edges <- currentnet$fluxes %>%
                             dplyr::mutate(
                               color = ifelse(
                                 .data[["Trophic"]],
                                 "red",
                                 "blue"))
-
-
-
                           if (isolate(input$showedges)){
                             edges <- edges %>%
                               mutate(label = .data[["Flux"]])
                           }
+                          return(edges)
+                        }
+
+                        drawNet <- function(){
+
+                          nodes <- createNodes()
+                          edges <- createEdges()
 
                           visNetwork(nodes =  nodes,
                                      edges = edges) %>%
@@ -112,7 +135,6 @@ visNetworkServer <- function(id, datanet){
                           newfluxes <- input$networkviz_proxy_edges
                           req(!is.null(newfluxes))
                           shinyCatch({
-
                             tmpfluxes <- do.call(
                               bind_rows,
                               lapply(newfluxes,
@@ -170,15 +192,21 @@ visNetworkServer <- function(id, datanet){
 
 
                         observeEvent(input$shownodes, {
-                          req(nrow(isolate(currentnet$components)) >0)
-                          output$networkviz_proxy <- renderVisNetwork(drawNet())
+                          req(nrow(isolate(currentnet$components)) > 0)
+                          nodes <- createNodes()
+                          visNetworkProxy(session$ns("networkviz_proxy")) %>%
+                            visNetwork::visUpdateNodes(nodes = nodes)
+                          #output$networkviz_proxy <- renderVisNetwork(drawNet())
                         })
 
 
 
                         observeEvent(input$showedges, {
-                          req(nrow(isolate(currentnet$components)) >0)
-                          output$networkviz_proxy <- renderVisNetwork(drawNet())
+                          req(nrow(isolate(currentnet$components)) > 0)
+                          edges <- createEdges()
+                          #output$networkviz_proxy <- renderVisNetwork(drawNet())
+                          visNetworkProxy(session$ns("networkviz_proxy")) %>%
+                            visNetwork::visUpdateEdges(edges = edges)
                         })
 
 
