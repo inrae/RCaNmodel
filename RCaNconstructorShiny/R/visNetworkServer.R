@@ -1,7 +1,7 @@
 #' visNetworkServer
 #'
 #' @param id the id of the visnetworkUI
-#' @param datanet the data of the graph
+#' @param network the data of the graph
 #'
 #' @return updated newtork
 #'
@@ -17,23 +17,26 @@
 #' @importFrom rlang .data
 #' @export
 
-visNetworkServer <- function(id, datanet){
+visNetworkServer <- function(id, network){
   shiny::moduleServer(id,
                       function(input, output, session) {
-                        currentnet <- createEmptyNetwork()
+                        newnetwork <- createEmptyNetwork()
                         observe({
-                          datanet$components
-                          datanet$fluxes
-                          datanet$model
-                          datanet$dictionary
+                          network$components
+                          network$fluxes
+                          network$model
+                          network$dictionary
                           updateVis <- TRUE
-                          if (identical(isolate(datanet$components),
-                                        isolate(currentnet$components)) &
-                              identical(isolate(datanet$fluxes),
-                                        isolate(currentnet$fluxes)))
+                          if (identical(isolate(network$components),
+                                        isolate(newnetwork$components)) &
+                              identical(isolate(network$fluxes),
+                                        isolate(newnetwork$fluxes)))
                             upateVis <- FALSE
-                          for (n in names(currentnet))
-                            currentnet[[n]] <- isolate(datanet[[n]])
+                          for (v in names(isolate(network))){
+                            if(!identical(isolate(network[[v]]),
+                                          isolate(newnetwork[[v]])))
+                              newnetwork[[v]] <<- isolate(network[[v]])
+                          }
 
                           if (updateVis){
                             nodes <- createNodes()
@@ -47,8 +50,10 @@ visNetworkServer <- function(id, datanet){
 
 
 
+
+
                         createNodes <- function(){
-                          nodes <- isolate(currentnet$components) %>%
+                          nodes <- isolate(newnetwork$components) %>%
                             dplyr::mutate(groups = as.character(.data[["Inside"]])) %>%
                             dplyr::mutate(color = ifelse(
                               .data[["Inside"]],
@@ -62,7 +67,7 @@ visNetworkServer <- function(id, datanet){
                         }
 
                         createEdges <- function(){
-                          edges <- currentnet$fluxes %>%
+                          edges <- isolate(newnetwork$fluxes) %>%
                             dplyr::mutate(
                               color = ifelse(
                                 .data[["Trophic"]],
@@ -100,99 +105,101 @@ visNetworkServer <- function(id, datanet){
                         })
 
 
-                        observe({
-
-
-                          newnodes <- input$networkviz_proxy_nodes
-                          req(!is.null(newnodes))
-                          shinyCatch({
-                            tmpcomponents <- do.call(
-                              bind_rows,
-                              lapply(newnodes,
-                                     function(n)
-                                     { if (is.null(n$Inside))
-                                       n$Inside <- 1
-                                     if (!n$Inside %in% c(0,1))
-                                       stop(paste("Inside should be 0 or 1 for", n$label))
-                                     data.frame(id = n$id,
-                                                Component = n$label,
-                                                Inside = ifelse(is.null(n$Inside),
-                                                                1,
-                                                                as.integer(n$Inside)))}))
-                            if (max(table(c(tmpcomponents$Component,
-                                            isolate(currentnet$fluxes$Flux)))) > 1){
-                              output$networkviz_proxy <- renderVisNetwork(drawNet())
-                              stop("Component names should be unique")
-                            }
-                            currentnet$components <<- tmpcomponents
-                            output$networkviz_proxy <- renderVisNetwork(drawNet())
-
-                          }
-                          )
-                        })
-
-                        observe({
-                          newfluxes <- input$networkviz_proxy_edges
-                          req(!is.null(newfluxes))
-                          shinyCatch({
-                            tmpfluxes <- do.call(
-                              bind_rows,
-                              lapply(newfluxes,
-                                     function(n){
-                                       if (is.null(n$Trophic))
-                                         n$Trophic <- 1
-                                       if (!n$Trophic %in% c(0, 1))
-                                         stop(paste0("Trophic should be 0 or 1 for", n$label))
-                                       if (!"label" %in% names(n))
-                                         n$label <- paste(isolate(datanet$dictionary[n$from]),
-                                                          isolate(datanet$dictionary[n$to]),
-                                                          sep = "_")
-                                       data.frame(id = n$id,
-                                                  Flux = n$label,
-                                                  from = n$from,
-                                                  to = n$to,
-                                                  From = isolate(datanet$dictionary[n$from]),
-                                                  To = isolate(datanet$dictionary[n$to]),
-                                                  Trophic = ifelse(is.null(n$Trophic),
-                                                                   1,
-                                                                   as.integer(n$Trophic)))
-                                     }
-                              ))
-                            if (max(table(c(tmpfluxes$Flux,
-                                            isolate(currentnet$components$Component)))) > 1){
-                              output$networkviz_proxy <- renderVisNetwork(drawNet())
-                              stop("fluxes names should be unique")
-                            }
-                            currentnet$fluxes <<- tmpfluxes
-                            output$networkviz_proxy <- renderVisNetwork(drawNet())
-
-
-                          }
-                          )
-                        })
 
                         observe({
                           req(!is.null(input$networkviz_proxy_graphChange$cmd))
-                          cmd <- input$networkviz_proxy_graphChange$cmd
-                          if (cmd %in% c("addNode", "editNode")){
-                            visNetworkProxy(session$ns("networkviz_proxy")) %>%
-                              visNetwork::visGetNodes()
-                          }
-                          if (cmd %in% c("addEdge", "editEdge")){
-                            visNetworkProxy(session$ns("networkviz_proxy")) %>%
-                              visNetwork::visGetEdges()
-                          }
-                          if (cmd %in% c("addEdge", "editEdge")){
-                            visNetworkProxy(session$ns("networkviz_proxy")) %>%
-                              visNetwork::visGetEdges() %>%
-                              visNetwork::visGetNodes()
-                          }
 
+                          shinyCatch({
+
+                            cmd <- input$networkviz_proxy_graphChange$cmd
+                            if (cmd %in% c("addNode", "editNode")){
+                              newnode <- isolate(input$networkviz_proxy_graphChange)
+                              newnode <- newnode[-which(names(newnode) == "cmd")]
+                              if (!"Inside" %in% names(newnode))
+                                newnode$Inside <- 1
+                              if (!newnode$Inside %in% c(0,1))
+                                stop(paste("Inside should be 0 or 1 for", newnode$label))
+                              newnode <- data.frame(id = newnode$id,
+                                                    Component = newnode$label,
+                                                    Inside = as.integer(newnode$Inside))
+                              if (cmd == "addNode"){
+                                newnetwork$components <<- bind_rows(isolate(newnetwork$components),
+                                                                    newnode)
+                              } else {
+                                newnetwork$components <<- bind_rows(isolate(newnetwork$components) %>%
+                                                                      dplyr::filter(.data[["id"]] != newnode$id),
+                                                                    newnode)
+                              }
+                              visNetworkProxy(session$ns("networkviz_proxy")) %>%
+                                visNetwork::visUpdateNodes(nodes = createNodes())
+
+
+                            }
+                            if (cmd %in% c("addEdge", "editEdge")){
+                              newedge <- isolate(input$networkviz_proxy_graphChange)
+                              newedge <- newedge[-which(names(newedge) == "cmd")]
+
+
+
+                              if (is.null(newedge$Trophic)){
+                                newedge$Trophic <- 1
+                              } else {
+                                newedge$Trophic <- as.integer(newedge$Trophic)
+                              }
+                              if (!newedge$Trophic %in% c(0, 1))
+                                stop(paste0("Trophic should be 0 or 1 for", newedge$label))
+                              if (!"label" %in% names(newedge))
+                                newedge$label <- paste(isolate(network$dictionary[newedge$from]),
+                                                       isolate(network$dictionary[newedge$to]),
+                                                       sep = "_")
+
+                              if (cmd == "addEdge"){
+                                newedge <- data.frame(id = newedge$id,
+                                                      Flux = newedge$label,
+                                                      from = newedge$from,
+                                                      to = newedge$to,
+                                                      From = isolate(network$dictionary[newedge$from]),
+                                                      To = isolate(network$dictionary[newedge$to]),
+                                                      Trophic = ifelse(is.null(newedge$Trophic),
+                                                                       1,
+                                                                       as.integer(newedge$Trophic)))
+                                newnetwork$fluxes <<- bind_rows(isolate(newnetwork$fluxes),
+                                                                newedge)
+                              } else {
+                                newedge <- as.data.frame(newedge)
+                                oldedges <- isolate(newnetwork$fluxes)
+                                for (i in seq(nrow(newedge))){
+                                  for (j in names(newedge)[-1]){
+                                    oldedges[oldedges$id == newedge$id[i], j] <-
+                                      newedge[i, j]
+                                  }
+                                }
+                                newnetwork$fluxes <<- oldedges
+                              }
+
+                              visNetworkProxy(session$ns("networkviz_proxy")) %>%
+                                visNetwork::visUpdateEdges(edges = createEdges())
+
+                            }
+
+                            if (cmd %in% c("deleteElements")){
+                              nodesdeleted <- isolate(input$networkviz_proxy_graphChange$nodes[[1]])
+                              edgesdeleted <- isolate(input$networkviz_proxy_graphChange$edges[[1]])
+                              if (length(nodesdeleted) > 1){
+                                newnetwork$components <<- isolate(newnetwork$components) %>%
+                                  filter(!.data[["id"]] %in% nodesdeleted)
+                              }
+                              if (length(edgesdeleted) > 1){
+                                newnetwork$fluxes <<- isolate(newnetwork$fluxes) %>%
+                                  filter(!.data[["id"]] %in% edgesdeleted)
+                              }
+                            }
+                          })
                         })
 
 
                         observeEvent(input$shownodes, {
-                          req(nrow(isolate(currentnet$components)) > 0)
+                          req(nrow(isolate(newnetwork$components)) > 0)
                           nodes <- createNodes()
                           visNetworkProxy(session$ns("networkviz_proxy")) %>%
                             visNetwork::visUpdateNodes(nodes = nodes)
@@ -202,7 +209,7 @@ visNetworkServer <- function(id, datanet){
 
 
                         observeEvent(input$showedges, {
-                          req(nrow(isolate(currentnet$components)) > 0)
+                          req(nrow(isolate(newnetwork$components)) > 0)
                           edges <- createEdges()
                           #output$networkviz_proxy <- renderVisNetwork(drawNet())
                           visNetworkProxy(session$ns("networkviz_proxy")) %>%
@@ -210,7 +217,7 @@ visNetworkServer <- function(id, datanet){
                         })
 
 
-                        return(currentnet)
+                        return(newnetwork)
 
                       }
   )

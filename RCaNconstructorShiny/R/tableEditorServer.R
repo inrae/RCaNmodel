@@ -25,8 +25,11 @@ tableEditorServer <- function(id, network, slot){
         network$fluxes
         network$dictionary
         network$model
-        for (v in names(isolate(network)))
-          newnetwork[[v]] <<- isolate(network[[v]])
+        for (v in names(isolate(network))){
+          if(!identical(isolate(network[[v]]),
+                        isolate(newnetwork[[v]])))
+            newnetwork[[v]] <<- isolate(network[[v]])
+        }
       })
 
       rendertab <- function(data, complist){
@@ -78,14 +81,14 @@ tableEditorServer <- function(id, network, slot){
           mutate(across(any_of(c("Inside" , "Trophic")), as.integer))
         shinyCatch({
           if (max(table(c(newdata[, ifelse(slot == "fluxes",
-                                         "Flux",
-                                         "Component")],
+                                           "Flux",
+                                           "Component")],
                           isolate(newnetwork[[ifelse(slot == "fluxes",
                                                      "components",
                                                      "fluxes")]][,
-                                                                      ifelse(slot == "fluxes",
-                                                                             "Component",
-                                                                             "Flux")])))) > 1)
+                                                                 ifelse(slot == "fluxes",
+                                                                        "Component",
+                                                                        "Flux")])))) > 1)
             stop("a name is already used")
         })
 
