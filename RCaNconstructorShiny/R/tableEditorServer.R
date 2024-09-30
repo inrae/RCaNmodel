@@ -17,7 +17,7 @@ tableEditorServer <- function(id, network, slot){
     id,
     function(input, output, session) {
 
-      hiddencols <- c("from", "to", "id")
+      hiddencols <- c("from", "to", "id", "x", "y")
 
       newnetwork <- createEmptyNetwork()
       observe({

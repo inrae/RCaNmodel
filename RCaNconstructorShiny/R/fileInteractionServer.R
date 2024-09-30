@@ -83,9 +83,16 @@ fileInteractionServer <- function(id, network){
                             "OtherLosses",
                             "Inertia",
                             "Satiation",
-                            "RefugeBiomass"))) %>%
+                            "RefugeBiomass",
+                            "x",
+                            "y"))) %>%
             mutate("Inside" = as.integer(.data[["Inside"]]),
                    "id" = .data[["Component"]])
+
+          if (!"x" %in% names(land_comp))
+            land_comp$x <- as.numeric(NA)
+          if (!"y" %in% names(land_comp))
+            land_comp$y <- as.numeric(NA)
 
           load_flux <- readxl::read_excel(input$loadname$datapath,
                                                   sheet = "Fluxes") %>%

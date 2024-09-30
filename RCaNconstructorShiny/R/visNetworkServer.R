@@ -44,7 +44,12 @@ visNetworkServer <- function(id, network){
                             #output$networkviz_proxy <- renderVisNetwork(drawNet())
                             visNetworkProxy(session$ns("networkviz_proxy")) %>%
                               visNetwork::visUpdateEdges(edges = edges) %>%
-                              visNetwork::visUpdateNodes(nodes = nodes)
+                              visNetwork::visUpdateNodes(nodes = nodes) %>%
+                              visEvents(dragEnd = paste0("function(nodes) {
+                                  Shiny.onInputChange('",
+                                                         session$ns('dragging_node_id'),
+                                                         "', nodes);
+                              ;}"))
                           }
                         })
 
@@ -88,6 +93,7 @@ visNetworkServer <- function(id, network){
                           visNetwork(nodes =  nodes,
                                      edges = edges) %>%
                             visNodes() %>%
+                            visIgraphLayout() %>%
                             visGroups(groupname = "1", shape = "triangle") %>%
                             visGroups(groupname = "0", shape = "circle") %>%
                             visClusteringByGroup(groups= c("1","0")) %>%
@@ -104,6 +110,23 @@ visNetworkServer <- function(id, network){
                           drawNet()
                         })
 
+
+                        observeEvent(input$dragging_node_id,{
+                          visNetworkProxy(session$ns("networkviz_proxy")) %>%
+                            visNetwork::visGetPositions(isolate(input$dragging_node_id$nodes[[1]]))
+                        })
+
+                        observe({
+                          req(input$networkviz_proxy_positions)
+                          node_id <- names(input$networkviz_proxy_positions)
+                          pos <- input$networkviz_proxy_positions[[1]]
+
+                          i_id <- which(isolate(newnetwork$components$id == node_id))
+                          oldcomp <- isolate(newnetwork$components[i_id,, drop = FALSE])
+                          oldcomp$x <- pos$x
+                          oldcomp$y <- pos$y
+                          newnetwork$components[i_id, ] <<- oldcomp
+                        })
 
 
                         observe({

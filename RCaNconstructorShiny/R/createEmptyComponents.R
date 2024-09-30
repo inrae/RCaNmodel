@@ -12,5 +12,7 @@ createEmptyComponents <- function(){
              OtherLosses = numeric(),
              Inertia = numeric(),
              Satiation = numeric(),
-             RefugeBiomass = numeric())
+             RefugeBiomass = numeric(),
+             x = numeric(),
+             y = numeric())
 }
