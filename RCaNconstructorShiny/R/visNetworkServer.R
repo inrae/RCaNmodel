@@ -102,6 +102,8 @@ visNetworkServer <- function(id, datanet){
                               stop("Component names should be unique")
                             }
                             currentnet$components <<- tmpcomponents
+                            output$networkviz_proxy <- renderVisNetwork(drawNet())
+
                           }
                           )
                         })
@@ -140,6 +142,7 @@ visNetworkServer <- function(id, datanet){
                               stop("fluxes names should be unique")
                             }
                             currentnet$fluxes <<- tmpfluxes
+                            output$networkviz_proxy <- renderVisNetwork(drawNet())
 
 
                           }
