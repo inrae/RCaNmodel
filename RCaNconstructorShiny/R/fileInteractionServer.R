@@ -89,10 +89,10 @@ fileInteractionServer <- function(id, network){
             mutate("Inside" = as.integer(.data[["Inside"]]),
                    "id" = .data[["Component"]])
 
-          if (!"x" %in% names(land_comp))
-            land_comp$x <- as.numeric(NA)
-          if (!"y" %in% names(land_comp))
-            land_comp$y <- as.numeric(NA)
+          if (!"x" %in% names(load_comp))
+            load_comp$x <- as.numeric(NA)
+          if (!"y" %in% names(load_comp))
+            load_comp$y <- as.numeric(NA)
 
           load_flux <- readxl::read_excel(input$loadname$datapath,
                                                   sheet = "Fluxes") %>%

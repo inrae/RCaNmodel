@@ -4,12 +4,12 @@
 \alias{visNetworkServer}
 \title{visNetworkServer}
 \usage{
-visNetworkServer(id, datanet)
+visNetworkServer(id, network)
 }
 \arguments{
 \item{id}{the id of the visnetworkUI}
 
-\item{datanet}{the data of the graph}
+\item{network}{the data of the graph}
 }
 \value{
 updated newtork
