@@ -3,6 +3,7 @@
 #' @param id the id of the ui
 #' @param network the current network
 #' @param slot either fluxes or components
+#' @param tab selected tab
 #'
 #' @return an updated network
 #' @importFrom magrittr %>%
@@ -12,24 +13,34 @@
 #' @importFrom shiny isolate observe
 #' @export
 
-tableEditorServer <- function(id, network, slot){
+tableEditorServer <- function(id, network, slot, tab){
   shiny::moduleServer(
     id,
     function(input, output, session) {
+      currenttab <- "Visualise Trophic Network"
 
-      hiddencols <- c("from", "to", "id", "x", "y")
+      hiddencols <- c("from", "to", "id")
 
       newnetwork <- createEmptyNetwork()
+      tmpnetwork <- list()
+
+
       observe({
+        browser()
         network$components
         network$fluxes
         network$dictionary
         network$model
+        req(isolate(tab$panel) == currenttab)
         for (v in names(isolate(network))){
           if(!identical(isolate(network[[v]]),
-                        isolate(newnetwork[[v]])))
-            newnetwork[[v]] <<- isolate(network[[v]])
+                        tmpnetwork[[v]]))
+            tmpnetwork[[v]] <<- isolate(network[[v]])
         }
+        output$tableedit <- rendertab(tmpnetwork[[slot]],
+                                      tmpnetwork$components$Component)
+        shinyjs::disable("ok")
+        shinyjs::disable("cancel")
       })
 
       rendertab <- function(data, complist){
@@ -52,7 +63,7 @@ tableEditorServer <- function(id, network, slot){
           tab <- tab %>%
             hot_col(c("From", "To"),
                     type = "dropdown",
-                    source = newnetwork$components$Component) %>%
+                    source = tmpnetwork$components$Component) %>%
             hot_col("Trophic", type = "checkbox")
         } else {
           tab <- tab %>%
@@ -62,12 +73,7 @@ tableEditorServer <- function(id, network, slot){
       }
 
 
-      observe({
-        output$tableedit <- rendertab(newnetwork[[slot]],
-                                      newnetwork$components$Component)
-        shinyjs::disable(input$ok)
-        shinyjs::disable(input$cancel)
-      })
+
 
       shiny::observe({
         input$tableedit$changes$changes
@@ -83,19 +89,19 @@ tableEditorServer <- function(id, network, slot){
           if (max(table(c(newdata[, ifelse(slot == "fluxes",
                                            "Flux",
                                            "Component")],
-                          isolate(newnetwork[[ifelse(slot == "fluxes",
+                          tmpnetwork[[ifelse(slot == "fluxes",
                                                      "components",
                                                      "fluxes")]][,
                                                                  ifelse(slot == "fluxes",
                                                                         "Component",
-                                                                        "Flux")])))) > 1)
+                                                                        "Flux")]))) > 1)
             stop("a name is already used")
         })
 
         if (slot == "fluxes"){
           newdata$from <- names(isolate(network$dictionary))[network$dictionary == newdata$From]
           newdata$to <- names(isolate(network$dictionary))[network$dictionary == newdata$To]
-          newnetwork$fluxes <<- newdata
+          tmpnetwork$fluxes <<- newdata
         } else {
           newfluxes <- isolate(network$fluxes)
           newfluxes$From <- newdata$Component[newfluxes$from == newdata$id]
@@ -103,8 +109,8 @@ tableEditorServer <- function(id, network, slot){
           # newfluxes$Flux <- paste(newdata$Component[newfluxes$from == newdata$id],
           #                         newdata$Component[newfluxes$to == newdata$id],
           #                         sep = "_")
-          isolate({newnetwork$fluxes <<- newfluxes})
-          newnetwork$components <<- newdata
+          tmpnetwork$fluxes <<- newfluxes
+          tmpnetwork$components <<- newdata
 
         }
 
@@ -114,13 +120,25 @@ tableEditorServer <- function(id, network, slot){
 
       })
       shiny::observeEvent(input$cancel,{
-        output$tableedit <- rendertab(newnetwork[[slot]],
-                                      newnetwork$components$Component)
+        output$tableedit <- rendertab(tmpnetwork[[slot]],
+                                      tmpnetwork$components$Component)
         shinyjs::disable("ok")
         shinyjs::disable("cancel")
       })
 
 
+      observe({
+        ntab <- tab$panel
+        if ((currenttab == "Components" & ntab != "Components" & slot == "components") |
+            (currenttab == "Fluxes" & ntab != "Fluxes" & slot == "fluxes")){
+          for (v in names(tmpnetwork)){
+            if (!identical(tmpnetwork[[v]],
+                           isolate(newnetwork[[v]])))
+              newnetwork[[v]] <<- tmpnetwork[[v]]
+          }
+        }
+        currenttab <<- ntab
+      })
 
       return(newnetwork)
 

@@ -1,9 +1,10 @@
 #' launch the Shiny App
 #'
+#' @param normal by default, use display.mode = "showcase" for debugging
 #' @return nothing
 #' @export
 #'
-launchConstructor <- function(){
+launchConstructor <- function(display.mode = "normal"){
   # library(shiny)
   # library(shinyjs)
   # library(dplyr)
@@ -22,5 +23,6 @@ launchConstructor <- function(){
   # source("R/tableEditorUI.R")
 
 shiny::shinyApp(ui = RCaNconstructorUI,
-                server = RCaNconstructorServer)
+                server = RCaNconstructorServer,
+                options = list(display.mode = display.mode))
 }

@@ -12,6 +12,11 @@
 RCaNconstructorServer <- function(input, output, session){
   network <- createEmptyNetwork()
 
+  tab <- reactiveValues(panel = "")
+  observe({
+    tab$panel <<- input$editpanel
+  }
+  )
 
   updateNetwork <- function(newnetwork){
     varnames <- setdiff(isolate(names(newnetwork)), "dictionary")
@@ -44,7 +49,7 @@ RCaNconstructorServer <- function(input, output, session){
   })
 
 
-  newnetworkviz <- visNetworkServer("visnetwork", network)
+  newnetworkviz <- visNetworkServer("visnetwork", network, tab)
   observe({
     newnetworkviz$components
     newnetworkviz$fluxes
@@ -55,7 +60,7 @@ RCaNconstructorServer <- function(input, output, session){
 
 
 
-  newnetwork_component <- tableEditorServer("components", network, "components")
+  newnetwork_component <- tableEditorServer("components", network, "components", tab)
   observe({
     newnetwork_component$components
     newnetwork_component$fluxes
@@ -63,13 +68,17 @@ RCaNconstructorServer <- function(input, output, session){
 
   })
 
-  newnetwork_fluxes <- tableEditorServer("fluxes", network, "fluxes")
+  newnetwork_fluxes <- tableEditorServer("fluxes", network, "fluxes", tab)
   observe({
     newnetwork_fluxes$components
     newnetwork_fluxes$fluxes
     updateNetwork(isolate(newnetwork_fluxes))
 
   })
+
+
+
+
 
 
 

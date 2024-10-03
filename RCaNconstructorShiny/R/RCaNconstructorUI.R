@@ -19,18 +19,19 @@ RCaNconstructorUI <- function(){
                       ################################################################################################
 
                       useShinyjs(), # to be able to use shiny js
-                      tabsetPanel(
+                      tabsetPanel(id = "mainpanel",
                         tabPanel("Model",
                                  fileInteractionUI("files")),
 
 
 
                         tabPanel("Edit TrophicNetwork",
-                                 tabsetPanel(
+                                 tabsetPanel(id = "editpanel",
                                    tabPanel("Visualise Trophic Network",
                                             h1("network"),
                                                visNetworkUI("visnetwork")),
-                                   tabPanel("Components", h1("components"),
+                                   tabPanel("Components",
+                                            h1("components"),
                                             tabEditorUI("components", "COMPONENTS")
                                    ),
                                    tabPanel("Fluxes", h1("fluxes"),
