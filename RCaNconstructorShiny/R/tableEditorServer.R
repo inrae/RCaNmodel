@@ -26,7 +26,6 @@ tableEditorServer <- function(id, network, slot, tab){
 
 
       observe({
-        browser()
         network$components
         network$fluxes
         network$dictionary
