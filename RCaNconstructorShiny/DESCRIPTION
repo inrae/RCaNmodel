@@ -13,6 +13,7 @@ Imports:
     dplyr,
     htmltools,
     magrittr,
+    openxlsx,
     RCaNmodel,
     readxl,
     rhandsontable,

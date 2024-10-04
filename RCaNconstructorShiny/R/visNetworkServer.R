@@ -24,13 +24,18 @@ visNetworkServer <- function(id, network, tab){
                       function(input, output, session) {
                         newnetwork <- createEmptyNetwork()
                         tmpnetwork <- list()
+                        updateVis <- reactiveVal()
+                        updateVis(FALSE)
 
 
 
 
 
 
-                        observeEvent(input$refresh,{
+
+
+                        observe({
+                          req(updateVis())
                           nodes <- createNodes()
                           req(nrow(nodes) > 0)
                           edges <- createEdges()
@@ -53,6 +58,7 @@ visNetworkServer <- function(id, network, tab){
                                                        session$ns('dragging_node_id'),
                                                        "', nodes);
                               ;}"))
+                          updateVis(FALSE)
                         })
 
                         currenttab <- ""
@@ -80,10 +86,12 @@ visNetworkServer <- function(id, network, tab){
 
                         createNodes <- function(){
                           nodes <- tmpnetwork$components %>%
-                            dplyr::mutate(color = ifelse(
-                              .data[["Inside"]],
-                              "orange",
-                              "grey"),
+                            dplyr::mutate(
+                              physics = FALSE,
+                              color = ifelse(
+                                .data[["Inside"]],
+                                "orange",
+                                "grey"),
                               across(all_of(c("x", "y")), ~ ifelse(is.na(.x),
                                                                    0,
                                                                    .x)))
@@ -336,6 +344,7 @@ visNetworkServer <- function(id, network, tab){
                             output$networkviz_proxy <- renderVisNetwork({
                               drawNet()
                             })
+                            shinyjs::delay(500, updateVis(TRUE))
                           }
                           currenttab <<- ntab
                         })

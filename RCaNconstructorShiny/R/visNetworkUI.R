@@ -14,8 +14,7 @@ visNetworkUI <- function(id){
   tagList(useShinyjs(),
           fluidRow(actionButton(ns("refresh"), "refresh"),
                    checkboxInput(ns("showedges"), "show fluxes labels", TRUE),
-                   checkboxInput(ns("shownodes"), "show components labels", TRUE),
-                   checkboxInput(ns("fixposition"),"manually move nodes", TRUE)),
+                   checkboxInput(ns("shownodes"), "show components labels", TRUE)),
           fluidRow(visNetworkOutput(ns("networkviz_proxy"),
                                     width = "100%",
                                     height = "800px")))
