@@ -13,7 +13,7 @@
 #' @importFrom dplyr bind_rows pull filter select anti_join
 #' @importFrom magrittr %>%
 #' @importFrom spsComps shinyCatch
-#' @importFrom shiny req
+#' @importFrom shiny req reactiveVal
 #' @importFrom shiny isolate
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
@@ -25,56 +25,27 @@ visNetworkServer <- function(id, network, tab){
                         newnetwork <- createEmptyNetwork()
                         tmpnetwork <- list()
 
-                        updateVis <- reactiveVal(FALSE)
-
-
-                        observe({
-                          if (updateVis()){
-                            nodes <- createNodes()
-                            edges <- createEdges()
-
-                            #output$networkviz_proxy <- renderVisNetwork(drawNet())
-                            visNetworkProxy(session$ns("networkviz_proxy")) %>%
-                              visNetwork::visUpdateNodes(nodes = nodes) %>%
-                              visNetwork::visUpdateEdges(edges = edges) %>%
-                              visGetPositions()
-
-                          }
-                          updateVis(FALSE)
-                        })
-
-
-                        currenttab <- "Visualise Trophic Network"
-                        observe({
-                          network$components
-                          network$fluxes
-                          network$model
-                          network$dictionary
-                          req(isolate(tab$panel) == currenttab)
-
-                          update <- TRUE
-                          if ((identical(isolate(network$components),
-                                         tmpnetwork$components) &
-                               identical(isolate(network$fluxes),
-                                         tmpnetwork$fluxes)))
-                            update <- FALSE
-                          for (v in names(isolate(network))){
-                            if(!identical(isolate(network[[v]]),
-                                          tmpnetwork[[v]]))
-                              tmpnetwork[[v]] <<- isolate(network[[v]])
-                          }
 
 
 
-                          if (update & nrow(tmpnetwork$components) > 0){
 
 
-                            output$networkviz_proxy <- renderVisNetwork({
-                              drawNet()
-                            })
+                        observeEvent(input$refresh,{
+                          nodes <- createNodes()
+                          req(nrow(nodes) > 0)
+                          edges <- createEdges()
 
-                            updateVis(TRUE)
-                          }
+                          visNetworkProxy(session$ns("networkviz_proxy")) %>%
+                            visNetwork::visUpdateNodes(nodes = nodes) %>%
+                            visNetwork::visUpdateEdges(edges = edges)
+
+                          visNetworkProxy(session$ns("networkviz_proxy")) %>%
+                            visEvents(dragEnd = paste0("function(nodes) {
+                                  Shiny.onInputChange('",
+                                                       session$ns('dragging_node_id'),
+                                                       "', nodes);
+                              ;}")) %>%
+                            visGetPositions()
 
                           visNetworkProxy(session$ns("networkviz_proxy")) %>%
                             visEvents(dragEnd = paste0("function(nodes) {
@@ -82,11 +53,26 @@ visNetworkServer <- function(id, network, tab){
                                                        session$ns('dragging_node_id'),
                                                        "', nodes);
                               ;}"))
+                        })
+
+                        currenttab <- ""
+                        observe({
+                          network$components
+                          network$fluxes
+                          network$model
+                          network$dictionary
+                          req(isolate(tab$panel) == currenttab)
+
+                          for (v in names(isolate(network))){
+                            if(!identical(isolate(network[[v]]),
+                                          tmpnetwork[[v]]))
+                              tmpnetwork[[v]] <<- isolate(network[[v]])
+                          }
+                        })
 
 
 
-                        }
-                        )
+
 
 
 
@@ -131,29 +117,24 @@ visNetworkServer <- function(id, network, tab){
 
 
                         drawNet <- function(){
-                          visNetwork(nodes = createEmptyComponents(),
-                                     edges = createEmptyFluxes()) %>%
-                            visNodes() %>%
-                            visEdges(arrows = "to") %>%
-                            visOptions(manipulation = list(enabled = TRUE,
-                                                           editEdgeCols = c("label", "Trophic"),
-                                                           editNodeCols = c("label","Inside"),
-                                                           addNodeCols = c("label", "Inside")))
+                          vis <- isolate({
+                            res <- visNetwork(nodes = createEmptyComponents(),
+                                              edges = createEmptyFluxes()) %>%
+                              visNodes() %>%
+                              visEdges(arrows = "to") %>%
+                              visOptions(manipulation = list(enabled = TRUE,
+                                                             editEdgeCols = c("label", "Trophic"),
+                                                             editNodeCols = c("label","Inside"),
+                                                             addNodeCols = c("label", "Inside")))
+                            res
+                          })
+                          vis
+
                         }
 
-                        output$networkviz_proxy <- renderVisNetwork({
-                          drawNet()
-                        })
 
-                        visNetworkProxy(session$ns("networkviz_proxy")) %>%
-                          visRemoveNodes(id = "mock") %>%
-                          visGetPositions() %>%
 
-                          visEvents(dragEnd = paste0("function(nodes) {
-                                  Shiny.onInputChange('",
-                                                     session$ns('dragging_node_id'),
-                                                     "', nodes);
-                              ;}"))
+
 
 
 
@@ -342,12 +323,19 @@ visNetworkServer <- function(id, network, tab){
 
                         observe({
                           ntab <- tab$panel
-                          if (currenttab == "Visualise Trophic Network" & ntab != "Visualise Trophic Network"){
+                          if (currenttab == "Visualise Trophic Network" & ntab != "Visualise Trophic Network" ){
                             for (v in names(tmpnetwork)){
                               if (!identical(tmpnetwork[[v]],
                                              isolate(newnetwork[[v]])))
                                 newnetwork[[v]] <- tmpnetwork[[v]]
                             }
+                          }
+
+                          if (ntab == "Visualise Trophic Network" & currenttab != "Visualise Trophic Network"){
+
+                            output$networkviz_proxy <- renderVisNetwork({
+                              drawNet()
+                            })
                           }
                           currenttab <<- ntab
                         })

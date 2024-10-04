@@ -17,7 +17,7 @@ tableEditorServer <- function(id, network, slot, tab){
   shiny::moduleServer(
     id,
     function(input, output, session) {
-      currenttab <- "Visualise Trophic Network"
+      currenttab <- ""
 
       hiddencols <- c("from", "to", "id")
 

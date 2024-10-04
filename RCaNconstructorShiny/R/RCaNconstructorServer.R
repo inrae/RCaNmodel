@@ -14,7 +14,11 @@ RCaNconstructorServer <- function(input, output, session){
 
   tab <- reactiveValues(panel = "")
   observe({
-    tab$panel <<- input$editpanel
+    if (input$mainpanel == "Edit TrophicNetwork"){
+      tab$panel <<- input$editpanel
+    } else {
+      tab$panel <<- ""
+    }
   }
   )
 
