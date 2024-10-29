@@ -12,7 +12,7 @@
 #' @importFrom readxl excel_sheets
 #' @importFrom dplyr filter mutate bind_rows
 #' @importFrom magrittr %>%
-#' @importFrom stringr str_match_all str_replace_all
+#' @importFrom stringr str_match_all str_replace_all fixed
 #' @importFrom rlang !! sym
 #' @return nothing but writes the file where specified
 #'
