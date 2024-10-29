@@ -4,7 +4,7 @@
 \alias{tableEditorServer}
 \title{tableEditorServer}
 \usage{
-tableEditorServer(id, network, slot)
+tableEditorServer(id, network, slot, tab)
 }
 \arguments{
 \item{id}{the id of the ui}
@@ -12,6 +12,8 @@ tableEditorServer(id, network, slot)
 \item{network}{the current network}
 
 \item{slot}{either fluxes or components}
+
+\item{tab}{selected tab}
 }
 \value{
 an updated network

@@ -30,6 +30,7 @@ fileInteractionServer <- function(id, network){
         newnetwork$components <<- createEmptyComponents()
         newnetwork$fluxes <<- createEmptyFluxes()
         newnetwork$dictionary <<- character()
+        newnetwork$observations <<- data.frame()
       }
 
       observe({
@@ -112,10 +113,25 @@ fileInteractionServer <- function(id, network){
                                                       load_comp$Component)],
                    "to" = load_comp$Component[match(.data[["To"]],
                                                     load_comp$Component)])
+
+
+          load_obs <- readxl::read_excel(input$loadname$datapath,
+                                         sheet = "Input time-series")
+
+          series <- character()
+          if (nrow(load_obs) > 0){
+            series <- setdiff(names(load_obs), "Year")
+          }
           newnetwork$components <- load_comp
+          newnetwork$observations <- load_obs
           newnetwork$fluxes <- load_flux
-          newnetwork$dictionary <- c(load_flux$Flux, load_comp$Component)
-          names(newnetwork$dictionary) <- c(load_flux$Flux, load_comp$Component)
+          newnetwork$dictionary <- c(load_flux$Flux,
+                                     load_comp$Component,
+                                     series)
+          names(newnetwork$dictionary) <- c(load_flux$Flux,
+                                            load_comp$Component,
+                                            series)
+
           newnetwork$model <- newname
 
 
@@ -150,6 +166,14 @@ fileInteractionServer <- function(id, network){
                               sheet = "Fluxes",
                               x = newnetwork$fluxes %>%
                                 dplyr::select(!any_of(c("id", "from", "to"))),
+                              colNames = TRUE)
+          obs <- data.frame(Year = integer())
+          if (!is.null(newnetwork$observations)){
+            obs <- newnetwork$observations
+          }
+          openxlsx::writeData(modelfile,
+                              sheet = "Input time-series",
+                              x = newnetwork$observations,
                               colNames = TRUE)
           openxlsx::saveWorkbook(modelfile, file)
         }

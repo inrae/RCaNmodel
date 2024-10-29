@@ -31,9 +31,13 @@ RCaNconstructorServer <- function(input, output, session){
         network[[v]] <<- isolate(newnetwork[[v]])
       }
       network$dictionary <<- c(isolate(network$fluxes$Flux),
-                               isolate(network$components$Component))
+                               isolate(network$components$Component),
+                               isolate(setdiff(names(network$observations),
+                                               "Year")))
       names(network$dictionary) <<- c(isolate(network$fluxes$id),
-                                      isolate(network$components$id))
+                                      isolate(network$components$id),
+                                      isolate(setdiff(names(network$observations),
+                                                      "Year")))
     }
   }
 

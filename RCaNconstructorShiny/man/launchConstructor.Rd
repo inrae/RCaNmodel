@@ -4,7 +4,10 @@
 \alias{launchConstructor}
 \title{launch the Shiny App}
 \usage{
-launchConstructor()
+launchConstructor(...)
+}
+\arguments{
+\item{...}{options to shinyApp}
 }
 \value{
 nothing
