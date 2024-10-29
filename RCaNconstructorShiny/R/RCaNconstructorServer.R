@@ -42,6 +42,7 @@ RCaNconstructorServer <- function(input, output, session){
     newnetwork_file$components
     newnetwork_file$fluxes
     newnetwork_file$model
+    newnetwork_file$observations
     updateNetwork(isolate(newnetwork_file))
 
   })
@@ -57,6 +58,7 @@ RCaNconstructorServer <- function(input, output, session){
   observe({
     newnetworkviz$components
     newnetworkviz$fluxes
+    newnetworkviz$observations
     updateNetwork(isolate(newnetworkviz))
 
   })
@@ -68,6 +70,7 @@ RCaNconstructorServer <- function(input, output, session){
   observe({
     newnetwork_component$components
     newnetwork_component$fluxes
+    newnetwork_component$observations
     updateNetwork(isolate(newnetwork_component))
 
   })
@@ -76,9 +79,23 @@ RCaNconstructorServer <- function(input, output, session){
   observe({
     newnetwork_fluxes$components
     newnetwork_fluxes$fluxes
+    newnetwork_fluxes$observations
     updateNetwork(isolate(newnetwork_fluxes))
 
   })
+
+
+  newnetwork_observations <- tableObsServer("obs", network, tab)
+  observe({
+    newnetwork_observations$components
+    newnetwork_observations$fluxes
+    newnetwork_observations$observations
+    updateNetwork(isolate(newnetwork_observations))
+
+  })
+
+
+
 
 
 

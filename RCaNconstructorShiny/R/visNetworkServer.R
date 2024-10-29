@@ -64,6 +64,7 @@ visNetworkServer <- function(id, network, tab){
                         currenttab <- ""
                         observe({
                           network$components
+                          network$observations
                           network$fluxes
                           network$model
                           network$dictionary
@@ -196,10 +197,11 @@ visNetworkServer <- function(id, network, tab){
                                                     Inside = as.integer(newnode$Inside))
                               if (cmd == "addNode"){
                                 if (newnode$Component %in% c(tmpnetwork$components$Component,
-                                                             tmpnetwork$fluxes$Flux)){
+                                                             tmpnetwork$fluxes$Flux,
+                                                             tmpnetwork$observations)){
                                   visNetworkProxy(session$ns("networkviz_proxy")) %>%
                                     visNetwork::visRemoveNodes(newnode$id)
-                                  stop("this name is alreay used")
+                                  stop("this name is already used")
                                 }
                                 tmpnetwork$components <<- bind_rows(tmpnetwork$components,
                                                                     newnode)
@@ -210,7 +212,8 @@ visNetworkServer <- function(id, network, tab){
                                     newnode$Component %in% (tmpnetwork$components %>%
                                                             filter(.data[["id"]] != newnode$id) %>%
                                                             dplyr::select(all_of("Component")) %>%
-                                                            dplyr::pull())) {
+                                                            dplyr::pull()) |
+                                    newnode$Component %in% names(tmpnetwork$observations)) {
                                   visNetworkProxy(session$ns("networkviz_proxy")) %>%
                                     visNetwork::visUpdateNodes(tmpnetwork$components %>%
                                                                  filter(.data[["id"]] == newnode$id) %>%

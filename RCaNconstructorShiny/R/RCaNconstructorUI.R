@@ -36,7 +36,9 @@ RCaNconstructorUI <- function(){
                                    ),
                                    tabPanel("Fluxes", h1("fluxes"),
                                             tabEditorUI("fluxes", "FLUXES")
-                                   )
+                                   ),
+                                   tabPanel("Time Series",h1("time series"),
+                                            tableObsUI("obs", "TIME SERIES"))
                                  ))
 
                       )

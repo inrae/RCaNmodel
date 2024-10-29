@@ -10,6 +10,7 @@ createEmptyNetwork <- function(){
     model = NULL,
     components = createEmptyComponents(),
     fluxes = createEmptyFluxes(),
-    dictionary = character()
+    dictionary = character(),
+    observations = data.frame(Year = numeric())
   )
 }

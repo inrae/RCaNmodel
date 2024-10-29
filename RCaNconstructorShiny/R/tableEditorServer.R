@@ -27,6 +27,7 @@ tableEditorServer <- function(id, network, slot, tab){
 
       observe({
         network$components
+        network$observations
         network$fluxes
         network$dictionary
         network$model
@@ -88,12 +89,13 @@ tableEditorServer <- function(id, network, slot, tab){
           if (max(table(c(newdata[, ifelse(slot == "fluxes",
                                            "Flux",
                                            "Component")],
+                          isolate(names(tmpnetwork$observations)),
                           tmpnetwork[[ifelse(slot == "fluxes",
-                                                     "components",
-                                                     "fluxes")]][,
-                                                                 ifelse(slot == "fluxes",
-                                                                        "Component",
-                                                                        "Flux")]))) > 1)
+                                             "components",
+                                             "fluxes")]][,
+                                                         ifelse(slot == "fluxes",
+                                                                "Component",
+                                                                "Flux")]))) > 1)
             stop("a name is already used")
         })
 
