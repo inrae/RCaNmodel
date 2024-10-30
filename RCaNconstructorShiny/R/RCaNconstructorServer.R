@@ -105,6 +105,17 @@ RCaNconstructorServer <- function(input, output, session){
   })
 
 
+  newnetwork_editedconstraints <- constrEditorServer("constreditor", network, tab)
+  observe({
+    newnetwork_editedconstraints$components
+    newnetwork_editedconstraints$fluxes
+    newnetwork_editedconstraints$observations
+    newnetwork_editedconstraints$constraints
+    updateNetwork(isolate(newnetwork_editedconstraints))
+
+  })
+
+
 
 
 
