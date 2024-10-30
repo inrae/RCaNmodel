@@ -16,6 +16,8 @@ RCaNconstructorServer <- function(input, output, session){
   observe({
     if (input$mainpanel == "Edit TrophicNetwork"){
       tab$panel <<- input$editpanel
+    } else if (input$mainpanel == "Constraints"){
+      tab$panel <<- input$editconstraits
     } else {
       tab$panel <<- ""
     }

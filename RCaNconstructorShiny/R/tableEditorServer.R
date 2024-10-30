@@ -58,7 +58,8 @@ tableEditorServer <- function(id, network, slot, tab){
                         overflow = "visible") %>%
           hot_cols(colWidths = ifelse(names(data) %in% hiddencols,
                                       1,
-                                      200))
+                                      200),
+                   manualColumnResize = TRUE)
         if (slot == "fluxes"){
           tab <- tab %>%
             hot_col(c("From", "To"),

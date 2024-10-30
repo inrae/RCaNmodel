@@ -1,8 +1,8 @@
 #' constrEditorUI
 #' Editor of constrEditorUI
 #' @param id the id of ui
-#' @importFrom shiny radioGroupButtons pickerInput verbatimTextOutput
-#' @importFrom shiny ns actionButton fluidRow column
+#' @importFrom shinyWidgets radioGroupButtons pickerInput
+#' @importFrom shiny NS actionButton fluidRow column verbatimTextOutput
 #' @export
 #'
 
@@ -39,19 +39,19 @@ constrEditorUI <- function(id){
                    radioGroupButtons(ns("components"),
                                      'components',
                                      "",
-                                     direction = "vertical",
+                                     size = "xs",
                                      selected = character(0))),
-            column(width = 6,
+            column(width = 3,
                    radioGroupButtons(ns("fluxes"),
                                      'fluxes',
                                      "",
-                                     direction = "vertical",
+                                     size = "xs",
                                      selected = character(0))),
             column(width = 3,
                    radioGroupButtons(ns("obs"),
                                      'observations',
                                      "",
-                                     direction = "vertical",
+                                     size = "xs",
                                      selected = character(0))),
             column(width = 3,
                    radioGroupButtons(ns("years"),
@@ -65,8 +65,8 @@ constrEditorUI <- function(id){
                    radioGroupButtons(ns("functions"),
                                      'functions',
                                      c("mean(", "sum("),
-                                     selected = character(0),
-                                     direction = "vertical"),
+                                     size = "xs",
+                                     selected = character(0)),
 
             ),
             column(width = 3,
@@ -80,7 +80,7 @@ constrEditorUI <- function(id){
                                        "Delta",
                                        "BeforeDelta",
                                        "BeforeRatio"),
-                                     direction = "vertical",
+                                     size = "xs",
                                      selected = character(0)))),
 
           actionButton(ns("remove"), "remove element"),
@@ -91,7 +91,7 @@ constrEditorUI <- function(id){
             selected = character(0)
           ),
           verbatimTextOutput(ns("message")),
-          actionButton(ns("OK"), "OK"))
+          actionButton(ns("ok"), "OK"))
 
 
 

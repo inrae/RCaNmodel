@@ -23,6 +23,7 @@ Imports:
     shinydashboard,
     shinydashboardPlus,
     shinyjs,
+    shinyWidgets,
     spsComps,
     stringr,
     visNetwork

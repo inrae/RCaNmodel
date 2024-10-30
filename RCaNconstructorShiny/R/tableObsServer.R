@@ -42,7 +42,8 @@ tableObsServer <- function(id, network, tab){
         tab <-
           rhandsontable(data,
                         strechH = "all",
-                        overflow = "visible")
+                        overflow = "visible") %>%
+          hot_cols(manualColumnResize = TRUE)
         for (col in names(data))
            tab <- tab %>%
            hot_col(col, "numeric")

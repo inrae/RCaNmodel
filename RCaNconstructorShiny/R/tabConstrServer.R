@@ -63,7 +63,8 @@ tabConstrServer <- function(id, network, tab){
                         overflow = "visible") %>%
           hot_cols(colWidths = ifelse(names(data) %in% hiddencols,
                                       1,
-                                      200))
+                                      200),
+                   manualColumnResize = TRUE)
         renderRHandsontable({tab})
       }
 

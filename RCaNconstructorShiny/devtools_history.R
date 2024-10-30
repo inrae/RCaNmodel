@@ -1,4 +1,6 @@
 usethis::use_package('shiny')
+usethis::use_package('shinyWidgets')
+
 usethis::use_package("visNetwork")
 usethis::use_package("RCaNmodel")
 usethis::use_package("shinydashboardPlus")
