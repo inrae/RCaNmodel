@@ -193,6 +193,13 @@ fileInteractionServer <- function(id, network){
                                 x = newnetwork$observations,
                                 colNames = TRUE,
                                 na.strings = "")
+
+          openxlsx2::wb_add_data(modelfile,
+                                 sheet = "Constraints",
+                                 x = newnetwork$constraints %>%
+                                   dplyr::select(!dplyr::any_of("idconstraint")),
+                                 colNames = TRUE,
+                                 na.strings = "")
           openxlsx2::wb_save(modelfile, file, overwrite = TRUE)
         }
       )
