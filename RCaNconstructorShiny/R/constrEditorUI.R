@@ -10,9 +10,13 @@ constrEditorUI <- function(id){
   ns <- NS(id)
   tagList(shinyjs::useShinyjs(),
           h1("CONSTRAINT EDITOR"),
-          pickerInput(ns("constraintselect"),
-                      "Constraint",
-                      choices = ""),
+          fluidRow(column(width = 4,
+                          pickerInput(ns("constraintselect"),
+                                      "Constraint",
+                                      choices = "New")),
+                   column(width=4,
+                          shinyjs::disabled(textInput(ns("newname"),
+                                                      "name of the new constraint")))),
 
           radioGroupButtons(ns("numbers"),
                             '',

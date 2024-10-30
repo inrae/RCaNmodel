@@ -23,6 +23,24 @@ constrEditorServer <- function(id, network, tab){
       constraint <- character(0)
 
 
+      observeEvent(input$constraintselect, {
+        req(input$constraintselect)
+        if (input$constraintselect == "New"){
+          updateTextInput(session,
+                          "newname",
+                          "")
+          shinyjs::enable("newname")
+          constraint <<- character(0)
+          updateRadioGroupButtons(session,
+                                  "equations",
+                                  choiceValues = "",
+                                  choiceNames = "",
+                                  selected = character(0))
+        } else {
+          shinyjs::disable("newname")
+        }
+      })
+
 
       addVal <- function(text) {
         pos <- isolate(input$equations)
