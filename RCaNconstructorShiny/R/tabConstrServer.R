@@ -87,11 +87,16 @@ tabConstrServer <- function(id, network, tab){
           for (tr in newdata$`Time-range`){
             tmp <- as.numeric(eval(parse(text=tr)))
           }
+          countid <- table(newdata$Id)
+          if (max(countid) > 1)
+            stop(paste(paste(names(countid)[which(countid > 1)],
+                             collapse = ", "),
+                       "non unique Id"))
           tmpnetwork$constraints <<- newdata
           shinyjs::disable("ok")
           shinyjs::disable("cancel")},
           error = function(e){
-            showNotification(paste(tr, "is not numeric"),
+            showNotification(e,
                              type = "error")
           }
         )
