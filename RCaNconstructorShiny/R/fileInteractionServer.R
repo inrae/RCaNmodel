@@ -81,6 +81,7 @@ fileInteractionServer <- function(id, network){
           modelname <- stringr::str_split(input$loadname$name,"\\.")[[1]]
           newname <- paste(modelname[seq_len(length(modelname) - 1)],
                            collapse = '.')
+
           load_comp <- readxl::read_excel(input$loadname$datapath,
                                           sheet = "Components & input parameter") %>%
             select(any_of(c("Component",
@@ -91,15 +92,31 @@ fileInteractionServer <- function(id, network){
                             "Inertia",
                             "Satiation",
                             "RefugeBiomass",
+                            "X",
+                            "Y",
                             "x",
                             "y"))) %>%
             mutate("Inside" = as.integer(.data[["Inside"]]),
                    "id" = .data[["Component"]])
 
-          if (!"x" %in% names(load_comp))
-            load_comp$x <- as.numeric(NA)
-          if (!"y" %in% names(load_comp))
-            load_comp$y <- as.numeric(NA)
+          if (!"x" %in% names(load_comp)){
+            if ("X" %in% names(load_comp)){
+              load_comp$x <- round(-400 + 800 * (load_comp$X- min(load_comp$X)) /
+                                     (max(load_comp$X) - min(load_comp$Y)))
+            } else {
+              load_comp$x <- as.numeric(NA)
+            }
+          }
+          if (!"y" %in% names(load_comp)){
+            if ("Y" %in% names(load_comp)){
+              load_comp$y <- round(- 400 + 800 * (load_comp$Y- min(load_comp$Y)) /
+                                     (max(load_comp$Y) - min(load_comp$Y)))
+            } else {
+              load_comp$y <- as.numeric(NA)
+            }
+          }
+          load_comp <- load_comp %>%
+            dplyr::select(!dplyr::any_of(c("X", "Y")))
 
           load_flux <- readxl::read_excel(input$loadname$datapath,
                                           sheet = "Fluxes") %>%
@@ -154,25 +171,28 @@ fileInteractionServer <- function(id, network){
           if (orig == "")
             orig <<- paste0(tempfile(), ".xlsx")
           modelfile <- openxlsx2::wb_load(orig)
-          openxlsx2::write_data(modelfile,
+          openxlsx2::wb_add_data(modelfile,
                                 sheet = "Components & input parameter",
                                 x = newnetwork$components %>%
                                   dplyr::select(!any_of("id")),
-                                colNames = TRUE)
+                                colNames = TRUE,
+                                na.strings = "")
 
-          openxlsx2::write_data(modelfile,
+          openxlsx2::wb_add_data(modelfile,
                                 sheet = "Fluxes",
                                 x = newnetwork$fluxes %>%
                                   dplyr::select(!any_of(c("id", "from", "to"))),
-                                colNames = TRUE)
+                                colNames = TRUE,
+                                na.strings = "")
           obs <- data.frame(Year = integer())
           if (!is.null(newnetwork$observations)){
             obs <- newnetwork$observations
           }
-          openxlsx2::write_data(modelfile,
+          openxlsx2::wb_add_data(modelfile,
                                 sheet = "Input time-series",
                                 x = newnetwork$observations,
-                                colNames = TRUE)
+                                colNames = TRUE,
+                                na.strings = "")
           openxlsx2::wb_save(modelfile, file, overwrite = TRUE)
         }
       )
