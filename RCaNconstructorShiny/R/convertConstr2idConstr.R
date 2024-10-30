@@ -7,10 +7,7 @@
 #' @export
 #'
 convertConstr2idConstr <- function(constraint, dictionary){
-  constraints_word <-
-    strsplit(gsub('[[:space:]]', "", constraint),
-             split = "(?=[/|\\+|=|<|\\*|>|\\-|\\)|\\(|\\[|\\]|\\:|, ])",
-             perl=TRUE)[[1]]
+  constraints_word <- getConstraintWord(constraint)
 
   for (i in seq_along(constraints_word)){
     word <- constraints_word[i]
