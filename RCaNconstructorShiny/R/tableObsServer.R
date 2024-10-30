@@ -131,7 +131,6 @@ tableObsServer <- function(id, network, tab){
 
 
       observeEvent(input$okremoved,{
-        browser()
         removeModal()
         deleted <- isolate(input$seriesremoved)
         req(input$seriesremoved)

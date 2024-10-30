@@ -39,7 +39,15 @@ RCaNconstructorUI <- function(){
                                    ),
                                    tabPanel("Time Series",h1("time series"),
                                             tableObsUI("obs", "TIME SERIES"))
-                                 ))
+                                 )),
+                        tabPanel("Constraints",
+                                 tabsetPanel(id = "editconstraits",
+                                             tabPanel("View Constraints",
+                                                      h1("Current Constraints"),
+                                                      tabConstrUI("tabconstraints")),
+                                             tabPanel("Add/Edit Constraints",
+                                                      h1("Constraints Editor"),
+                                                      constrEditorUI("constreditor"))))
 
                       )
 

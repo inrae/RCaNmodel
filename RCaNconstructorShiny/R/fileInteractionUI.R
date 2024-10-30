@@ -15,5 +15,5 @@ fileInteractionUI <- function(id){
           fluidRow(
             actionButton(ns("new"), "new"),
             actionButton(ns("open"), "open"),
-            actionButton(ns("save"), "save")))
+            downloadButton(ns("savename"), "save")))
 }

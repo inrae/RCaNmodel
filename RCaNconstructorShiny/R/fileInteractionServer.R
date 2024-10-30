@@ -54,7 +54,7 @@ fileInteractionServer <- function(id, network){
                       easyClose = FALSE))
       })
       observeEvent(input$ok,{
-        orig <<- tempfile()
+        orig <<- paste0(tempfile(), ".xlsx")
         removeModal()
         cleanNewtork()
         newnetwork$model <- isolate(input$newname)
@@ -125,12 +125,21 @@ fileInteractionServer <- function(id, network){
           newnetwork$components <- load_comp
           newnetwork$observations <- load_obs
           newnetwork$fluxes <- load_flux
-          newnetwork$dictionary <- c(load_flux$Flux,
-                                     load_comp$Component,
-                                     series)
-          names(newnetwork$dictionary) <- c(load_flux$Flux,
-                                            load_comp$Component,
-                                            series)
+
+
+          newnetwork$dictionary <-
+            generateDictionary(load_comp,
+                               load_flux,
+                               load_obs)
+
+          load_constr <- readxl::read_excel(input$loadname$datapath,
+                                            sheet = "Constraints")
+          load_constr$idconstraint = sapply(load_constr$Constraint,
+                                            convertConstr2idConstr,
+                                            newnetwork$dictionary)
+
+          newnetwork$constraints <- load_constr
+
 
           newnetwork$model <- newname
 
@@ -139,43 +148,32 @@ fileInteractionServer <- function(id, network){
 
       })
 
-      observeEvent(input$save,{
-        showModal(
-          modalDialog(tile = "SAVE FILE",
-                      downloadButton(session$ns("savename"), "select file"),
-                      footer = tagList(
-                        modalButton(("Cancel")),
-                      ),
-                      easyClose = FALSE))
-      })
-
-      observeEvent(input$savename,
-                   removeModal())
-
       output$savename <- shiny::downloadHandler(
-        filename = function() paste0(network$model, ".xlxs"),
+        filename = function() paste0(network$model, ".xlsx"),
         content = function(file){
-          modelfile <- openxlsx::loadWorkbook(orig)
-          openxlsx::writeData(modelfile,
-                              sheet = "Components & input parameter",
-                              x = newnetwork$components %>%
-                                dplyr::select(!any_of("id")),
-                              colNames = TRUE)
+          if (orig == "")
+            orig <<- paste0(tempfile(), ".xlsx")
+          modelfile <- openxlsx2::wb_load(orig)
+          openxlsx2::write_data(modelfile,
+                                sheet = "Components & input parameter",
+                                x = newnetwork$components %>%
+                                  dplyr::select(!any_of("id")),
+                                colNames = TRUE)
 
-          openxlsx::writeData(modelfile,
-                              sheet = "Fluxes",
-                              x = newnetwork$fluxes %>%
-                                dplyr::select(!any_of(c("id", "from", "to"))),
-                              colNames = TRUE)
+          openxlsx2::write_data(modelfile,
+                                sheet = "Fluxes",
+                                x = newnetwork$fluxes %>%
+                                  dplyr::select(!any_of(c("id", "from", "to"))),
+                                colNames = TRUE)
           obs <- data.frame(Year = integer())
           if (!is.null(newnetwork$observations)){
             obs <- newnetwork$observations
           }
-          openxlsx::writeData(modelfile,
-                              sheet = "Input time-series",
-                              x = newnetwork$observations,
-                              colNames = TRUE)
-          openxlsx::saveWorkbook(modelfile, file)
+          openxlsx2::write_data(modelfile,
+                                sheet = "Input time-series",
+                                x = newnetwork$observations,
+                                colNames = TRUE)
+          openxlsx2::wb_save(modelfile, file, overwrite = TRUE)
         }
       )
 

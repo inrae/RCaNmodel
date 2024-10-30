@@ -95,7 +95,8 @@ tableEditorServer <- function(id, network, slot, tab){
                                              "fluxes")]][,
                                                          ifelse(slot == "fluxes",
                                                                 "Component",
-                                                                "Flux")]))) > 1)
+                                                                "Flux")] %>%
+                          dplyr::pull()))) > 1)
             stop("a name is already used")
         })
 
@@ -105,8 +106,11 @@ tableEditorServer <- function(id, network, slot, tab){
           tmpnetwork$fluxes <<- newdata
         } else {
           newfluxes <- isolate(network$fluxes)
-          newfluxes$From <- newdata$Component[newfluxes$from == newdata$id]
-          newfluxes$To <- newdata$Component[newfluxes$to == newdata$id]
+          newfluxes$From <- newdata$Component[match(newfluxes$from,
+                                                    newdata$id)]
+
+            newfluxes$To <- newdata$Component[match(newfluxes$to,
+                                                    newdata$id)]
           # newfluxes$Flux <- paste(newdata$Component[newfluxes$from == newdata$id],
           #                         newdata$Component[newfluxes$to == newdata$id],
           #                         sep = "_")

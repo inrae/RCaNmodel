@@ -30,14 +30,10 @@ RCaNconstructorServer <- function(input, output, session){
       for (v in varnames){
         network[[v]] <<- isolate(newnetwork[[v]])
       }
-      network$dictionary <<- c(isolate(network$fluxes$Flux),
-                               isolate(network$components$Component),
-                               isolate(setdiff(names(network$observations),
-                                               "Year")))
-      names(network$dictionary) <<- c(isolate(network$fluxes$id),
-                                      isolate(network$components$id),
-                                      isolate(setdiff(names(network$observations),
-                                                      "Year")))
+
+      network$dictionary <<- generateDictionary(isolate(network$components),
+                                                isolate(network$fluxes),
+                                                isolate(network$observations))
     }
   }
 
@@ -95,6 +91,16 @@ RCaNconstructorServer <- function(input, output, session){
     newnetwork_observations$fluxes
     newnetwork_observations$observations
     updateNetwork(isolate(newnetwork_observations))
+
+  })
+
+  newnetwork_constraints <- tabConstrServer("tabconstraints", network, tab)
+  observe({
+    newnetwork_constraints$components
+    newnetwork_constraints$fluxes
+    newnetwork_constraints$observations
+    newnetwork_constraints$constraints
+    updateNetwork(isolate(newnetwork_constraints))
 
   })
 

@@ -14,7 +14,7 @@ Imports:
     dplyr,
     htmltools,
     magrittr,
-    openxlsx,
+    openxlsx2,
     RCaNmodel,
     readxl,
     rhandsontable,
