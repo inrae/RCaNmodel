@@ -9,7 +9,7 @@
 #' @importFrom magrittr %>%
 #' @importFrom dplyr mutate select across any_of
 #' @importFrom rhandsontable rhandsontable hot_col renderRHandsontable hot_cols
-#' @importFrom rhandsontable hot_rows hot_to_r
+#' @importFrom rhandsontable hot_rows hot_to_r hot_cell
 #' @importFrom shiny isolate observe
 #' @export
 
@@ -51,29 +51,34 @@ tabConstrServer <- function(id, network, slot, tab){
       })
 
 
-      formcol <- ifelse(slot == "components",
+      formcol <- ifelse(slot == "constraints",
                         "Constraint",
                         "Formula")
 
       rendertab <- function(data){
-        data[, formcol] <- sapply(data$idconstraint,
-                                  convertidConstr2Constr,
-                                  dictionary = tmpnetwork$dictionary)
-
         if (nrow(data) > 0){
-          browser()
-          data$valid <- sapply(
+
+          data[, formcol] <- sapply(data$idconstraint,
+                                    convertidConstr2Constr,
+                                    dictionary = tmpnetwork$dictionary)
+
+
+          validity_comments <- sapply(
             data[, formcol] %>% pull(),
             function(constr)
               checkValidity(constr,
                             tmpnetwork,
-                            onesided = (slot == "aliases")) == "TRUE")
-
+                            onesided = (slot == "aliases")))
+          data$valid <- (validity_comments == "TRUE")
+        } else {
+          validity_comments <- character(0)
         }
 
-        col_highlight <- 1
-        row_highlight <- which(!data$valid)
 
+
+
+        col_highlight <- 1
+        row_highlight <- which(!data$valid) - 1
         tab <-
           rhandsontable(data %>%
                           mutate(
@@ -81,23 +86,36 @@ tabConstrServer <- function(id, network, slot, tab){
                               any_of(c("Active")),
                               ~ as.logical(.x ))),
                         strechH = "all",
+                        row_highlight = as.vector(row_highlight),
                         col_highlight = col_highlight,
-                        row_highlight = row_highlight,
                         overflow = "visible") %>%
           hot_cols(colWidths = ifelse(names(data) %in% hiddencols,
                                       1,
                                       200),
                    manualColumnResize = TRUE,
-                   renderer = "
-            function(instance, td, row, col, prop, value, cellProperties) {
-                if (instance.params) {
-                    hcols = instance.params.col_highlight
-                    hcols = hcols instanceof Array ? hcols : [hcols]
-                    hrows = instance.params.row_highlight
-                    hrows = hrows instanceof Array ? hrows : [hrows]
-                }
-                if (instance.params && hrows.includes(row)) td.style.background = 'red';
-            }")
+                   columnSorting = TRUE) %>%
+          hot_col(2,
+                  renderer = "
+                   function (instance, td, row, col, prop, value, cellProperties) {
+                     Handsontable.renderers.TextRenderer.apply(this, arguments);
+
+                     if (instance.params) {
+                       hrows = instance.params.row_highlight
+                       hrows = hrows instanceof Array ? hrows : [hrows]
+                       hcols = instance.params.col_highlight
+                       hcols = hcols instanceof Array ? hcols : [hcols]
+
+                       if (hrows.includes(row)) {
+                         td.style.background = 'red'
+                       }
+
+
+                     }
+                   }")
+        for (i in as.vector(row_highlight)){
+          tab <- tab %>%
+            hot_cell(i + 1, 2, comment = as.character(validity_comments[i + 1]))
+        }
         renderRHandsontable({tab})
       }
 

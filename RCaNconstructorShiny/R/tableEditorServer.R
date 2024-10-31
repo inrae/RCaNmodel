@@ -59,6 +59,7 @@ tableEditorServer <- function(id, network, slot, tab){
           hot_cols(colWidths = ifelse(names(data) %in% hiddencols,
                                       1,
                                       200),
+                   columnSorting = TRUE,
                    manualColumnResize = TRUE)
         if (slot == "fluxes"){
           tab <- tab %>%
