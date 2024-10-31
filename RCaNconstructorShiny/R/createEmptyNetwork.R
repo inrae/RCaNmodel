@@ -12,6 +12,8 @@ createEmptyNetwork <- function(){
     fluxes = createEmptyFluxes(),
     constraints = createEmptyConstraints(),
     dictionary = character(),
-    observations = data.frame(Year = numeric())
+    observations = data.frame(Year = numeric()),
+    aliases = createEmptyAliases(),
+    envir = new.env()
   )
 }

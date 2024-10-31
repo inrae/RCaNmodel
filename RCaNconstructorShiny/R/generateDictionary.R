@@ -24,7 +24,7 @@ generateDictionary <- function(components, fluxes, observations, aliases = NULL)
   names(dictionary) <- c(components$id,
                          fluxes$id,
                          setdiff(names(observations), "Year"),
-                         aliases$Alias,
+                         aliases$id,
                          "AllFlows",
                          paste0("Outflows",
                                 components$id[which(components$Inside == 1)]),

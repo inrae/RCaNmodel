@@ -82,6 +82,18 @@ fileInteractionServer <- function(id, network){
           newname <- paste(modelname[seq_len(length(modelname) - 1)],
                            collapse = '.')
 
+          if ("Aliases" %in% readxl::excel_sheets(input$loadname$datapath)){
+            load_aliases <- readxl::read_excel(input$loadname$datapath,
+                                               sheet = "Components & input parameter") %>%
+              mutate(id = .data[["Alias"]])
+            if (!"Comment" %in% names(load_aliases)){
+              load_aliases$Comment <- character(nrow(load_aliases))
+            }
+          } else {
+            load_aliases <- createEmptyAliases()
+          }
+
+
           load_comp <- readxl::read_excel(input$loadname$datapath,
                                           sheet = "Components & input parameter") %>%
             select(any_of(c("Component",
@@ -98,6 +110,7 @@ fileInteractionServer <- function(id, network){
                             "y"))) %>%
             mutate("Inside" = as.integer(.data[["Inside"]]),
                    "id" = .data[["Component"]])
+
 
           if (!"x" %in% names(load_comp)){
             if ("X" %in% names(load_comp)){
@@ -142,12 +155,14 @@ fileInteractionServer <- function(id, network){
           newnetwork$components <- load_comp
           newnetwork$observations <- load_obs
           newnetwork$fluxes <- load_flux
+          newnetwork$aliases <- load_aliases
 
 
           newnetwork$dictionary <-
             generateDictionary(load_comp,
                                load_flux,
-                               load_obs)
+                               load_obs,
+                               load_aliases)
 
           load_constr <- readxl::read_excel(input$loadname$datapath,
                                             sheet = "Constraints")
@@ -159,6 +174,7 @@ fileInteractionServer <- function(id, network){
 
 
           newnetwork$model <- newname
+          newnetwork$envir <- generateSymbolicEnvir(newnetwork)
 
 
         })
@@ -198,6 +214,12 @@ fileInteractionServer <- function(id, network){
                                  sheet = "Constraints",
                                  x = newnetwork$constraints %>%
                                    dplyr::select(!dplyr::any_of("idconstraint")),
+                                 colNames = TRUE,
+                                 na.strings = "")
+          openxlsx2::wb_add_data(modelfile,
+                                 sheet = "Aliases",
+                                 x = newnetwork$aliases %>%
+                                   dplyr::select(!dplyr::any_of("id")),
                                  colNames = TRUE,
                                  na.strings = "")
           openxlsx2::wb_save(modelfile, file, overwrite = TRUE)

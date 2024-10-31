@@ -88,6 +88,11 @@ tabConstrServer <- function(id, network, tab){
           for (tr in newdata$`Time-range`){
             tmp <- as.numeric(eval(parse(text=tr)))
           }
+          for (const in newdata$Constraint) {
+            valid <- checkValidity(const, tmpnetwork)
+            if (valid != "TRUE")
+              stop(paste(const, valid, sep = ":"))
+          }
           countid <- table(newdata$Id)
           if (max(countid) > 1)
             stop(paste(paste(names(countid)[which(countid > 1)],

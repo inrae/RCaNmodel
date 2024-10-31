@@ -25,19 +25,38 @@ constrEditorServer <- function(id, network, tab){
       constraint <- character(0)
 
 
+
+      resetPage <- function() {
+        updateTextInput(session,
+                        "newname",
+                        "")
+        shinyjs::enable("newname")
+        constraint <<- character(0)
+        updateRadioGroupButtons(session,
+                                "equations",
+                                choices = "",
+                                selected = character(0))
+
+        req(tmpnetwork$constraints)
+
+
+        if (nrow(tmpnetwork$constraints) > 0)
+          updatePickerInput(session,
+                            "constraintselect",
+                            choices = c("New",
+                                        sort(tmpnetwork$constraints$Id)),
+                            selected = "New")
+
+
+
+      }
+
+
+
       observeEvent(input$constraintselect, {
         req(input$constraintselect)
         if (input$constraintselect == "New"){
-          updateTextInput(session,
-                          "newname",
-                          "")
-          shinyjs::enable("newname")
-          constraint <<- character(0)
-          updateRadioGroupButtons(session,
-                                  "equations",
-                                  choiceValues = "",
-                                  choiceNames = "",
-                                  selected = character(0))
+          resetPage()
         } else {
           shinyjs::disable("newname")
           idconstraint <- tmpnetwork$constraints$idconstraint[tmpnetwork$constraints$Id == input$constraintselect]
@@ -99,32 +118,35 @@ constrEditorServer <- function(id, network, tab){
                                   "obs",
                                   size = "xs",
                                   choices = setdiff(names(tmpnetwork$observations),
-                                                    "Year"))
+                                                    "Year"),
+                                  selected = character(0))
 
-        if (nrow(tmpnetwork$constraints) > 0)
-          updatePickerInput(session,
-                            "constraintselect",
-                            choices = c("New",
-                                        sort(tmpnetwork$constraints$Id)))
+
 
         if (nrow(tmpnetwork$observations) > 0)
           updateRadioGroupButtons(session,
                                   "years",
                                   size = "xs",
-                                  choices = sort(tmpnetwork$observations$Year))
+                                  choices = sort(tmpnetwork$observations$Year),
+                                  selected = character(0))
 
         if (nrow(tmpnetwork$components) > 0)
           updateRadioGroupButtons(session,
                                   "components",
                                   size = "xs",
+                                  selected = character(0),
                                   choices = sort(tmpnetwork$components$Component))
 
         if (nrow(tmpnetwork$fluxes) > 0)
           updateRadioGroupButtons(session,
                                   "fluxes",
                                   size = "xs",
+                                  selected = character(0),
                                   choices = sort(c(tmpnetwork$fluxes$Flux,
                                                    "Allflows")))
+
+
+        resetPage()
 
       })
 
@@ -236,11 +258,16 @@ constrEditorServer <- function(id, network, tab){
         req(length(constraint) > 0)
         shinyCatch({
           formula <- paste(constraint, collapse = "")
+          valid <- checkValidity(formula, tmpnetwork)
+          if (valid != "TRUE")
+            stop(paste(formula, valid, sep = ":"))
+
           idformula <- convertConstr2idConstr(formula,
                                               tmpnetwork$dictionary)
           if (isolate(input$constraintselect) == "New"){
             if (isolate(input$newname) %in% tmpnetwork$constraint$Id)
               stop("Id already used")
+
             tmpnetwork$constraints <<- tmpnetwork$constraints %>%
               dplyr::bind_rows(
                 data.frame(

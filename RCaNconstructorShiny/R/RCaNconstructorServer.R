@@ -42,6 +42,7 @@ RCaNconstructorServer <- function(input, output, session){
   newnetwork_file <- fileInteractionServer("files", network)
   observe({
     newnetwork_file$components
+    newnetwork_file$aliases
     newnetwork_file$fluxes
     newnetwork_file$model
     newnetwork_file$observations
@@ -59,6 +60,8 @@ RCaNconstructorServer <- function(input, output, session){
   newnetworkviz <- visNetworkServer("visnetwork", network, tab)
   observe({
     newnetworkviz$components
+    newnetworkviz$aliases
+    newnetworkviz$constraints
     newnetworkviz$fluxes
     newnetworkviz$observations
     updateNetwork(isolate(newnetworkviz))
@@ -71,6 +74,8 @@ RCaNconstructorServer <- function(input, output, session){
   newnetwork_component <- tableEditorServer("components", network, "components", tab)
   observe({
     newnetwork_component$components
+    newnetwork_component$constraints
+    newnetwork_component$aliases
     newnetwork_component$fluxes
     newnetwork_component$observations
     updateNetwork(isolate(newnetwork_component))
@@ -80,6 +85,8 @@ RCaNconstructorServer <- function(input, output, session){
   newnetwork_fluxes <- tableEditorServer("fluxes", network, "fluxes", tab)
   observe({
     newnetwork_fluxes$components
+    newnetwork_fluxes$constraints
+    newnetwork_fluxes$aliases
     newnetwork_fluxes$fluxes
     newnetwork_fluxes$observations
     updateNetwork(isolate(newnetwork_fluxes))
@@ -91,6 +98,8 @@ RCaNconstructorServer <- function(input, output, session){
   observe({
     newnetwork_observations$components
     newnetwork_observations$fluxes
+    newnetwork_observations$constraints
+    newnetwork_observations$aliases
     newnetwork_observations$observations
     updateNetwork(isolate(newnetwork_observations))
 
@@ -100,6 +109,7 @@ RCaNconstructorServer <- function(input, output, session){
   observe({
     newnetwork_constraints$components
     newnetwork_constraints$fluxes
+    newnetwork_constraints$aliases
     newnetwork_constraints$observations
     newnetwork_constraints$constraints
     updateNetwork(isolate(newnetwork_constraints))
@@ -111,6 +121,7 @@ RCaNconstructorServer <- function(input, output, session){
   observe({
     newnetwork_editedconstraints$components
     newnetwork_editedconstraints$fluxes
+    newnetwork_editedconstraints$aliases
     newnetwork_editedconstraints$observations
     newnetwork_editedconstraints$constraints
     updateNetwork(isolate(newnetwork_editedconstraints))
