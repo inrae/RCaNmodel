@@ -9,7 +9,7 @@
 #' @return a ggplot
 #' @importFrom magrittr %>%
 #' @importFrom tidyr pivot_longer
-#' @importFrom rlang !! sym
+#' @importFrom rlang !! sym .data
 #' @importFrom dplyr filter
 #' @importFrom dplyr slice
 #' @importFrom dplyr n
@@ -84,8 +84,8 @@ ggTopDownBottomUp <- function(mysampleCaNmod,
   # Transform the mcmc output into a 4 col vector with simulation id, year, variable and value
   mcmc <- mysampleCaNmod$mcmc
   myCaNmodFit_long <- as.data.frame(as.matrix(mcmc)) %>%
-    mutate(Sample_id = seq_len(nrow(.))) %>%
-    slice(round(seq(1, nrow(.), length.out = round(frac * nrow(.))))) %>%
+    mutate(Sample_id = seq_len(nrow(as.matrix(mcmc)))) %>%
+    slice(round(seq(1, length(.data[["Sample_id"]]), length.out = round(frac * length(.data[["Sample_id"]]))))) %>%
     pivot_longer(cols = -!!sym("Sample_id"),
                  names_to = c("Var","Year"),
                  names_pattern = "(.*)\\[(.*)\\]",

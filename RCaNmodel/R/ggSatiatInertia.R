@@ -7,7 +7,7 @@
 #' @return a ggplot
 #' @importFrom magrittr %>%
 #' @importFrom tidyr pivot_longer
-#' @importFrom rlang !! sym
+#' @importFrom rlang !! sym .data
 #' @importFrom dplyr filter
 #' @importFrom dplyr rename
 #' @importFrom dplyr mutate
@@ -178,8 +178,10 @@ ggSatiatInertia <- function(mysampleCaNmod,
            !!sym("growth_std"))
 
 
-  full_tab <- merge(inertia_tab, satiation_tab) %>%
-    slice(round(seq(1, nrow(.), length.out = round(frac * nrow(.)))))
+  full_tab <- merge(inertia_tab, satiation_tab) 
+  nfull_tab <- nrow(full_tab)
+  full_tab <- full_tab %>%
+    slice(round(seq(1, nfull_tab, length.out = round(frac * nfull_tab))))
 
     ggplot(full_tab, aes(y = !!sym("growth_std"), x = !!sym("satiation_std"))) +
       geom_point(shape=".",col="grey") +

@@ -257,8 +257,8 @@ generateSymbolicObjects <-
     for (sp in components$Component){
       for (p in names(components)[-1]){
         assign(paste0(sp, p),
-               rep(components[components$Component == sp, p],
-                   nrow(series)))
+               unlist(rep(components[components$Component == sp, p],
+                   nrow(series))))
       }
     }
     

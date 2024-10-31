@@ -17,7 +17,7 @@ optionally aliases}
 }
 \value{
 a CaNmod object with following elements
-\itemize{
+\describe{
  \item{"components_param"}{the table of components description}
  \item{"species"}{the name of the species}
  \item{"fluxes_def}{the table of fluxes definition}
@@ -37,8 +37,7 @@ a CaNmod object with following elements
  \item{"v"}{vector of active constraints C.x=v}
  \item{"vAll"}{vector of all constraints C.x=v}
  \item{"L"}{matrix of B=L.F, since B0 is a parameter, there is no M}
- \item{"symbolic_enviro"}{an environment storing all symbolic objects
- required for the computation}
+ \item{"symbolic_enviro"}{environment storing symbolic objects for the computation}
 }
 }
 \description{
