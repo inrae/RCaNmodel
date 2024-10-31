@@ -82,16 +82,6 @@ fileInteractionServer <- function(id, network){
           newname <- paste(modelname[seq_len(length(modelname) - 1)],
                            collapse = '.')
 
-          if ("Aliases" %in% readxl::excel_sheets(input$loadname$datapath)){
-            load_aliases <- readxl::read_excel(input$loadname$datapath,
-                                               sheet = "Components & input parameter") %>%
-              mutate(id = .data[["Alias"]])
-            if (!"Comment" %in% names(load_aliases)){
-              load_aliases$Comment <- character(nrow(load_aliases))
-            }
-          } else {
-            load_aliases <- createEmptyAliases()
-          }
 
 
           load_comp <- readxl::read_excel(input$loadname$datapath,
@@ -155,7 +145,8 @@ fileInteractionServer <- function(id, network){
           newnetwork$components <- load_comp
           newnetwork$observations <- load_obs
           newnetwork$fluxes <- load_flux
-          newnetwork$aliases <- load_aliases
+
+          load_aliases <- createEmptyAliases()
 
 
           newnetwork$dictionary <-
@@ -163,6 +154,28 @@ fileInteractionServer <- function(id, network){
                                load_flux,
                                load_obs,
                                load_aliases)
+
+          if ("Aliases" %in% readxl::excel_sheets(input$loadname$datapath)){
+            load_aliases <- readxl::read_excel(input$loadname$datapath,
+                                               sheet = "Components & input parameter") %>%
+              mutate(id = .data[["Alias"]])
+            if (!"Comment" %in% names(load_aliases)){
+              load_aliases$Comment <- character(nrow(load_aliases))
+              load_aliases$idconstraint = sapply(load_aliases$Formula,
+                                                 convertConstr2idConstr,
+                                                 newnetwork$dictionary)
+            }
+          }
+
+
+
+          newnetwork$dictionary <-
+            generateDictionary(load_comp,
+                               load_flux,
+                               load_obs,
+                               load_aliases)
+          newnetwork$aliases <- load_aliases
+
 
           load_constr <- readxl::read_excel(input$loadname$datapath,
                                             sheet = "Constraints")
@@ -176,6 +189,18 @@ fileInteractionServer <- function(id, network){
           newnetwork$model <- newname
           newnetwork$envir <- generateSymbolicEnvir(newnetwork)
 
+          if (nrow(newnetwork$constraints) > 0)
+            newnetwork$constraints$valid <- sapply(
+              load_constr$Constraint,
+              function(constr)
+                checkValidity(constr, newnetwork) == "TRUE")
+
+          if (nrow(newnetwork$aliases) > 0)
+            newnetwork$aliases$valid <- sapply(
+              load_constr$Formula,
+              function(constr)
+                checkValidity(constr, newnetwork, onesided = TRUE) == "TRUE")
+
 
         })
 
@@ -188,38 +213,40 @@ fileInteractionServer <- function(id, network){
             orig <<- paste0(tempfile(), ".xlsx")
           modelfile <- openxlsx2::wb_load(orig)
           openxlsx2::wb_add_data(modelfile,
-                                sheet = "Components & input parameter",
-                                x = newnetwork$components %>%
-                                  dplyr::select(!any_of("id")),
-                                colNames = TRUE,
-                                na.strings = "")
+                                 sheet = "Components & input parameter",
+                                 x = newnetwork$components %>%
+                                   dplyr::select(!any_of("id")),
+                                 colNames = TRUE,
+                                 na.strings = "")
 
           openxlsx2::wb_add_data(modelfile,
-                                sheet = "Fluxes",
-                                x = newnetwork$fluxes %>%
-                                  dplyr::select(!any_of(c("id", "from", "to"))),
-                                colNames = TRUE,
-                                na.strings = "")
+                                 sheet = "Fluxes",
+                                 x = newnetwork$fluxes %>%
+                                   dplyr::select(!any_of(c("id", "from", "to"))),
+                                 colNames = TRUE,
+                                 na.strings = "")
           obs <- data.frame(Year = integer())
           if (!is.null(newnetwork$observations)){
             obs <- newnetwork$observations
           }
           openxlsx2::wb_add_data(modelfile,
-                                sheet = "Input time-series",
-                                x = newnetwork$observations,
-                                colNames = TRUE,
-                                na.strings = "")
+                                 sheet = "Input time-series",
+                                 x = newnetwork$observations,
+                                 colNames = TRUE,
+                                 na.strings = "")
 
           openxlsx2::wb_add_data(modelfile,
                                  sheet = "Constraints",
                                  x = newnetwork$constraints %>%
-                                   dplyr::select(!dplyr::any_of("idconstraint")),
+                                   dplyr::select(!dplyr::any_of(c("idconstraint",
+                                                                  "valid"))),
                                  colNames = TRUE,
                                  na.strings = "")
           openxlsx2::wb_add_data(modelfile,
                                  sheet = "Aliases",
                                  x = newnetwork$aliases %>%
-                                   dplyr::select(!dplyr::any_of("id")),
+                                   dplyr::select(!dplyr::any_of(c("id",
+                                                                  "valid"))),
                                  colNames = TRUE,
                                  na.strings = "")
           openxlsx2::wb_save(modelfile, file, overwrite = TRUE)
@@ -235,5 +262,5 @@ fileInteractionServer <- function(id, network){
       return(newnetwork)
 
     }
-  )
+    )
 }

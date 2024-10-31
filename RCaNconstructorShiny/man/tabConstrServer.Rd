@@ -4,12 +4,14 @@
 \alias{tabConstrServer}
 \title{tabConstrServer}
 \usage{
-tabConstrServer(id, network, tab)
+tabConstrServer(id, network, slot, tab)
 }
 \arguments{
 \item{id}{the id of the ui}
 
 \item{network}{the current network}
+
+\item{slot}{components or aliases}
 
 \item{tab}{selected tab}
 }

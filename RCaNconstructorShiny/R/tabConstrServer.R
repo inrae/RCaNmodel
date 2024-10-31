@@ -2,6 +2,7 @@
 #'
 #' @param id the id of the ui
 #' @param network the current network
+#' @param slot components or aliases
 #' @param tab selected tab
 #'
 #' @return an updated network
@@ -12,13 +13,13 @@
 #' @importFrom shiny isolate observe
 #' @export
 
-tabConstrServer <- function(id, network, tab){
+tabConstrServer <- function(id, network, slot, tab){
   shiny::moduleServer(
     id,
     function(input, output, session) {
       currenttab <- ""
 
-      hiddencols <- c("idconstraint")
+      hiddencols <- c("idconstraint", "id", "valid")
 
       newnetwork <- createEmptyNetwork()
       tmpnetwork <- list()
@@ -49,10 +50,30 @@ tabConstrServer <- function(id, network, tab){
 
       })
 
+
+      formcol <- ifelse(slot == "components",
+                        "Constraint",
+                        "Formula")
+
       rendertab <- function(data){
-        data$Constraint <- sapply(data$idconstraint,
+        data[, formcol] <- sapply(data$idconstraint,
                                   convertidConstr2Constr,
                                   dictionary = tmpnetwork$dictionary)
+
+        if (nrow(data) > 0){
+          browser()
+          data$valid <- sapply(
+            data[, formcol] %>% pull(),
+            function(constr)
+              checkValidity(constr,
+                            tmpnetwork,
+                            onesided = (slot == "aliases")) == "TRUE")
+
+        }
+
+        col_highlight <- 1
+        row_highlight <- which(!data$valid)
+
         tab <-
           rhandsontable(data %>%
                           mutate(
@@ -60,11 +81,23 @@ tabConstrServer <- function(id, network, tab){
                               any_of(c("Active")),
                               ~ as.logical(.x ))),
                         strechH = "all",
+                        col_highlight = col_highlight,
+                        row_highlight = row_highlight,
                         overflow = "visible") %>%
           hot_cols(colWidths = ifelse(names(data) %in% hiddencols,
                                       1,
                                       200),
-                   manualColumnResize = TRUE)
+                   manualColumnResize = TRUE,
+                   renderer = "
+            function(instance, td, row, col, prop, value, cellProperties) {
+                if (instance.params) {
+                    hcols = instance.params.col_highlight
+                    hcols = hcols instanceof Array ? hcols : [hcols]
+                    hrows = instance.params.row_highlight
+                    hrows = hrows instanceof Array ? hrows : [hrows]
+                }
+                if (instance.params && hrows.includes(row)) td.style.background = 'red';
+            }")
         renderRHandsontable({tab})
       }
 
@@ -88,8 +121,10 @@ tabConstrServer <- function(id, network, tab){
           for (tr in newdata$`Time-range`){
             tmp <- as.numeric(eval(parse(text=tr)))
           }
-          for (const in newdata$Constraint) {
-            valid <- checkValidity(const, tmpnetwork)
+          for (const in newdata[, formcol]  %>% pull()) {
+            valid <- checkValidity(const,
+                                   tmpnetwork,
+                                   onesided = (slot == "aliases"))
             if (valid != "TRUE")
               stop(paste(const, valid, sep = ":"))
           }
@@ -98,7 +133,9 @@ tabConstrServer <- function(id, network, tab){
             stop(paste(paste(names(countid)[which(countid > 1)],
                              collapse = ", "),
                        "non unique Id"))
-          tmpnetwork$constraints <<- newdata
+          newdata$idconstraint <- convertConstr2idConstr(newdata[, formcol] %>% pull(),
+                                                         tmpnetwork$dictionary)
+          tmpnetwork[[slot]] <<- newdata
           shinyjs::disable("ok")
           shinyjs::disable("cancel")},
           error = function(e){
@@ -112,7 +149,7 @@ tabConstrServer <- function(id, network, tab){
       })
 
       shiny::observeEvent(input$cancel,{
-        output$tableedit <- rendertab(tmpnetwork$constraints)
+        output$tableedit <- rendertab(tmpnetwork[[slot]])
         shinyjs::disable("ok")
         shinyjs::disable("cancel")
       })
@@ -120,7 +157,8 @@ tabConstrServer <- function(id, network, tab){
 
       observe({
         ntab <- tab$panel
-        if (currenttab == "View Constraints" & ntab != "View Constraints"){
+        if ((currenttab == "View Constraints" & ntab != "View Constraints" & slot == "constraints") |
+            (currenttab == 'View Aliases' & ntab != 'View Aliases' & slot == "aliases")) {
           for (v in names(tmpnetwork)){
             if (!identical(tmpnetwork[[v]],
                            isolate(newnetwork[[v]])))

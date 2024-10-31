@@ -47,7 +47,15 @@ RCaNconstructorUI <- function(){
                                                       tabConstrUI("tabconstraints")),
                                              tabPanel("Add/Edit Constraints",
                                                       h1("Constraints Editor"),
-                                                      constrEditorUI("constreditor"))))
+                                                      constrEditorUI("constreditor")))),
+                        tabPanel("Aliases",
+                                 tabsetPanel(id = "editaliases",
+                                             tabPanel("View Aliases",
+                                                      h1("Current Aliases"),
+                                                      tabConstrUI("tabaliases")),
+                                             tabPanel("Add/Edit Aliases",
+                                                      h1("Aliases Editor"),
+                                                      constrEditorUI("constraliases"))))
 
                       )
 

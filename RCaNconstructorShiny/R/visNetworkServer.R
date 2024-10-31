@@ -297,13 +297,13 @@ visNetworkServer <- function(id, network, tab){
                             }
 
                             if (cmd %in% c("deleteElements")){
-                              nodesdeleted <- isolate(input$networkviz_proxy_graphChange$nodes[[1]])
-                              edgesdeleted <- isolate(input$networkviz_proxy_graphChange$edges[[1]])
-                              if (length(nodesdeleted) > 1){
+                              nodesdeleted <- unlist(isolate(input$networkviz_proxy_graphChange$nodes))
+                              edgesdeleted <- unlist(isolate(input$networkviz_proxy_graphChange$edges))
+                              if (length(nodesdeleted) >= 1){
                                 tmpnetwork$components <<- tmpnetwork$components %>%
                                   filter(!.data[["id"]] %in% nodesdeleted)
                               }
-                              if (length(edgesdeleted) > 1){
+                              if (length(edgesdeleted) >= 1){
                                 tmpnetwork$fluxes <<- tmpnetwork$fluxes %>%
                                   filter(!.data[["id"]] %in% edgesdeleted)
                               }

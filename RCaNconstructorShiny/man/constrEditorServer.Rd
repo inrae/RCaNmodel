@@ -4,12 +4,14 @@
 \alias{constrEditorServer}
 \title{constrEditorServer}
 \usage{
-constrEditorServer(id, network, tab)
+constrEditorServer(id, network, slot, tab)
 }
 \arguments{
 \item{id}{the id of the ui}
 
 \item{network}{the current network}
+
+\item{slot}{either components or aliases}
 
 \item{tab}{selected tab}
 }

@@ -9,5 +9,6 @@ createEmptyConstraints <- function(){
              `Time-range` = character(),
              Active = logical(),
              Comment = character(),
-             idconstraint = character())
+             idconstraint = character(),
+             valid = logical())
 }

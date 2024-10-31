@@ -105,7 +105,10 @@ RCaNconstructorServer <- function(input, output, session){
 
   })
 
-  newnetwork_constraints <- tabConstrServer("tabconstraints", network, tab)
+  newnetwork_constraints <- tabConstrServer("tabconstraints",
+                                            network,
+                                            "constraints",
+                                            tab)
   observe({
     newnetwork_constraints$components
     newnetwork_constraints$fluxes
@@ -117,7 +120,10 @@ RCaNconstructorServer <- function(input, output, session){
   })
 
 
-  newnetwork_editedconstraints <- constrEditorServer("constreditor", network, tab)
+  newnetwork_editedconstraints <- constrEditorServer("constreditor",
+                                                     network,
+                                                     "constraints",
+                                                     tab)
   observe({
     newnetwork_editedconstraints$components
     newnetwork_editedconstraints$fluxes
