@@ -11,7 +11,7 @@
 #' if trophic model)
 #'
 #' @return en environment storing all symbolic elements including among others
-#' \itemize{
+#' \describe{
 #'  \item{"IE_H"}{identity- H the matrix of the equation (Bt+1=(I-H).B+N.F)}
 #'  \item{"n"}{the N matrix of the equation (Bt+1=(I-H).B+N.F)}
 #'  \item{"B_0"}{initial biomasses}
