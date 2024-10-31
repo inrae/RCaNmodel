@@ -31,7 +31,7 @@
 #' @importFrom dplyr group_by
 #' @importFrom dplyr mutate
 #' @importFrom magrittr %>%
-#' @importFrom rlang !! sym
+#' @importFrom rlang !! sym .data
 #' @importFrom tidyr pivot_longer
 #' @importFrom ggplot2 facet_wrap
 #' @importFrom ggplot2 theme
@@ -54,7 +54,7 @@ ggGrowth <- function(mysampleCaNmod,
 
   myCaNmodFit_long <- as.data.frame(as.matrix(mysampleCaNmod$mcmc)) %>%
     mutate("Sample_id" = 1:nrow(as.matrix(mysampleCaNmod$mcmc))) %>%
-    slice(round(seq(1, nrow(.), length.out = round(frac * nrow(.))))) %>%
+    slice(round(seq(1, length(.data[["Sample_id"]]), length.out = round(frac * length(.data[["Sample_id"]]))))) %>%
     pivot_longer(cols = -!!sym("Sample_id"),
                  names_to = c("Var","Year"),
                  names_pattern = "(.*)\\[(.*)\\]",

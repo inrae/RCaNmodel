@@ -44,23 +44,23 @@ createDynamics <- function(dynamics_equation = NULL,
   
   matrices <- lapply(seq_len(nrow(series)),
                      function(y) {
-                       otherLosses <- sapply(species, function(s){
+                       otherLosses <- unlist(sapply(species, function(s){
                          get(paste0(s, "OtherLosses"))[y]
-                       })
-                       assimE <- mapply(function(tro, s){
+                       }))
+                       assimE <- unlist(mapply(function(tro, s){
                          if (!tro) {
                            return (1)
                          } else {
                            get(paste0(s, "AssimilationE"))[y]
                          }
-                       }, is_trophic_flux, fluxes$To)
-                       digestib <- mapply(function(tro, s){
+                       }, is_trophic_flux, fluxes$To))
+                       digestib <- unlist(mapply(function(tro, s){
                          if (!tro) {
                            return (1)
                          } else {
                            get(paste0(s, "Digestibility"))[y]
                          }
-                       }, is_trophic_flux, fluxes$From)
+                       }, is_trophic_flux, fluxes$From))
                        
                        H <- diag(1,
                                  nrow=length(species))
