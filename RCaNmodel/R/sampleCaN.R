@@ -12,7 +12,7 @@
 #' @param keepCovMat save or not the covariance matrix (saving can gain time
 #' if new samples should be run but is very memory consuming - default FALSE)
 #' @return a sampleCaNmod object which contains three elements
-#' \itemize{
+#' \describe{
 #'  \item{"CaNmod"}{the CaNmod object descring the model}
 #'  \item{"mcmc"}{\code{\link[coda]{mcmc.list}}}
 #'  \item{"x0"}{average starting point}
