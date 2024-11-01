@@ -83,7 +83,7 @@ getTimerestrictedRCaNfile <-
       times <- sapply(constraintsrestricted$`Time-range`,
                       function(x) {
                         tr <- eval(parse(text=x))
-                        deparse(tr[tr %in% from:to])
+                        paste(deparse(tr[tr %in% from:to]), collapse = "")
                       }
       )
       times <- as.character(sapply(times, dput))
