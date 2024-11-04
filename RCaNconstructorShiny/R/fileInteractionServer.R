@@ -31,6 +31,8 @@ fileInteractionServer <- function(id, network){
         newnetwork$fluxes <<- createEmptyFluxes()
         newnetwork$dictionary <<- character()
         newnetwork$observations <<- data.frame()
+        newnetwork$metaobs <<- createEmptyMetaObs()
+        newnetwork$aliases <<- createEmptyAliases()
       }
 
       observe({
@@ -38,6 +40,8 @@ fileInteractionServer <- function(id, network){
         network$fluxes
         network$dictionary
         network$model
+        network$aliases
+        network$metaobs
         for (v in names(isolate(network)))
           newnetwork[[v]] <<- isolate(network[[v]])
       })
@@ -147,12 +151,14 @@ fileInteractionServer <- function(id, network){
           newnetwork$fluxes <- load_flux
 
           load_aliases <- createEmptyAliases()
+          load_metaobs <- createEmptyMetaObs()
 
 
           newnetwork$dictionary <-
             generateDictionary(load_comp,
                                load_flux,
                                load_obs,
+                               load_metaobs,
                                load_aliases)
 
           if ("Aliases" %in% readxl::excel_sheets(input$loadname$datapath)){
@@ -168,13 +174,30 @@ fileInteractionServer <- function(id, network){
           }
 
 
+          if ("MetaObs" %in% readxl::excel_sheets(input$loadname$datapath)){
+            load_metaobs <- readxl::read_excel(input$loadname$datapath,
+                                               sheet = "Observation MetaInfo") %>%
+              mutate(id = .data[["Observation"]])
+            if (!"Comment" %in% names(load_metaobs)){
+              load_metaobs$Comment <- character(nrow(load_metaobs))
+            }
+          } else {
+            load_metaobs <- data.frame(
+              id = setdiff(names(load_obs), "Year"),
+              Observation = setdiff(names(load_obs), "Year"),
+              Comment = character(ncol(load_obs) - 1))
+          }
+
+
 
           newnetwork$dictionary <-
             generateDictionary(load_comp,
                                load_flux,
                                load_obs,
+                               load_metaobs,
                                load_aliases)
           newnetwork$aliases <- load_aliases
+          newnetwork$metaobs <- load_metaobs
 
 
           load_constr <- readxl::read_excel(input$loadname$datapath,
@@ -229,9 +252,12 @@ fileInteractionServer <- function(id, network){
           if (!is.null(newnetwork$observations)){
             obs <- newnetwork$observations
           }
+          renamed <- newnetwork$metaobs$id %>%
+            setNames(newnetwork$Observation)
           openxlsx2::wb_add_data(modelfile,
                                  sheet = "Input time-series",
-                                 x = newnetwork$observations,
+                                 x = newnetwork$observations %>%
+                                   dplyr::rename(dplyr::all_of(renamed)),
                                  colNames = TRUE,
                                  na.strings = "")
 
@@ -249,6 +275,15 @@ fileInteractionServer <- function(id, network){
                                                                   "valid"))),
                                  colNames = TRUE,
                                  na.strings = "")
+
+
+          openxlsx2::wb_add_data(modelfile,
+                                 sheet = "Observation MetaInfo",
+                                 x = newnetwork$metaobs %>%
+                                   dplyr::select(!dplyr::any_of(c("id"))),
+                                 colNames = TRUE,
+                                 na.strings = "")
+
           openxlsx2::wb_save(modelfile, file, overwrite = TRUE)
         }
       )
@@ -262,5 +297,5 @@ fileInteractionServer <- function(id, network){
       return(newnetwork)
 
     }
-    )
+  )
 }

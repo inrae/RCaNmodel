@@ -14,6 +14,7 @@ createEmptyNetwork <- function(){
     dictionary = character(),
     observations = data.frame(Year = numeric()),
     aliases = createEmptyAliases(),
+    metaobs = createEmptyMetaObs(),
     envir = new.env()
   )
 }

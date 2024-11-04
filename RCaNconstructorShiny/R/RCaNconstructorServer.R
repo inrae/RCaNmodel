@@ -17,8 +17,10 @@ RCaNconstructorServer <- function(input, output, session){
     if (input$mainpanel == "Edit TrophicNetwork"){
       tab$panel <<- input$editpanel
     } else if (input$mainpanel == "Constraints"){
-      tab$panel <<- input$editconstraits
-    } else {
+      tab$panel <<- input$editconstraints
+    } else if (input$mainpanel == "Observations"){
+      tab$panel <<- input$editobservations
+    }else {
       tab$panel <<- ""
     }
   }
@@ -35,7 +37,9 @@ RCaNconstructorServer <- function(input, output, session){
 
       network$dictionary <<- generateDictionary(isolate(network$components),
                                                 isolate(network$fluxes),
-                                                isolate(network$observations))
+                                                isolate(network$observations),
+                                                isolate(network$metaobs),
+                                                isolate(network$aliases))
     }
   }
 
@@ -46,6 +50,7 @@ RCaNconstructorServer <- function(input, output, session){
     newnetwork_file$fluxes
     newnetwork_file$model
     newnetwork_file$observations
+    newnetwork_file$metaobs
     updateNetwork(isolate(newnetwork_file))
 
   })
@@ -64,6 +69,7 @@ RCaNconstructorServer <- function(input, output, session){
     newnetworkviz$constraints
     newnetworkviz$fluxes
     newnetworkviz$observations
+    newnetworkviz$metaobs
     updateNetwork(isolate(newnetworkviz))
 
   })
@@ -78,6 +84,7 @@ RCaNconstructorServer <- function(input, output, session){
     newnetwork_component$aliases
     newnetwork_component$fluxes
     newnetwork_component$observations
+    newnetwork_component$metaobs
     updateNetwork(isolate(newnetwork_component))
 
   })
@@ -89,6 +96,7 @@ RCaNconstructorServer <- function(input, output, session){
     newnetwork_fluxes$aliases
     newnetwork_fluxes$fluxes
     newnetwork_fluxes$observations
+    newnetwork_fluxes$metaobs
     updateNetwork(isolate(newnetwork_fluxes))
 
   })
@@ -101,6 +109,7 @@ RCaNconstructorServer <- function(input, output, session){
     newnetwork_observations$constraints
     newnetwork_observations$aliases
     newnetwork_observations$observations
+    newnetwork_observations$metaobs
     updateNetwork(isolate(newnetwork_observations))
 
   })
@@ -115,6 +124,7 @@ RCaNconstructorServer <- function(input, output, session){
     newnetwork_constraints$aliases
     newnetwork_constraints$observations
     newnetwork_constraints$constraints
+    newnetwork_constraints$metaobs
     updateNetwork(isolate(newnetwork_constraints))
 
   })
@@ -130,9 +140,28 @@ RCaNconstructorServer <- function(input, output, session){
     newnetwork_editedconstraints$aliases
     newnetwork_editedconstraints$observations
     newnetwork_editedconstraints$constraints
+    newnetwork_editedconstraints$metaobs
     updateNetwork(isolate(newnetwork_editedconstraints))
 
   })
+
+
+  newnetwork_editedmetaobs <- tabObsMetaServer("tabmetaobs",
+                                               network,
+                                               tab)
+  observe({
+    newnetwork_editedmetaobs$components
+    newnetwork_editedmetaobs$fluxes
+    newnetwork_editedmetaobs$aliases
+    newnetwork_editedmetaobs$observations
+    newnetwork_editedmetaobs$constraints
+    newnetwork_editedmetaobs$metaobs
+    updateNetwork(isolate(newnetwork_editedmetaobs))
+
+  })
+
+
+
 
 
 

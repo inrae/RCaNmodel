@@ -36,12 +36,19 @@ RCaNconstructorUI <- function(){
                                    ),
                                    tabPanel("Fluxes", h1("fluxes"),
                                             tabEditorUI("fluxes", "FLUXES")
-                                   ),
-                                   tabPanel("Time Series",h1("time series"),
-                                            tableObsUI("obs", "TIME SERIES"))
+                                   )
                                  )),
+                        tabPanel("Observations",
+                                 tabsetPanel(id = "editobservations",
+                                             tabPanel("Observation MetaInfo",
+                                                      h1("Observation MetaInfo"),
+                                                      tabObsMetaUI("tabmetaobs")),
+                                             tabPanel("Time Series",
+                                                      h1("time series"),
+                                                      tableObsUI("obs", "TIME SERIES"))
+                                             )),
                         tabPanel("Constraints",
-                                 tabsetPanel(id = "editconstraits",
+                                 tabsetPanel(id = "editconstraints",
                                              tabPanel("View Constraints",
                                                       h1("Current Constraints"),
                                                       tabConstrUI("tabconstraints")),

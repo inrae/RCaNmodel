@@ -66,6 +66,7 @@ visNetworkServer <- function(id, network, tab){
                           network$components
                           network$observations
                           network$fluxes
+                          network$metaobs
                           network$model
                           network$dictionary
                           req(isolate(tab$panel) == currenttab)

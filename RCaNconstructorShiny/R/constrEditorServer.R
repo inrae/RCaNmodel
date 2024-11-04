@@ -19,7 +19,6 @@ constrEditorServer <- function(id, network, slot, tab){
     function(input, output, session) {
       currenttab <- ""
 
-      hiddencols <- c("idconstraint")
 
       newnetwork <- createEmptyNetwork()
       tmpnetwork <- list()
@@ -117,6 +116,8 @@ constrEditorServer <- function(id, network, slot, tab){
         network$dictionary
         network$constraints
         network$model
+        network$metaobs
+
         req(isolate(tab$panel) == currenttab)
 
 
@@ -138,8 +139,7 @@ constrEditorServer <- function(id, network, slot, tab){
           updateRadioGroupButtons(session,
                                   "obs",
                                   size = "xs",
-                                  choices = setdiff(names(tmpnetwork$observations),
-                                                    "Year"),
+                                  choices = sort(tmpnetwork$metaobs$Observation),
                                   selected = character(0))
 
 

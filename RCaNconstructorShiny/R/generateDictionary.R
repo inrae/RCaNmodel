@@ -3,15 +3,24 @@
 #' @param components the components
 #' @param fluxes the fluxes
 #' @param observations the observations
+#' @param metaobs meta information of observation
 #' @param aliases facultative aliases
 #'
 #' @return a dictionary
 #' @export
 #'
-generateDictionary <- function(components, fluxes, observations, aliases = NULL){
+generateDictionary <- function(components,
+                               fluxes,
+                               observations,
+                               metaobs,
+                               aliases = NULL){
+  if (!all(sort(setdiff(names(observations), "Year")) ==
+          sort(metaobs$Observation)))
+    showNotification("metaobs and observations are not consistent",
+                     type = "error")
   dictionary <- c(components$Component,
                   fluxes$Flux,
-                  setdiff(names(observations), "Year"),
+                  metaobs$Observation,
                   aliases$Alias,
                   "AllFlows",
                   paste0("Outflows",
@@ -23,7 +32,7 @@ generateDictionary <- function(components, fluxes, observations, aliases = NULL)
 
   names(dictionary) <- c(components$id,
                          fluxes$id,
-                         setdiff(names(observations), "Year"),
+                         metaobs$id,
                          aliases$id,
                          "AllFlows",
                          paste0("Outflows",

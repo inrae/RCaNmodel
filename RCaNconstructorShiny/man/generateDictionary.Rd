@@ -4,7 +4,7 @@
 \alias{generateDictionary}
 \title{generateDictionary}
 \usage{
-generateDictionary(components, fluxes, observations, aliases = NULL)
+generateDictionary(components, fluxes, observations, metaobs, aliases = NULL)
 }
 \arguments{
 \item{components}{the components}
@@ -12,6 +12,8 @@ generateDictionary(components, fluxes, observations, aliases = NULL)
 \item{fluxes}{the fluxes}
 
 \item{observations}{the observations}
+
+\item{metaobs}{meta information of observation}
 
 \item{aliases}{facultative aliases}
 }

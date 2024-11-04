@@ -38,6 +38,8 @@ tabConstrServer <- function(id, network, slot, tab){
         network$dictionary
         network$constraints
         network$model
+        network$metaobs
+
         req(isolate(tab$panel) == currenttab)
 
 

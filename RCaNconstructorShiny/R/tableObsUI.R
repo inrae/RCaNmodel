@@ -14,9 +14,6 @@ tableObsUI <- function(id, title){
           h1(title),
           fluidRow(actionButton(ns("ok"), "VALIDATE"),
                    actionButton(ns("cancel"), "CANCEL")),
-
-          fluidRow(actionButton(ns("add"), "Add series"),
-                   actionButton(ns("remove"), "Remove series")),
           fluidRow(rhandsontable::rHandsontableOutput(ns("tableedit")))
   )
 }
