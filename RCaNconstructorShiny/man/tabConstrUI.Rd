@@ -2,17 +2,13 @@
 % Please edit documentation in R/tabConstrUI.R
 \name{tabConstrUI}
 \alias{tabConstrUI}
-\title{tabConstrUI
-Visualize tables}
+\title{tabConstrUI}
 \usage{
 tabConstrUI(id)
 }
 \arguments{
 \item{id}{the id of ui}
-
-\item{title}{the title to display}
 }
 \description{
-tabConstrUI
 Visualize tables
 }

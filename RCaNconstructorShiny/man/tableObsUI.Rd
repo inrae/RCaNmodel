@@ -2,8 +2,7 @@
 % Please edit documentation in R/tableObsUI.R
 \name{tableObsUI}
 \alias{tableObsUI}
-\title{tableObsUI
-Editor of tables}
+\title{tableObsUI}
 \usage{
 tableObsUI(id, title)
 }
@@ -13,6 +12,5 @@ tableObsUI(id, title)
 \item{title}{the tital to display}
 }
 \description{
-tableObsUI
 Editor of tables
 }

@@ -1,5 +1,7 @@
 #' tableObsUI
+#'
 #' Editor of tables
+#'
 #' @param id the id of ui
 #' @param title the tital to display
 #' @importFrom shiny actionButton fluidRow h1 numericInput

@@ -206,7 +206,7 @@ visNetworkServer <- function(id, network, tab){
                                 tmpnetwork$components <<- bind_rows(tmpnetwork$components,
                                                                     newnode)
                                 visNetworkProxy(session$ns("networkviz_proxy")) %>%
-                                  visGetPositions(node = newnode$id)
+                                  visGetPositions(nodes = newnode$id)
                               } else {
                                 if (newnode$Component %in% tmpnetwork$fluxes$flux |
                                     newnode$Component %in% (tmpnetwork$components %>%
