@@ -7,7 +7,7 @@ Authors@R: c(person("Hilaire","Drouineau",email="hilaire.drouineau@inrae.fr",rol
     person("Christian","Mullon",role=c("aut")),
     person("INRAE - Norvegian Institute of Marine Research - IRD",role=("cph")))
 Description: This is a GUI to facilitate the construction of RCaNmodel.
-License: BSD_3_clause + file LICENSE
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: 
