@@ -2,11 +2,12 @@ Package: RCaNconstructor
 Type: Package
 Title: What the Package Does (Title Case)
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Authors@R: c(person("Hilaire","Drouineau",email="hilaire.drouineau@inrae.fr",role=c("aut","cre")),
+    person("Benjamin","Planque",role=c("aut")),
+    person("Christian","Mullon",role=c("aut")),
+    person("INRAE - Norvegian Institute of Marine Research - IRD",role=("cph")))
+Description: This is a GUI to facilitate the construction of RCaNmodel.
+License: BSD_3_clause + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: 
@@ -26,5 +27,6 @@ Imports:
     shinyWidgets,
     spsComps,
     stringr,
+    symengine,
     visNetwork
 RoxygenNote: 7.3.1

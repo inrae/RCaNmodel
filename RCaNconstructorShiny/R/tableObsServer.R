@@ -10,6 +10,7 @@
 #' @importFrom rhandsontable hot_rows hot_to_r
 #' @importFrom shiny isolate observe req validate need selectInput modalButton
 #' @importFrom datamods import_modal import_server
+#' @importFrom rlang .data
 #' @export
 
 tableObsServer <- function(id, network, tab){
@@ -85,7 +86,7 @@ tableObsServer <- function(id, network, tab){
         if (!is.null(newdata)){
           newdata <- newdata %>%
             dplyr::full_join(adddata) %>%
-            dplyr::arrange(Year)
+            dplyr::arrange(.data[["Year"]])
         } else {
           newdata <- adddata
         }

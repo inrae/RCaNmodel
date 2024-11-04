@@ -9,7 +9,7 @@
 #' @importFrom spsComps shinyCatch
 #' @importFrom magrittr %>%
 #' @importFrom dplyr mutate select across any_of pull
-#' @importFrom shiny isolate observe
+#' @importFrom shiny isolate observe updateTextInput
 #' @importFrom shinyWidgets updateRadioGroupButtons updatePickerInput
 #' @export
 
@@ -301,7 +301,7 @@ constrEditorServer <- function(id, network, slot, tab){
               if (isolate(input$newname) %in% tmpnetwork$constraint$Id)
                 stop("Id already used")
             } else {
-              if (isolate(input$newname) %in% names(tmp$dictionary))
+              if (isolate(input$newname) %in% names(tmpnetwork$dictionary))
                 stop("Id already used")
             }
             if (slot == "constraints"){

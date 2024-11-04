@@ -1,7 +1,7 @@
 #' tabConstrUI
 #' Visualize tables
 #' @param id the id of ui
-#' @param title the tital to display
+#' @param title the title to display
 #' @importFrom shiny actionButton fluidRow h1
 #' @export
 #'

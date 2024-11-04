@@ -10,7 +10,7 @@
 #' @importFrom visNetwork visOptions visEdges visNetworkProxy visUpdateEdges
 #' @importFrom visNetwork visNodes visClusteringByGroup visUpdateNodes
 #' @importFrom visNetwork visEvents visIgraphLayout visRemoveNodes
-#' @importFrom dplyr bind_rows pull filter select anti_join
+#' @importFrom dplyr bind_rows pull filter select anti_join all_of
 #' @importFrom magrittr %>%
 #' @importFrom spsComps shinyCatch
 #' @importFrom shiny req reactiveVal

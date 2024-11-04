@@ -4,7 +4,7 @@
 #'
 #' @return nothing
 #'
-#' @importFrom shiny NS fluidRow tagList
+#' @importFrom shiny NS fluidRow tagList checkboxInput
 #' @importFrom shinyjs useShinyjs
 #' @importFrom visNetwork visNetworkOutput
 #' @export

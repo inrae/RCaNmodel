@@ -10,7 +10,7 @@
 #' @importFrom dplyr mutate select across any_of
 #' @importFrom rhandsontable rhandsontable hot_col renderRHandsontable hot_cols
 #' @importFrom rhandsontable hot_rows hot_to_r hot_cell
-#' @importFrom shiny isolate observe
+#' @importFrom shiny isolate observe showNotification
 #' @export
 
 tabConstrServer <- function(id, network, slot, tab){
