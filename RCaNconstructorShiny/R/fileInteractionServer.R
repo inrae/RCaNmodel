@@ -11,6 +11,7 @@
 #' @importFrom readxl read_excel
 #' @importFrom rlang .data
 #' @importFrom magrittr %>%
+#' @importFrom stats setNames
 #' @importFrom dplyr mutate any_of select
 #' @export
 

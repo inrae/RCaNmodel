@@ -9,6 +9,7 @@
 #' @importFrom rhandsontable hot_col renderRHandsontable hot_cols
 #' @importFrom rhandsontable hot_rows hot_to_r
 #' @importFrom shiny isolate observe req validate need selectInput modalButton
+#' @importFrom stats setNames
 #' @importFrom rlang .data
 #' @export
 
