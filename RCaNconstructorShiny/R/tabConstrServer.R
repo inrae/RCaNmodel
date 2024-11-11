@@ -60,7 +60,6 @@ tabConstrServer <- function(id, network, slot, tab){
       rendertab <- function(data){
         if (nrow(data) > 0){
 
-          browser()
           data[, formcol] <- sapply(data$idconstraint,
                                     convertidConstr2Constr,
                                     dictionary = tmpnetwork$dictionary)
