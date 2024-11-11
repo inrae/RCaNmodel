@@ -233,57 +233,84 @@ fileInteractionServer <- function(id, network){
       output$savename <- shiny::downloadHandler(
         filename = function() paste0(network$model, ".xlsx"),
         content = function(file){
-          if (orig == "")
+          if (orig == ""){
             orig <<- paste0(tempfile(), ".xlsx")
-          modelfile <- openxlsx2::wb_load(orig)
-          openxlsx2::wb_add_data(modelfile,
-                                 sheet = "Components & input parameter",
-                                 x = newnetwork$components %>%
-                                   dplyr::select(!any_of("id")),
-                                 colNames = TRUE,
-                                 na.strings = "")
+            modelfile <- openxlsx2::wb_workbook()
+          } else {
+            modelfile <- openxlsx2::wb_load(orig)
+          }
+          sheets <- openxlsx2::wb_get_sheet_names(modelfile)
+          if (!"Components & input parameter" %in% sheets)
+            modelfile <- openxlsx2::wb_add_worksheet(modelfile,
+                                                     "Components & input parameter")
+          modelfile <- openxlsx2::wb_add_data(modelfile,
+                                              sheet = "Components & input parameter",
+                                              x = newnetwork$components %>%
+                                                dplyr::select(!any_of("id")),
+                                              colNames = TRUE,
+                                              na.strings = "")
 
-          openxlsx2::wb_add_data(modelfile,
-                                 sheet = "Fluxes",
-                                 x = newnetwork$fluxes %>%
-                                   dplyr::select(!any_of(c("id", "from", "to"))),
-                                 colNames = TRUE,
-                                 na.strings = "")
+          if (!"Fluxes" %in% sheets)
+            modelfile <- openxlsx2::wb_add_worksheet(modelfile,
+                                                     "Fluxes")
+          modelfile <- openxlsx2::wb_add_data(modelfile,
+                                              sheet = "Fluxes",
+                                              x = newnetwork$fluxes %>%
+                                                dplyr::select(!any_of(c("id",
+                                                                        "from",
+                                                                        "to"))),
+                                              colNames = TRUE,
+                                              na.strings = "")
           obs <- data.frame(Year = integer())
           if (!is.null(newnetwork$observations)){
             obs <- newnetwork$observations
           }
           renamed <- newnetwork$metaobs$id %>%
-            setNames(newnetwork$Observation)
-          openxlsx2::wb_add_data(modelfile,
-                                 sheet = "Input time-series",
-                                 x = newnetwork$observations %>%
-                                   dplyr::rename(dplyr::all_of(renamed)),
-                                 colNames = TRUE,
-                                 na.strings = "")
+            setNames(newnetwork$metaobs$Observation)
 
-          openxlsx2::wb_add_data(modelfile,
-                                 sheet = "Constraints",
-                                 x = newnetwork$constraints %>%
-                                   dplyr::select(!dplyr::any_of(c("idconstraint",
-                                                                  "valid"))),
-                                 colNames = TRUE,
-                                 na.strings = "")
-          openxlsx2::wb_add_data(modelfile,
-                                 sheet = "Aliases",
-                                 x = newnetwork$aliases %>%
-                                   dplyr::select(!dplyr::any_of(c("id",
-                                                                  "valid"))),
-                                 colNames = TRUE,
-                                 na.strings = "")
+          if (!"Input time-series" %in% sheets)
+            modelfile <- openxlsx2::wb_add_worksheet(modelfile,
+                                                     "Input time-series")
+          modelfile <- openxlsx2::wb_add_data(modelfile,
+                                              sheet = "Input time-series",
+                                              x = newnetwork$observations %>%
+                                                dplyr::rename(dplyr::all_of(renamed)),
+                                              colNames = TRUE,
+                                              na.strings = "")
+
+          if (!"Constraints" %in% sheets)
+            modelfile <- openxlsx2::wb_add_worksheet(modelfile,
+                                                     "Constraints")
+          modelfile <- openxlsx2::wb_add_data(modelfile,
+                                              sheet = "Constraints",
+                                              x = newnetwork$constraints %>%
+                                                dplyr::select(!dplyr::any_of(c("idconstraint",
+                                                                               "valid"))),
+                                              colNames = TRUE,
+                                              na.strings = "")
+
+          if (!"Aliases" %in% sheets)
+            modelfile <- openxlsx2::wb_add_worksheet(modelfile,
+                                                     "Aliases")
+          modelfile <- openxlsx2::wb_add_data(modelfile,
+                                              sheet = "Aliases",
+                                              x = newnetwork$aliases %>%
+                                                dplyr::select(!dplyr::any_of(c("id",
+                                                                               "valid"))),
+                                              colNames = TRUE,
+                                              na.strings = "")
 
 
-          openxlsx2::wb_add_data(modelfile,
-                                 sheet = "Observation MetaInfo",
-                                 x = newnetwork$metaobs %>%
-                                   dplyr::select(!dplyr::any_of(c("id"))),
-                                 colNames = TRUE,
-                                 na.strings = "")
+          if (!"Observation MetaInfo" %in% sheets)
+            modelfile <- openxlsx2::wb_add_worksheet(modelfile,
+                                                     "Observation MetaInfo")
+          browser()
+          modelfile <- openxlsx2::wb_add_data(modelfile,
+                                              sheet = "Observation MetaInfo",
+                                              x = newnetwork$metaobs %>%
+                                                dplyr::select(!dplyr::any_of(c("id"))),
+                                              colNames = TRUE,
+                                              na.strings = "")
 
           openxlsx2::wb_save(modelfile, file, overwrite = TRUE)
         }
