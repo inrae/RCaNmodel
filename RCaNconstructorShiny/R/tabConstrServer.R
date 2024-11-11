@@ -48,7 +48,7 @@ tabConstrServer <- function(id, network, slot, tab){
                         tmpnetwork[[v]]))
             tmpnetwork[[v]] <<- isolate(network[[v]])
         }
-        output$tableedit <- rendertab(tmpnetwork$constraints)
+        output$tableedit <- rendertab(tmpnetwork[[slot]])
 
       })
 
@@ -60,6 +60,7 @@ tabConstrServer <- function(id, network, slot, tab){
       rendertab <- function(data){
         if (nrow(data) > 0){
 
+          browser()
           data[, formcol] <- sapply(data$idconstraint,
                                     convertidConstr2Constr,
                                     dictionary = tmpnetwork$dictionary)

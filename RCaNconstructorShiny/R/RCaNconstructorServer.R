@@ -41,6 +41,7 @@ RCaNconstructorServer <- function(input, output, session){
                                                 isolate(network$metaobs),
                                                 isolate(network$aliases))
     }
+    network$envir <- generateSymbolicEnvir(network)
   }
 
   newnetwork_file <- fileInteractionServer("files", network)
@@ -160,6 +161,21 @@ RCaNconstructorServer <- function(input, output, session){
 
   })
 
+
+  newnetwork_aliases <- tabConstrServer("tabaliases",
+                                            network,
+                                            "aliases",
+                                            tab)
+  observe({
+    newnetwork_aliases$components
+    newnetwork_aliases$fluxes
+    newnetwork_aliases$aliases
+    newnetwork_aliases$observations
+    newnetwork_aliases$constraints
+    newnetwork_aliases$metaobs
+    updateNetwork(isolate(newnetwork_aliases))
+
+  })
 
 
 

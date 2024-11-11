@@ -164,13 +164,13 @@ fileInteractionServer <- function(id, network){
 
           if ("Aliases" %in% readxl::excel_sheets(input$loadname$datapath)){
             load_aliases <- readxl::read_excel(input$loadname$datapath,
-                                               sheet = "Components & input parameter") %>%
-              mutate(id = .data[["Alias"]])
+                                               sheet = "Aliases") %>%
+              mutate(id = .data[["Alias"]],
+                     idconstraint = sapply(Formula,
+                                           convertConstr2idConstr,
+                                           newnetwork$dictionary))
             if (!"Comment" %in% names(load_aliases)){
               load_aliases$Comment <- character(nrow(load_aliases))
-              load_aliases$idconstraint = sapply(load_aliases$Formula,
-                                                 convertConstr2idConstr,
-                                                 newnetwork$dictionary)
             }
           }
 
@@ -221,7 +221,7 @@ fileInteractionServer <- function(id, network){
 
           if (nrow(newnetwork$aliases) > 0)
             newnetwork$aliases$valid <- sapply(
-              load_constr$Formula,
+              load_aliases$Formula,
               function(constr)
                 checkValidity(constr, newnetwork, onesided = TRUE) == "TRUE")
 

@@ -163,9 +163,9 @@ generateSymbolicEnvir <- function(network){
                                    beforedelta = TRUE)
   }
   for (i in seq_len(nrow(aliases))){
-    assign(aliases[i, 1],
-           genVector(aliases[i, 1]))
-    generateDerivedSymbolicObjects(aliases[i, 1],
+    assign(aliases$Alias[i],
+           genVector(aliases$Alias[i]))
+    generateDerivedSymbolicObjects(aliases$Alias[i],
                                    environment(),
                                    before = TRUE,
                                    after = TRUE,
