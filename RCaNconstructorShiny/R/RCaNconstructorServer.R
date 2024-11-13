@@ -34,13 +34,16 @@ RCaNconstructorServer <- function(input, output, session){
       for (v in varnames){
         network[[v]] <<- isolate(newnetwork[[v]])
       }
+      
+      oldic <- sort(isolate(network$dictionary))
 
       network$dictionary <<- generateDictionary(isolate(network$components),
                                                 isolate(network$fluxes),
                                                 isolate(network$observations),
                                                 isolate(network$metaobs),
                                                 isolate(network$aliases))
-      network$envir <- generateSymbolicEnvir(network)
+      if (!identical(oldic, isolate(sort(network$dicitonary))))
+        network$envir <- generateSymbolicEnvir(network)
 
     }
   }
