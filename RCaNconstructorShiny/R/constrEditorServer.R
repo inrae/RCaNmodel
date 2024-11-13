@@ -9,7 +9,7 @@
 #' @importFrom spsComps shinyCatch
 #' @importFrom magrittr %>%
 #' @importFrom dplyr mutate select across any_of pull
-#' @importFrom shiny isolate observe updateTextInput
+#' @importFrom shiny isolate observe updateTextInput updateSelectInput
 #' @importFrom shinyWidgets updateRadioGroupButtons updatePickerInput
 #' @export
 
@@ -18,17 +18,17 @@ constrEditorServer <- function(id, network, slot, tab){
     id,
     function(input, output, session) {
       currenttab <- ""
-
-
+      
+      
       newnetwork <- createEmptyNetwork()
       tmpnetwork <- list()
       constraint <- character(0)
-
+      
       formcol <- ifelse(slot == "constraints",
                         "Constraint",
                         "Formula")
-
-
+      
+      
       resetPage <- function() {
         updateTextInput(session,
                         "newname",
@@ -39,10 +39,10 @@ constrEditorServer <- function(id, network, slot, tab){
                                 "equations",
                                 choices = "",
                                 selected = character(0))
-
+        
         req(tmpnetwork[[slot]])
-
-
+        
+        
         if (nrow(tmpnetwork[[slot]]) > 0)
           updatePickerInput(session,
                             "constraintselect",
@@ -55,13 +55,13 @@ constrEditorServer <- function(id, network, slot, tab){
                                         )
                             ),
                             selected = "New")
-
-
-
+        
+        
+        
       }
-
-
-
+      
+      
+      
       observeEvent(input$constraintselect, {
         req(input$constraintselect)
         if (input$constraintselect == "New"){
@@ -84,8 +84,8 @@ constrEditorServer <- function(id, network, slot, tab){
                                   selected = character(0))
         }
       })
-
-
+      
+      
       addVal <- function(text) {
         pos <- isolate(input$equations)
         if (is.null(pos)){
@@ -97,18 +97,18 @@ constrEditorServer <- function(id, network, slot, tab){
                                 after = as.integer(pos) - 1)
           selected <- pos + 1
         }
-
+        
         updateRadioGroupButtons(session,
                                 "equations",
                                 choiceValues = seq_along(constraint),
                                 choiceNames = constraint,
                                 selected = selected)
       }
-
-
-
-
-
+      
+      
+      
+      
+      
       observe({
         network$components
         network$observations
@@ -117,108 +117,102 @@ constrEditorServer <- function(id, network, slot, tab){
         network$constraints
         network$model
         network$metaobs
-
+        
         req(isolate(tab$panel) == currenttab)
-
-
+        
+        
         for (v in names(isolate(network))){
           if(!identical(isolate(network[[v]]),
                         tmpnetwork[[v]]))
             tmpnetwork[[v]] <<- isolate(network[[v]])
         }
-
-
+        
+        
         if (nrow(tmpnetwork$aliases) > 0)
-          updateRadioGroupButtons(session,
-                                  "obs",
-                                  size = "xs",
-                                  choices = sort(tmpnetwork$aliases$Alias),
-                                  selected = character(0))
-
+          updateSelectInput(session,
+                            "aliases",
+                            choices = c("",
+                                        sort(tmpnetwork$aliases$Alias)),
+                            selected = "")
+        
         if (nrow(tmpnetwork$observations) > 0)
-          updateRadioGroupButtons(session,
-                                  "obs",
-                                  size = "xs",
-                                  choices = sort(tmpnetwork$metaobs$Observation),
-                                  selected = character(0))
-
-
-
+          updateSelectInput(session,
+                            "obs",
+                            choices = c("", 
+                                        sort(tmpnetwork$metaobs$Observation)),
+                            selected = "")
+        
+        
+        
         if (nrow(tmpnetwork$observations) > 0)
-          updateRadioGroupButtons(session,
-                                  "years",
-                                  size = "xs",
-                                  choices = sort(tmpnetwork$observations$Year),
-                                  selected = character(0))
-
+          updateSelectInput(session,
+                            "years",
+                            choices = c("",
+                                        sort(tmpnetwork$observations$Year)),
+                            selected = "")
+        
         if (nrow(tmpnetwork$components) > 0)
-          updateRadioGroupButtons(session,
-                                  "components",
-                                  size = "xs",
-                                  selected = character(0),
-                                  choices = sort(tmpnetwork$components$Component))
-
+          updateSelectInput(session,
+                            "components",
+                            selected = "",
+                            choices = c("",
+                                        sort(tmpnetwork$components$Component[tmpnetwork$components$Inside == 1])))
+        
         if (nrow(tmpnetwork$fluxes) > 0)
-          updateRadioGroupButtons(session,
-                                  "fluxes",
-                                  size = "xs",
-                                  selected = character(0),
-                                  choices = sort(c(tmpnetwork$fluxes$Flux,
-                                                   "Allflows")))
-
-
+          updateSelectInput(session,
+                            "fluxes",
+                            selected = "",
+                            choices = c("",sort(c(tmpnetwork$fluxes$Flux,
+                                                  "Allflows"))))
+        
+        
         resetPage()
-
+        
       })
-
-
-
-
+      
+      
+      
+      
       observeEvent(input$years,{
         addVal(isolate(input$years))
-        updateRadioGroupButtons(session,
-                                "years",
-                                size = "xs",
-                                selected = character(0))
+        updateSelectInput(session,
+                          "years",
+                          selected = "")
       }
       )
-
+      
       observeEvent(input$obs,{
         addVal(isolate(input$obs))
-        updateRadioGroupButtons(session,
-                                "obs",
-                                size = "xs",
-                                selected = character(0))
+        updateSelectInput(session,
+                          "obs",
+                          selected = "")
       }
       )
-
+      
       observeEvent(input$fluxes,{
         addVal(isolate(input$fluxes))
-        updateRadioGroupButtons(session,
-                                "fluxes",
-                                size = "xs",
-                                selected = character(0))
+        updateSelectInput(session,
+                          "fluxes",
+                          selected = "")
       }
       )
-
+      
       observeEvent(input$aliases,{
         addVal(isolate(input$aliases))
-        updateRadioGroupButtons(session,
-                                "aliases",
-                                size = "xs",
-                                selected = character(0))
+        updateSelectInput(session,
+                          "aliases",
+                          selected = "")
       }
       )
-
+      
       observeEvent(input$components,{
         addVal(isolate(input$components))
-        updateRadioGroupButtons(session,
-                                "components",
-                                size = "xs",
-                                selected = character(0))
+        updateSelectInput(session,
+                          "components",
+                          selected = "")
       }
       )
-
+      
       observeEvent(input$brackets,{
         addVal(isolate(input$brackets))
         updateRadioGroupButtons(session,
@@ -227,7 +221,7 @@ constrEditorServer <- function(id, network, slot, tab){
                                 selected = character(0))
       }
       )
-
+      
       observeEvent(input$functions,{
         addVal(isolate(input$functions))
         updateRadioGroupButtons(session,
@@ -236,7 +230,7 @@ constrEditorServer <- function(id, network, slot, tab){
                                 selected = character(0))
       }
       )
-
+      
       observeEvent(input$numbers,{
         addVal(isolate(input$numbers))
         updateRadioGroupButtons(session,
@@ -245,7 +239,7 @@ constrEditorServer <- function(id, network, slot, tab){
                                 selected = character(0))
       }
       )
-
+      
       observeEvent(input$comparisons,{
         addVal(isolate(input$comparisons))
         updateRadioGroupButtons(session,
@@ -254,8 +248,8 @@ constrEditorServer <- function(id, network, slot, tab){
                                 selected = character(0))
       }
       )
-
-
+      
+      
       observeEvent(input$modifiers,{
         addVal(isolate(input$modifiers))
         updateRadioGroupButtons(session,
@@ -264,8 +258,8 @@ constrEditorServer <- function(id, network, slot, tab){
                                 selected = character(0))
       }
       )
-
-
+      
+      
       observeEvent(input$remove,{
         req(isolate(input$equations))
         constraint <<- constraint[-as.integer(isolate(input$equations))]
@@ -281,9 +275,9 @@ constrEditorServer <- function(id, network, slot, tab){
                                   choiceNames = constraint,
                                   selected = character(0))
         }
-
+        
       })
-
+      
       observeEvent(input$ok,{
         req(length(constraint) > 0)
         shinyCatch({
@@ -293,7 +287,7 @@ constrEditorServer <- function(id, network, slot, tab){
                                  onesided = (slot == "aliases"))
           if (valid != "TRUE")
             stop(paste(formula, valid, sep = ":"))
-
+          
           idformula <- convertConstr2idConstr(formula,
                                               tmpnetwork$dictionary)
           if (isolate(input$constraintselect) == "New"){
@@ -309,7 +303,7 @@ constrEditorServer <- function(id, network, slot, tab){
                 dplyr::bind_rows(
                   data.frame(
                     Id = isolate(input$newname),
-                    Constaint = formula,
+                    Constraint = formula,
                     idconstraint = idformula,
                     valid = TRUE)
                 )
@@ -324,8 +318,23 @@ constrEditorServer <- function(id, network, slot, tab){
                     valid = TRUE)
                 )
             }
-
-
+            updateTextInput(session, "newname", value = "")
+            updatePickerInput(session,
+                              "constraintselect",
+                              choices = c("New",
+                                          sort(tmpnetwork[[slot]][,
+                                                                  ifelse(slot == "constraints",
+                                                                         "Id",
+                                                                         "Alias")] %>%
+                                                 pull()
+                                          )
+                              ),
+                              selected = "New")
+            updateRadioGroupButtons(session,
+                                    "equations",
+                                    choices = "",
+                                    selected = character(0))            
+            
           } else {
             i <- which(tmpnetwork[[slot]][,ifelse(slot == "constraints",
                                                   "Id",
@@ -336,10 +345,10 @@ constrEditorServer <- function(id, network, slot, tab){
           }
         })
       })
-
+      
       observe({
         ntab <- tab$panel
-        if ((currenttab == "Add/Edit Constraints" & ntab != "Add/Edit Constraints") |
+        if ((currenttab == "Add/Edit Constraints" & ntab != "Add/Edit Constraints" & slot == "constraints" ) |
             (currenttab == 'View Aliases' & ntab != 'View Aliases' & slot == "aliases")){
           for (v in names(tmpnetwork)){
             if (!identical(tmpnetwork[[v]],
@@ -349,7 +358,7 @@ constrEditorServer <- function(id, network, slot, tab){
         }
         currenttab <<- ntab
       })
-
+      
       return(newnetwork)
     }
   )
