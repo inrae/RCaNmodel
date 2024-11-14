@@ -64,13 +64,13 @@ tabConstrServer <- function(id, network, slot, tab){
       })
       
       observeEvent(input$filter, {
-        output$tableedit <- rendertab(createSubData(),
-                                      tmpnetwork$constraints$Id)
+        output$tableedit <- rendertab(createSubData())
       })
 
       createSubData <- function(){
         fval <- isolate(input$filter)
         cdata <- hot_to_r(isolate(input$tableedit))
+        req(cdata)
         if (length(hiddencols) > 0)
           cdata <- cdata %>%
           tibble::rownames_to_column("rowname") %>%
@@ -91,9 +91,6 @@ tabConstrServer <- function(id, network, slot, tab){
         } else {
           subdata <- wholedata
         }
-        if (length(hiddencols) > 0)
-          subdata <- subdata %>%
-          select(!any_of(hiddencols))
         subdata
       }
       
@@ -112,14 +109,18 @@ tabConstrServer <- function(id, network, slot, tab){
 
       rendertab <- function(data){
         if (nrow(data) > 0){
-
           data[, formcol] <- sapply(data$idconstraint,
                                     convertidConstr2Constr,
                                     dictionary = tmpnetwork$dictionary)
 
 
+          if (slot == "aliases"){
+            allconstraints <- data$Formula
+          } else {
+            allconstraints <- data$Constraint
+          }
           validity_comments <- sapply(
-            data[, formcol] %>% pull(),
+            allconstraints,
             function(constr)
               checkValidity(constr,
                             tmpnetwork,
@@ -134,6 +135,11 @@ tabConstrServer <- function(id, network, slot, tab){
 
         col_highlight <- 1
         row_highlight <- which(!data$valid) - 1
+        
+        if (length(hiddencols) > 0)
+          data <- data %>%
+          select(!any_of(hiddencols))
+        
         tab <-
           rhandsontable(data %>%
                           mutate(

@@ -80,6 +80,7 @@ tableEditorServer <- function(id, network, slot, tab){
       createSubData <- function(){
         fval <- isolate(input$filter)
         cdata <- hot_to_r(isolate(input$tableedit))
+        req(cdata)
         if (length(hiddencols) > 0)
           cdata <- cdata %>%
           tibble::rownames_to_column("rowname") %>%
@@ -100,9 +101,7 @@ tableEditorServer <- function(id, network, slot, tab){
         } else {
           subdata <- wholedata
         }
-        if (length(hiddencols) > 0)
-          subdata <- subdata %>%
-          select(!any_of(hiddencols))
+
         subdata
       }
       
@@ -117,6 +116,10 @@ tableEditorServer <- function(id, network, slot, tab){
       
       
       rendertab <- function(data, complist){
+        if (length(hiddencols) > 0)
+          data <- data %>%
+            select(!any_of(hiddencols))
+        
         tab <-
           rhandsontable(data %>%
                           mutate(
