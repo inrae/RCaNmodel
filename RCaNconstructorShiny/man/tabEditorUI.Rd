@@ -10,7 +10,7 @@ tabEditorUI(id, title)
 \arguments{
 \item{id}{the id of ui}
 
-\item{title}{the tital to display}
+\item{title}{the title to display}
 }
 \description{
 tabEditorUI

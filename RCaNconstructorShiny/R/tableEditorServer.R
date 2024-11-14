@@ -11,6 +11,7 @@
 #' @importFrom rhandsontable rhandsontable hot_col renderRHandsontable hot_cols
 #' @importFrom rhandsontable hot_rows hot_to_r
 #' @importFrom shiny isolate observe
+#' @importFrom rlang .data
 #' @export
 
 tableEditorServer <- function(id, network, slot, tab){
@@ -71,8 +72,6 @@ tableEditorServer <- function(id, network, slot, tab){
       })
       
       observeEvent(input$filter, {
-        browser()
-        
         output$tableedit <- rendertab(createSubData(),
                                       tmpnetwork$components$Component)
       })
@@ -81,20 +80,29 @@ tableEditorServer <- function(id, network, slot, tab){
       createSubData <- function(){
         fval <- isolate(input$filter)
         cdata <- hot_to_r(isolate(input$tableedit))
+        if (length(hiddencols) > 0)
+          cdata <- cdata %>%
+          tibble::rownames_to_column("rowname") %>%
+          dplyr::left_join(wholedata %>%
+                             tibble::rownames_to_column("rowname") %>%
+                             dplyr::select(any_of(c("rowname", hiddencols))),
+                           by = "rowname") %>%
+          tibble::column_to_rownames("rowname")
+        
         req(nrow(cdata) > 0)
         wholedata <<- wholedata %>%
-          rownames_to_column("irow") %>%
-          filter(!irow %in% rownames(cdata)) %>%
-          column_to_rownames("irow") %>%
+          filter_with_rownames(!.data[["rowname"]] %in% rownames(cdata)) %>%
           bind_rows(cdata %>% mutate(across(where(is.factor), ~ factor(.x, ordered = FALSE)))) 
         wholedata <<- wholedata[rownames(wholedata), , drop = FALSE]
         if (fval != "All"){
-          subdata <- filter(wholedata %>% rownames_to_column("irow"), 
-                            .data[[idcolumn]] == fval) %>%
-            column_to_rownames("irow")
+          subdata <- filter_with_rownames(wholedata , 
+                            .data[[idcolumn]] == fval) 
         } else {
           subdata <- wholedata
         }
+        if (length(hiddencols) > 0)
+          subdata <- subdata %>%
+          select(!any_of(hiddencols))
         subdata
       }
       
@@ -102,9 +110,7 @@ tableEditorServer <- function(id, network, slot, tab){
         cdata <- hot_to_r(isolate(input$tableedit))
         req(nrow(cdata) > 0)
         wholedata <<- wholedata %>%
-          rownames_to_column("irow") %>%
-          filter(!irow %in% rownames(cdata)) %>%
-          column_to_rownames("irow") %>%
+          filter_with_rownames(!.data[["rowname"]] %in% rownames(cdata)) %>%
           bind_rows(cdata %>% mutate(across(where(is.factor), ~ factor(.x, ordered = FALSE)))) 
         wholedata <<- wholedata[rownames(wholedata), , drop = FALSE]
       }
@@ -123,10 +129,7 @@ tableEditorServer <- function(id, network, slot, tab){
                               ~ as.logical(.x ))),
                         strechH = "all",
                         overflow = "visible") %>%
-          hot_cols(colWidths = ifelse(names(data) %in% hiddencols,
-                                      1,
-                                      200),
-                   columnSorting = TRUE,
+          hot_cols(columnSorting = TRUE,
                    manualColumnResize = TRUE)
         if (slot == "fluxes"){
           tab <- tab %>%

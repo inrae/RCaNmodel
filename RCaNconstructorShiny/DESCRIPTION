@@ -28,5 +28,6 @@ Imports:
     spsComps,
     stringr,
     symengine,
+    tibble,
     visNetwork
 RoxygenNote: 7.3.1

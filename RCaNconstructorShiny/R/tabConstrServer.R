@@ -24,8 +24,11 @@ tabConstrServer <- function(id, network, slot, tab){
       newnetwork <- createEmptyNetwork()
       tmpnetwork <- list()
 
+      wholedata <- data.frame()
+      
 
 
+      idcolumn <- "Id"
 
 
 
@@ -49,9 +52,59 @@ tabConstrServer <- function(id, network, slot, tab){
             tmpnetwork[[v]] <<- isolate(network[[v]])
         }
         output$tableedit <- rendertab(tmpnetwork[[slot]])
+        
+        wholedata <<- tmpnetwork$constraints
+        choices <- sort(tmpnetwork$constraints$Id)
+        updateSelectInput(session,
+                          "filter",
+                          choices = c("All", 
+                                      choices),
+                          selected = "All")
 
       })
+      
+      observeEvent(input$filter, {
+        output$tableedit <- rendertab(createSubData(),
+                                      tmpnetwork$constraints$Id)
+      })
 
+      createSubData <- function(){
+        fval <- isolate(input$filter)
+        cdata <- hot_to_r(isolate(input$tableedit))
+        if (length(hiddencols) > 0)
+          cdata <- cdata %>%
+          tibble::rownames_to_column("rowname") %>%
+          dplyr::left_join(wholedata %>%
+                             tibble::rownames_to_column("rowname") %>%
+                             dplyr::select(any_of(c("rowname", hiddencols))),
+                           by = "rowname") %>%
+          tibble::column_to_rownames("rowname")
+        
+        req(nrow(cdata) > 0)
+        wholedata <<- wholedata %>%
+          filter_with_rownames(!.data[["rowname"]] %in% rownames(cdata)) %>%
+          bind_rows(cdata %>% mutate(across(where(is.factor), ~ factor(.x, ordered = FALSE)))) 
+        wholedata <<- wholedata[rownames(wholedata), , drop = FALSE]
+        if (fval != "All"){
+          subdata <- filter_with_rownames(wholedata , 
+                                          .data[[idcolumn]] == fval) 
+        } else {
+          subdata <- wholedata
+        }
+        if (length(hiddencols) > 0)
+          subdata <- subdata %>%
+          select(!any_of(hiddencols))
+        subdata
+      }
+      
+      updateWholeData <- function(){
+        cdata <- hot_to_r(isolate(input$tableedit))
+        req(nrow(cdata) > 0)
+        wholedata <<- wholedata %>%
+          filter_with_rownames(!.data[["rowname"]] %in% rownames(cdata)) %>%
+          bind_rows(cdata %>% mutate(across(where(is.factor), ~ factor(.x, ordered = FALSE)))) 
+        wholedata <<- wholedata[rownames(wholedata), , drop = FALSE]
+      }
 
       formcol <- ifelse(slot == "constraints",
                         "Constraint",
@@ -91,10 +144,7 @@ tabConstrServer <- function(id, network, slot, tab){
                         row_highlight = as.vector(row_highlight),
                         col_highlight = col_highlight,
                         overflow = "visible") %>%
-          hot_cols(colWidths = ifelse(names(data) %in% hiddencols,
-                                      1,
-                                      200),
-                   manualColumnResize = TRUE,
+          hot_cols(manualColumnResize = TRUE,
                    columnSorting = TRUE) %>%
           hot_col(2,
                   renderer = "
@@ -132,7 +182,9 @@ tabConstrServer <- function(id, network, slot, tab){
       })
 
       shiny::observeEvent(input$ok,{
-        newdata <- hot_to_r(input$tableedit)
+        updateWholeData()
+        
+        newdata <- wholedata
         req(newdata)
         validate(need(nrow(newdata) > 0, "no data"))
         newdata <- newdata %>%
@@ -169,6 +221,7 @@ tabConstrServer <- function(id, network, slot, tab){
       })
 
       shiny::observeEvent(input$cancel,{
+        wholedata <<- tmpnetwork[[slot]]
         output$tableedit <- rendertab(tmpnetwork[[slot]])
         shinyjs::disable("ok")
         shinyjs::disable("cancel")
