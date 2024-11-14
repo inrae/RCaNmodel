@@ -18,13 +18,25 @@ tableEditorServer <- function(id, network, slot, tab){
     id,
     function(input, output, session) {
       currenttab <- ""
-
+      
       hiddencols <- c("from", "to", "id")
-
+      
       newnetwork <- createEmptyNetwork()
       tmpnetwork <- list()
-
-
+      
+      idcolumn <- ifelse(slot == "components",
+                         "Component",
+                         "Flux")
+      
+      
+      wholedata <- data.frame()
+      
+      
+      updateSelectInput(session,
+                        "filter",
+                        label = ifelse(slot == "components",
+                                       "Component",
+                                       "Flux"))
       observe({
         network$components
         network$observations
@@ -41,8 +53,63 @@ tableEditorServer <- function(id, network, slot, tab){
                                       tmpnetwork$components$Component)
         shinyjs::disable("ok")
         shinyjs::disable("cancel")
+        if (slot == "components"){
+          wholedata <<- tmpnetwork$components
+        } else {
+          wholedata <<- tmpnetwork$components
+        }
+        if (slot == "components"){
+          choices <- sort(tmpnetwork$components$Component)
+        } else {
+          choices <- sort(tmpnetwork$fluxes$Flux)
+        }
+        updateSelectInput(session,
+                          "filter",
+                          choices = c("All", 
+                                      choices),
+                          selected = "All")
       })
-
+      
+      observeEvent(input$filter, {
+        browser()
+        
+        output$tableedit <- rendertab(createSubData(),
+                                      tmpnetwork$components$Component)
+      })
+      
+      
+      createSubData <- function(){
+        fval <- isolate(input$filter)
+        cdata <- hot_to_r(isolate(input$tableedit))
+        req(nrow(cdata) > 0)
+        wholedata <<- wholedata %>%
+          rownames_to_column("irow") %>%
+          filter(!irow %in% rownames(cdata)) %>%
+          column_to_rownames("irow") %>%
+          bind_rows(cdata %>% mutate(across(where(is.factor), ~ factor(.x, ordered = FALSE)))) 
+        wholedata <<- wholedata[rownames(wholedata), , drop = FALSE]
+        if (fval != "All"){
+          subdata <- filter(wholedata %>% rownames_to_column("irow"), 
+                            .data[[idcolumn]] == fval) %>%
+            column_to_rownames("irow")
+        } else {
+          subdata <- wholedata
+        }
+        subdata
+      }
+      
+      updateWholeData <- function(){
+        cdata <- hot_to_r(isolate(input$tableedit))
+        req(nrow(cdata) > 0)
+        wholedata <<- wholedata %>%
+          rownames_to_column("irow") %>%
+          filter(!irow %in% rownames(cdata)) %>%
+          column_to_rownames("irow") %>%
+          bind_rows(cdata %>% mutate(across(where(is.factor), ~ factor(.x, ordered = FALSE)))) 
+        wholedata <<- wholedata[rownames(wholedata), , drop = FALSE]
+      }
+      
+      
       rendertab <- function(data, complist){
         tab <-
           rhandsontable(data %>%
@@ -73,19 +140,20 @@ tableEditorServer <- function(id, network, slot, tab){
         }
         renderRHandsontable({tab})
       }
-
-
-
-
+      
+      
+      
+      
       shiny::observe({
         input$tableedit$changes$changes
         req(!is.null(input$tableedit$changes$changes))
         shinyjs::enable("ok")
         shinyjs::enable("cancel")
       })
-
+      
       shiny::observeEvent(input$ok,{
-        newdata <- hot_to_r(input$tableedit) %>%
+        updateWholeData()
+        newdata <- wholedata %>%
           mutate(across(any_of(c("Inside" , "Trophic")), as.integer))
         shinyCatch({
           if (max(table(c(newdata[, ifelse(slot == "fluxes",
@@ -101,7 +169,7 @@ tableEditorServer <- function(id, network, slot, tab){
                           dplyr::pull()))) > 1)
             stop("a name is already used")
         })
-
+        
         if (slot == "fluxes"){
           newdata$from <- names(isolate(network$dictionary))[network$dictionary == newdata$From]
           newdata$to <- names(isolate(network$dictionary))[network$dictionary == newdata$To]
@@ -110,30 +178,31 @@ tableEditorServer <- function(id, network, slot, tab){
           newfluxes <- isolate(network$fluxes)
           newfluxes$From <- newdata$Component[match(newfluxes$from,
                                                     newdata$id)]
-
-            newfluxes$To <- newdata$Component[match(newfluxes$to,
-                                                    newdata$id)]
+          
+          newfluxes$To <- newdata$Component[match(newfluxes$to,
+                                                  newdata$id)]
           # newfluxes$Flux <- paste(newdata$Component[newfluxes$from == newdata$id],
           #                         newdata$Component[newfluxes$to == newdata$id],
           #                         sep = "_")
           tmpnetwork$fluxes <<- newfluxes
           tmpnetwork$components <<- newdata
-
+          
         }
-
+        
         # newnetwork[[slot]] <<- isolate(tmpnetwork[[slot]])
         # shinyjs::disable("ok")
         # shinyjs::disable("cancel")
-
+        
       })
       shiny::observeEvent(input$cancel,{
+        wholedata <<- tmpnetwork[[slot]]
         output$tableedit <- rendertab(tmpnetwork[[slot]],
                                       tmpnetwork$components$Component)
         shinyjs::disable("ok")
         shinyjs::disable("cancel")
       })
-
-
+      
+      
       observe({
         ntab <- tab$panel
         if ((currenttab == "Components" & ntab != "Components" & slot == "components") |
@@ -146,9 +215,9 @@ tableEditorServer <- function(id, network, slot, tab){
         }
         currenttab <<- ntab
       })
-
+      
       return(newnetwork)
-
+      
     }
   )
 }
