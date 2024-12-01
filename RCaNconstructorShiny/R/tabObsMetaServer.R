@@ -135,9 +135,14 @@ tabObsMetaServer <- function(id, network, tab){
                                                               "Year"),
                                         Comment = character(ncol(adddata) - 1)))
           tmpnetwork2$metaobs <<- newdata
+          if (nrow(tmpnetwork$observation) > 0){
           tmpnetwork2$observations <<- tmpnetwork$observations %>%
             dplyr::full_join(newdata) %>%
             dplyr::arrange(.data[["Year"]])
+          } else {
+            tmpnetwork2$observations <<- newdata %>%
+              dplyr::arrange(.data[["Year"]])
+          }
         } else {
           newdata <-
             data.frame(id = setdiff(names(adddata), "Year"),
@@ -203,10 +208,10 @@ tabObsMetaServer <- function(id, network, tab){
       observe({
         ntab <- tab$panel
         if (currenttab == "Observation MetaInfo" & ntab != "Observation MetaInfo") {
-          for (v in names(tmpnetwork)){
-            if (!identical(tmpnetwork[[v]],
+          for (v in names(tmpnetwork2)){
+            if (!identical(tmpnetwork2[[v]],
                            isolate(tabMOnewnetwork[[v]])))
-              tabMOnewnetwork[[v]] <<- tmpnetwork[[v]]
+              tabMOnewnetwork[[v]] <<- tmpnetwork2[[v]]
           }
         }
         currenttab <<- ntab
