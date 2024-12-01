@@ -21,6 +21,7 @@ Imports:
     rhandsontable,
     rlang,
     shiny,
+    shinybusy,
     shinydashboard,
     shinydashboardPlus,
     shinyjs,

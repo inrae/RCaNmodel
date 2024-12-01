@@ -27,6 +27,7 @@ RCaNconstructorServer <- function(input, output, session){
   )
 
   updateNetwork <- function(newnetwork){
+    isolate({
     varnames <- setdiff(isolate(names(newnetwork)), c("dictionary", "envir"))
     if (any(sapply(varnames, function(v) isolate(!identical(network[[v]],
                                                             newnetwork[[v]]))
@@ -42,10 +43,10 @@ RCaNconstructorServer <- function(input, output, session){
                                                 isolate(network$observations),
                                                 isolate(network$metaobs),
                                                 isolate(network$aliases))
-      if (!identical(oldic, isolate(sort(network$dicitonary))))
-        network$envir <- generateSymbolicEnvir(network)
+      if (!identical(oldic, isolate(sort(network$dictionary))))
+        network$envir <<- generateSymbolicEnvir(isolate(network))
 
-    }
+    }})
   }
 
   newnetwork_file <- fileInteractionServer("files", network)

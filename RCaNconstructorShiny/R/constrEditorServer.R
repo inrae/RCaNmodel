@@ -8,6 +8,7 @@
 #' @return an updated network
 #' @importFrom spsComps shinyCatch
 #' @importFrom magrittr %>%
+#' @importFrom tibble tibble
 #' @importFrom dplyr mutate select across any_of pull
 #' @importFrom shiny isolate observe updateTextInput updateSelectInput
 #' @importFrom shinyWidgets updateRadioGroupButtons updatePickerInput
@@ -47,11 +48,12 @@ constrEditorServer <- function(id, network, slot, tab){
           updatePickerInput(session,
                             "constraintselect",
                             choices = c("New",
-                                        sort(tmpnetwork[[slot]][,
-                                                                ifelse(slot == "constraints",
-                                                                       "Id",
-                                                                       "Alias")] %>%
-                                               pull()
+                                        sort(tibble(
+                                          tmpnetwork[[slot]])[,
+                                                              ifelse(slot == "constraints",
+                                                                     "Id",
+                                                                     "Alias")] %>%
+                                            pull()
                                         )
                             ),
                             selected = "New")
@@ -68,10 +70,11 @@ constrEditorServer <- function(id, network, slot, tab){
           resetPage()
         } else {
           shinyjs::disable("newname")
-          selected <- which(tmpnetwork[[slot]][,ifelse(slot == "constraints",
-                                                       "Id",
-                                                       "Alias")] %>%
-                              pull() == input$constraintselect)
+          selected <- which(tibble(
+            tmpnetwork[[slot]])[,ifelse(slot == "constraints",
+                                        "Id",
+                                        "Alias")] %>%
+              pull() == input$constraintselect)
           idconstraint <- tmpnetwork[[slot]]$idconstraint[selected]
           constraint <<- getConstraintWord(
             convertidConstr2Constr(
@@ -123,8 +126,9 @@ constrEditorServer <- function(id, network, slot, tab){
         
         for (v in names(isolate(network))){
           if(!identical(isolate(network[[v]]),
-                        tmpnetwork[[v]]))
+                        tmpnetwork[[v]])){
             tmpnetwork[[v]] <<- isolate(network[[v]])
+          }
         }
         
         
@@ -322,11 +326,12 @@ constrEditorServer <- function(id, network, slot, tab){
             updatePickerInput(session,
                               "constraintselect",
                               choices = c("New",
-                                          sort(tmpnetwork[[slot]][,
-                                                                  ifelse(slot == "constraints",
-                                                                         "Id",
-                                                                         "Alias")] %>%
-                                                 pull()
+                                          sort(
+                                            tibble(tmpnetwork[[slot]])[,
+                                                                          ifelse(slot == "constraints",
+                                                                                 "Id",
+                                                                                 "Alias")] %>%
+                                              pull()
                                           )
                               ),
                               selected = "New")

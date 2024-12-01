@@ -7,10 +7,11 @@
 #'
 #' @return an updated network
 #' @importFrom magrittr %>%
-#' @importFrom dplyr mutate select across any_of
+#' @importFrom dplyr mutate select across any_of where
 #' @importFrom rhandsontable rhandsontable hot_col renderRHandsontable hot_cols
 #' @importFrom rhandsontable hot_rows hot_to_r
 #' @importFrom shiny isolate observe
+#' @importFrom tibble tibble
 #' @importFrom rlang .data
 #' @export
 
@@ -22,7 +23,7 @@ tableEditorServer <- function(id, network, slot, tab){
       
       hiddencols <- c("from", "to", "id")
       
-      newnetwork <- createEmptyNetwork()
+      tabEnewnetwork <- createEmptyNetwork()
       tmpnetwork <- list()
       
       idcolumn <- ifelse(slot == "components",
@@ -47,8 +48,9 @@ tableEditorServer <- function(id, network, slot, tab){
         req(isolate(tab$panel) == currenttab)
         for (v in names(isolate(network))){
           if(!identical(isolate(network[[v]]),
-                        tmpnetwork[[v]]))
+                        tmpnetwork[[v]])){
             tmpnetwork[[v]] <<- isolate(network[[v]])
+          }
         }
         output$tableedit <- rendertab(tmpnetwork[[slot]],
                                       tmpnetwork$components$Component)
@@ -97,11 +99,11 @@ tableEditorServer <- function(id, network, slot, tab){
         wholedata <<- wholedata[rownames(wholedata), , drop = FALSE]
         if (fval != "All"){
           subdata <- filter_with_rownames(wholedata , 
-                            .data[[idcolumn]] == fval) 
+                                          .data[[idcolumn]] == fval) 
         } else {
           subdata <- wholedata
         }
-
+        
         subdata
       }
       
@@ -110,7 +112,14 @@ tableEditorServer <- function(id, network, slot, tab){
         req(nrow(cdata) > 0)
         wholedata <<- wholedata %>%
           filter_with_rownames(!.data[["rowname"]] %in% rownames(cdata)) %>%
-          bind_rows(cdata %>% mutate(across(where(is.factor), ~ factor(.x, ordered = FALSE)))) 
+          bind_rows(cdata %>%
+                      tibble::rownames_to_column("rowname") %>%
+                      dplyr::left_join(wholedata %>%
+                                         tibble::rownames_to_column("rowname") %>%
+                                         dplyr::select(any_of(c("rowname", hiddencols))),
+                                       by = "rowname") %>%
+                      tibble::column_to_rownames("rowname") %>%
+                      mutate(across(where(is.factor), ~ factor(.x, ordered = FALSE)))) 
         wholedata <<- wholedata[rownames(wholedata), , drop = FALSE]
       }
       
@@ -166,14 +175,15 @@ tableEditorServer <- function(id, network, slot, tab){
                                            "Flux",
                                            "Component")],
                           isolate(names(tmpnetwork$observations)),
-                          tmpnetwork[[ifelse(slot == "fluxes",
-                                             "components",
-                                             "fluxes")]][,
-                                                         ifelse(slot == "fluxes",
-                                                                "Component",
-                                                                "Flux")] %>%
+                          tibble(
+                            tmpnetwork[[ifelse(slot == "fluxes",
+                                               "components",
+                                               "fluxes")]])[,
+                                                            ifelse(slot == "fluxes",
+                                                                   "Component",
+                                                                   "Flux")] %>%
                           dplyr::pull()))) > 1)
-            stop("a name is already used")
+          stop("a name is already used")
         })
         
         if (slot == "fluxes"){
@@ -195,7 +205,7 @@ tableEditorServer <- function(id, network, slot, tab){
           
         }
         
-        # newnetwork[[slot]] <<- isolate(tmpnetwork[[slot]])
+        # tabEnewnetwork[[slot]] <<- isolate(tmpnetwork[[slot]])
         # shinyjs::disable("ok")
         # shinyjs::disable("cancel")
         
@@ -215,14 +225,14 @@ tableEditorServer <- function(id, network, slot, tab){
             (currenttab == "Fluxes" & ntab != "Fluxes" & slot == "fluxes")){
           for (v in names(tmpnetwork)){
             if (!identical(tmpnetwork[[v]],
-                           isolate(newnetwork[[v]])))
-              newnetwork[[v]] <<- tmpnetwork[[v]]
+                           isolate(tabEnewnetwork[[v]])))
+              tabEnewnetwork[[v]] <<- tmpnetwork[[v]]
           }
         }
         currenttab <<- ntab
       })
       
-      return(newnetwork)
+      return(tabEnewnetwork)
       
     }
   )

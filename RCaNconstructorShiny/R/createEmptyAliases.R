@@ -9,5 +9,6 @@ createEmptyAliases <- function(){
              Comment = character(0),
              id = character(0),
              idconstraint = character(0),
-             valid = logical(0))
+             valid = logical(0),
+             validity_comments = character(0))
 }

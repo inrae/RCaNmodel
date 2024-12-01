@@ -22,7 +22,7 @@ tabObsMetaServer <- function(id, network, tab){
 
       hiddencols <- c("id")
 
-      newnetwork <- createEmptyNetwork()
+      tabMOnewnetwork <- createEmptyNetwork()
       tmpnetwork <- list()
       tmpnetwork2 <- list()
 
@@ -205,14 +205,14 @@ tabObsMetaServer <- function(id, network, tab){
         if (currenttab == "Observation MetaInfo" & ntab != "Observation MetaInfo") {
           for (v in names(tmpnetwork)){
             if (!identical(tmpnetwork[[v]],
-                           isolate(newnetwork[[v]])))
-              newnetwork[[v]] <<- tmpnetwork[[v]]
+                           isolate(tabMOnewnetwork[[v]])))
+              tabMOnewnetwork[[v]] <<- tmpnetwork[[v]]
           }
         }
         currenttab <<- ntab
       })
 
-      return(newnetwork)
+      return(tabMOnewnetwork)
 
     }
   )

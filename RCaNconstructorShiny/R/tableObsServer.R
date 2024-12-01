@@ -18,10 +18,10 @@ tableObsServer <- function(id, network, tab){
     id,
     function(input, output, session) {
       currenttab <- ""
-
-      newnetwork <- createEmptyNetwork()
+      
+      tabOnewnetwork <- createEmptyNetwork()
       tmpnetwork <- list()
-
+      
       observe({
         network$components
         network$metaobs
@@ -29,20 +29,21 @@ tableObsServer <- function(id, network, tab){
         network$fluxes
         network$dictionary
         network$model
-
+        
         req(isolate(tab$panel) == currenttab)
         for (v in names(isolate(network))){
           if(!identical(isolate(network[[v]]),
-                        tmpnetwork[[v]]))
+                        tmpnetwork[[v]])){
             tmpnetwork[[v]] <<- isolate(network[[v]])
+          }
         }
         renamed <- tmpnetwork$metaobs$id %>%
           setNames(tmpnetwork$metaobs$Observation)
         output$tableedit <- rendertab(tmpnetwork$observations %>%
                                         dplyr::rename(all_of(renamed)))
-
+        
       })
-
+      
       rendertab <- function(data){
         req(nrow(data) > 0)
         tab <-
@@ -51,16 +52,16 @@ tableObsServer <- function(id, network, tab){
                         overflow = "visible") %>%
           hot_cols(manualColumnResize = TRUE)
         for (col in names(data))
-           tab <- tab %>%
-           hot_col(col, "numeric")
-         tab <- tab %>%
-           hot_col("Year", readOnly = TRUE, format = "0000")
+          tab <- tab %>%
+          hot_col(col, "numeric")
+        tab <- tab %>%
+          hot_col("Year", readOnly = TRUE, format = "0000")
         renderRHandsontable({tab})
       }
-
-
-
-
+      
+      
+      
+      
       shiny::observeEvent(input$ok,{
         newdata <- hot_to_r(input$tableedit)
         req(newdata)
@@ -78,28 +79,28 @@ tableObsServer <- function(id, network, tab){
             dplyr::rename(renamed)
         })
       })
-
-
-
+      
+      
+      
       shiny::observeEvent(input$cancel,{
         output$tableedit <- rendertab(tmpnetwork$observations)
       })
-
-
+      
+      
       observe({
         ntab <- tab$panel
         if (currenttab == "Time Series" & ntab != "Time Series"){
           for (v in names(tmpnetwork)){
             if (!identical(tmpnetwork[[v]],
-                           isolate(newnetwork[[v]])))
-              newnetwork[[v]] <<- tmpnetwork[[v]]
+                           isolate(tabOnewnetwork[[v]])))
+              tabOnewnetwork[[v]] <<- tmpnetwork[[v]]
           }
         }
         currenttab <<- ntab
       })
-
-      return(newnetwork)
-
+      
+      return(tabOnewnetwork)
+      
     }
   )
 }
