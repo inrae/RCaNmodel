@@ -40,13 +40,10 @@ tabConstrServer <- function(id, network, slot, tab){
       
       
       observe({
-        network$components
-        network$observations
-        network$fluxes
-        network$dictionary
-        network$constraints
-        network$model
-        network$metaobs
+        #this observes any change in network
+        for (v in names(network)){
+          network[[v]]
+        }
         
         req(isolate(tab$panel) == currenttab)
         

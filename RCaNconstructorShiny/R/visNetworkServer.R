@@ -65,12 +65,10 @@ visNetworkServer <- function(id, network, tab){
                         
                         currenttab <- ""
                         observe({
-                          network$components
-                          network$observations
-                          network$fluxes
-                          network$metaobs
-                          network$model
-                          network$dictionary
+                          #this observes any change in network
+                          for (v in names(network)){
+                            network[[v]]
+                          }
                           req(isolate(tab$panel) == currenttab)
                           
                           anychange <- FALSE

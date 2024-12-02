@@ -23,12 +23,10 @@ tableObsServer <- function(id, network, tab){
       tmpnetwork <- list()
       
       observe({
-        network$components
-        network$metaobs
-        network$observations
-        network$fluxes
-        network$dictionary
-        network$model
+        #this observes any change in network
+        for (v in names(network)){
+          network[[v]]
+        }
         
         req(isolate(tab$panel) == currenttab)
         for (v in names(isolate(network))){

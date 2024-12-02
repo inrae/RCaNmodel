@@ -34,13 +34,10 @@ tabObsMetaServer <- function(id, network, tab){
 
 
       observe({
-        network$components
-        network$observations
-        network$fluxes
-        network$metaobs
-        network$dictionary
-        network$constraints
-        network$model
+        #this observes any change in network
+        for (v in names(network)){
+          network[[v]]
+        }
         req(isolate(tab$panel) == currenttab)
 
 

@@ -54,12 +54,10 @@ fileInteractionServer <- function(id, network){
       }
       
       observe({
-        network$components
-        network$fluxes
-        network$dictionary
-        network$model
-        network$aliases
-        network$metaobs
+        #this observes any change in network
+        for (v in names(network)){
+          network[[v]]
+        }
         for (v in names(isolate(network)))
           filenewnetwork[[v]] <<- isolate(network[[v]])
       })
@@ -308,7 +306,6 @@ fileInteractionServer <- function(id, network){
                                                 dplyr::rename(dplyr::all_of(renamed)),
                                               colNames = TRUE,
                                               na.strings = "")
-          
           if (!"Constraints" %in% sheets)
             modelfile <- openxlsx2::wb_add_worksheet(modelfile,
                                                      "Constraints")

@@ -40,11 +40,10 @@ tableEditorServer <- function(id, network, slot, tab){
                                        "Component",
                                        "Flux"))
       observe({
-        network$components
-        network$observations
-        network$fluxes
-        network$dictionary
-        network$model
+        #this observes any change in network
+        for (v in names(network)){
+          network[[v]]
+        }
         req(isolate(tab$panel) == currenttab)
         for (v in names(isolate(network))){
           if(!identical(isolate(network[[v]]),
