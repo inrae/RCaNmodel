@@ -187,8 +187,10 @@ tableEditorServer <- function(id, network, slot, tab){
         })
         
         if (slot == "fluxes"){
-          newdata$from <- names(isolate(network$dictionary))[network$dictionary == newdata$From]
-          newdata$to <- names(isolate(network$dictionary))[network$dictionary == newdata$To]
+          newdata$from <- names(isolate(network$dictionary))[match(newdata$From,
+                                                                   network$dictionary)]
+          newdata$to <- names(isolate(network$dictionary))[match(newdata$To,
+                                                                 network$dictionary)]
           tmpnetwork$fluxes <<- newdata
         } else {
           newfluxes <- isolate(network$fluxes)
