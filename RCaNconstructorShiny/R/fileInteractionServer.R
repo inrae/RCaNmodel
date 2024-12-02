@@ -317,8 +317,7 @@ fileInteractionServer <- function(id, network){
       
       
       
-      
-      
+
       
       
       return(filenewnetwork)
