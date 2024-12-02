@@ -5,7 +5,7 @@
 #' @return a updated network
 #' @importFrom magrittr %>%
 #' @importFrom shiny isolate observe modalDialog observeEvent tagList
-#' @importFrom shiny downloadButton
+#' @importFrom shiny downloadButton updateTextAreaInput
 #' @importFrom shiny modalButton textInput fileInput showModal removeModal
 #' @importFrom spsComps shinyCatch
 #' @importFrom readxl read_excel
@@ -19,6 +19,23 @@ fileInteractionServer <- function(id, network){
   shiny::moduleServer(
     id,
     function(input, output, session) {
+      
+      param <- read.csv(system.file("info.csv", package = "RCaNconstructor"),
+                        sep = "\t",
+                        header=FALSE, 
+                        na.strings = "")
+      
+      
+      resetInfo <- function(){
+        for (i in nrow(param)){
+          if (!is.na(param[i,2]))
+            updateTextAreaInput(session, 
+                                param[i, 2],
+                                value = "")
+        }
+      }
+      
+      
       
       
       orig <- ""
@@ -48,6 +65,7 @@ fileInteractionServer <- function(id, network){
       })
       
       observeEvent(input$new, {
+        resetInfo()
         showModal(
           modalDialog(tile = "CAUTION",
                       "changes to current model will be lost",
@@ -83,13 +101,13 @@ fileInteractionServer <- function(id, network){
         removeModal()
         shinyCatch({
           orig <<- isolate(input$loadname$datapath)
-          modelname <- stringr::str_split(input$loadname$name,"\\.")[[1]]
+          modelname <- stringr::str_split(isolate(input$loadname$name),"\\.")[[1]]
           newname <- paste(modelname[seq_len(length(modelname) - 1)],
                            collapse = '.')
           
           
           
-          load_comp <- readxl::read_excel(input$loadname$datapath,
+          load_comp <- readxl::read_excel(orig,
                                           sheet = "Components & input parameter") %>%
             select(any_of(c("Component",
                             "Inside",
@@ -126,7 +144,7 @@ fileInteractionServer <- function(id, network){
           load_comp <- load_comp %>%
             dplyr::select(!dplyr::any_of(c("X", "Y")))
           
-          load_flux <- readxl::read_excel(input$loadname$datapath,
+          load_flux <- readxl::read_excel(orig,
                                           sheet = "Fluxes") %>%
             select(any_of(c("Flux",
                             "From",
@@ -140,7 +158,7 @@ fileInteractionServer <- function(id, network){
                                                     load_comp$Component)])
           
           
-          load_obs <- readxl::read_excel(input$loadname$datapath,
+          load_obs <- readxl::read_excel(orig,
                                          sheet = "Input time-series")
           
           series <- character()
@@ -162,8 +180,8 @@ fileInteractionServer <- function(id, network){
                                load_metaobs,
                                load_aliases)
           
-          if ("Aliases" %in% readxl::excel_sheets(input$loadname$datapath)){
-            load_aliases <- readxl::read_excel(input$loadname$datapath,
+          if ("Aliases" %in% readxl::excel_sheets(orig)){
+            load_aliases <- readxl::read_excel(orig,
                                                sheet = "Aliases") %>%
               mutate(id = .data[["Alias"]],
                      idconstraint = sapply(.data[["Formula"]],
@@ -175,8 +193,8 @@ fileInteractionServer <- function(id, network){
           }
           
           
-          if ("MetaObs" %in% readxl::excel_sheets(input$loadname$datapath)){
-            load_metaobs <- readxl::read_excel(input$loadname$datapath,
+          if ("MetaObs" %in% readxl::excel_sheets(orig)){
+            load_metaobs <- readxl::read_excel(orig,
                                                sheet = "Observation MetaInfo") %>%
               mutate(id = .data[["Observation"]])
             if (!"Comment" %in% names(load_metaobs)){
@@ -201,7 +219,7 @@ fileInteractionServer <- function(id, network){
           filenewnetwork$metaobs <- load_metaobs
           
           
-          load_constr <- readxl::read_excel(input$loadname$datapath,
+          load_constr <- readxl::read_excel(orig,
                                             sheet = "Constraints")
           load_constr$idconstraint = sapply(load_constr$Constraint,
                                             convertConstr2idConstr,
@@ -225,6 +243,21 @@ fileInteractionServer <- function(id, network){
           
           
         })
+        
+        if ("INFO" %in% readxl::excel_sheets(orig)){
+          info <- as.data.frame(
+            readxl::read_excel(orig, 
+                               col_names = FALSE)
+          )
+          for (i in seq_len(nrow(param))){
+            if (!is.na(param[i,2]))
+              updateTextAreaInput(session, 
+                                  param[i, 2],
+                                  value = info[i, 2])
+          }
+        } else {
+          resetInfo()
+        }
         
       })
       
@@ -300,6 +333,40 @@ fileInteractionServer <- function(id, network){
                                               colNames = TRUE,
                                               na.strings = "")
           
+          if (!"INFO" %in% sheets)
+            modelfile <- openxlsx2::wb_add_worksheet(modelfile,
+                                                     "INFO")
+          for (i in seq_len(nrow(param))){
+            modelfile <- openxlsx2::wb_add_data(modelfile,
+                                                sheet = "INFO",
+                                                param[i, 1],
+                                                start_col = 1,
+                                                start_row = i)
+            if (!is.na(param[i, 2])){
+              modelfile <- openxlsx2::wb_add_data(modelfile,
+                                                  sheet = "INFO",
+                                                  input[[param[i, 2]]],
+                                                  start_col = 2,
+                                                  start_row = i)
+            }
+            if (!is.na(param[i, 3])){
+              modelfile <- openxlsx2::wb_add_data(modelfile,
+                                                  sheet = "INFO",
+                                                  param[i, 3],
+                                                  start_col = 3,
+                                                  start_row = i)
+            }
+          }
+          modelfile <- openxlsx2::wb_add_data(modelfile,
+                                              sheet = "INFO",
+                                              orig,
+                                              start_col = 2,
+                                              start_row = 1)
+          modelfile <- openxlsx2::wb_add_data(modelfile,
+                                              sheet = "INFO",
+                                              "Value",
+                                              start_col = 2,
+                                              start_row = 2)
           
           if (!"Observation MetaInfo" %in% sheets)
             modelfile <- openxlsx2::wb_add_worksheet(modelfile,
@@ -317,7 +384,7 @@ fileInteractionServer <- function(id, network){
       
       
       
-
+      
       
       
       return(filenewnetwork)
