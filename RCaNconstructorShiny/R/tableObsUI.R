@@ -3,15 +3,13 @@
 #' Editor of tables
 #'
 #' @param id the id of ui
-#' @param title the tital to display
-#' @importFrom shiny actionButton fluidRow h1 numericInput
+#' @importFrom shiny actionButton fluidRow numericInput
 #' @export
 #'
 
-tableObsUI <- function(id, title){
+tableObsUI <- function(id){
   ns <- NS(id)
   tagList(shinyjs::useShinyjs(),
-          h1(title),
           fluidRow(actionButton(ns("ok"), "VALIDATE"),
                    actionButton(ns("cancel"), "CANCEL")),
           fluidRow(rhandsontable::rHandsontableOutput(ns("tableedit")))

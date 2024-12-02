@@ -5,12 +5,10 @@
 \title{tabEditorUI
 Editor of tables}
 \usage{
-tabEditorUI(id, title)
+tabEditorUI(id)
 }
 \arguments{
 \item{id}{the id of ui}
-
-\item{title}{the title to display}
 }
 \description{
 tabEditorUI

@@ -28,14 +28,14 @@ RCaNconstructorUI <- function(){
                         tabPanel("Edit TrophicNetwork",
                                  tabsetPanel(id = "editpanel",
                                    tabPanel("Visualise Trophic Network",
-                                            h1("network"),
+                                            h1("Network"),
                                                visNetworkUI("visnetwork")),
                                    tabPanel("Components",
-                                            h1("components"),
-                                            tabEditorUI("components", "COMPONENTS")
+                                            h1("Components"),
+                                            tabEditorUI("components")
                                    ),
-                                   tabPanel("Fluxes", h1("fluxes"),
-                                            tabEditorUI("fluxes", "FLUXES")
+                                   tabPanel("Fluxes", h1("Fluxes"),
+                                            tabEditorUI("fluxes")
                                    )
                                  )),
                         tabPanel("Observations",
@@ -44,8 +44,8 @@ RCaNconstructorUI <- function(){
                                                       h1("Observation MetaInfo"),
                                                       tabObsMetaUI("tabmetaobs")),
                                              tabPanel("Time Series",
-                                                      h1("time series"),
-                                                      tableObsUI("obs", "TIME SERIES"))
+                                                      h1("Time Series"),
+                                                      tableObsUI("obs"))
                                              )),
                         tabPanel("Constraints",
                                  tabsetPanel(id = "editconstraints",

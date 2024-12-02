@@ -5,7 +5,7 @@
 #' @return nothing
 #'
 #' @importFrom shiny NS fluidRow tagList
-#' @importFrom shinyjs useShinyjs
+#' @importFrom shinyjs useShinyjs h3
 #' @export
 #'
 
@@ -17,7 +17,7 @@ fileInteractionUI <- function(id){
             actionButton(ns("open"), "open"),
             downloadButton(ns("savename"), "save")),
           fluidRow(
-            h1("NAME VERSION AND AUTHORS"),
+            h3("NAME VERSION AND AUTHORS"),
             textAreaInput(ns("modelname"), "Model Name", ""),
             shinyBS::bsTooltip(ns("modelname"), 
                                "Title/name of the food-web model"),
@@ -32,7 +32,7 @@ fileInteractionUI <- function(id){
             
             
             
-            h1("DOMAIN AND UNITS"),
+            h3("DOMAIN AND UNITS"),
             textAreaInput(ns("domaincoverage"), "Domain coverage", ""),
             shinyBS::bsTooltip(ns("domaincoverage"),
                                "Geographical and temporal extent of the model"),
@@ -47,7 +47,7 @@ fileInteractionUI <- function(id){
             
             
             
-            h1("COMPONENTS"),
+            h3("COMPONENTS"),
             textAreaInput(ns("componentsin"), "Components within the model domain", ""),
             shinyBS::bsTooltip(ns("componentsin"),
                                "List of the trophospecies within the model domain and a description of how they were defined, e.g. are these taxonomic species? Are some divided by developmental stage or are several species grouped under a single trophospecies? Are there trophospecies that are split by geographical areas? Indication of relevant sources of data and information"),
@@ -58,7 +58,7 @@ fileInteractionUI <- function(id){
             
             
             
-            h1("FLUXES"),
+            h3("FLUXES"),
             textAreaInput(ns("trophicflux"), "Trophic links", ""),
             shinyBS::bsTooltip(ns("trophicflux"),
                                "List of the trophic links and a description of how these were defined/selected. Trophic links are from prey to predators. Indication of relevant sources of data and information"),
@@ -69,7 +69,7 @@ fileInteractionUI <- function(id){
             
             
             
-            h1("INPUT PARAMETERS, DATA AND CONSTRAINTS"),
+            h3("INPUT PARAMETERS, DATA AND CONSTRAINTS"),
             textAreaInput(ns("inputparam"), "Input Parameters", ""),
             shinyBS::bsTooltip(ns("inputparam"),
                                "Source of information (datasets, references, experimental results, theory-based, other models, [Ellipsis]) used to derive EACH input parameter values (i.e. AssimilationE,	Digestibility,	OtherLosses,	Inertia,	Satiation and	RefugeBiomass for each trophospecies within the model domain)"),
@@ -84,7 +84,7 @@ fileInteractionUI <- function(id){
             
             
             
-            h1("UNCERTAINTIES AND LIMITATIONS"),
+            h3("UNCERTAINTIES AND LIMITATIONS"),
             textAreaInput(ns("uncertspeciesexhaus"), "Species Exhaustivity", ""),
             shinyBS::bsTooltip(ns("uncertspeciesexhaus"),
                                "How well does the list of trophospecies cover the biomass of all species within the model domain? Could/should more species be added?"),
@@ -119,7 +119,7 @@ fileInteractionUI <- function(id){
             
             
             
-            h1("RESEARCH PROJECT"),
+            h3("RESEARCH PROJECT"),
             textAreaInput(ns("projident"), "Project identity", ""),
             shinyBS::bsTooltip(ns("projident"),
                                "Title or name of the research project under which the food-web model was developed"),

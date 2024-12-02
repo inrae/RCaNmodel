@@ -9,7 +9,6 @@
 constrEditorUI <- function(id){
   ns <- NS(id)
   tagList(shinyjs::useShinyjs(),
-          h1("CONSTRAINT EDITOR"),
           fluidRow(column(width = 4,
                           pickerInput(ns("constraintselect"),
                                       "Constraint",

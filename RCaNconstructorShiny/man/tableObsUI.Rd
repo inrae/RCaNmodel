@@ -4,12 +4,10 @@
 \alias{tableObsUI}
 \title{tableObsUI}
 \usage{
-tableObsUI(id, title)
+tableObsUI(id)
 }
 \arguments{
 \item{id}{the id of ui}
-
-\item{title}{the tital to display}
 }
 \description{
 Editor of tables

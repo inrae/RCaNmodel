@@ -1,15 +1,13 @@
 #' tabEditorUI
 #' Editor of tables
 #' @param id the id of ui
-#' @param title the title to display
-#' @importFrom shiny actionButton fluidRow h1 selectInput
+#' @importFrom shiny actionButton fluidRow selectInput
 #' @export
 #'
 
-tabEditorUI <- function(id, title){
+tabEditorUI <- function(id){
     ns <- NS(id)
     tagList(shinyjs::useShinyjs(),
-            h1(title),
             fluidRow(shinyjs::disabled(actionButton(ns("ok"), "VALIDATE")),
                      shinyjs::disabled(actionButton(ns("cancel"), "CANCEL"))),
             fluidRow(selectInput(ns("filter"),

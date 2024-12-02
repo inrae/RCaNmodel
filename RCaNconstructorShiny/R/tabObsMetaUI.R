@@ -10,7 +10,6 @@
 tabObsMetaUI <- function(id){
   ns <- NS(id)
   tagList(shinyjs::useShinyjs(),
-          h1("OBSERVATIONS Descriptions"),
           fluidRow(shinyjs::disabled(actionButton(ns("ok"), "VALIDATE")),
                    shinyjs::disabled(actionButton(ns("cancel"), "CANCEL"))),
           fluidRow(actionButton(ns("add"), "Add series"),
