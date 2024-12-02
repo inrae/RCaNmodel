@@ -258,7 +258,7 @@ tabConstrServer <- function(id, network, slot, tab){
           shinyjs::disable("ok")
           shinyjs::disable("cancel")},
           error = function(e){
-            showNotification(e,
+            showNotification(as.character(e),
                              type = "error")
           }
         )
