@@ -120,9 +120,8 @@ constrEditorServer <- function(id, network, slot, tab){
         network$constraints
         network$model
         network$metaobs
-        
         req(isolate(tab$panel) == currenttab)
-        
+
         
         for (v in names(isolate(network))){
           if(!identical(isolate(network[[v]]),
