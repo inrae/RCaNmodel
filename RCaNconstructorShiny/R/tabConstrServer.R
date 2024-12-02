@@ -126,7 +126,7 @@ tabConstrServer <- function(id, network, slot, tab){
               checkValidity(constr,
                             tmpnetwork,
                             onesided = (slot == "aliases")))
-          wholedata$valid <- (wholedata$validity_comments == "TRUE")
+          wholedata$valid <<- (wholedata$validity_comments == "TRUE")
           output$tableedit <- rendertab(createSubData())
         })
         remove_modal_spinner(session = getDefaultReactiveDomain())
