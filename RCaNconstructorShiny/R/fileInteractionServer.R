@@ -32,13 +32,17 @@ fileInteractionServer <- function(id, network){
             updateTextAreaInput(session, 
                                 param[i, 2],
                                 value = "")
-            shinyBS::bsTooltip(session$ns(param[i, 2]),
-                               param[i, 3])
+            shinyBS::removePopover(session,
+                                   param[i, 2])
+            shinyBS::addPopover(session,
+                                param[i, 2],
+                                param[i, 3])
           }
         }
       }
       
       
+      resetInfo()
       
       
       orig <- ""
@@ -85,9 +89,10 @@ fileInteractionServer <- function(id, network){
         updateTextAreaInput(session,
                             "modelname",
                             value = isolate(input$newname))
-        shinyBS::bsTooltip(session$ns("modelname"), 
-                           param[which(param[, 2] == "modelname" & !is.na(param[, 2])),
-                                 3])
+        shinyBS::removePopover(session,"modelname")
+        shinyBS::addPopover(session,"modelname", 
+                            param[which(param[, 2] == "modelname" & !is.na(param[, 2])),
+                                  3])
         filenewnetwork$model <- isolate(input$newname)
       })
       
@@ -262,8 +267,11 @@ fileInteractionServer <- function(id, network){
               updateTextAreaInput(session, 
                                   param[i, 2],
                                   value = info[i, 2])
-              shinyBS::bsTooltip(session$ns(param[i, 2]),
-                                 param[i, 3])
+              shinyBS::removePopover(session,
+                                     param[i, 2])
+              shinyBS::addPopover(session,
+                                  param[i, 2],
+                                  param[i, 3])
             }
           }
         } else {
