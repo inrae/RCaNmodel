@@ -43,7 +43,6 @@ tableObsServer <- function(id, network, tab){
       })
       
       rendertab <- function(data){
-        req(nrow(data) > 0)
         tab <-
           rhandsontable(data,
                         strechH = "all",

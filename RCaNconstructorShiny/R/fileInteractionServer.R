@@ -51,7 +51,7 @@ fileInteractionServer <- function(id, network){
         filenewnetwork$components <<- createEmptyComponents()
         filenewnetwork$fluxes <<- createEmptyFluxes()
         filenewnetwork$dictionary <<- character()
-        filenewnetwork$observations <<- data.frame()
+        filenewnetwork$observations <<- data.frame(Year = numeric())
         filenewnetwork$metaobs <<- createEmptyMetaObs()
         filenewnetwork$aliases <<- createEmptyAliases()
         filenewnetwork$constraints <<- createEmptyConstraints()
