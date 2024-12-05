@@ -4,8 +4,8 @@
 #'
 #' @return nothing
 #'
-#' @importFrom shiny NS fluidRow tagList
-#' @importFrom shinyjs useShinyjs h3
+#' @importFrom shiny NS fluidRow tagList h3
+#' @importFrom shinyjs useShinyjs 
 #' @export
 #'
 

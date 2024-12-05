@@ -27,11 +27,14 @@ fileInteractionServer <- function(id, network){
       
       
       resetInfo <- function(){
-        for (i in nrow(param)){
-          if (!is.na(param[i,2]))
+        for (i in seq_len(nrow(param))){
+          if (!is.na(param[i,2])){
             updateTextAreaInput(session, 
                                 param[i, 2],
                                 value = "")
+            shinyBS::bsTooltip(session$ns(param[i, 2]),
+                               param[i, 3])
+          }
         }
       }
       
@@ -51,6 +54,7 @@ fileInteractionServer <- function(id, network){
         filenewnetwork$observations <<- data.frame()
         filenewnetwork$metaobs <<- createEmptyMetaObs()
         filenewnetwork$aliases <<- createEmptyAliases()
+        filenewnetwork$constraints <<- createEmptyConstraints()
       }
       
       observe({
@@ -63,7 +67,6 @@ fileInteractionServer <- function(id, network){
       })
       
       observeEvent(input$new, {
-        resetInfo()
         showModal(
           modalDialog(tile = "CAUTION",
                       "changes to current model will be lost",
@@ -78,6 +81,13 @@ fileInteractionServer <- function(id, network){
         orig <<- paste0(tempfile(), ".xlsx")
         removeModal()
         cleanNewtork()
+        resetInfo()
+        updateTextAreaInput(session,
+                            "modelname",
+                            value = isolate(input$newname))
+        shinyBS::bsTooltip(session$ns("modelname"), 
+                           param[which(param[, 2] == "modelname" & !is.na(param[, 2])),
+                                 3])
         filenewnetwork$model <- isolate(input$newname)
       })
       
@@ -248,10 +258,13 @@ fileInteractionServer <- function(id, network){
                                col_names = FALSE)
           )
           for (i in seq_len(nrow(param))){
-            if (!is.na(param[i,2]))
+            if (!is.na(param[i,2])){
               updateTextAreaInput(session, 
                                   param[i, 2],
                                   value = info[i, 2])
+              shinyBS::bsTooltip(session$ns(param[i, 2]),
+                                 param[i, 3])
+            }
           }
         } else {
           resetInfo()
