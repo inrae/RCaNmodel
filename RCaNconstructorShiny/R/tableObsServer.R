@@ -70,7 +70,7 @@ tableObsServer <- function(id, network, tab){
         shinyCatch({
           if (max(table(c(names(newdata),
                           tmpnetwork$fluxes$Flux,
-                          tmpnetwork$components$Components))) > 1)
+                          tmpnetwork$components$Component))) > 1)
             stop("a name is already used")
           tmpnetwork$observations <<- newdata %>%
             dplyr::rename(renamed)
