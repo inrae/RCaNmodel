@@ -433,7 +433,9 @@ fileInteractionServer <- function(id, network, timeline){
       
       
       
-      return(filenewnetwork)
+      return({
+        filenewnetwork
+        })
       
     }
   )

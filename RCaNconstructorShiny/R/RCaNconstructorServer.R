@@ -39,8 +39,6 @@ RCaNconstructorServer <- function(input, output, session){
         for (v in varnames){
           if (!identical(isolate(newnetwork[[v]]), isolate(network[[v]]))){
             if (v %in% c("components", "aliases", "constraints", "metaobs", "observations")){
-              browser()
-              
               new <- isolate(newnetwork[[v]] %>%
                                filter(!.data[["id"]] %in% network[[v]]$id))
               if (nrow(new) > 0){
@@ -269,6 +267,11 @@ RCaNconstructorServer <- function(input, output, session){
     updateTimeLine(isolate(newnetwork_editedaliases))
     updateNetwork(isolate(newnetwork_editedaliases))
     
+  })
+  
+  newtimeline <- timeLineServer("tlui", timeline)
+  observe({
+    newtimeline
   })
   
   

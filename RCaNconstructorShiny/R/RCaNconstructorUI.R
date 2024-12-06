@@ -62,7 +62,9 @@ RCaNconstructorUI <- function(){
                                                       tabConstrUI("tabaliases")),
                                              tabPanel("Add/Edit Aliases",
                                                       h1("Aliases Editor"),
-                                                      constrEditorUI("editaliases"))))
+                                                      constrEditorUI("editaliases")))),
+                        tabPanel("TimeLine",
+                                 timeLineUI("tlui"))
 
                       )
 
