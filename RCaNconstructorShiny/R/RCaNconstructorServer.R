@@ -6,12 +6,15 @@
 #' @return a module server
 #' @importFrom shiny reactiveValues
 #' @importFrom magrittr %>%
+#' @importFrom rlang .data
 #' @importFrom shiny isolate
+#' @importFrom dplyr filter left_join inner_join anti_join bind_rows
 #' @export
 #'
 RCaNconstructorServer <- function(input, output, session){
   network <- createEmptyNetwork()
-
+  
+  timeline <- reactiveValues(timeline = createEmptyTimeLine())
   tab <- reactiveValues(panel = "")
   observe({
     if (input$mainpanel == "Edit TrophicNetwork"){
@@ -25,39 +28,99 @@ RCaNconstructorServer <- function(input, output, session){
     }
   }
   )
-
+  
+  updateTimeLine <- function(newnetwork){
+    isolate({
+      varnames <- setdiff(isolate(names(newnetwork)), 
+                          c("dictionary", "envir", "timeline"))
+      if (any(sapply(varnames, function(v) isolate(!identical(network[[v]],
+                                                              newnetwork[[v]]))
+      ))){
+        for (v in varnames){
+          if (!identical(isolate(newnetwork[[v]]), isolate(network[[v]]))){
+            if (v %in% c("components", "aliases", "constraints", "metaobs", "observations")){
+              browser()
+              
+              new <- isolate(newnetwork[[v]] %>%
+                               filter(!.data[["id"]] %in% network[[v]]$id))
+              if (nrow(new) > 0){
+                for (i in seq_len(nrow(new))){
+                  timeline$timeline <<- isolate(timeline$timeline) %>%
+                    bind_rows(writeTimeLine(v, new[i, , drop = FALSE], NULL))
+                }
+              }
+              
+              old <- isolate(network[[v]] %>%
+                               filter(!.data[["id"]] %in% newnetwork[[v]]$id))
+              if (nrow(old) > 0){
+                for (i in seq_len(nrow(old))){
+                  timeline$timeline <<- isolate(timeline$timeline) %>%
+                    bind_rows(writeTimeLine(v, NULL, old[i, , drop = FALSE]))
+                }
+              }
+              notupdated <- isolate(inner_join(network[[v]], newnetwork[[v]]))
+              newupdated <- isolate(newnetwork[[v]] %>%
+                                      filter(.data[["id"]] %in% network[[v]]$id &
+                                               !.data[["id"]] %in% notupdated$id))
+              oldupdated <- isolate(network[[v]] %>%
+                                      filter(.data[["id"]] %in% newnetwork[[v]]$id &
+                                               !.data[["id"]] %in% notupdated$id))
+              for (i in seq_len(nrow(newupdated))){
+                timeline$timeline <<- isolate(timeline$timeline) %>%
+                  bind_rows(writeTimeLine(v,
+                                          newupdated[i, , drop = FALSE],
+                                          oldupdated[oldupdated$id == newupdated$id[i], , drop = FALSE]))
+              }
+            }
+          }
+        }
+      }})
+  }
+  
+  
   updateNetwork <- function(newnetwork){
     isolate({
-    varnames <- setdiff(isolate(names(newnetwork)), c("dictionary", "envir"))
-    if (any(sapply(varnames, function(v) isolate(!identical(network[[v]],
-                                                            newnetwork[[v]]))
-    ))){
-      for (v in varnames){
-        network[[v]] <<- isolate(newnetwork[[v]])
-      }
-      
-      oldic <- sort(isolate(network$dictionary))
-
-      network$dictionary <<- generateDictionary(isolate(network$components),
-                                                isolate(network$fluxes),
-                                                isolate(network$observations),
-                                                isolate(network$metaobs),
-                                                isolate(network$aliases))
-      if (!identical(oldic, isolate(sort(network$dictionary))))
-        network$envir <<- generateSymbolicEnvir(isolate(network))
-
-    }})
+      varnames <- setdiff(isolate(names(newnetwork)), 
+                          c("dictionary", "envir", "timeline"))
+      if (any(sapply(varnames, function(v) isolate(!identical(network[[v]],
+                                                              newnetwork[[v]]))
+      ))){
+        for (v in varnames){
+          if (!identical(isolate(newnetwork[[v]]), isolate(network[[v]]))){
+            network[[v]] <<- isolate(newnetwork[[v]])
+          }
+        }
+        
+        oldic <- sort(isolate(network$dictionary))
+        
+        network$dictionary <<- generateDictionary(isolate(network$components),
+                                                  isolate(network$fluxes),
+                                                  isolate(network$observations),
+                                                  isolate(network$metaobs),
+                                                  isolate(network$aliases))
+        if (!identical(oldic, isolate(sort(network$dictionary))))
+          network$envir <<- generateSymbolicEnvir(isolate(network))
+        
+      }})
   }
-
-  newnetwork_file <- fileInteractionServer("files", network)
+  
+  newnetwork_file <- fileInteractionServer("files", network, timeline)
   observe({
+    newnetwork_file$timeline
     newnetwork_file$components
     newnetwork_file$aliases
     newnetwork_file$fluxes
     newnetwork_file$model
     newnetwork_file$observations
     newnetwork_file$metaobs
-    updateNetwork(isolate(newnetwork_file))
+    isolate({
+      tline <- newnetwork_file$timeline
+      if (!identical(tline, timeline$timeline))
+        timeline$timeline <<- tline
+      updateNetwork(isolate(newnetwork_file))
+      
+    })
+    
 
   })
   observe({
@@ -66,8 +129,8 @@ RCaNconstructorServer <- function(input, output, session){
     if (newnetwork_file$model != isolate(network$model))
       network$model <- newnetwork_file$model
   })
-
-
+  
+  
   newnetworkviz <- visNetworkServer("visnetwork", network, tab)
   observe({
     newnetworkviz$components
@@ -76,13 +139,14 @@ RCaNconstructorServer <- function(input, output, session){
     newnetworkviz$fluxes
     newnetworkviz$observations
     newnetworkviz$metaobs
+    updateTimeLine(isolate(newnetworkviz))
     updateNetwork(isolate(newnetworkviz))
-
+    
   })
-
-
-
-
+  
+  
+  
+  
   newnetwork_component <- tableEditorServer("components", network, "components", tab)
   observe({
     newnetwork_component$components
@@ -91,10 +155,11 @@ RCaNconstructorServer <- function(input, output, session){
     newnetwork_component$fluxes
     newnetwork_component$observations
     newnetwork_component$metaobs
+    updateTimeLine(isolate(newnetwork_component))
     updateNetwork(isolate(newnetwork_component))
-
+    
   })
-
+  
   newnetwork_fluxes <- tableEditorServer("fluxes", network, "fluxes", tab)
   observe({
     newnetwork_fluxes$components
@@ -103,11 +168,12 @@ RCaNconstructorServer <- function(input, output, session){
     newnetwork_fluxes$fluxes
     newnetwork_fluxes$observations
     newnetwork_fluxes$metaobs
+    updateTimeLine(isolate(newnetwork_fluxes))
     updateNetwork(isolate(newnetwork_fluxes))
-
+    
   })
-
-
+  
+  
   newnetwork_observations <- tableObsServer("obs", network, tab)
   observe({
     newnetwork_observations$components
@@ -116,10 +182,11 @@ RCaNconstructorServer <- function(input, output, session){
     newnetwork_observations$aliases
     newnetwork_observations$observations
     newnetwork_observations$metaobs
+    updateTimeLine(isolate(newnetwork_observations))
     updateNetwork(isolate(newnetwork_observations))
-
+    
   })
-
+  
   newnetwork_constraints <- tabConstrServer("tabconstraints",
                                             network,
                                             "constraints",
@@ -131,11 +198,12 @@ RCaNconstructorServer <- function(input, output, session){
     newnetwork_constraints$observations
     newnetwork_constraints$constraints
     newnetwork_constraints$metaobs
+    updateTimeLine(isolate(newnetwork_constraints))
     updateNetwork(isolate(newnetwork_constraints))
-
+    
   })
-
-
+  
+  
   newnetwork_editedconstraints <- constrEditorServer("constreditor",
                                                      network,
                                                      "constraints",
@@ -147,11 +215,12 @@ RCaNconstructorServer <- function(input, output, session){
     newnetwork_editedconstraints$observations
     newnetwork_editedconstraints$constraints
     newnetwork_editedconstraints$metaobs
+    updateTimeLine(isolate(newnetwork_editedconstraints))
     updateNetwork(isolate(newnetwork_editedconstraints))
-
+    
   })
-
-
+  
+  
   newnetwork_editedmetaobs <- tabObsMetaServer("tabmetaobs",
                                                network,
                                                tab)
@@ -162,15 +231,16 @@ RCaNconstructorServer <- function(input, output, session){
     newnetwork_editedmetaobs$observations
     newnetwork_editedmetaobs$constraints
     newnetwork_editedmetaobs$metaobs
+    updateTimeLine(isolate(newnetwork_editedmetaobs))
     updateNetwork(isolate(newnetwork_editedmetaobs))
-
+    
   })
-
-
+  
+  
   newnetwork_aliases <- tabConstrServer("tabaliases",
-                                            network,
-                                            "aliases",
-                                            tab)
+                                        network,
+                                        "aliases",
+                                        tab)
   observe({
     newnetwork_aliases$components
     newnetwork_aliases$fluxes
@@ -178,16 +248,17 @@ RCaNconstructorServer <- function(input, output, session){
     newnetwork_aliases$observations
     newnetwork_aliases$constraints
     newnetwork_aliases$metaobs
+    updateTimeLine(isolate(newnetwork_aliases))
     updateNetwork(isolate(newnetwork_aliases))
-
+    
   })
-
-
-
+  
+  
+  
   newnetwork_editedaliases <- constrEditorServer("editaliases",
-                                                     network,
-                                                     "aliases",
-                                                     tab)
+                                                 network,
+                                                 "aliases",
+                                                 tab)
   observe({
     newnetwork_editedaliases$components
     newnetwork_editedaliases$fluxes
@@ -195,25 +266,26 @@ RCaNconstructorServer <- function(input, output, session){
     newnetwork_editedaliases$observations
     newnetwork_editedaliases$constraints
     newnetwork_editedaliases$metaobs
+    updateTimeLine(isolate(newnetwork_editedaliases))
     updateNetwork(isolate(newnetwork_editedaliases))
-
+    
   })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 }

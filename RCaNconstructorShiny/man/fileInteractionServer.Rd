@@ -4,12 +4,14 @@
 \alias{fileInteractionServer}
 \title{fileInteractionServer}
 \usage{
-fileInteractionServer(id, network)
+fileInteractionServer(id, network, timeline)
 }
 \arguments{
 \item{id}{the id of the ui}
 
 \item{network}{the network}
+
+\item{timeline}{the timeline}
 }
 \value{
 a updated network

@@ -2,6 +2,7 @@
 #'
 #' @param id the id of the ui
 #' @param network the network
+#' @param timeline the timeline
 #' @return a updated network
 #' @importFrom magrittr %>%
 #' @importFrom shiny isolate observe modalDialog observeEvent tagList
@@ -15,7 +16,7 @@
 #' @importFrom dplyr mutate any_of select
 #' @export
 
-fileInteractionServer <- function(id, network){
+fileInteractionServer <- function(id, network, timeline){
   shiny::moduleServer(
     id,
     function(input, output, session) {
@@ -49,6 +50,7 @@ fileInteractionServer <- function(id, network){
       
       
       filenewnetwork <- createEmptyNetwork()
+      filenewnetwork$timeline <- createEmptyTimeLine()
       
       cleanNewtork <- function(){
         filenewnetwork$model <<- NULL
@@ -59,6 +61,7 @@ fileInteractionServer <- function(id, network){
         filenewnetwork$metaobs <<- createEmptyMetaObs()
         filenewnetwork$aliases <<- createEmptyAliases()
         filenewnetwork$constraints <<- createEmptyConstraints()
+        filenewnetwork$timeline <<- createEmptyTimeLine()
       }
       
       observe({
@@ -68,6 +71,11 @@ fileInteractionServer <- function(id, network){
         }
         for (v in names(isolate(network)))
           filenewnetwork[[v]] <<- isolate(network[[v]])
+      })
+      
+      observe({
+        timeline$timeline
+        isolate(filenewnetwork$timeline <<- timeline$timeline)
       })
       
       observeEvent(input$new, {
@@ -221,7 +229,6 @@ fileInteractionServer <- function(id, network){
           }
           
           
-          
           filenewnetwork$dictionary <-
             generateDictionary(load_comp,
                                load_flux,
@@ -276,6 +283,20 @@ fileInteractionServer <- function(id, network){
           }
         } else {
           resetInfo()
+        }
+        
+        if ("TimeLines" %in% readxl::excel_sheets(orig)){
+          tryCatch({
+            filenewnetwork$timeline <<- readxl::read_excel(orig,
+                                                           "TimeLines") %>%
+              dplyr::select(all_of(c("Date", "Task", "Annotation")))
+          },
+          error = function(e){
+            filenetwork$timeline <<- createEmptyTimeLine()
+          }
+          )
+        } else {
+          filenetwork$timeline <<- createEmptyTimeLine()
         }
         
       })
@@ -350,6 +371,13 @@ fileInteractionServer <- function(id, network){
                                                                                "validity_comments"))),
                                               colNames = TRUE,
                                               na.strings = "")
+          if (!"TimeLines" %in% sheets)
+            modelfile <- openxlsx2::wb_add_worksheet(modelfile,
+                                                     "TimeLines")
+          modelfile <- openxlsx2::wb_add_data(modelfile,
+                                              sheet = "TimeLines",
+                                              x = filenewnetwork$timeline)
+          
           
           if (!"INFO" %in% sheets)
             modelfile <- openxlsx2::wb_add_worksheet(modelfile,
