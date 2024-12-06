@@ -2,6 +2,7 @@
 #'
 #' @return a reactive network with empty components
 #' @importFrom shiny reactiveValues
+#' @importFrom tibble tibble
 #' @export
 #'
 
@@ -12,7 +13,7 @@ createEmptyNetwork <- function(){
     fluxes = createEmptyFluxes(),
     constraints = createEmptyConstraints(),
     dictionary = character(),
-    observations = data.frame(Year = numeric()),
+    observations = tibble(Year = numeric()),
     aliases = createEmptyAliases(),
     metaobs = createEmptyMetaObs(),
     envir = new.env()

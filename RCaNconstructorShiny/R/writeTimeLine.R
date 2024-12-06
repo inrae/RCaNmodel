@@ -6,7 +6,7 @@
 #'
 #' @return a string describing the change
 #' @export
-#'
+#' @importFrom tibble tibble
 #' @examples
 #' writeTimeLine("aliases", data.frame(Alias = "toto", Formula = 33), NULL)
 #' 
@@ -51,7 +51,7 @@ writeTimeLine <- function(type, new, old){
   if (type == "fluxes"){
     if ((!is.null(new)) & is.null(old)){
       timeline <- paste("added flux", new$Flux)
-    } else if (!is.null(old) & !is.null(new)) {
+    } else if ((!is.null(old)) & is.null(new)) {
       timeline <- paste("deleted flux", old$Flux)
     } else {
       
@@ -85,7 +85,7 @@ writeTimeLine <- function(type, new, old){
   if (type == "aliases"){
     if ((!is.null(new)) & is.null(old)){
       timeline <- paste("added alias", new$Alias)
-    } else if (!is.null(old) & !is.null(new)) {
+    } else if ((!is.null(old)) & is.null(new)) {
       timeline <- paste("deleted alias", old$Alias)
     } else {
       
@@ -115,7 +115,7 @@ writeTimeLine <- function(type, new, old){
   if (type == "constraints"){
     if ((!is.null(new)) & is.null(old)){
       timeline <- paste("added constraints", new$Id)
-    } else if (!is.null(old) & !is.null(new)) {
+    } else if ((!is.null(old)) & is.null(new)) {
       timeline <- paste("deleted constraints", old$Id)
     } else {
       if (new$Id != old$Id)
@@ -142,26 +142,32 @@ writeTimeLine <- function(type, new, old){
   }
   
   if (type == "observations"){
-    for (col in setdiff(intersect(names(new),
-                                  names(old)),
-                        "Year")){
-      if (!identical(new[, col], var[,col]))
-        timeline <- paste(
-          timeline,
-          paste("val of",
-                col,
-                "changed",
-                old[, col],
-                "->",
-                new[, col]),
-          collapse = ", ")
+    if ((!is.null(new)) & is.null(old)){
+      timeline <- paste("added Year", new$Year)
+    } else if  ((!is.null(old)) & is.null(new)) {
+      timeline <- paste("deleted Year", old$Year)
+    } else {
+      for (col in setdiff(intersect(names(new),
+                                    names(old)),
+                          "Year")){
+        if (!identical(new[, col], old[,col]))
+          timeline <- paste0(
+            timeline,
+            paste("val of series",
+                  col,
+                  "changed",
+                  old[, col],
+                  "->",
+                  new[, col]),
+            collapse = ", ")
+      }
     }
   }
   
   if (type == "metaobs"){
     if ((!is.null(new)) & is.null(old)){
       timeline <- paste("added series", new$Observation)
-    } else if  (!is.null(old) & !is.null(new)) {
+    } else if  ((!is.null(old)) & is.null(new)) {
       timeline <- paste("deleted series", old$Observation)
     } else {
       
@@ -189,7 +195,7 @@ writeTimeLine <- function(type, new, old){
   }
   
   if (timeline != ""){
-    return (data.frame(Date = format(Sys.time()),
+    return (tibble(Date = format(Sys.time()),
                        Task = timeline,
                        Annotation = ""))
   } else {

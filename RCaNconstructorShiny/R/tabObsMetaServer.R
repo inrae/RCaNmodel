@@ -6,6 +6,7 @@
 #'
 #' @return an updated network
 #' @importFrom magrittr %>%
+#' @importFrom tibble tibble
 #' @importFrom datamods import_modal import_server
 #' @importFrom dplyr mutate select across any_of
 #' @importFrom rhandsontable rhandsontable hot_col renderRHandsontable hot_cols
@@ -19,28 +20,28 @@ tabObsMetaServer <- function(id, network, tab){
     id,
     function(input, output, session) {
       currenttab <- ""
-
+      
       hiddencols <- c("id")
-
+      
       tabMOnewnetwork <- createEmptyNetwork()
       tmpnetwork <- list()
       tmpnetwork2 <- list()
-
-
-
-
-
-
-
-
+      
+      
+      
+      
+      
+      
+      
+      
       observe({
         #this observes any change in network
         for (v in names(network)){
           network[[v]]
         }
         req(isolate(tab$panel) == currenttab)
-
-
+        
+        
         for (v in names(isolate(network))){
           if(!identical(isolate(network[[v]]),
                         tmpnetwork[[v]])){
@@ -49,10 +50,10 @@ tabObsMetaServer <- function(id, network, tab){
           }
         }
         output$tableedit <- rendertab(tmpnetwork$metaobs)
-
+        
       })
-
-
+      
+      
       rendertab <- function(data){
         tab <-
           rhandsontable(data,
@@ -65,10 +66,10 @@ tabObsMetaServer <- function(id, network, tab){
                    columnSorting = TRUE) %>%
           hot_context_menu(allowRowEdit = FALSE, allowColEdit = FALSE)
         renderRHandsontable({tab})
-
+        
       }
-
-
+      
+      
       shiny::observeEvent(input$remove,{
         newdata <- isolate(hot_to_r(input$tableedit))
         req(nrow(newdata) > 0)
@@ -85,7 +86,7 @@ tabObsMetaServer <- function(id, network, tab){
                       ),
                       easyClose = FALSE))
       })
-
+      
       observeEvent(input$okremove,{
         removeModal()
         removed <- isolate(input$idremove)
@@ -99,61 +100,62 @@ tabObsMetaServer <- function(id, network, tab){
         shinyjs::enable("ok")
         shinyjs::enable("cancel")
       })
-
-
+      
+      
       imported <- import_server("importid", return_class = "tbl_df")
-
+      
       observe({
         adddata <- imported$data()
         validate(need("Year" %in% names(adddata),
                       "Year should be a column name"))
         validate(need(is.numeric(as.matrix(adddata)),
                       "Data should be numeric"))
-
-
+        
+        
         req(nrow(adddata) > 0)
         req(ncol(adddata) > 1)
         shinyjs::enable("ok")
         shinyjs::enable("cancel")
-        newdata <- hot_to_r(input$tableedit)
+        newdata <- hot_to_r(input$tableedit) %>%
+          mutate(across(everything(), as.character))
         common <- intersect(setdiff(names(adddata), "Year"),
                             c(isolate(tmpnetwork2$components$Component),
                               isolate(tmpnetwork2$fluxes$Flux),
                               isolate(newdata$Observation)))
-
+        
         validate(need(length(common) == 0, paste('name',
                                                  common,
                                                  "already used")))
         if (!is.null(newdata)){
           newdata <- newdata %>%
-            dplyr::bind_rows(data.frame(id = setdiff(names(adddata), "Year"),
-                                        Observation = setdiff(names(adddata),
-                                                              "Year"),
-                                        Comment = character(ncol(adddata) - 1)))
+            dplyr::bind_rows(tibble(id = setdiff(names(adddata), "Year"),
+                                    Observation = setdiff(names(adddata),
+                                                          "Year"),
+                                    Comment = character(ncol(adddata) - 1)))
           tmpnetwork2$metaobs <<- newdata
           if (nrow(tmpnetwork$observation) > 0){
-          tmpnetwork2$observations <<- tmpnetwork$observations %>%
-            dplyr::full_join(newdata) %>%
-            dplyr::arrange(.data[["Year"]])
+            tmpnetwork2$observations <<- tmpnetwork$observations %>%
+              dplyr::full_join(adddata) %>%
+              dplyr::arrange(.data[["Year"]])
           } else {
-            tmpnetwork2$observations <<- newdata %>%
+            tmpnetwork2$observations <<- adddata %>%
               dplyr::arrange(.data[["Year"]])
           }
         } else {
           newdata <-
-            data.frame(id = setdiff(names(adddata), "Year"),
-                       Observation = setdiff(names(adddata),
-                                             "Year"),
-                       Comment = character(ncol(adddata) - 1))
+            tibble(id = setdiff(names(adddata), "Year"),
+                   Observation = setdiff(names(adddata),
+                                         "Year"),
+                   Comment = character(ncol(adddata) - 1))
           tmpnetwork2$observations <<- adddata
         }
         tmpnetwork2$metaobs <<- newdata
         output$tableedit <- rendertab(newdata)
       })
-
-
-
-
+      
+      
+      
+      
       shiny::observeEvent(input$ok,{
         newdata <- hot_to_r(isolate(input$tableedit))
         req(newdata)
@@ -173,10 +175,10 @@ tabObsMetaServer <- function(id, network, tab){
           }
           shinyjs::disable("ok")
           shinyjs::disable("cancel")
-
+          
         })
       })
-
+      
       shiny::observeEvent(input$add,{
         import_modal(
           id = session$ns("importid"),
@@ -184,14 +186,14 @@ tabObsMetaServer <- function(id, network, tab){
           title = "Import data to be used in application"
         )
       })
-
+      
       shiny::observe({
         input$tableedit$changes$changes
         req(!is.null(input$tableedit$changes$changes))
         shinyjs::enable("ok")
         shinyjs::enable("cancel")
       })
-
+      
       shiny::observeEvent(input$cancel,{
         output$tableedit <- rendertab(network$metaobs)
         tmpnetwork2$metaobs <<- tmpnetwork$metaobs
@@ -199,8 +201,8 @@ tabObsMetaServer <- function(id, network, tab){
         shinyjs::disable("ok")
         shinyjs::disable("cancel")
       })
-
-
+      
+      
       observe({
         ntab <- tab$panel
         if (currenttab == "Observation MetaInfo" & ntab != "Observation MetaInfo") {
@@ -212,9 +214,9 @@ tabObsMetaServer <- function(id, network, tab){
         }
         currenttab <<- ntab
       })
-
+      
       return(tabMOnewnetwork)
-
+      
     }
   )
 }

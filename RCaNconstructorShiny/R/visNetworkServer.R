@@ -73,7 +73,7 @@ visNetworkServer <- function(id, network, tab){
                           
                           anychange <- FALSE
                           for (v in names(isolate(network))){
-                            if(!identical(isolate(network[[v]]),
+                            if(!identical(network[[v]],
                                           tmpnetwork[[v]])){
                               tmpnetwork[[v]] <<- isolate(network[[v]])
                               anychange <- TRUE
@@ -174,7 +174,7 @@ visNetworkServer <- function(id, network, tab){
                                                        do.call(bind_rows,
                                                                lapply(
                                                                  isolate(input$networkviz_proxy_positions), function(n){
-                                                                   data.frame(
+                                                                   tibble(
                                                                      x = n$x,
                                                                      y = n$y)
                                                                  })))
@@ -202,7 +202,7 @@ visNetworkServer <- function(id, network, tab){
                                 newnode$Inside <- 1
                               if (!newnode$Inside %in% c(0,1))
                                 stop(paste("Inside should be 0 or 1 for", newnode$label))
-                              newnode <- data.frame(id = newnode$id,
+                              newnode <- tibble(id = newnode$id,
                                                     Component = newnode$label,
                                                     Inside = as.integer(newnode$Inside))
                               if (cmd == "addNode"){
@@ -265,7 +265,7 @@ visNetworkServer <- function(id, network, tab){
                                     visNetwork::visRemoveEdges(newedge$id)
                                   stop("this name is alreay used")
                                 }
-                                newedge <- data.frame(id = newedge$id,
+                                newedge <- tibble(id = newedge$id,
                                                       Flux = newedge$label,
                                                       from = newedge$from,
                                                       to = newedge$to,

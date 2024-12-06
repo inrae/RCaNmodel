@@ -12,8 +12,9 @@
 #' @importFrom readxl read_excel
 #' @importFrom rlang .data
 #' @importFrom magrittr %>%
+#' @importFrom tibble tibble
 #' @importFrom stats setNames
-#' @importFrom dplyr mutate any_of select
+#' @importFrom dplyr mutate any_of select pull
 #' @export
 
 fileInteractionServer <- function(id, network, timeline){
@@ -57,7 +58,7 @@ fileInteractionServer <- function(id, network, timeline){
         filenewnetwork$components <<- createEmptyComponents()
         filenewnetwork$fluxes <<- createEmptyFluxes()
         filenewnetwork$dictionary <<- character()
-        filenewnetwork$observations <<- data.frame(Year = numeric())
+        filenewnetwork$observations <<- tibble(Year = numeric())
         filenewnetwork$metaobs <<- createEmptyMetaObs()
         filenewnetwork$aliases <<- createEmptyAliases()
         filenewnetwork$constraints <<- createEmptyConstraints()
@@ -222,7 +223,7 @@ fileInteractionServer <- function(id, network, timeline){
               load_metaobs$Comment <- character(nrow(load_metaobs))
             }
           } else {
-            load_metaobs <- data.frame(
+            load_metaobs <- tibble(
               id = setdiff(names(load_obs), "Year"),
               Observation = setdiff(names(load_obs), "Year"),
               Comment = character(ncol(load_obs) - 1))
@@ -265,7 +266,7 @@ fileInteractionServer <- function(id, network, timeline){
         })
         
         if ("INFO" %in% readxl::excel_sheets(orig)){
-          info <- as.data.frame(
+          info <- tibble(
             readxl::read_excel(orig, 
                                col_names = FALSE)
           )
@@ -273,7 +274,7 @@ fileInteractionServer <- function(id, network, timeline){
             if (!is.na(param[i,2])){
               updateTextAreaInput(session, 
                                   param[i, 2],
-                                  value = info[i, 2])
+                                  value = info[i, 2] %>% pull())
               shinyBS::removePopover(session,
                                      param[i, 2])
               shinyBS::addPopover(session,
@@ -332,7 +333,7 @@ fileInteractionServer <- function(id, network, timeline){
                                                                         "to"))),
                                               colNames = TRUE,
                                               na.strings = "")
-          obs <- data.frame(Year = integer())
+          obs <- tibble(Year = integer())
           if (!is.null(filenewnetwork$observations)){
             obs <- filenewnetwork$observations
           }

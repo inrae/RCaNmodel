@@ -1,10 +1,12 @@
 #' createEmptyMetaObs
 #' creates an empty meta obs data frame
 #' @return a data frame
+#' 
+#' @importFrom tibble tibble
 #' @export
 #'
 createEmptyMetaObs <- function(){
-  data.frame(id = character(),
+  tibble(id = character(),
              Observation = character(),
-             Comment = integer())
+             Comment = character())
 }

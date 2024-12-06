@@ -15,7 +15,6 @@ timeLineServer <- function(id, timeline){
       newtimeline <- reactiveValues(timeline = createEmptyTimeLine())
       
       observe({
-        browser()
         newtimeline$timeline <<- timeline$timeline
       })
       

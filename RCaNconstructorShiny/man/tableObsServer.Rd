@@ -14,7 +14,7 @@ tableObsServer(id, network, tab)
 \item{tab}{selected tab}
 }
 \value{
-a data.frame observation
+a tibble observation
 }
 \description{
 tableObsServer

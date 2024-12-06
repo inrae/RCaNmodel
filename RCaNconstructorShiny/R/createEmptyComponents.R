@@ -1,10 +1,11 @@
 #' createEmptyComponents
 #' this function creates an empty components data.reme
 #' @return an empty component data frame
+#' @importFrom tibble tibble
 #' @export
 #'
 createEmptyComponents <- function(){
-  data.frame(id = character(),
+  tibble(id = character(),
              Component = character(),
              Inside = integer(),
              AssimilationE = numeric(),

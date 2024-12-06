@@ -301,7 +301,7 @@ constrEditorServer <- function(id, network, slot, tab){
             if (slot == "constraints"){
               tmpnetwork$constraints <<- tmpnetwork$constraints %>%
                 dplyr::bind_rows(
-                  data.frame(
+                  tibble(
                     Id = isolate(input$newname),
                     Constraint = formula,
                     idconstraint = idformula,
@@ -310,7 +310,7 @@ constrEditorServer <- function(id, network, slot, tab){
             } else {
               tmpnetwork$aliases <<- tmpnetwork$aliases %>%
                 dplyr::bind_rows(
-                  data.frame(
+                  tibble(
                     Alias = isolate(input$newname),
                     Forula = formula,
                     idconstraint = idformula,

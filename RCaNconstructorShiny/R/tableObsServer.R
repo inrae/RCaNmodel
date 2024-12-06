@@ -3,7 +3,7 @@
 #' @param id the id of the ui
 #' @param network the current network
 #' @param tab selected tab
-#' @return a data.frame observation
+#' @return a tibble observation
 #' @importFrom magrittr %>%
 #' @importFrom dplyr anti_join bind_rows mutate select across any_of arrange all_of
 #' @importFrom rhandsontable hot_col renderRHandsontable hot_cols

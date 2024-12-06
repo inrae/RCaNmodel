@@ -4,7 +4,7 @@
 #' @export
 #'
 createEmptyFluxes <- function(){
-  data.frame(id = character(),
+  tibble(id = character(),
              Flux = character(),
              to = character(),
              from = character(),

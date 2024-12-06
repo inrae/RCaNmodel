@@ -7,6 +7,7 @@
 #' @importFrom shiny reactiveValues
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
+#' @importFrom tibble tibble
 #' @importFrom shiny isolate
 #' @importFrom dplyr filter left_join inner_join anti_join bind_rows
 #' @export
@@ -29,16 +30,72 @@ RCaNconstructorServer <- function(input, output, session){
   }
   )
   
+  updateObsTimeLine <- function(newnetwork){
+    isolate({
+      #we check only series that already exist
+      commonseries <- setdiff(intersect(names(newnetwork$observations),
+                                        names(network$observations)),
+                              "Year")
+      newYear <- newnetwork$observations %>%
+        filter(!.data[["Year"]] %in% network$observations$Year)
+      if (nrow(newYear) > 0){
+        for (i in seq_len(nrow(newYear))){
+          timeline$timeline <<- isolate(timeline$timeline) %>%
+            bind_rows(writeTimeLine("observations",
+                                    newYear[i, , drop = FALSE],
+                                    NULL))
+        }
+      }
+      
+      oldYear <- network$observations %>%
+        filter(!.data[["Year"]] %in% newnetwork$observations$Year)
+      if (nrow(oldYear) > 0){
+        for (i in seq_len(nrow(oldYear))){
+          timeline$timeline <<- isolate(timeline$timeline) %>%
+            bind_rows(writeTimeLine("observations",
+                                    NULL,
+                                    oldYear[i, , drop = FALSE]))
+        }
+      }
+      
+      newcommon <- tibble(newnetwork$observations) %>%
+        dplyr::select(all_of(c("Year", commonseries))) %>%
+        filter(.data[["Year"]] %in% network$observations$Year) %>%
+        dplyr::arrange(.data[["Year"]])
+      
+      oldcommon <- tibble(network$observations) %>%
+        dplyr::select(all_of(c("Year", commonseries))) %>%
+        filter(.data[["Year"]] %in% newnetwork$observations$Year) %>%
+        dplyr::arrange(.data[["Year"]])
+      
+      if(!identical(oldcommon, newcommon)){
+        for (i in seq_len(nrow(newcommon))){
+          browser()
+          if (!identical(newcommon[i, , drop = FALSE], 
+                         oldcommon[i, , drop = FALSE])){
+            timeline$timeline <<- isolate(timeline$timeline) %>%
+              bind_rows(writeTimeLine("observations",
+                                      newcommon[i, , drop = FALSE],
+                                      oldcommon[i, , drop = FALSE]))
+          }
+        }
+      }
+      
+    })
+  }
+  
   updateTimeLine <- function(newnetwork){
     isolate({
       varnames <- setdiff(isolate(names(newnetwork)), 
                           c("dictionary", "envir", "timeline"))
-      if (any(sapply(varnames, function(v) isolate(!identical(network[[v]],
-                                                              newnetwork[[v]]))
+      if (any(sapply(varnames, 
+                     function(v) isolate(!identical(network[[v]],
+                                                    newnetwork[[v]]))
       ))){
         for (v in varnames){
-          if (!identical(isolate(newnetwork[[v]]), isolate(network[[v]]))){
-            if (v %in% c("components", "aliases", "constraints", "metaobs", "observations")){
+          if (!identical(newnetwork[[v]], network[[v]])){
+            if (v %in% c("components", "aliases", "constraints",
+                         "metaobs")){
               new <- isolate(newnetwork[[v]] %>%
                                filter(!.data[["id"]] %in% network[[v]]$id))
               if (nrow(new) > 0){
@@ -56,7 +113,8 @@ RCaNconstructorServer <- function(input, output, session){
                     bind_rows(writeTimeLine(v, NULL, old[i, , drop = FALSE]))
                 }
               }
-              notupdated <- isolate(inner_join(network[[v]], newnetwork[[v]]))
+              notupdated <- isolate(inner_join(network[[v]],
+                                               newnetwork[[v]]))
               newupdated <- isolate(newnetwork[[v]] %>%
                                       filter(.data[["id"]] %in% network[[v]]$id &
                                                !.data[["id"]] %in% notupdated$id))
@@ -80,11 +138,12 @@ RCaNconstructorServer <- function(input, output, session){
     isolate({
       varnames <- setdiff(isolate(names(newnetwork)), 
                           c("dictionary", "envir", "timeline"))
-      if (any(sapply(varnames, function(v) isolate(!identical(network[[v]],
-                                                              newnetwork[[v]]))
+      if (any(sapply(varnames, 
+                     function(v) !identical(network[[v]],
+                                            newnetwork[[v]])
       ))){
         for (v in varnames){
-          if (!identical(isolate(newnetwork[[v]]), isolate(network[[v]]))){
+          if (!identical(newnetwork[[v]], network[[v]])){
             network[[v]] <<- isolate(newnetwork[[v]])
           }
         }
@@ -113,13 +172,13 @@ RCaNconstructorServer <- function(input, output, session){
     newnetwork_file$metaobs
     isolate({
       tline <- newnetwork_file$timeline
-      if (!identical(tline, timeline$timeline))
+      if (!identical(tibble(tline), tibble(timeline$timeline)))
         timeline$timeline <<- tline
       updateNetwork(isolate(newnetwork_file))
       
     })
     
-
+    
   })
   observe({
     newnetwork_file$model
@@ -180,7 +239,7 @@ RCaNconstructorServer <- function(input, output, session){
     newnetwork_observations$aliases
     newnetwork_observations$observations
     newnetwork_observations$metaobs
-    updateTimeLine(isolate(newnetwork_observations))
+    updateObsTimeLine(isolate(newnetwork_observations))
     updateNetwork(isolate(newnetwork_observations))
     
   })

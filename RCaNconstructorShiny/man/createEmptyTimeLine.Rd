@@ -13,6 +13,6 @@ an empty timeline datafame
 createEmptyTimeLine
 }
 \examples{
-createEmptyTimeLine
+createEmptyTimeLine()
 
 }

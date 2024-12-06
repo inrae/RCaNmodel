@@ -2,12 +2,13 @@
 #'
 #' @return an empty timeline datafame
 #' @export
+#' @importFrom tibble tibble
 #'
 #' @examples
-#' createEmptyTimeLine
+#' createEmptyTimeLine()
 #' 
 createEmptyTimeLine <- function(){
-  data.frame(Date = vector("character"),
+  tibble(Date = vector("character"),
              Task = vector("character"),
              Annotation = vector("character"))
 }

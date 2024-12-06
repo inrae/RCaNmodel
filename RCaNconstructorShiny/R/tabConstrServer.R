@@ -29,7 +29,7 @@ tabConstrServer <- function(id, network, slot, tab){
       tabCnewnetwork <- createEmptyNetwork()
       tmpnetwork <- list()
       
-      wholedata <- data.frame()
+      wholedata <- tibble()
       
       
       
