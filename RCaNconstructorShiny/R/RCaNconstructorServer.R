@@ -70,7 +70,6 @@ RCaNconstructorServer <- function(input, output, session){
       
       if(!identical(oldcommon, newcommon)){
         for (i in seq_len(nrow(newcommon))){
-          browser()
           if (!identical(newcommon[i, , drop = FALSE], 
                          oldcommon[i, , drop = FALSE])){
             timeline$timeline <<- isolate(timeline$timeline) %>%
