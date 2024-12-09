@@ -54,7 +54,7 @@ fileInteractionServer <- function(id, network, timeline){
       filenewnetwork$timeline <- createEmptyTimeLine()
       
       cleanNewtork <- function(){
-        filenewnetwork$model <<- NULL
+        filenewnetwork$model <<- ""
         filenewnetwork$components <<- createEmptyComponents()
         filenewnetwork$fluxes <<- createEmptyFluxes()
         filenewnetwork$dictionary <<- character()
@@ -124,7 +124,10 @@ fileInteractionServer <- function(id, network, timeline){
         modelname <- stringr::str_split(isolate(input$loadname$name),"\\.")[[1]]
         removeModal()
         shinyCatch({
-          filenewnetwork <- loadRCaNfile(orig, modelname)
+          readfile <- loadRCaNfile(orig, modelname)
+          for (v in names(isolate(network)))
+            filenewnetwork[[v]] <<- readfile[[v]]
+          browser()
           if ("INFO" %in% readxl::excel_sheets(orig)){
             info <- tibble(
               readxl::read_excel(orig, 
@@ -151,7 +154,9 @@ fileInteractionServer <- function(id, network, timeline){
       })
       
       output$savename <- shiny::downloadHandler(
-        filename = function() paste0(network$model, ".xlsx"),
+        filename = function() {
+          paste0(filenewnetwork$model, ".xlsx")
+          },
         content = function(file){
           if (orig == ""){
             orig <<- paste0(tempfile(), ".xlsx")
@@ -159,7 +164,11 @@ fileInteractionServer <- function(id, network, timeline){
           } else {
             modelfile <- openxlsx2::wb_load(orig)
           }
-          modelfile <- writeRCaNfile(modelfile, filenewnetwork)
+          modelfile <- writeRCaNfile(modelfile, 
+                                     filenewnetwork, 
+                                     param, 
+                                     input, 
+                                     orig)
           
           openxlsx2::wb_save(modelfile, file, overwrite = TRUE)
         }

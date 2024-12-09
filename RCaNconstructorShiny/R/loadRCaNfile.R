@@ -157,13 +157,13 @@ loadRCaNfile <- function(datapath, modelname){
           dplyr::select(all_of(c("Date", "Task", "Annotation")))
       },
       error = function(e){
-        filenetwork$timeline <<- createEmptyTimeLine()
+        filenewnetwork$timeline <<- createEmptyTimeLine()
       }
       )
     } else {
-      filenetwork$timeline <<- createEmptyTimeLine()
+      filenewnetwork$timeline <<- createEmptyTimeLine()
     }
     
   })
-  return(filenetwork)
+  return(filenewnetwork)
 }

@@ -2,12 +2,15 @@
 #'
 #' @param modelfile the workbook to write
 #' @param filenewnetwork the description of the network
+#' @param param the parameter of the info
+#' @param input the input for which to retrieve info
+#' @param orig the original file
 #'
 #' @return an updated modefile
 #' @importFrom tibble tibble
 #' @export
 #'
-writeRCaNfile <- function(modelfile, filenewnetwork){
+writeRCaNfile <- function(modelfile, filenewnetwork, param, input, orig){
   sheets <- openxlsx2::wb_get_sheet_names(modelfile)
   if (!"Components & input parameter" %in% sheets)
     modelfile <- openxlsx2::wb_add_worksheet(modelfile,

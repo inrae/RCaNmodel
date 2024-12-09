@@ -8,7 +8,7 @@
 
 createEmptyNetwork <- function(){
   reactiveValues(
-    model = NULL,
+    model = "",
     components = createEmptyComponents(),
     fluxes = createEmptyFluxes(),
     constraints = createEmptyConstraints(),
