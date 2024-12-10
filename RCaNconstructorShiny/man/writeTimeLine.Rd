@@ -7,11 +7,11 @@
 writeTimeLine(type, new, old)
 }
 \arguments{
-\item{type}{}
+\item{type}{the slot that have beenn modified}
 
-\item{new}{}
+\item{new}{a tibble of new value}
 
-\item{old}{}
+\item{old}{a tiblle of old value}
 }
 \value{
 a string describing the change

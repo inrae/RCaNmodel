@@ -1,8 +1,8 @@
 #' writeTimeLine
 #'
-#' @param type 
-#' @param new 
-#' @param old 
+#' @param type the slot that have beenn modified 
+#' @param new a tibble of new value
+#' @param old a tiblle of old value
 #'
 #' @return a string describing the change
 #' @export
@@ -13,6 +13,8 @@
 
 writeTimeLine <- function(type, new, old){
   timeline <- ""
+  new <- tibble(new)
+  old <- tibble(old)
   if (type == "components"){
     if ((!is.null(new)) & is.null(old)){
       timeline <- paste("added component", new$Component)
@@ -195,9 +197,7 @@ writeTimeLine <- function(type, new, old){
   }
   
   if (timeline != ""){
-    return (tibble(Date = format(Sys.time()),
-                       Task = timeline,
-                       Annotation = ""))
+    return (tibble(Task = timeline))
   } else {
     return (NULL)
   }

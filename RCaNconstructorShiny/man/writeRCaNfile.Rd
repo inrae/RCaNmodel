@@ -4,12 +4,18 @@
 \alias{writeRCaNfile}
 \title{writeRCaNfile}
 \usage{
-writeRCaNfile(modelfile, filenewnetwork)
+writeRCaNfile(modelfile, filenewnetwork, param, input, orig)
 }
 \arguments{
 \item{modelfile}{the workbook to write}
 
 \item{filenewnetwork}{the description of the network}
+
+\item{param}{the parameter of the info}
+
+\item{input}{the input for which to retrieve info}
+
+\item{orig}{the original file}
 }
 \value{
 an updated modefile
