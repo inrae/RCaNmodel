@@ -152,16 +152,16 @@ loadRCaNfile <- function(datapath, modelname){
     
     if ("TimeLines" %in% readxl::excel_sheets(orig)){
       tryCatch({
-        filenewnetwork$timeline <<- readxl::read_excel(orig,
+        filenewnetwork$timeline <- readxl::read_excel(orig,
                                                        "TimeLines") %>%
           dplyr::select(all_of(c("Date", "Task", "Annotation")))
       },
       error = function(e){
-        filenewnetwork$timeline <<- createEmptyTimeLine()
+        filenewnetwork$timeline <- createEmptyTimeLine()
       }
       )
     } else {
-      filenewnetwork$timeline <<- createEmptyTimeLine()
+      filenewnetwork$timeline <- createEmptyTimeLine()
     }
     
   })

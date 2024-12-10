@@ -125,7 +125,7 @@ fileInteractionServer <- function(id, network, timeline){
         removeModal()
         shinyCatch({
           readfile <- loadRCaNfile(orig, modelname)
-          for (v in names(isolate(network)))
+          for (v in names(isolate(filenewnetwork)))
             filenewnetwork[[v]] <<- readfile[[v]]
           if ("INFO" %in% readxl::excel_sheets(orig)){
             info <- tibble(
