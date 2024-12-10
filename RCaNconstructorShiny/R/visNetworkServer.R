@@ -260,7 +260,6 @@ visNetworkServer <- function(id, network, tab){
                                                        sep = "_")
                               
                               if (cmd == "addEdge"){
-                                browser()
                                 if (newedge$label %in% c(tmpnetwork$components$Component, tmpnetwork$fluxes$Flux)){
                                   visNetworkProxy(session$ns("networkviz_proxy")) %>%
                                     visNetwork::visRemoveEdges(newedge$id)
