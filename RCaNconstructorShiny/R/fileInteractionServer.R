@@ -127,7 +127,6 @@ fileInteractionServer <- function(id, network, timeline){
           readfile <- loadRCaNfile(orig, modelname)
           for (v in names(isolate(network)))
             filenewnetwork[[v]] <<- readfile[[v]]
-          browser()
           if ("INFO" %in% readxl::excel_sheets(orig)){
             info <- tibble(
               readxl::read_excel(orig, 

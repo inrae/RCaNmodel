@@ -83,10 +83,10 @@ RCaNconstructorServer <- function(input, output, session){
       
       if (nrow(newtimeline) > 0){
         timeline$timeline <- timeline$timeline %>%
-          bind_rows(tibble(Date = format(Sys.time())),
-                    Task = sapply(newtimeline$Task, 
-                                  function(task) paste0(task, collapse ="; ")),
-                    Annotation = "")
+          bind_rows(tibble(Date = format(Sys.time()),
+                           Task = paste0(newtimeline$Task, 
+                                         collapse ="; "),
+                           Annotation = ""))
       }
       
     })
@@ -130,6 +130,7 @@ RCaNconstructorServer <- function(input, output, session){
               oldupdated <- network[[v]] %>%
                 filter(.data[["id"]] %in% newnetwork[[v]]$id &
                          !.data[["id"]] %in% notupdated$id)
+              
               for (i in seq_len(nrow(newupdated))){
                 newtimeline <- newtimeline %>%
                   bind_rows(writeTimeLine(v,
@@ -142,10 +143,10 @@ RCaNconstructorServer <- function(input, output, session){
       }
       if (nrow(newtimeline) > 0){
         timeline$timeline <- timeline$timeline %>%
-          bind_rows(tibble(Date = format(Sys.time())),
-                    Task = sapply(newtimeline$Task, 
-                                  function(task) paste0(task, collapse ="; ")),
-                    Annotation = "")
+          bind_rows(tibble(Date = format(Sys.time()),
+                           Task = paste0(newtimeline$Task, 
+                                         collapse ="; "),
+                           Annotation = ""))
       }
     })
   }

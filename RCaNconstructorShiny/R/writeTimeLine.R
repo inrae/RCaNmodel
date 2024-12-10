@@ -13,8 +13,10 @@
 
 writeTimeLine <- function(type, new, old){
   timeline <- ""
-  new <- tibble(new)
-  old <- tibble(old)
+  if (!is.null(new))
+    new <- tibble(new)
+  if (!is.null(old))
+    old <- tibble(old)
   if (type == "components"){
     if ((!is.null(new)) & is.null(old)){
       timeline <- paste("added component", new$Component)
@@ -153,6 +155,7 @@ writeTimeLine <- function(type, new, old){
                                     names(old)),
                           "Year")){
         if (!ident_tol(new[, col], old[,col]))
+          {
           timeline <- paste0(
             timeline,
             paste("val of series",
@@ -161,7 +164,7 @@ writeTimeLine <- function(type, new, old){
                   old[, col],
                   "->",
                   new[, col]),
-            collapse = ", ")
+            collapse = ", ")}
       }
     }
   }
@@ -172,7 +175,6 @@ writeTimeLine <- function(type, new, old){
     } else if  ((!is.null(old)) & is.null(new)) {
       timeline <- paste("deleted series", old$Observation)
     } else {
-      
       if (new$Observation != old$Observation)
         timeline <- paste("observation",
                           old$Observation,

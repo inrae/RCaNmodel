@@ -27,5 +27,5 @@ ident_tol <- function(x, y, tolerance = 0.001){
     x <- tibble(x)
     y <- tibble(y)
   }
-  isTRUE(all.equal(x, y, tolerance = tolerance))
+  isTRUE(all.equal(x, y, tolerance = tolerance, scale = 1))
 }
