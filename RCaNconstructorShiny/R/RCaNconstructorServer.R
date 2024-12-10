@@ -69,9 +69,9 @@ RCaNconstructorServer <- function(input, output, session){
         filter(.data[["Year"]] %in% newnetwork$observations$Year) %>%
         dplyr::arrange(.data[["Year"]])
       
-      if(!identical(oldcommon, newcommon)){
+      if(!ident_tol(oldcommon, newcommon)){
         for (i in seq_len(nrow(newcommon))){
-          if (!identical(newcommon[i, , drop = FALSE], 
+          if (!ident_tol(newcommon[i, , drop = FALSE], 
                          oldcommon[i, , drop = FALSE])){
             newtimeline <- newtimeline %>%
               bind_rows(writeTimeLine("observations",
@@ -98,11 +98,11 @@ RCaNconstructorServer <- function(input, output, session){
       varnames <- setdiff(names(newnetwork), 
                           c("dictionary", "envir", "timeline"))
       if (any(sapply(varnames, 
-                     function(v) !identical(network[[v]],
+                     function(v) !ident_tol(network[[v]],
                                             newnetwork[[v]])
       ))){
         for (v in varnames){
-          if (!identical(newnetwork[[v]], network[[v]])){
+          if (!ident_tol(newnetwork[[v]], network[[v]])){
             if (v %in% c("components", "aliases", "constraints",
                          "metaobs")){
               new <- isolate(newnetwork[[v]] %>%
@@ -156,11 +156,11 @@ RCaNconstructorServer <- function(input, output, session){
       varnames <- setdiff(names(newnetwork), 
                           c("dictionary", "envir", "timeline"))
       if (any(sapply(varnames, 
-                     function(v) !identical(network[[v]],
+                     function(v) !ident_tol(network[[v]],
                                             newnetwork[[v]])
       ))){
         for (v in varnames){
-          if (!identical(newnetwork[[v]], network[[v]])){
+          if (!ident_tol(newnetwork[[v]], network[[v]])){
             network[[v]] <<- newnetwork[[v]]
           }
         }
@@ -172,7 +172,7 @@ RCaNconstructorServer <- function(input, output, session){
                                                   network$observations,
                                                   network$metaobs,
                                                   network$aliases)
-        if (!identical(oldic, sort(network$dictionary)))
+        if (!ident_tol(oldic, sort(network$dictionary)))
           network$envir <<- generateSymbolicEnvir(network)
         
       }})
@@ -189,7 +189,7 @@ RCaNconstructorServer <- function(input, output, session){
     newnetwork_file$metaobs
     isolate({
       tline <- newnetwork_file$timeline
-      if (!identical(tibble(tline), tibble(timeline$timeline)))
+      if (!ident_tol(tibble(tline), tibble(timeline$timeline)))
         timeline$timeline <<- tline
       updateNetwork(isolate(newnetwork_file))
       

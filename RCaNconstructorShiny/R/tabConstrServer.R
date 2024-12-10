@@ -49,7 +49,7 @@ tabConstrServer <- function(id, network, slot, tab){
         
         
         for (v in names(isolate(network))){
-          if(!identical(isolate(network[[v]]),
+          if(!ident_tol(isolate(network[[v]]),
                         tmpnetwork[[v]])){
             
             tmpnetwork[[v]] <<- isolate(network[[v]])
@@ -277,7 +277,7 @@ tabConstrServer <- function(id, network, slot, tab){
         if ((currenttab == "View Constraints" & ntab != "View Constraints" & slot == "constraints") |
             (currenttab == 'View Aliases' & ntab != 'View Aliases' & slot == "aliases")) {
           for (v in names(tmpnetwork)){
-            if (!identical(tmpnetwork[[v]],
+            if (!ident_tol(tmpnetwork[[v]],
                            isolate(tabCnewnetwork[[v]])))
               tabCnewnetwork[[v]] <<- tmpnetwork[[v]]
           }

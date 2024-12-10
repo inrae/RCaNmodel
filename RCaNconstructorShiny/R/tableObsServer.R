@@ -30,7 +30,7 @@ tableObsServer <- function(id, network, tab){
         
         req(isolate(tab$panel) == currenttab)
         for (v in names(isolate(network))){
-          if(!identical(isolate(network[[v]]),
+          if(!ident_tol(isolate(network[[v]]),
                         tmpnetwork[[v]])){
             tmpnetwork[[v]] <<- isolate(network[[v]])
           }
@@ -88,7 +88,7 @@ tableObsServer <- function(id, network, tab){
         ntab <- tab$panel
         if (currenttab == "Time Series" & ntab != "Time Series"){
           for (v in names(tmpnetwork)){
-            if (!identical(tmpnetwork[[v]],
+            if (!ident_tol(tmpnetwork[[v]],
                            isolate(tabOnewnetwork[[v]])))
               tabOnewnetwork[[v]] <<- tmpnetwork[[v]]
           }

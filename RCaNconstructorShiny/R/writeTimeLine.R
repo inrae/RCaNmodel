@@ -29,7 +29,7 @@ writeTimeLine <- function(type, new, old){
                           new$Component)
       for (var in c("Inside", "AssimilationE", "Digestibility", "OtherLosses",
                     "Inertia", "Satiation", "RefugeBiomass")){
-        if (!identical(new[, var], old[, var]))
+        if (!ident_tol(new[, var], old[, var]))
           timeline <- paste0(
             timeline,
             paste("component",
@@ -63,7 +63,7 @@ writeTimeLine <- function(type, new, old){
                           "renamed to",
                           new$Flux)
       for (var in c("From", "To", "Trophic")){
-        if (!identical(new[, var], old[, var]))
+        if (!ident_tol(new[, var], old[, var]))
           timeline <- paste0(
             timeline,
             paste("flux",
@@ -98,7 +98,7 @@ writeTimeLine <- function(type, new, old){
                           new$Alias)
       
       for (var in c("Formula")){
-        if (!identical(new[, var], old[, var]))
+        if (!ident_tol(new[, var], old[, var]))
           timeline <- paste0(
             timeline,
             paste("alias",
@@ -127,7 +127,7 @@ writeTimeLine <- function(type, new, old){
                           new$Id)
       
       for (var in c("Constraint", "Active", "Time-range")){
-        if (!identical(new[, var], old[, var]))
+        if (!ident_tol(new[, var], old[, var]))
           timeline <- paste0(
             timeline,
             paste("constraint",
@@ -152,7 +152,7 @@ writeTimeLine <- function(type, new, old){
       for (col in setdiff(intersect(names(new),
                                     names(old)),
                           "Year")){
-        if (!identical(new[, col], old[,col]))
+        if (!ident_tol(new[, col], old[,col]))
           timeline <- paste0(
             timeline,
             paste("val of series",
@@ -179,7 +179,7 @@ writeTimeLine <- function(type, new, old){
                           "renamed to",
                           new$Observation)
       for (var in c("Comment")){
-        if (!identical(new[, var], old[, var]))
+        if (!ident_tol(new[, var], old[, var]))
           timeline <- paste0(
             timeline,
             paste("series",

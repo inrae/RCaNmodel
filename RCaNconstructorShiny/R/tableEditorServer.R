@@ -47,7 +47,7 @@ tableEditorServer <- function(id, network, slot, tab){
         }
         req(isolate(tab$panel) == currenttab)
         for (v in names(isolate(network))){
-          if(!identical(isolate(network[[v]]),
+          if(!ident_tol(isolate(network[[v]]),
                         tmpnetwork[[v]])){
             tmpnetwork[[v]] <<- isolate(network[[v]])
           }
@@ -226,7 +226,7 @@ tableEditorServer <- function(id, network, slot, tab){
         if ((currenttab == "Components" & ntab != "Components" & slot == "components") |
             (currenttab == "Fluxes" & ntab != "Fluxes" & slot == "fluxes")){
           for (v in names(tmpnetwork)){
-            if (!identical(tmpnetwork[[v]],
+            if (!ident_tol(tmpnetwork[[v]],
                            isolate(tabEnewnetwork[[v]])))
               tabEnewnetwork[[v]] <<- tmpnetwork[[v]]
           }

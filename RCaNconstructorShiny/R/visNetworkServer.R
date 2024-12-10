@@ -73,7 +73,7 @@ visNetworkServer <- function(id, network, tab){
                           
                           anychange <- FALSE
                           for (v in names(isolate(network))){
-                            if(!identical(network[[v]],
+                            if(!ident_tol(network[[v]],
                                           tmpnetwork[[v]])){
                               tmpnetwork[[v]] <<- isolate(network[[v]])
                               anychange <- TRUE
@@ -347,7 +347,7 @@ visNetworkServer <- function(id, network, tab){
                           ntab <- tab$panel
                           if (currenttab == "Visualise Trophic Network" & ntab != "Visualise Trophic Network" ){
                             for (v in names(tmpnetwork)){
-                              if (!identical(tmpnetwork[[v]],
+                              if (!ident_tol(tmpnetwork[[v]],
                                              isolate(viznewnetwork[[v]])))
                                 viznewnetwork[[v]] <<- tmpnetwork[[v]]
                             }

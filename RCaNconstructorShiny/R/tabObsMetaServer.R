@@ -43,7 +43,7 @@ tabObsMetaServer <- function(id, network, tab){
         
         
         for (v in names(isolate(network))){
-          if(!identical(isolate(network[[v]]),
+          if(!ident_tol(isolate(network[[v]]),
                         tmpnetwork[[v]])){
             tmpnetwork[[v]] <<- isolate(network[[v]])
             tmpnetwork2[[v]] <<- isolate(network[[v]])
@@ -168,7 +168,7 @@ tabObsMetaServer <- function(id, network, tab){
                           tmpnetwork2$components$Component))) > 1)
             stop("a name is already used")
           for (v in names(isolate(network))){
-            if(!identical(isolate(tmpnetwork2[[v]]),
+            if(!ident_tol(isolate(tmpnetwork2[[v]]),
                           tmpnetwork[[v]])){
               tmpnetwork[[v]] <<- tmpnetwork2[[v]]
             }
@@ -207,7 +207,7 @@ tabObsMetaServer <- function(id, network, tab){
         ntab <- tab$panel
         if (currenttab == "Observation MetaInfo" & ntab != "Observation MetaInfo") {
           for (v in names(tmpnetwork2)){
-            if (!identical(tmpnetwork2[[v]],
+            if (!ident_tol(tmpnetwork2[[v]],
                            isolate(tabMOnewnetwork[[v]])))
               tabMOnewnetwork[[v]] <<- tmpnetwork2[[v]]
           }

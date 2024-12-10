@@ -121,7 +121,7 @@ constrEditorServer <- function(id, network, slot, tab){
 
         
         for (v in names(isolate(network))){
-          if(!identical(isolate(network[[v]]),
+          if(!ident_tol(isolate(network[[v]]),
                         tmpnetwork[[v]])){
             tmpnetwork[[v]] <<- isolate(network[[v]])
           }
@@ -352,7 +352,7 @@ constrEditorServer <- function(id, network, slot, tab){
         if ((currenttab == "Add/Edit Constraints" & ntab != "Add/Edit Constraints" & slot == "constraints" ) |
             (currenttab == 'View Aliases' & ntab != 'View Aliases' & slot == "aliases")){
           for (v in names(tmpnetwork)){
-            if (!identical(tmpnetwork[[v]],
+            if (!ident_tol(tmpnetwork[[v]],
                            isolate(newnetwork[[v]])))
               newnetwork[[v]] <<- tmpnetwork[[v]]
           }
