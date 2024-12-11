@@ -17,7 +17,9 @@ convertConstr2idConstr <- function(constraint, dictionary){
     word2 <- gsub("^Delta", "", word)
     if (word2 %in% dictionary){
       word <- gsub(word2,
-                   names(dictionary)[dictionary == word2],
+                   paste0('{',
+                          names(dictionary)[dictionary == word2],
+                          '}'),
                    word,
                    fixed = TRUE)
       constraints_word[i] <- word

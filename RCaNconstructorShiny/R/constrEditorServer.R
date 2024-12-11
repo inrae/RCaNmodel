@@ -302,6 +302,7 @@ constrEditorServer <- function(id, network, slot, tab){
               tmpnetwork$constraints <<- tmpnetwork$constraints %>%
                 dplyr::bind_rows(
                   tibble(
+                    id = isolate(input$newname),
                     Id = isolate(input$newname),
                     Constraint = formula,
                     idconstraint = idformula,

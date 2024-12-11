@@ -7,6 +7,13 @@
 #' @export
 #'
 convertidConstr2Constr <- function(constraint, dictionary){
+  names(dictionary) <- paste0("{",
+                              names(dictionary),
+                              "}")
+  constraint <- stringr::str_replace_all(
+    constraint,
+    stringr::fixed(dictionary)
+  )
   constraints_word <- getConstraintWord(constraint)
   for (i in seq_along(constraints_word)){
     word <- constraints_word[i]

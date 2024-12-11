@@ -78,13 +78,14 @@ loadRCaNfile <- function(datapath, modelname){
     
     load_aliases <- createEmptyAliases()
     load_metaobs <- createEmptyMetaObs()
-    
+    load_constr <- createEmptyConstraints()
     
     filenewnetwork$dictionary <-
       generateDictionary(load_comp,
                          load_flux,
                          load_obs,
                          load_metaobs,
+                         load_constr,
                          load_aliases)
     
     if ("Aliases" %in% readxl::excel_sheets(orig)){
@@ -115,24 +116,26 @@ loadRCaNfile <- function(datapath, modelname){
     }
     
     
-    filenewnetwork$dictionary <-
-      generateDictionary(load_comp,
-                         load_flux,
-                         load_obs,
-                         load_metaobs,
-                         load_aliases)
+    
     filenewnetwork$aliases <- load_aliases
     filenewnetwork$metaobs <- load_metaobs
     
     
     load_constr <- readxl::read_excel(orig,
                                       sheet = "Constraints")
-    load_constr$idconstraint = sapply(load_constr$Constraint,
+    load_constr$idconstraint <- sapply(load_constr$Constraint,
                                       convertConstr2idConstr,
                                       filenewnetwork$dictionary)
     
     filenewnetwork$constraints <- load_constr
     
+    filenewnetwork$dictionary <-
+      generateDictionary(load_comp,
+                         load_flux,
+                         load_obs,
+                         load_metaobs,
+                         load_constr,
+                         load_aliases)
     
     filenewnetwork$model <- newname
     filenewnetwork$envir <- generateSymbolicEnvir(filenewnetwork)

@@ -55,6 +55,7 @@ writeRCaNfile <- function(modelfile, filenewnetwork, param, input, orig){
   modelfile <- openxlsx2::wb_add_data(modelfile,
                                       sheet = "Constraints",
                                       x = filenewnetwork$constraints %>%
+                                        mutate(Id = filenewnetwork$dictionary[.data[["id"]]]) %>%
                                         dplyr::select(!dplyr::any_of(c("idconstraint",
                                                                        "valid",
                                                                        "validity_comments"))),
@@ -67,6 +68,7 @@ writeRCaNfile <- function(modelfile, filenewnetwork, param, input, orig){
   modelfile <- openxlsx2::wb_add_data(modelfile,
                                       sheet = "Aliases",
                                       x = filenewnetwork$aliases %>%
+                                        mutate(Alias = filenewnetwork$dictionary[.data[["id"]]]) %>%
                                         dplyr::select(!dplyr::any_of(c("id",
                                                                        "valid",
                                                                        "validity_comments"))),

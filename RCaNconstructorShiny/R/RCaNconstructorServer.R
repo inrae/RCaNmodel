@@ -8,7 +8,7 @@
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #' @importFrom tibble tibble
-#' @importFrom shiny isolate
+#' @importFrom shiny isolate exportTestValues
 #' @importFrom dplyr filter left_join inner_join anti_join bind_rows
 #' @export
 #'
@@ -172,6 +172,7 @@ RCaNconstructorServer <- function(input, output, session){
                                                   network$fluxes,
                                                   network$observations,
                                                   network$metaobs,
+                                                  network$constraints,
                                                   network$aliases)
         if (!ident_tol(oldic, sort(network$dictionary)))
           network$envir <<- generateSymbolicEnvir(network)
@@ -345,6 +346,20 @@ RCaNconstructorServer <- function(input, output, session){
     updateNetwork(isolate(newnetwork_editedaliases))
     
   })
+  
+  
+  exportTestValues(
+    components = network$components[, c("Component", "Inside", "Digestibility",
+                                        "Satatiation", "AssimilationE",
+                                        "RefugeBiomass", "OtherLosses", 
+                                        "Inertia")],
+    fluxes = network$fluxes[, c("Flux", "From", "To", "Trophic")],
+    constraints = network$constraints[, c("Id", "Constraint")],
+    aliases = network$alias[, c("Alias", "Formula")],
+    metaobs = network$metaobs[, c("Observation", "Comment")],
+    observations = network$observations,
+    timeline = timeline$timeline[, c("Task", "Annotation")]
+  )
   
   newtimeline <- timeLineServer("tlui", timeline)
   observe({

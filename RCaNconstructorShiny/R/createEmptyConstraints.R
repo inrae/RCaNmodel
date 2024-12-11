@@ -5,7 +5,8 @@
 #' @export
 #'
 createEmptyConstraints <- function(){
-  tibble(Id = character(0),
+  tibble(id = character(0),
+         Id = character(0),
          Constraint = character(0),
          `Time-range` = character(0),
          Active = logical(0),

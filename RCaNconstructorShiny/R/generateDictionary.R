@@ -4,6 +4,7 @@
 #' @param fluxes the fluxes
 #' @param observations the observations
 #' @param metaobs meta information of observation
+#' @param constraints constaints
 #' @param aliases facultative aliases
 #'
 #' @return a dictionary
@@ -13,6 +14,7 @@ generateDictionary <- function(components,
                                fluxes,
                                observations,
                                metaobs,
+                               constraints,
                                aliases = NULL){
   if (!all(sort(setdiff(names(observations), "Year")) ==
           sort(metaobs$Observation)))
@@ -21,6 +23,7 @@ generateDictionary <- function(components,
   dictionary <- c(components$Component,
                   fluxes$Flux,
                   metaobs$Observation,
+                  constraints$Id,
                   aliases$Alias,
                   "AllFlows",
                   paste0("Outflows",
@@ -33,6 +36,7 @@ generateDictionary <- function(components,
   names(dictionary) <- c(components$id,
                          fluxes$id,
                          metaobs$id,
+                         constraints$id,
                          aliases$id,
                          "AllFlows",
                          paste0("Outflows",

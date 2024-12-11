@@ -233,8 +233,10 @@ tabConstrServer <- function(id, network, slot, tab){
         newdata <- newdata %>%
           mutate(across(any_of(c("Active")), as.integer))
         tryCatch({
-          for (tr in newdata$`Time-range`){
-            tmp <- as.numeric(eval(parse(text=tr)))
+          if (slot == "constraints"){
+            for (tr in newdata$`Time-range`){
+              tmp <- as.numeric(eval(parse(text=tr)))
+            }
           }
           for (const in tibble(newdata)[, formcol]  %>% pull()) {
             valid <- checkValidity(const,
@@ -243,11 +245,11 @@ tabConstrServer <- function(id, network, slot, tab){
             if (valid != "TRUE")
               stop(paste(const, valid, sep = ":"))
           }
-          countid <- table(newdata$Id)
+          countid <- table(newdata$id)
           if (max(countid) > 1)
             stop(paste(paste(names(countid)[which(countid > 1)],
                              collapse = ", "),
-                       "non unique Id"))
+                       "non unique id"))
           newdata$idconstraint <- convertConstr2idConstr(
             tibble(newdata)[, formcol] %>% pull(),
             tmpnetwork$dictionary)
