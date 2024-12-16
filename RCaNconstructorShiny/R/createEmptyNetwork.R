@@ -4,7 +4,8 @@
 #' @importFrom shiny reactiveValues
 #' @importFrom tibble tibble
 #' @export
-#'
+#' @example 
+#' createEmptyNetwork()
 
 createEmptyNetwork <- function(){
   reactiveValues(

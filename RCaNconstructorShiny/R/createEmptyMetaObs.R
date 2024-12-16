@@ -4,7 +4,8 @@
 #' 
 #' @importFrom tibble tibble
 #' @export
-#'
+#' @example 
+#' createEmptyMetaObs()
 createEmptyMetaObs <- function(){
   tibble(id = character(),
              Observation = character(),
