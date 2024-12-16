@@ -56,7 +56,8 @@ writeRCaNfile <- function(modelfile, filenewnetwork, param, input, orig){
                                       sheet = "Constraints",
                                       x = filenewnetwork$constraints %>%
                                         mutate(Id = filenewnetwork$dictionary[.data[["id"]]]) %>%
-                                        dplyr::select(!dplyr::any_of(c("idconstraint",
+                                        dplyr::select(!dplyr::any_of(c("id",
+                                                                       "idconstraint",
                                                                        "valid",
                                                                        "validity_comments"))),
                                       colNames = TRUE,
@@ -70,6 +71,7 @@ writeRCaNfile <- function(modelfile, filenewnetwork, param, input, orig){
                                       x = filenewnetwork$aliases %>%
                                         mutate(Alias = filenewnetwork$dictionary[.data[["id"]]]) %>%
                                         dplyr::select(!dplyr::any_of(c("id",
+                                                                       "idconstraint",
                                                                        "valid",
                                                                        "validity_comments"))),
                                       colNames = TRUE,
