@@ -20,6 +20,9 @@ constrEditorServer <- function(id, network, slot, tab){
     function(input, output, session) {
       currenttab <- ""
       
+      if (isTRUE(getOption("shiny.testmode"))) {
+        shinyjs::enable("newname")
+      }
       
       newnetwork <- createEmptyNetwork()
       tmpnetwork <- list()
@@ -69,7 +72,8 @@ constrEditorServer <- function(id, network, slot, tab){
         if (input$constraintselect == "New"){
           resetPage()
         } else {
-          shinyjs::disable("newname")
+          if (!isTRUE(getOption("shiny.testmode"))) 
+            shinyjs::disable("newname")
           selected <- which(tibble(
             tmpnetwork[[slot]])[,ifelse(slot == "constraints",
                                         "Id",
@@ -118,7 +122,7 @@ constrEditorServer <- function(id, network, slot, tab){
           network[[v]]
         }
         req(isolate(tab$panel) == currenttab)
-
+        
         
         for (v in names(isolate(network))){
           if(!ident_tol(isolate(network[[v]]),
@@ -325,9 +329,9 @@ constrEditorServer <- function(id, network, slot, tab){
                               choices = c("New",
                                           sort(
                                             tibble(tmpnetwork[[slot]])[,
-                                                                          ifelse(slot == "constraints",
-                                                                                 "Id",
-                                                                                 "Alias")] %>%
+                                                                       ifelse(slot == "constraints",
+                                                                              "Id",
+                                                                              "Alias")] %>%
                                               pull()
                                           )
                               ),
