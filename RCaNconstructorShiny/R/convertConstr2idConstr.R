@@ -12,9 +12,9 @@ convertConstr2idConstr <- function(constraint, dictionary){
   for (i in seq_along(constraints_word)){
     word <- constraints_word[i]
     word2 <- gsub("^Before", "", word)
-    word2 <- gsub("^After", "", word)
-    word2 <- gsub("^Ratio", "", word)
-    word2 <- gsub("^Delta", "", word)
+    word2 <- gsub("^After", "", word2)
+    word2 <- gsub("^Ratio", "", word2)
+    word2 <- gsub("^Delta", "", word2)
     if (word2 %in% dictionary){
       word <- gsub(word2,
                    paste0('{',
