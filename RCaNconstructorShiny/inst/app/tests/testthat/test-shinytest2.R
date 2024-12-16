@@ -184,3 +184,61 @@ test_that("{shinytest2} recording: importobs", {
                              "timeline",
                              "observations"))
 })
+
+
+
+
+
+test_that("{shinytest2} recording: constraints", {
+  app <- AppDriver$new(name = "constraints", height = 873, width = 909, variant = platform_variant())
+  app$click("files-open")
+  app$upload_file(`files-loadname` = system.file("extdata",
+                                                 "CaN_template_mini.xlsx", package = "RCaNmodel"))
+  app$click("files-okload")
+  app$wait_for_idle()
+  
+  app$set_inputs(`visnetwork-shinyjs-delay-b0c7cb97f7e886650b37232cde174d57` = 500,
+                 allow_no_input_binding_ = TRUE)
+  app$set_inputs(mainpanel = "Constraints")
+  app$set_inputs(editconstraints = "Add/Edit Constraints")
+  app$set_inputs(`constreditor-newname` = "test")
+  app$set_inputs(`constreditor-components` = "HerbZooplankton")
+  app$set_inputs(`constreditor-comparisons` = "+")
+  app$set_inputs(`constreditor-components` = "OmniZooplankton")
+  app$set_inputs(`constreditor-comparisons` = ">=")
+  app$set_inputs(`constreditor-obs` = "PrimaryProduction")
+  app$click("constreditor-ok")
+  app$set_inputs(`constreditor-constraintselect` = "C01")
+  app$set_inputs(`constreditor-equations` = "4")
+  app$set_inputs(`constreditor-comparisons` = "*")
+  app$set_inputs(`constreditor-numbers` = "0")
+  app$set_inputs(`constreditor-numbers` = ".")
+  app$set_inputs(`constreditor-numbers` = "9")
+  app$click("constreditor-ok")
+  app$wait_for_idle()
+  app$set_inputs(editconstraints = "View Constraints")
+  app$wait_for_idle()
+  app$expect_values(export=c("constraints", "timeline"))
+  app$run_js('var table = HTMLWidgets.find("#tabconstraints-tableedit").hot;
+             table.setDataAtCell(0,0,"C01bis");
+             table.setDataAtCell(0,1,"F01+F02*0.9<=PrimaryProductio*1.3");
+             ')
+  app$click("tabconstraints-checkvalid")
+  app$get_screenshot()
+  app$run_js('var table = HTMLWidgets.find("#tabconstraints-tableedit").hot;
+             table.setDataAtCell(0,0,"C01bis");
+             table.setDataAtCell(0,1,"F01+F02*0.9<=PrimaryProduction*1.3");
+             ')
+  app$click("tabconstraints-checkvalid")
+  app$get_screenshot()
+  app$run_js('var table = HTMLWidgets.find("#tabconstraints-tableedit").hot;
+             table.setDataAtCell(2,3,false);
+             ')
+  app$click("tabconstraints-ok")
+  app$wait_for_idle()
+  app$set_inputs(editconstraints = "Add/Edit Constraints")
+  app$wait_for_idle()
+  app$expect_values(export=c("constraints", "timeline"))
+  
+})
+
