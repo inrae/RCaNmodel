@@ -122,7 +122,8 @@ loadRCaNfile <- function(datapath, modelname){
     
     
     load_constr <- readxl::read_excel(orig,
-                                      sheet = "Constraints")
+                                      sheet = "Constraints") %>%
+      mutate(id = .data[["Id"]])
     load_constr$idconstraint <- sapply(load_constr$Constraint,
                                       convertConstr2idConstr,
                                       filenewnetwork$dictionary)
