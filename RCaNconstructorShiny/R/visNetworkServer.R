@@ -42,11 +42,11 @@ visNetworkServer <- function(id, network, tab){
                             req(nrow(nodes) > 0)
                             edges <- createEdges()
                             
-                            visNetworkProxy(session$ns("networkviz_proxy")) %>%
+                            visNetworkProxy(session$ns("networkvizproxy")) %>%
                               visNetwork::visUpdateNodes(nodes = nodes) %>%
                               visNetwork::visUpdateEdges(edges = edges)
                             
-                            visNetworkProxy(session$ns("networkviz_proxy")) %>%
+                            visNetworkProxy(session$ns("networkvizproxy")) %>%
                               visEvents(dragEnd = paste0("function(nodes) {
                                   Shiny.onInputChange('",
                                                          session$ns('dragging_node_id'),
@@ -54,7 +54,7 @@ visNetworkServer <- function(id, network, tab){
                               ;}")) %>%
                               visGetPositions()
                             
-                            visNetworkProxy(session$ns("networkviz_proxy")) %>%
+                            visNetworkProxy(session$ns("networkvizproxy")) %>%
                               visEvents(dragEnd = paste0("function(nodes) {
                                   Shiny.onInputChange('",
                                                          session$ns('dragging_node_id'),
@@ -80,7 +80,7 @@ visNetworkServer <- function(id, network, tab){
                             }
                           }
                           if (anychange){
-                            output$networkviz_proxy <- renderVisNetwork({
+                            output$networkvizproxy <- renderVisNetwork({
                               drawNet()
                             })
                             shinyjs::delay(500, updateVis(TRUE))
@@ -164,16 +164,16 @@ visNetworkServer <- function(id, network, tab){
                         
                         observe({
                           input$dragging_node_id
-                          visNetworkProxy(session$ns("networkviz_proxy")) %>%
+                          visNetworkProxy(session$ns("networkvizproxy")) %>%
                             visNetwork::visGetPositions(isolate(input$dragging_node_id$nodes[[1]]))
                         })
                         
                         observe({
-                          req(input$networkviz_proxy_positions)
-                          newnodes <- dplyr::bind_cols(id = isolate(names(input$networkviz_proxy_positions)),
+                          req(input$networkvizproxy_positions)
+                          newnodes <- dplyr::bind_cols(id = isolate(names(input$networkvizproxy_positions)),
                                                        do.call(bind_rows,
                                                                lapply(
-                                                                 isolate(input$networkviz_proxy_positions), function(n){
+                                                                 isolate(input$networkvizproxy_positions), function(n){
                                                                    tibble(
                                                                      x = n$x,
                                                                      y = n$y)
@@ -191,12 +191,11 @@ visNetworkServer <- function(id, network, tab){
                         
                         
                         observe({
-                          req(!is.null(input$networkviz_proxy_graphChange$cmd))
-                          
+                          req(!is.null(as.list(input$networkvizproxy_graphChange)$cmd))
                           shinyCatch({
-                            cmd <- input$networkviz_proxy_graphChange$cmd
+                            cmd <- as.list(input$networkvizproxy_graphChange)$cmd
                             if (cmd %in% c("addNode", "editNode")){
-                              newnode <- isolate(input$networkviz_proxy_graphChange)
+                              newnode <- isolate(as.list(input$networkvizproxy_graphChange))
                               newnode <- newnode[-which(names(newnode) == "cmd")]
                               if (!"Inside" %in% names(newnode))
                                 newnode$Inside <- 1
@@ -209,23 +208,23 @@ visNetworkServer <- function(id, network, tab){
                                 if (newnode$Component %in% c(tmpnetwork$components$Component,
                                                              tmpnetwork$fluxes$Flux,
                                                              tmpnetwork$observations)){
-                                  visNetworkProxy(session$ns("networkviz_proxy")) %>%
+                                  visNetworkProxy(session$ns("networkvizproxy")) %>%
                                     visNetwork::visRemoveNodes(newnode$id)
                                   stop("this name is already used")
                                 }
                                 tmpnetwork$components <<- bind_rows(tmpnetwork$components,
                                                                     newnode)
-                                visNetworkProxy(session$ns("networkviz_proxy")) %>%
+                                visNetworkProxy(session$ns("networkvizproxy")) %>%
                                   visGetPositions(nodes = newnode$id)
                               } else {
-                                if (newnode$Component %in% tmpnetwork$fluxes$flux |
+                                if (newnode$Component %in% tmpnetwork$fluxes$Flux |
                                     newnode$Component %in% (tibble(
                                       tmpnetwork$components) %>%
                                       filter(.data[["id"]] != newnode$id) %>%
                                       dplyr::select(all_of("Component")) %>%
                                       dplyr::pull()) |
                                     newnode$Component %in% names(tmpnetwork$observations)) {
-                                  visNetworkProxy(session$ns("networkviz_proxy")) %>%
+                                  visNetworkProxy(session$ns("networkvizproxy")) %>%
                                     visNetwork::visUpdateNodes(tmpnetwork$components %>%
                                                                  filter(.data[["id"]] == newnode$id) %>%
                                                                  mutate(label = .data[["Component"]]))
@@ -235,14 +234,14 @@ visNetworkServer <- function(id, network, tab){
                                                                       dplyr::filter(.data[["id"]] != newnode$id),
                                                                     newnode)
                               }
-                              visNetworkProxy(session$ns("networkviz_proxy")) %>%
+                              visNetworkProxy(session$ns("networkvizproxy")) %>%
                                 visNetwork::visUpdateNodes(nodes = createNodes())
                               
                               
                               
                             }
                             if (cmd %in% c("addEdge", "editEdge")){
-                              newedge <- isolate(input$networkviz_proxy_graphChange)
+                              newedge <- isolate(as.list(input$networkvizproxy_graphChange))
                               newedge <- newedge[-which(names(newedge) == "cmd")]
                               
                               
@@ -261,7 +260,7 @@ visNetworkServer <- function(id, network, tab){
                               
                               if (cmd == "addEdge"){
                                 if (newedge$label %in% c(tmpnetwork$components$Component, tmpnetwork$fluxes$Flux)){
-                                  visNetworkProxy(session$ns("networkviz_proxy")) %>%
+                                  visNetworkProxy(session$ns("networkvizproxy")) %>%
                                     visNetwork::visRemoveEdges(newedge$id)
                                   stop("this name is alreay used")
                                 }
@@ -283,7 +282,7 @@ visNetworkServer <- function(id, network, tab){
                                                         filter(.data[["id"]] != newedge$id) %>%
                                                         dplyr::select(all_of("Flux")) %>%
                                                         dplyr::pull())) {
-                                  visNetworkProxy(session$ns("networkviz_proxy")) %>%
+                                  visNetworkProxy(session$ns("networkvizproxy")) %>%
                                     visNetwork::visUpdateEdges(tmpnetwork$fluxes %>%
                                                                  filter(.data[["id"]] == newedge$id) %>%
                                                                  mutate(label = .data[["Flux"]]))
@@ -302,14 +301,14 @@ visNetworkServer <- function(id, network, tab){
                                 tmpnetwork$fluxes <<- oldedges
                               }
                               
-                              visNetworkProxy(session$ns("networkviz_proxy")) %>%
+                              visNetworkProxy(session$ns("networkvizproxy")) %>%
                                 visNetwork::visUpdateEdges(edges = createEdges())
                               
                             }
                             
                             if (cmd %in% c("deleteElements")){
-                              nodesdeleted <- unlist(isolate(input$networkviz_proxy_graphChange$nodes))
-                              edgesdeleted <- unlist(isolate(input$networkviz_proxy_graphChange$edges))
+                              nodesdeleted <- unlist(isolate(input$networkvizproxy_graphChange$nodes))
+                              edgesdeleted <- unlist(isolate(input$networkvizproxy_graphChange$edges))
                               if (length(nodesdeleted) >= 1){
                                 tmpnetwork$components <<- tmpnetwork$components %>%
                                   filter(!.data[["id"]] %in% nodesdeleted)
@@ -326,9 +325,9 @@ visNetworkServer <- function(id, network, tab){
                         observeEvent(input$shownodes, {
                           req(nrow(tmpnetwork$components) > 0)
                           nodes <- createNodes()
-                          visNetworkProxy(session$ns("networkviz_proxy")) %>%
+                          visNetworkProxy(session$ns("networkvizproxy")) %>%
                             visNetwork::visUpdateNodes(nodes = nodes)
-                          #output$networkviz_proxy <- renderVisNetwork(drawNet())
+                          #output$networkvizproxy <- renderVisNetwork(drawNet())
                         })
                         
                         
@@ -337,8 +336,8 @@ visNetworkServer <- function(id, network, tab){
                           req(nrow(tmpnetwork$components) > 0)
                           req(nrow(tmpnetwork$fluxes) > 0)
                           edges <- createEdges()
-                          #output$networkviz_proxy <- renderVisNetwork(drawNet())
-                          visNetworkProxy(session$ns("networkviz_proxy")) %>%
+                          #output$networkvizproxy <- renderVisNetwork(drawNet())
+                          visNetworkProxy(session$ns("networkvizproxy")) %>%
                             visNetwork::visUpdateEdges(edges = edges)
                         })
                         
@@ -355,7 +354,7 @@ visNetworkServer <- function(id, network, tab){
                           
                           if (ntab == "Visualise Trophic Network" & currenttab != "Visualise Trophic Network"){
                             
-                            output$networkviz_proxy <- renderVisNetwork({
+                            output$networkvizproxy <- renderVisNetwork({
                               drawNet()
                             })
                             shinyjs::delay(500, updateVis(TRUE))

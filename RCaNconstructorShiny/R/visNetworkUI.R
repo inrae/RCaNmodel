@@ -15,7 +15,7 @@ visNetworkUI <- function(id){
           fluidRow(actionButton(ns("refresh"), "refresh"),
                    checkboxInput(ns("showedges"), "show fluxes labels", TRUE),
                    checkboxInput(ns("shownodes"), "show components labels", TRUE)),
-          fluidRow(visNetworkOutput(ns("networkviz_proxy"),
+          fluidRow(visNetworkOutput(ns("networkvizproxy"),
                                     width = "800px",
                                     height = "800px")))
 }
