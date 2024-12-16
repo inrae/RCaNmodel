@@ -22,7 +22,7 @@ tableEditorServer <- function(id, network, slot, tab){
     function(input, output, session) {
       currenttab <- ""
       
-      hiddencols <- c("from", "to", "id")
+      hiddencols <- c("from", "to", "id", "x", "y")
       
       tabEnewnetwork <- createEmptyNetwork()
       tmpnetwork <- list()
@@ -66,7 +66,7 @@ tableEditorServer <- function(id, network, slot, tab){
         if (slot == "components"){
           wholedata <<- tmpnetwork$components
         } else {
-          wholedata <<- tmpnetwork$components
+          wholedata <<- tmpnetwork$fluxes
         }
         if (slot == "components"){
           choices <- sort(tmpnetwork$components$Component)
