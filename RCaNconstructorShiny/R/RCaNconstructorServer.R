@@ -350,12 +350,12 @@ RCaNconstructorServer <- function(input, output, session){
   
   exportTestValues(
     components = network$components[, c("Component", "Inside", "Digestibility",
-                                        "Satatiation", "AssimilationE",
+                                        "Satiation", "AssimilationE",
                                         "RefugeBiomass", "OtherLosses", 
                                         "Inertia")],
     fluxes = network$fluxes[, c("Flux", "From", "To", "Trophic")],
     constraints = network$constraints[, c("Id", "Constraint")],
-    aliases = network$alias[, c("Alias", "Formula")],
+    aliases = network$aliases[, c("Alias", "Formula")],
     metaobs = network$metaobs[, c("Observation", "Comment")],
     observations = network$observations,
     timeline = timeline$timeline[, c("Task", "Annotation")]
