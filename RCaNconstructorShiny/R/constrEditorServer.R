@@ -102,7 +102,7 @@ constrEditorServer <- function(id, network, slot, tab){
           constraint <<- append(constraint,
                                 text,
                                 after = as.integer(pos) - 1)
-          selected <- pos + 1
+          selected <- as.integer(pos) + 1
         }
         
         updateRadioGroupButtons(session,
