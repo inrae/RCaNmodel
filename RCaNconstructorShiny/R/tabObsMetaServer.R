@@ -154,6 +154,14 @@ tabObsMetaServer <- function(id, network, tab){
           tmpnetwork2$observations <<- adddata
         }
         tmpnetwork2$metaobs <<- newdata
+        tmpnetwork2$dictionary <<- generateDictionary(
+          tmpnetwork2$components,
+          tmpnetwork2$fluxes,
+          tmpnetwork2$observations,
+          tmpnetwork2$metaobs,
+          tmpnetwork2$constraints,
+          tmpnetwork2$aliases
+        )
         output$tableedit <- rendertab(newdata)
       })
       
