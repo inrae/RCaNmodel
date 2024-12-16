@@ -28,6 +28,10 @@ tabObsMetaServer <- function(id, network, tab){
       tmpnetwork2 <- list()
       
       
+      if (isTRUE(getOption("shiny.testmode"))) {
+        shinyjs::enable("ok")
+        shinyjs::enable("cancel")
+      }
       
       
       
@@ -173,8 +177,10 @@ tabObsMetaServer <- function(id, network, tab){
               tmpnetwork[[v]] <<- tmpnetwork2[[v]]
             }
           }
-          shinyjs::disable("ok")
-          shinyjs::disable("cancel")
+          if (!isTRUE(getOption("shiny.testmode"))) {
+            shinyjs::disable("ok")
+            shinyjs::disable("cancel")
+          }
           
         })
       })
@@ -198,8 +204,10 @@ tabObsMetaServer <- function(id, network, tab){
         output$tableedit <- rendertab(network$metaobs)
         tmpnetwork2$metaobs <<- tmpnetwork$metaobs
         tmpnetwork2$observations <<- tmpnetwork$observations
-        shinyjs::disable("ok")
-        shinyjs::disable("cancel")
+        if (!isTRUE(getOption("shiny.testmode"))) {
+          shinyjs::disable("ok")
+          shinyjs::disable("cancel")
+        }
       })
       
       

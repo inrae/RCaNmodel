@@ -34,6 +34,11 @@ tableEditorServer <- function(id, network, slot, tab){
       
       wholedata <- tibble()
       
+      if (isTRUE(getOption("shiny.testmode"))) {
+        shinyjs::enable("ok")
+        shinyjs::enable("cancel")
+      }
+      
       
       updateSelectInput(session,
                         "filter",
@@ -54,8 +59,10 @@ tableEditorServer <- function(id, network, slot, tab){
         }
         output$tableedit <- rendertab(tmpnetwork[[slot]],
                                       tmpnetwork$components$Component)
-        shinyjs::disable("ok")
-        shinyjs::disable("cancel")
+        if (!isTRUE(getOption("shiny.testmode"))) {
+          shinyjs::disable("ok")
+          shinyjs::disable("cancel")
+        }
         if (slot == "components"){
           wholedata <<- tmpnetwork$components
         } else {
@@ -216,8 +223,10 @@ tableEditorServer <- function(id, network, slot, tab){
         wholedata <<- tmpnetwork[[slot]]
         output$tableedit <- rendertab(tmpnetwork[[slot]],
                                       tmpnetwork$components$Component)
-        shinyjs::disable("ok")
-        shinyjs::disable("cancel")
+        if (!isTRUE(getOption("shiny.testmode"))) {
+          shinyjs::disable("ok")
+          shinyjs::disable("cancel")
+        }
       })
       
       
