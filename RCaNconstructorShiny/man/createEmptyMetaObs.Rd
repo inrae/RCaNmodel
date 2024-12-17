@@ -14,3 +14,7 @@ a data frame
 createEmptyMetaObs
 creates an empty meta obs data frame
 }
+\examples{
+createEmptyMetaObs()
+
+}

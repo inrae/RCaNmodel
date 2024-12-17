@@ -10,6 +10,7 @@
 #' @importFrom shiny modalButton textInput fileInput showModal removeModal
 #' @importFrom spsComps shinyCatch
 #' @importFrom readxl read_excel
+#' @importFrom utils read.csv
 #' @importFrom rlang .data
 #' @importFrom magrittr %>%
 #' @importFrom tibble tibble

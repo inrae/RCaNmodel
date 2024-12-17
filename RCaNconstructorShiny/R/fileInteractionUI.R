@@ -4,7 +4,7 @@
 #'
 #' @return nothing
 #'
-#' @importFrom shiny NS fluidRow tagList h3
+#' @importFrom shiny NS fluidRow tagList h3 textAreaInput
 #' @importFrom shinyjs useShinyjs 
 #' @export
 #'

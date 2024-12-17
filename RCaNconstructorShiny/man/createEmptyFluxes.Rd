@@ -14,3 +14,7 @@ a data frame
 createEmptyFluxes
 creates an empty fluxes data frame
 }
+\examples{
+createEmptyFluxes()
+
+}

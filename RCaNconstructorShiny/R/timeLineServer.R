@@ -5,7 +5,7 @@
 #'
 #' @return an updated network
 #' @importFrom datamods edit_data_server
-#' @importFrom shiny reactiveValues
+#' @importFrom shiny reactiveValues reactive
 #' @export
 
 timeLineServer <- function(id, timeline){

@@ -12,3 +12,7 @@ an empty aliases data.frame
 \description{
 createEmptyAliases
 }
+\examples{
+createEmptyAliases()
+
+}

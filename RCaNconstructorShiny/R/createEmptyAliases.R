@@ -3,7 +3,7 @@
 #' @return an empty aliases data.frame
 #' @importFrom tibble tibble
 #' @export
-#' @example 
+#' @examples 
 #' createEmptyAliases()
 #'
 createEmptyAliases <- function(){

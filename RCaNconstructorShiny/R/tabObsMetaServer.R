@@ -8,7 +8,7 @@
 #' @importFrom magrittr %>%
 #' @importFrom tibble tibble
 #' @importFrom datamods import_modal import_server
-#' @importFrom dplyr mutate select across any_of
+#' @importFrom dplyr mutate select across any_of everything
 #' @importFrom rhandsontable rhandsontable hot_col renderRHandsontable hot_cols
 #' @importFrom rhandsontable hot_rows hot_to_r hot_context_menu
 #' @importFrom shiny isolate observe showNotification

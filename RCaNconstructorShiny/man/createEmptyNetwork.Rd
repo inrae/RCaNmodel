@@ -12,3 +12,6 @@ a reactive network with empty components
 \description{
 createEmptyNetwork
 }
+\examples{
+createEmptyNetwork()
+}

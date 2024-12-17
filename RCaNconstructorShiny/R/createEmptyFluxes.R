@@ -2,7 +2,7 @@
 #' creates an empty fluxes data frame
 #' @return a data frame
 #' @export
-#' @example 
+#' @examples
 #' createEmptyFluxes()
 #'
 createEmptyFluxes <- function(){

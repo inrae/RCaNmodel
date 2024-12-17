@@ -6,6 +6,7 @@
 #'
 #' @return a message (TRUE if valid otherwise the error message)
 #' @importFrom stringr str_extract_all
+#' @importFrom stats na.omit 
 #' @importFrom symengine expand Vector V get_type get_args get_str
 #' @export
 #'

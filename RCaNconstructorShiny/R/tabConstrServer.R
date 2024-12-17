@@ -131,7 +131,7 @@ tabConstrServer <- function(id, network, slot, tab){
           wholedata$valid <<- (wholedata$validity_comments == "TRUE")
           output$tableedit <- rendertab(createSubData())
         })
-        remove_modal_spinner(session = getDefaultReactiveDomain())
+        remove_modal_spinner(session = shiny::getDefaultReactiveDomain())
         
       })
       
