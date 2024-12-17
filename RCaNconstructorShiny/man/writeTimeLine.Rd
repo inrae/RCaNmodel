@@ -11,7 +11,7 @@ writeTimeLine(type, new, old)
 
 \item{new}{a tibble of new value}
 
-\item{old}{a tiblle of old value}
+\item{old}{a tibble of old value}
 }
 \value{
 a string describing the change

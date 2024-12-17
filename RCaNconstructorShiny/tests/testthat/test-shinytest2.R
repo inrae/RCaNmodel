@@ -1,5 +1,6 @@
 library(shinytest2)
-devtools::load_all("../../")
+library(RCaNconstructor)
+# devtools::load_all("../../")
 addNode <- function(app, id, label, Inside, cmd = "addNode"){
   if (cmd == "addNode"){
     app$run_js(paste0('var network = HTMLWidgets.find("#visnetwork-networkvizproxy");
@@ -42,7 +43,11 @@ addEdge <- function(app, Trophic, from, to , cmd = "addEdge"){
 }
 
 test_that("{shinytest2} recording: visnetwork", {
-  app <- AppDriver$new(name = "visnetwork", height = 873, width = 909, variant = platform_variant())
+  app <- AppDriver$new(launchConstructor(),
+                       name = "visnetwork", 
+                       height = 873, 
+                       width = 909, 
+                       variant = platform_variant())
   app$set_inputs(`visnetwork-shinyjs-delay-b0c7cb97f7e886650b37232cde174d57` = 500,
                  allow_no_input_binding_ = TRUE)
   app$set_inputs(mainpanel = "Edit TrophicNetwork")
@@ -67,7 +72,11 @@ test_that("{shinytest2} recording: visnetwork", {
 
 
 test_that("{shinytest2} recording: componentsfluxes", {
-  app <- AppDriver$new(name = "componentsfluxes", height = 873, width = 909, variant = platform_variant())
+  app <- AppDriver$new(launchConstructor(),
+                       name = "componentsfluxes",
+                       height = 873, 
+                       width = 909,
+                       variant = platform_variant())
   app$set_inputs(`visnetwork-shinyjs-delay-b0c7cb97f7e886650b37232cde174d57` = 500,
                  allow_no_input_binding_ = TRUE)
   app$set_inputs(mainpanel = "Edit TrophicNetwork")
@@ -110,8 +119,12 @@ test_that("{shinytest2} recording: componentsfluxes", {
 
 
 test_that("{shinytest2} recording: loadfile", {
-  app <- AppDriver$new(variant = platform_variant(), name = "loadfile", height = 873, 
-                       width = 909, shiny_args = list(test.mode = TRUE))
+  app <- AppDriver$new(launchConstructor(),
+                       variant = platform_variant(),
+                       name = "loadfile",
+                       height = 873, 
+                       width = 909,
+                       shiny_args = list(test.mode = TRUE))
   app$click("files-open")
   app$upload_file(`files-loadname` = system.file("extdata",
                                                  "CaN_template_mini.xlsx", package = "RCaNmodel"))
@@ -128,7 +141,11 @@ test_that("{shinytest2} recording: loadfile", {
 
 
 test_that("{shinytest2} recording: importobs", {
-  app <- AppDriver$new(name = "importobs", height = 643, width = 906, variant = platform_variant())
+  app <- AppDriver$new(launchConstructor(),
+                       name = "importobs",
+                       height = 643, 
+                       width = 906,
+                       variant = platform_variant())
   app$set_inputs(`visnetwork-shinyjs-delay-9da50a375729c9b2344463f26fc34234` = 500, 
                  allow_no_input_binding_ = TRUE)
   app$set_inputs(mainpanel = "Observations")
@@ -152,6 +169,7 @@ test_that("{shinytest2} recording: importobs", {
   app$set_inputs(`tabmetaobs-importid-copypaste-data_pasted` = "", wait_ = FALSE)
   app$set_inputs(`tabmetaobs-importid-copypaste-name` = "", wait_ = FALSE)
   app$set_inputs(`tabmetaobs-importid-hidden` = "03e87e631056c5863738e7a8", wait_ = FALSE)
+  app$wait_for_idle()
   app$upload_file(`tabmetaobs-importid-file-file` = system.file("extdata",
                                                                 "CaN_template_mini.xlsx", package = "RCaNmodel"))
   app$set_inputs(`tabmetaobs-importid-file-sheet_open` = TRUE, allow_no_input_binding_ = TRUE, wait_ = FALSE)
@@ -191,7 +209,11 @@ test_that("{shinytest2} recording: importobs", {
 
 
 test_that("{shinytest2} recording: constraints", {
-  app <- AppDriver$new(name = "constraints", height = 873, width = 909, variant = platform_variant())
+  app <- AppDriver$new(launchConstructor(),
+                       name = "constraints", 
+                       height = 873, 
+                       width = 909, 
+                       variant = platform_variant())
   app$click("files-open")
   app$upload_file(`files-loadname` = system.file("extdata",
                                                  "CaN_template_mini.xlsx", package = "RCaNmodel"))
