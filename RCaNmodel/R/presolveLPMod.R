@@ -75,7 +75,8 @@ presolveLPMod <-
     set.constr.type(lp_model, c(rep("<=", nrow(A)), rep("=", nrow(C))))
     dimnames(lp_model) <- list(c(rownames(A), rownames(C)), colnames(A))
     
-    lp.control(lp_model, sense = sense, presolve = presolve, scaling = scaling)
+    lp.control(lp_model, sense = sense, presolve = presolve, scaling = scaling,
+               timeout = 30)
     set.objfn(lp_model, runif(nbparam))
     res <- solve.lpExtPtr(lp_model)
     
