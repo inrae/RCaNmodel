@@ -1,0 +1,3 @@
+[submodule "RCaNExplorer"]
+	path = RCaNExplorer
+	url = https://github.com/TanguyGen/RCaNExplorer.git
