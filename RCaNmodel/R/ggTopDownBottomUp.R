@@ -9,7 +9,7 @@
 #' @return a ggplot
 #' @importFrom magrittr %>%
 #' @importFrom tidyr pivot_longer
-#' @importFrom rlang !! sym
+#' @importFrom rlang !! sym .data
 #' @importFrom dplyr filter
 #' @importFrom dplyr slice
 #' @importFrom dplyr n
@@ -84,8 +84,8 @@ ggTopDownBottomUp <- function(mysampleCaNmod,
   # Transform the mcmc output into a 4 col vector with simulation id, year, variable and value
   mcmc <- mysampleCaNmod$mcmc
   myCaNmodFit_long <- as.data.frame(as.matrix(mcmc)) %>%
-    mutate(Sample_id = 1:dim(as.matrix(mcmc))[1]) %>%
-    slice(seq(1, n(),by = round(n() / (frac * n())))) %>%
+    mutate(Sample_id = seq_len(nrow(as.matrix(mcmc)))) %>%
+    slice(round(seq(1, length(.data[["Sample_id"]]), length.out = round(frac * length(.data[["Sample_id"]]))))) %>%
     pivot_longer(cols = -!!sym("Sample_id"),
                  names_to = c("Var","Year"),
                  names_pattern = "(.*)\\[(.*)\\]",
@@ -146,7 +146,7 @@ ggTopDownBottomUp <- function(mysampleCaNmod,
                  values_to="correlation")
 
   ggplot(data = cortable) +
-    geom_vline(xintercept = c(-0.5,0.5), size = 1, alpha = 0.25) +
+    geom_vline(xintercept = c(-0.5,0.5), linewidth = 1, alpha = 0.25) +
     geom_density(aes(x = !!sym("correlation"),
                             fill = !!sym("type"),
                             linetype = !!sym('type')),

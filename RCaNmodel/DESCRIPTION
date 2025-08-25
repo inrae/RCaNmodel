@@ -8,7 +8,7 @@ Authors@R: c(person("Hilaire","Drouineau",email="hilaire.drouineau@irstea.fr",ro
     person("Christian","Mullon",role=c("aut")),
     person("INRAE - Norvegian Institute of Marine Research - IRD",role=("cph")))
 Description: RCaNmodel facilitates the development and exploration of food-web models, and potentially other models, based on a Chance and Necessity approach.
-License: BSD_3_clause + file LICENSE
+License: MIT + file LICENSE
 Imports: 
     symengine,
     Matrix,
@@ -40,10 +40,11 @@ Suggests:
     ggraph,
     igraph,
     testthat (>= 3.0.0),
-    ROI.plugin.cbc
+    ROI.plugin.cbc,
+    openxlsx
 RdMacros: Rdpack
 VignetteBuilder: knitr
-RoxygenNote: 7.2.1
+RoxygenNote: 7.3.1
 Encoding: UTF-8
 LazyData: true
 Depends: 

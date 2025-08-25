@@ -30,16 +30,16 @@
 #' @importFrom dplyr group_by
 #' @importFrom dplyr mutate
 #' @importFrom magrittr %>%
-#' @importFrom rlang !! sym
+#' @importFrom rlang !! sym .data
 #' @importFrom tidyr pivot_longer
 #' @importFrom ggplot2 facet_grid
 #' @importFrom ggplot2 theme
 #' @export
 #'
 ggTrophicRelation <- function(mysampleCaNmod,
-                     species = NULL,
-                     years = NULL,
-                     frac = 1) {
+                              species = NULL,
+                              years = NULL,
+                              frac = 1) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("Package ggplot2 needed for this function to work. Please install it.",
          call. = FALSE)
@@ -52,9 +52,14 @@ ggTrophicRelation <- function(mysampleCaNmod,
     stop("some species are not recognized")
   species <- factor(species, levels = species)
   myCaNmodFit_long <- as.data.frame(as.matrix(mysampleCaNmod$mcmc)) %>%
-    slice(seq(1, n(),by = round(n() / (frac * n())))) %>%
-    mutate("Sample_id" = 1:nrow(as.matrix(mysampleCaNmod$mcmc))) %>%
-    sample_n(min(1000, nrow(as.matrix(mysampleCaNmod$mcmc))), replace = FALSE) %>%
+    mutate("Sample_id" = seq_len(nrow(as.matrix(mysampleCaNmod$mcmc)))) %>%
+    slice(round(seq(1, length(.data[["Sample_id"]]), length.out = round(frac * length(.data[["Sample_id"]]))))) 
+  
+  if (nrow(myCaNmodFit_long) > 1000)
+    myCaNmodFit_long <- myCaNmodFit_long %>%
+    sample_n(1000, replace = FALSE)
+  
+  myCaNmodFit_long <- myCaNmodFit_long %>%
     pivot_longer(cols = -!!sym("Sample_id"),
                  names_to = c("Var","Year"),
                  names_pattern = "(.*)\\[(.*)\\]",
@@ -84,16 +89,16 @@ ggTrophicRelation <- function(mysampleCaNmod,
     summarize("consumption" = sum(!!sym("value")))
   biomass <- biomass %>%
     left_join(fluxes)
-
+  
   biomass$predator <- factor(biomass$predator,
-                            levels = species)
-  biomass$prey <- factor(biomass$prey,
                              levels = species)
+  biomass$prey <- factor(biomass$prey,
+                         levels = species)
   biomass <- biomass %>%
     na.omit()
-
-
-
+  
+  
+  
   g <- ggplot(na.omit(biomass),
               aes(x = !!sym("b"),
                   y = !!sym("consumption"))) +
@@ -106,7 +111,7 @@ ggTrophicRelation <- function(mysampleCaNmod,
     scale_fill_viridis_d() +
     facet_grid(predator ~  prey,
                scales = "free") +
-    guides(colour = FALSE, alpha = FALSE, fill = FALSE) +
+    guides(colour = "none", alpha = "none", fill = "none") +
     xlab('Biomass prey') +
     ylab('Flux to predator') +
     theme(legend.position = "none") +

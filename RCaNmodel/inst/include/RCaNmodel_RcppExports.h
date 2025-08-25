@@ -88,6 +88,27 @@ namespace RCaNmodel {
         return Rcpp::as<List >(rcpp_result_gen);
     }
 
+    inline List degenerateSubSpace(const Eigen::MatrixXd& A, const Eigen::VectorXd& b, const Eigen::MatrixXd& C, const Eigen::VectorXd& v, const Eigen::VectorXd& z) {
+        typedef SEXP(*Ptr_degenerateSubSpace)(SEXP,SEXP,SEXP,SEXP,SEXP);
+        static Ptr_degenerateSubSpace p_degenerateSubSpace = NULL;
+        if (p_degenerateSubSpace == NULL) {
+            validateSignature("List(*degenerateSubSpace)(const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::MatrixXd&,const Eigen::VectorXd&,const Eigen::VectorXd&)");
+            p_degenerateSubSpace = (Ptr_degenerateSubSpace)R_GetCCallable("RCaNmodel", "_RCaNmodel_degenerateSubSpace");
+        }
+        RObject rcpp_result_gen;
+        {
+            RNGScope RCPP_rngScope_gen;
+            rcpp_result_gen = p_degenerateSubSpace(Shield<SEXP>(Rcpp::wrap(A)), Shield<SEXP>(Rcpp::wrap(b)), Shield<SEXP>(Rcpp::wrap(C)), Shield<SEXP>(Rcpp::wrap(v)), Shield<SEXP>(Rcpp::wrap(z)));
+        }
+        if (rcpp_result_gen.inherits("interrupted-error"))
+            throw Rcpp::internal::InterruptedException();
+        if (Rcpp::internal::isLongjumpSentinel(rcpp_result_gen))
+            throw Rcpp::LongjumpException(rcpp_result_gen);
+        if (rcpp_result_gen.inherits("try-error"))
+            throw Rcpp::exception(Rcpp::as<std::string>(rcpp_result_gen).c_str());
+        return Rcpp::as<List >(rcpp_result_gen);
+    }
+
 }
 
 #endif // RCPP_RCaNmodel_RCPPEXPORTS_H_GEN_

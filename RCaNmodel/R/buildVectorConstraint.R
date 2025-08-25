@@ -48,7 +48,7 @@ buildVectorConstraint <-
       members <- as.list(get_args(basic_constraint))
       types <- sapply(members, get_type)
       if ("Pow" %in% types) {
-        numerator <- do.call(sum, members[-which(types == "Pow")])
+        numerator <- do.call(prod, members[-which(types == "Pow")])
         denominator <- members[which(types == "Pow")]
       } else {
         numerator <- basic_constraint

@@ -33,7 +33,7 @@
 #' @importFrom dplyr group_by
 #' @importFrom dplyr mutate
 #' @importFrom magrittr %>%
-#' @importFrom rlang !! sym
+#' @importFrom rlang !! sym .data
 #' @importFrom tidyr pivot_longer
 #' @importFrom tidyr pivot_wider
 #' @importFrom ggplot2 facet_wrap
@@ -65,7 +65,7 @@ ggPairsBiomass <- function(mysampleCaNmod,
 
   myCaNmodFit_long <- as.data.frame(as.matrix(mysampleCaNmod$mcmc)) %>%
     mutate("Sample_id" = 1:nrow(as.matrix(mysampleCaNmod$mcmc))) %>%
-    slice(seq(1, n(), by=round(n() / (frac * n())))) %>%
+    slice(round(seq(1, length(.data[["Sample_id"]]), length.out = round(frac * length(.data[["Sample_id"]]))))) %>%
     pivot_longer(cols = -!!sym("Sample_id"),
                  names_to = c("Var","Year"),
                  names_pattern = "(.*)\\[(.*)\\]",
@@ -83,8 +83,10 @@ ggPairsBiomass <- function(mysampleCaNmod,
                             levels = species)
   biomass <- pivot_wider(biomass,
                          names_from = !!sym("species"),
-                         values_from = !!sym("b")) %>%
-    slice(seq(1, n(), by=round(n() / (frac * n()))))
+                         values_from = !!sym("b")) 
+  nbiom <- nrow(biomass)
+  biomass <- biomass %>%
+    slice(round(seq(1, nbiom, length.out = round(frac * nbiom))))
   g <- ggpairs(biomass,
                columns = 3:ncol(biomass),
                lower = list(continuous = wrap("smooth",

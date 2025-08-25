@@ -85,7 +85,11 @@ sampleCaNCPP <- function(N, A, b, C, v, L, x0, thin, gibbs = TRUE, seed = 1L, st
     .Call(`_RCaNmodel_sampleCaNCPP`, N, A, b, C, v, L, x0, thin, gibbs, seed, stream, covMat)
 }
 
+degenerateSubSpace <- function(A, b, C, v, z) {
+    .Call(`_RCaNmodel_degenerateSubSpace`, A, b, C, v, z)
+}
+
 # Register entry points for exported C++ functions
 methods::setLoadAction(function(ns) {
-    .Call('_RCaNmodel_RcppExport_registerCCallable', PACKAGE = 'RCaNmodel')
+    .Call(`_RCaNmodel_RcppExport_registerCCallable`)
 })

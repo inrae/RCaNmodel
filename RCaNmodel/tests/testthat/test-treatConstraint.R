@@ -1,6 +1,3 @@
-file1 <- system.file("extdata",
-                     "CaN_template_mini.xlsx", package = "RCaNmodel")
-myCaNmod <- buildCaN(file1)
 symbo <- RCaNmodel:::generateSymbolicObjects(myCaNmod$components_param,
                                         myCaNmod$fluxes_def,
                                         nrow(myCaNmod$series),

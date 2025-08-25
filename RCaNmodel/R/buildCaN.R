@@ -11,7 +11,7 @@
 #' (FALSE, default) or a generic model (TRUE)
 #'
 #' @return a CaNmod object with following elements
-#' \itemize{
+#' \describe{
 #'  \item{"components_param"}{the table of components description}
 #'  \item{"species"}{the name of the species}
 #'  \item{"fluxes_def}{the table of fluxes definition}
@@ -31,8 +31,7 @@
 #'  \item{"v"}{vector of active constraints C.x=v}
 #'  \item{"vAll"}{vector of all constraints C.x=v}
 #'  \item{"L"}{matrix of B=L.F, since B0 is a parameter, there is no M}
-#'  \item{"symbolic_enviro"}{an environment storing all symbolic objects
-#'  required for the computation}
+#'  \item{"symbolic_enviro"}{environment storing symbolic objects for the computation}
 #' }
 #' @export
 #'
@@ -61,6 +60,9 @@
 #'                                fluxes_def = fluxes_def,
 #'                                series = series,
 #'                                constraints = constraints))
+#'
+#' #this can be done directly with
+#' myCaNmod <- buildCaN(file)
 #'
 #' #example with a template under the generic format
 #' file <- system.file("extdata",
@@ -296,8 +298,7 @@ buildCaN <- function(x, generic = FALSE) {
           components_param$Component[components_param$Component %in% species],
           function(sp){
             if (! generic) {
-              refuge <- components_param$RefugeBiomass[
-                components_param$Component == sp]
+              refuge <- paste0(sp, "RefugeBiomass")
               refuge <- ifelse(is.na(refuge), 0, refuge)
             } else{
               refuge <- 0
@@ -327,7 +328,7 @@ buildCaN <- function(x, generic = FALSE) {
                   paste(fluxes_def$Flux[fluxes_def$To == sp &
                                           is_trophic_flux], collapse = "+"),
                   "<=",
-                  components_param$Satiation[components_param$Component == sp],
+                  paste0(sp, "Satiation"),
                   "*",
                   sp
                 ),
@@ -358,8 +359,8 @@ buildCaN <- function(x, generic = FALSE) {
                         "[1:(length(",
                         sp,
                         ")-1)]*exp(-",
-                        components_param$Inertia[
-                          components_param$Component == sp],
+                        paste0("head(", sp, "Inertia, -1)"), #we remove the last
+                                                             #inertia
                         ")",
                         sep = ""
                       ),
@@ -377,8 +378,9 @@ buildCaN <- function(x, generic = FALSE) {
                           components_param$Component %in% species &
                             !is.na(components_param$Inertia)],
                         function(sp) {
-                          mu <- components_param$Inertia[
-                            components_param$Component == sp]
+                          mu <- eval(parse(
+                            text = paste0("head(", sp, "Inertia, -1)")),
+                            envir = symbolic_enviro)
                           #decrease
                           immigrants <-
                             as.character(fluxes_def$Flux)[

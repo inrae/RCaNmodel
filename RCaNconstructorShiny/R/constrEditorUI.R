@@ -1,0 +1,100 @@
+#' constrEditorUI
+#' Editor of constrEditorUI
+#' @param id the id of ui
+#' @importFrom shinyWidgets radioGroupButtons pickerInput
+#' @importFrom shiny NS actionButton fluidRow column verbatimTextOutput
+#' @export
+#'
+
+constrEditorUI <- function(id){
+  ns <- NS(id)
+  tagList(shinyjs::useShinyjs(),
+          fluidRow(column(width = 4,
+                          pickerInput(ns("constraintselect"),
+                                      "Constraint",
+                                      choices = "New")),
+                   column(width=4,
+                          shinyjs::disabled(textInput(ns("newname"),
+                                                      "name of the new constraint")))),
+          
+          radioGroupButtons(ns("numbers"),
+                            '',
+                            c(0:9, "."),
+                            size = "xs",
+                            selected = character(0)),
+          radioGroupButtons(ns("brackets"),
+                            '',
+                            c("(", ")", "[",']', ":", ","),
+                            size = "xs",
+                            selected = character(0)),
+          
+          radioGroupButtons(ns("comparisons"),
+                            'comparisons',
+                            c(">=", "<=", "+", "-", "/", "*"),
+                            size = "xs",
+                            selected = character(0)),
+          fluidRow(
+            column(width = 3,
+                   selectInput(ns("components"),
+                               'components',
+                               "",
+                               selected = "")),
+            column(width = 3,
+                   selectInput(ns("fluxes"),
+                               'fluxes',
+                               "",
+                               selected = "")),
+          column(width = 3,
+                 selectInput(ns("obs"),
+                             'observations',
+                             "",
+                             selected = "")),
+          column(width = 3,
+                 selectInput(ns("aliases"),
+                                   'aliases',
+                                   "",
+                                   selected = "")),
+          column(width = 3,
+                 selectInput(ns("years"),
+                                   'years',
+                                   "",
+                                   selected = ""))),
+  
+  fluidRow(
+    column(width = 3,
+           radioGroupButtons(ns("functions"),
+                             'functions',
+                             c("mean(", "sum("),
+                             size = "xs",
+                             selected = character(0)),
+           
+    ),
+    column(width = 3,
+           radioGroupButtons(ns("modifiers"),
+                             'modifiers',
+                             c("Inflows",
+                               "Outflows",
+                               "Before",
+                               "After",
+                               "Ratio",
+                               "Delta",
+                               "BeforeDelta",
+                               "BeforeRatio"),
+                             size = "xs",
+                             selected = character(0)))),
+  
+  actionButton(ns("remove"), "remove element"),
+  radioGroupButtons(
+    inputId = ns("equations"),
+    label = "Formula",
+    choices = "",
+    selected = character(0)
+  ),
+  verbatimTextOutput(ns("message")),
+  actionButton(ns("ok"), "OK"))
+
+
+
+
+
+}

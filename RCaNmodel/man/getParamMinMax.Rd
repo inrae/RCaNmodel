@@ -3,21 +3,23 @@
 \name{getParamMinMax}
 \alias{getParamMinMax}
 \title{getParamMinMax
-Computes the minum value bounds for a parameter p of a polytope defined
+Computes the minimum value bounds for a parameter p of a polytope defined
 by+A.x<=b and C.x=v or by the polytope of the CaNmod object}
 \usage{
-getParamMinMax(OP, p)
+getParamMinMax(OP, p, solution = FALSE)
 }
 \arguments{
 \item{OP}{an OP object}
 
 \item{p}{index of the parameter}
+
+\item{solution}{if TRUE, returns a list with the vector of solution}
 }
 \value{
 a vector with lower bounds and upper bounds
 }
 \description{
 getParamMinMax
-Computes the minum value bounds for a parameter p of a polytope defined
+Computes the minimum value bounds for a parameter p of a polytope defined
 by+A.x<=b and C.x=v or by the polytope of the CaNmod object
 }

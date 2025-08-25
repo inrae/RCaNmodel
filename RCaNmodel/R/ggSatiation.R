@@ -32,7 +32,7 @@
 #' @importFrom dplyr group_by
 #' @importFrom dplyr mutate
 #' @importFrom magrittr %>%
-#' @importFrom rlang !! sym
+#' @importFrom rlang !! sym .data
 #' @importFrom tidyr pivot_longer
 #' @importFrom ggplot2 facet_wrap
 #' @importFrom ggplot2 theme
@@ -55,7 +55,7 @@ ggSatiation <- function(mysampleCaNmod,
   species <- factor(species, levels = species)
   myCaNmodFit_long <- as.data.frame(as.matrix(mysampleCaNmod$mcmc)) %>%
     mutate("Sample_id" = 1:nrow(as.matrix(mysampleCaNmod$mcmc))) %>%
-    slice(seq(1, n(),by = round(n() / (frac * n())))) %>%
+    slice(round(seq(1, length(.data[["Sample_id"]]), length.out = round(frac * length(.data[["Sample_id"]]))))) %>%
     pivot_longer(cols = -!!sym("Sample_id"),
                  names_to = c("Var","Year"),
                  names_pattern = "(.*)\\[(.*)\\]",
@@ -109,7 +109,7 @@ ggSatiation <- function(mysampleCaNmod,
                            colour = NA,
                            breaks = seq(0.1, 1.0, length.out = 10)) +
     scale_fill_viridis_d() +
-    guides(colour = FALSE, alpha = FALSE, fill = FALSE) +
+    guides(colour = "none", alpha = "none", fill = "none") +
     facet_wrap(~predator,
                ncol = ceiling(length(species)^0.5),
                scales = "free") +

@@ -50,7 +50,8 @@ checkPolytopeStatus <- function(x) {
                                                "mergerows"),
                                   scaling = c("extreme",
                                               "equilibrate",
-                                              "integers")))
+                                              "integers"),
+                                  timeout = 30))
   if (requireNamespace("ROI.plugin.cbc", quietly = TRUE)
       & res$status$msg$code == 5){
     res <- ROI_solve(lp_model,
@@ -68,7 +69,8 @@ checkPolytopeStatus <- function(x) {
                                                  "mergerows"),
                                     scaling = c("extreme",
                                                 "equilibrate",
-                                                "integers")))
+                                                "integers"),
+                                    timeout = 30))
     if (requireNamespace("ROI.plugin.cbc", quietly = TRUE)
         & res$status$msg$code ==5){
       res <- ROI_solve(lp_model,
@@ -79,16 +81,16 @@ checkPolytopeStatus <- function(x) {
 
   }
   if (res$status$msg$code == 0) {
-    print("polytope ok")
+    writeLines("polytope ok")
   } else if (res$status$msg$code == 2) {
-    print("empty polytope")
+    writeLines("empty polytope")
   } else if (res$status$msg$code == 3) {
-    print("polytope not bounded")
+    writeLines("polytope not bounded")
   } else if (res$status$msg$code == 9) {
-    print("unique solution")
+    writeLines("unique solution")
   } else if (res$status$msg$code == 5) {
-    print("numerical error")
+    writeLines("numerical error")
   } else {
-    print("potential problem")
+    writeLines("potential problem")
   }
 }

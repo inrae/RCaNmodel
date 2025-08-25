@@ -47,8 +47,10 @@ presolveLPMod <-
     presolve <- c("rows",
                   "lindep",
                   "rowdominate",
-                  "mergerows",
-                  "coldominate")
+                  "mergerows")
+    scaling <- c("extreme",
+                 "equilibrate",
+                 "integers")
     if (is.null(lower)) lower <- rep(0, ncol(A))
     if (is.null(upper)) upper <- rep(Inf, ncol(A))
     if (is.null(C)) {
@@ -72,12 +74,13 @@ presolveLPMod <-
     set.rhs(lp_model, c(b, v))
     set.constr.type(lp_model, c(rep("<=", nrow(A)), rep("=", nrow(C))))
     dimnames(lp_model) <- list(c(rownames(A), rownames(C)), colnames(A))
-
-    lp.control(lp_model, sense = sense, presolve = presolve)
-    set.objfn(lp_model, rep(1, nbparam))
+    
+    lp.control(lp_model, sense = sense, presolve = presolve, scaling = scaling,
+               timeout = 30)
+    set.objfn(lp_model, runif(nbparam))
     res <- solve.lpExtPtr(lp_model)
-
-
+    
+    
     dir <- get.constr.type(lp_model)
     rhs <- get.rhs(lp_model)
     lhs <- matrix(0,length(rhs), dim(lp_model)[2])
@@ -93,22 +96,22 @@ presolveLPMod <-
     if (all(lower == 0)) lower <- NULL
     upper <- bounds$upper
     if (all(is.infinite(upper))) upper <- NULL
-    fixed <- NA
+    fixed <- integer(0)
     if (ncol(lhs) < ncol(A)){
       sol <- get.primal.solution(lp_model, orig = TRUE)[- (1:(nrow(A)+nrow(C)))]
       fixed <- sol[! colnames(A) %in% colnames(lhs)]
       names(fixed) <- colnames(A)[! colnames(A) %in% colnames(lhs)]
     }
-
-
-
-    A2 <- lhs[dir == "<=", ]
+    
+    
+    
+    A2 <- lhs[dir == "<=", , drop = FALSE]
     b2 <- rhs[dir == "<="]
-    C2 <- lhs[dir == "=", ]
+    C2 <- lhs[dir == "=", , drop = FALSE]
     v2 <- rhs[dir == "="]
     if (nrow(lhs) > 0){
       OP <- defineLPMod(A2, b2, C2, v2, bounds$lower, bounds$upper,
-                        maximum = maximum, ob = rep(1, ncol(lhs)))
+                        maximum = maximum, ob = runif(ncol(lhs)))
     } else {
       OP <- NULL
     }

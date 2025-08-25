@@ -1,0 +1,39 @@
+Package: RCaNconstructor
+Type: Package
+Title: What the Package Does (Title Case)
+Version: 0.1.0
+Authors@R: c(person("Hilaire","Drouineau",email="hilaire.drouineau@inrae.fr",role=c("aut","cre")),
+    person("Benjamin","Planque",role=c("aut")),
+    person("Christian","Mullon",role=c("aut")),
+    person("INRAE - Norvegian Institute of Marine Research - IRD",role=("cph")))
+Description: This is a GUI to facilitate the construction of RCaNmodel.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    datamods,
+    dplyr,
+    htmltools,
+    magrittr,
+    openxlsx2,
+    RCaNmodel,
+    readxl,
+    rhandsontable,
+    rlang,
+    shiny,
+    shinyBS,
+    shinybusy,
+    shinydashboard,
+    shinydashboardPlus,
+    shinyjs,
+    shinyWidgets,
+    spsComps,
+    stringr,
+    symengine,
+    tibble,
+    visNetwork
+RoxygenNote: 7.3.1
+Suggests: 
+    shinytest2,
+    showimage,
+    testthat
