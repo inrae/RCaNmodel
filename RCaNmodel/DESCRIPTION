@@ -1,8 +1,8 @@
 Package: RCaNmodel
 Type: Package
 Title: a package to fit Chance and Necessity model
-Version: 2.0
-Date: 2022-09-27
+Version: 23.0
+Date: 2025-05-25
 Authors@R: c(person("Hilaire","Drouineau",email="hilaire.drouineau@irstea.fr",role=c("aut","cre")),
     person("Benjamin","Planque",role=c("aut")),
     person("Christian","Mullon",role=c("aut")),
