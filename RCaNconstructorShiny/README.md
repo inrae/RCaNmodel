@@ -14,19 +14,25 @@ avoiding the use of java. However, please note that:
 ### Installation
 From an R console:
 
-    > library(remotes)
-    > remotes::install_github("https://github.com/inrae/RCaNmodel.git", subdir="RCaNconstructorShiny", dependencies = TRUE)
+```
+library(remotes)
+remotes::install_github("https://github.com/inrae/RCaNmodel.git", subdir="RCaNconstructorShiny", dependencies = TRUE)
+```
     
 or 
 
-    > require(devtools)
-    > devtools::install_github("https://github.com/inrae/RCaNmodel.git", subdir="RCaNconstructorShiny", dependencies = TRUE)
+```
+require(devtools)
+devtools::install_github("https://github.com/inrae/RCaNmodel.git", subdir="RCaNconstructorShiny", dependencies = TRUE)
+```
 
 
 
 ### Usage
-  > library(RCaNconstructorShiny)
-  > launchConstructor()
+```
+library(RCaNconstructor)
+launchConstructor()
+```
 
 ### Bug reporting
 Please report bugs and feature request as [Issues on GitHub](https://github.com/inrae/RCaNmodel/issues).
