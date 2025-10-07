@@ -67,8 +67,8 @@ getTimerestrictedRCaNfile <-
     
     if (is.null(to)) to <- yN
     if (is.null(from)) from <- y0
-    if (from < y0 || from > yN) stop("from should is outside model range")
-    if (to < y0 | to > yN) stop("to should is outside model range")
+    if (from < y0 || from > yN) stop("from is outside model range")
+    if (to < y0 | to > yN) stop("to is outside model range")
     if (to <= from) stop("to should be greater than from")
     if (to == yN & from == y0) stop("model range unchanged")
     
@@ -83,7 +83,9 @@ getTimerestrictedRCaNfile <-
       times <- sapply(constraintsrestricted$`Time-range`,
                       function(x) {
                         tr <- eval(parse(text=x))
-                        paste(deparse(tr[tr %in% from:to]), collapse = "")
+                        gsub("L$",
+                             "",
+                          paste(deparse(tr[tr %in% from:to]), collapse = ""))
                       }
       )
       times <- as.character(sapply(times, dput))
