@@ -102,7 +102,7 @@ getTimerestrictedRCaNfile <-
       if (nrow(years) > 0){
         newyears <- sapply(years[, 2], function(x) {
           oldyears <- eval(parse(text = x))
-          paste0("[", deparse(oldyears[oldyears %in% from:to]), "]")
+          paste0("[", gsub("L$", "", deparse(oldyears[oldyears %in% from:to])), "]")
         })
         names(newyears) <- years[, 1]
         cons <- str_replace_all(cons, fixed(newyears))
