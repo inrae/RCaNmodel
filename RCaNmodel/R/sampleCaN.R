@@ -7,7 +7,7 @@
 #' @param nchain the number of mcmc chains
 #' @param ncore number of cores to use
 #' @param thin thinning interval
-#' @param method one of gibbs (default) or hitandrun
+#' @param method one of CDHR (default from volesti), RDHR (from volesti), gibbs 
 #' @param lastF should flow for last year be simulated (default = FALSE)
 #' @param keepCovMat save or not the covariance matrix (saving can gain time
 #' if new samples should be run but is very memory consuming - default FALSE)
@@ -44,6 +44,7 @@
 #' @importFrom foreach %dopar%
 #' @importFrom foreach %do%
 #' @importFrom stats runif
+#' @importFrom volesti sample_points Hpolytope
 sampleCaN <- function(myCaNmod,
                       N,
                       nchain = 1,
@@ -58,7 +59,7 @@ sampleCaN <- function(myCaNmod,
   } else{
     covMat <- NULL
   }
-  if (! method %in% c("gibbs","hitandrun"))
+  if (! method %in% c("gibbs","hitandrun", 'CDHR', "RDHR"))
     stop("method should be either gibbs or hitandrun")
   ncore <- min(min(detectCores() - 1, ncore), nchain)
   `%myinfix%` <- `%do%`
@@ -171,9 +172,20 @@ sampleCaN <- function(myCaNmod,
     if (any(is.nan(x0)))
       stop("unable to find any suitable solutions after 100 tries")
     writeLines(paste("###Start cpgs chain",i))
-    
-    res <-
-      cpgs(N, A3, b3, x0, thin, method == "gibbs", i, i, covMat)
+    if (methods %in% c("gibbs", 'hitandrun')){
+      res <-
+        cpgs(N, A3, b3, x0, thin, method == "gibbs", i, i, covMat)
+    } else {
+      P <- Hpolytope(A = A3, b = b3)
+      res <- list()
+      res$X <- t(sample_points(P, 
+                               n = N, 
+                               random_walk = list(starting_point = x0, 
+                                                  walk = method,
+                                                  nburns = 1000,
+                                                  walk_length = thin)))
+      res$covMat <- NULL
+    }
     #now we turn back result into original format
     if (length(fixed) > 0){
       res$X <- cbind(res$X, 

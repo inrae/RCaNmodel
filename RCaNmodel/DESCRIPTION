@@ -29,7 +29,8 @@ Imports:
     Rdpack,
     Rcpp,
     dqrng,
-    RcppEigen
+    RcppEigen,
+    volesti
 LinkingTo: Rcpp, RcppEigen, dqrng
 Suggests: 
     kableExtra,
