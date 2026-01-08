@@ -172,7 +172,7 @@ sampleCaN <- function(myCaNmod,
     if (any(is.nan(x0)))
       stop("unable to find any suitable solutions after 100 tries")
     writeLines(paste("###Start cpgs chain",i))
-    if (methods %in% c("gibbs", 'hitandrun')){
+    if (method %in% c("gibbs", 'hitandrun')){
       res <-
         cpgs(N, A3, b3, x0, thin, method == "gibbs", i, i, covMat)
     } else {
