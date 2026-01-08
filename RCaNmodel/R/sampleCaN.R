@@ -50,7 +50,7 @@ sampleCaN <- function(myCaNmod,
                       nchain = 1,
                       ncore = 1,
                       thin = 1,
-                      method = "gibbs",
+                      method = "CDHR",
                       lastF = FALSE,
                       keepCovMat = FALSE) {
   if (inherits(myCaNmod, "sampleCaNmod")){
@@ -177,14 +177,13 @@ sampleCaN <- function(myCaNmod,
         cpgs(N, A3, b3, x0, thin, method == "gibbs", i, i, covMat)
     } else {
       P <- Hpolytope(A = A3, b = b3)
-      res <- list()
-      res$X <- t(sample_points(P, 
-                               n = N, 
-                               random_walk = list(starting_point = x0, 
-                                                  walk = method,
-                                                  nburns = 1000,
-                                                  walk_length = thin)))
-      res$covMat <- NULL
+      res <- list(X = t(sample_points(P, 
+                                      n = N, 
+                                      random_walk = list(starting_point = x0, 
+                                                         walk = method,
+                                                         nburns = 1000,
+                                                         walk_length = thin))),
+                  covMat = NULL)
     }
     #now we turn back result into original format
     if (length(fixed) > 0){
