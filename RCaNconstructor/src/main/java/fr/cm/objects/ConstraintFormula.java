@@ -9,39 +9,23 @@ import java.util.List;
 public class ConstraintFormula {
 
     List<String> tokens = new ArrayList<>();
-
     // --------------------------------------------
-    public static List<String> nombres = new ArrayList<>(Arrays.asList(
-            ".", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",":"
-    ));
+    static List<String> nombres = new ArrayList<>(Arrays.asList(".", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",":"));
     // --------------------------------------------
-    public static List<String> operatorsArithmetiques = new ArrayList<>(Arrays.asList(
-            "+", "-", "*", "/"
-    ));
-
+    static List<String> operatorsArithmetiques = new ArrayList<>(Arrays.asList("+", "-", "*", "/"));
     // --------------------------------------------
-    public static List<String> operatorsUnaires =  new ArrayList<>(Arrays.asList(
-            "sum", "mean"
-    ));
-
+    static List<String> operatorsUnaires =  new ArrayList<>(Arrays.asList("sum", "mean","survey"));
     // --------------------------------------------
-    public static List<String> operatorsComparaison = new ArrayList<>(Arrays.asList(
-            "<=", ">=","="
-    ));
-
+    static List<String> operatorsComparaison = new ArrayList<>(Arrays.asList("<=", ">=","="));
+    static List<String> shortcuts = new ArrayList<>(Arrays.asList("Outflows","Inflows","TrophicInflows","TrophicOuflows","TrophicAllFlows", "After","Before","Delta","Ratio"));
     // --------------------------------------------
-    public static List<String> symbolsAndOperators = new ArrayList<>(Arrays.asList(
-            "(", ")","[", "]", "+", "-", "*", "/", "<=", ">=","=","sum", "mean"));
-
+    static List<String> symbolsAndOperators = new ArrayList<>(Arrays.asList("(", ")","[", "]", "+", "-", "*", "/", "<=", ">=","=","sum", "mean","survey"));
     // --------------------------------------------
-    public static List<String> symbolsAndOperatorsD = new ArrayList<>(Arrays.asList(
-            "(", ")", "[", "]", "+", "-", "*", "/", "&", "#","=","!", "?"));
-
+    static List<String> symbolsAndOperatorsD = new ArrayList<>(Arrays.asList("(", ")", "[", "]", "+", "-", "*", "/", "&", "#","=","!", "?"));
     // --------------------------------------------
     List<String> operatorsBinaires = new ArrayList<>();
     boolean previousTokenIsNumeric;
     int pos;
-
     // --------------------------------------------
     public ConstraintFormula() {
         operatorsBinaires.addAll(operatorsArithmetiques);
@@ -200,7 +184,7 @@ public class ConstraintFormula {
                 newTokens.add(s);
             }
         }
-        // on vérifie la validité de la formule par élimination successive des bloc corrects
+        // on vérifie la validité de la formule par élimination successive des blocs corrects
         // un bloc correct est obtenu a partir des transformations
         // ok [ok] -> ok
         // operateur unaire ( ok ) -> ok
@@ -278,7 +262,7 @@ public class ConstraintFormula {
                     }
                 }
             }
-             tokensOld = newTokens;
+            tokensOld = newTokens;
             // - ok  -> ok (- en première position)
             newTokens = new ArrayList<>();
             for (int t = 0; t < tokensOld.size(); t++) {
@@ -288,23 +272,19 @@ public class ConstraintFormula {
                     newTokens.add(tokensOld.get(t));
                 }
             }
-             tokensOld = newTokens;
-
+            tokensOld = newTokens;
             int nf = tokensOld.size();
             changes = !(nf == nd);
         }
         if(tokensOld.size() !=  1){
-            return ("Unbalanced formula)");
+            return ("Unbalanced formula");
         }
         return ("Ok");
     }
     // ----------------------------------------------------------------------------------
     public int getPos() { return pos; }
-
     public void setPos(int pos) { this.pos = Math.min(pos, tokens.size() - 1); }
-
     public int getNbTokens() { return (tokens.size()); }
-
     public String getToken(int t) { return (tokens.get(t)); }
     // ----------------------------------------------------------------------------------
 

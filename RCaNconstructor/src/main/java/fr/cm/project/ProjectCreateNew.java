@@ -10,6 +10,7 @@ import fr.cm.Main.Context;
 import java.io.File;
 import java.util.Optional;
 
+import fr.cm.Main.Logg;
 import fr.cm.Main.MainApplication;
 import fr.cm.preferences.ColorsAndFormats;
 import javafx.scene.control.*;
@@ -51,10 +52,13 @@ public class ProjectCreateNew extends Dialog<ButtonType> {
                 chooser.setTitle("Select the directory of your project");
                 chooser.setInitialDirectory(new File(Context.getDirName()));
                 File selectedDirectory = chooser.showDialog(MainApplication.stage);
-                Context.setDirName(selectedDirectory.getAbsolutePath());
+                String dirName = selectedDirectory.getAbsolutePath();
+                Context.setDirName(dirName);
                 Context.setFileName(fileName);
                 Context.setStarted(true);
-             }
+                Logg.addLog("Creating "+dirName+"/"+fileName);
+
+            }
         }
     }
     // --------------------------------------------

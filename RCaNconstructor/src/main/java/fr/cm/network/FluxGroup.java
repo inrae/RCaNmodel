@@ -1,6 +1,6 @@
 package fr.cm.network;
 
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import fr.cm.Main.Context;
 import fr.cm.objects.Component;
 import fr.cm.preferences.ColorsAndFormats;
@@ -19,18 +19,16 @@ import javafx.scene.shape.*;
 
 public class FluxGroup extends Group {
     // Group : javafx class pour les objets graphiques
-    Component in;
-    Component out;
+    Component in,  out;
     Color col;
-    Path arrow;
-    Path path;
+    Path arrow,  path;
     Circle circle;
     boolean typeTrophic;
 
     // --------------------------------------------
     public FluxGroup(String i, String o, boolean t) {
-        in = ProjectListsManager.whichComponent(i);
-        out = ProjectListsManager.whichComponent(o);
+        in = ObjectsManager.whichComponent(i);
+        out = ObjectsManager.whichComponent(o);
         typeTrophic = t;
     }
 
@@ -216,7 +214,7 @@ public class FluxGroup extends Group {
     // --------------------------------------------
     public void changeTypeTrophic(boolean newTypeTrophic){
         if(!typeTrophic==newTypeTrophic){
-            ProjectListsManager.addTimeLine(
+            ObjectsManager.addTimeLine(
                     "Change type of flux " + getName() + " : trophic "+ typeTrophic +" -> "+ newTypeTrophic, false);
             typeTrophic = newTypeTrophic;
         }

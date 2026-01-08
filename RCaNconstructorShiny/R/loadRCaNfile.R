@@ -144,11 +144,17 @@ loadRCaNfile <- function(datapath, modelname){
     if (nrow(filenewnetwork$constraints) > 0){
       filenewnetwork$constraints$valid <- TRUE
       filenewnetwork$constraints$validity_comments <- character(nrow(filenewnetwork$constraints))
+    } else {
+      filenewnetwork$constraints$valid <- logical(0)
+      filenewnetwork$constraints$validity_comments <- character(0)
     }
     
     if (nrow(filenewnetwork$aliases) > 0){
       filenewnetwork$aliases$valid <- TRUE
       filenewnetwork$aliases$validity_comments <- character(nrow(filenewnetwork$aliases))
+    } else {
+      filenewnetwork$aliases$valid <- logical(0)
+      filenewnetwork$aliases$validity_comments <- character(0)
     }
     
     

@@ -9,6 +9,7 @@ import fr.cm.Main.Context;
 
 import java.io.File;
 
+import fr.cm.Main.Logg;
 import fr.cm.Main.MainApplication;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
@@ -34,6 +35,7 @@ public class ProjectSaveAs extends Dialog<ButtonType> {
                 Context.setFileName(fileName);
                 Context.setDirName(dirName);
                 Context.setStarted(true);
+                Logg.addLog("Saving "+dirName+"/"+fileName);
             }
         }
     }

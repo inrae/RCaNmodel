@@ -5,15 +5,15 @@
  */
 package fr.cm.objects;
 
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import javafx.beans.property.SimpleStringProperty;
 
 public class Constraint {
 
-    final SimpleStringProperty formula = new SimpleStringProperty();
-    final SimpleStringProperty name = new SimpleStringProperty();
-    final SimpleStringProperty years = new SimpleStringProperty();
-    final SimpleStringProperty comment = new SimpleStringProperty();
+    final SimpleStringProperty formula = new SimpleStringProperty(),
+            name = new SimpleStringProperty(),
+            years = new SimpleStringProperty(),
+            comment = new SimpleStringProperty();
     boolean active;
 
     public Constraint(String name, String formula, String years,
@@ -47,13 +47,13 @@ public class Constraint {
 
     public void changeName(String newName){
         if(! this.getName().equals(newName)){
-            ProjectListsManager.addTimeLine("Change constraint name : " + name + " -> "+ newName, true);
+            ObjectsManager.addTimeLine("Change constraint name : " + name + " -> "+ newName, true);
             setName(newName);
         }
     }
     public void changeActive(boolean newActive){
         if(!active==newActive){
-            ProjectListsManager.addTimeLine("Change position of component  " + name + " : active "+ active +" -> "+ newActive, true);
+            ObjectsManager.addTimeLine("Change position of component  " + name + " : active "+ active +" -> "+ newActive, true);
             active = newActive;
         }
     }

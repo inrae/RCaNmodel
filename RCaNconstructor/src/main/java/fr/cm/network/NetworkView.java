@@ -5,7 +5,7 @@ import fr.cm.objects.ComponentNewDialog;
 import fr.cm.objects.FluxEditDialog;
 import fr.cm.objects.Component;
 import fr.cm.objects.Flux;
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import fr.cm.Main.Context;
 
 import fr.cm.preferences.ColorsAndFormats;
@@ -17,7 +17,6 @@ import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -82,11 +81,11 @@ public class NetworkView extends Pane {
     public void update() {
         ObservableList<Node> components = this.getChildren();
         this.getChildren().removeAll(components);
-        List<Component> listOfComponents = ProjectListsManager.getListOfComponents();
+        List<Component> listOfComponents = ObjectsManager.getListOfComponents();
         for(Component component: listOfComponents){
             component.setPos();
         }
-        List<Flux> listOfFluxes = ProjectListsManager.getListOfFluxes();
+        List<Flux> listOfFluxes = ObjectsManager.getListOfFluxes();
         fond = background();
         interieur = inside();
         this.getChildren().addAll(fond, interieur);
@@ -162,13 +161,13 @@ public class NetworkView extends Pane {
         } else {
             if (addingTrophicLink) {
                 Flux flux = new Flux(originOfLink, clickedComponent, true);
-                ProjectListsManager.addLink(flux, true);
+                ObjectsManager.addLink(flux, true);
                 resetLink();
                 update();
             }
             if (addingNonTrophicLink) {
                 Flux flux = new Flux(originOfLink, clickedComponent, false);
-                ProjectListsManager.addLink(flux, true);
+                ObjectsManager.addLink(flux, true);
                 resetLink();
                 update();
              }
@@ -200,9 +199,5 @@ public class NetworkView extends Pane {
         originOfLink = clickedComponent;
         this.addingNonTrophicLink = addingNonTrophicLink;
     }
-    // -------------------------------------------------------------------------------------
-    public  void setOriginOfLink(Component origin) {
-        this.originOfLink = origin;
-    }
-    // -------------------------------------------------------------------------------------
+     // -------------------------------------------------------------------------------------
 }

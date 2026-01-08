@@ -15,12 +15,10 @@ import fr.cm.objects.Component;
 public class Flux extends FluxGroup {
     // --------------------------------------------
     public Flux(String i, String o, boolean t) {
-
         super(i,o,t);
     }
     // --------------------------------------------
     public Flux(Component i, Component o, boolean t) {
-
         super(i,o,t);
     }
     // ---------------------------------------------------------------------

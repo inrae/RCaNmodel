@@ -6,7 +6,7 @@
 package fr.cm.objects;
 
 import fr.cm.network.ComponentGroup;
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import fr.cm.preferences.Strings;
 
 
@@ -39,30 +39,25 @@ public class Component extends ComponentGroup {
     public double[] getParameters() {
         return (parameters);
     }
-
     public double getParameters(int p) {
         return (parameters[p]);
     }
-
     public void setParameters(double[] param) {
         System.arraycopy(param,0,parameters,0,np);
     }
-
     // --------------------------------------------
-
     public void changeParameters(int p, String newVal){
         double nVal;
         try {
             nVal = Double.parseDouble(newVal);
             if ((Math.abs(nVal - parameters[p]) > 0.0000001) && nVal>=0.0) {
-                ProjectListsManager.addTimeLine("Change value of parameter "
+                ObjectsManager.addTimeLine("Change value of parameter "
                         + Strings.getParametersNames(p)+ " for component  "
                         + this.getName() + " : " + parameters[p] + " -> " + newVal, true);
                 parameters[p] = nVal;
             }
         }
         catch (NumberFormatException e) {
-
         }
     }
 }

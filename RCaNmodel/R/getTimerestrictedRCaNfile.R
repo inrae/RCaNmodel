@@ -67,8 +67,8 @@ getTimerestrictedRCaNfile <-
     
     if (is.null(to)) to <- yN
     if (is.null(from)) from <- y0
-    if (from < y0 || from > yN) stop("from should is outside model range")
-    if (to < y0 | to > yN) stop("to should is outside model range")
+    if (from < y0 || from > yN) stop("from is outside model range")
+    if (to < y0 | to > yN) stop("to is outside model range")
     if (to <= from) stop("to should be greater than from")
     if (to == yN & from == y0) stop("model range unchanged")
     
@@ -83,7 +83,9 @@ getTimerestrictedRCaNfile <-
       times <- sapply(constraintsrestricted$`Time-range`,
                       function(x) {
                         tr <- eval(parse(text=x))
-                        paste(deparse(tr[tr %in% from:to]), collapse = "")
+                        gsub("L$",
+                             "",
+                          paste(deparse(tr[tr %in% from:to]), collapse = ""))
                       }
       )
       times <- as.character(sapply(times, dput))
@@ -100,7 +102,7 @@ getTimerestrictedRCaNfile <-
       if (nrow(years) > 0){
         newyears <- sapply(years[, 2], function(x) {
           oldyears <- eval(parse(text = x))
-          paste0("[", deparse(oldyears[oldyears %in% from:to]), "]")
+          paste0("[", gsub("L$", "", deparse(oldyears[oldyears %in% from:to])), "]")
         })
         names(newyears) <- years[, 1]
         cons <- str_replace_all(cons, fixed(newyears))
@@ -118,7 +120,10 @@ getTimerestrictedRCaNfile <-
     }
     
     if (!is.null(aliases)){
-      names(aliases) <- c("Alias", "Formula")
+      names_aliases <- setdiff(names(aliases),
+                               c("Alias", "Formula"))
+      aliases <- aliases |>
+        dplyr::select(dplyr::all_of(c("Alias", "Formula", names_aliases)))
       if (nrow(aliases > 0)){
         for (i in seq_len(nrow(aliases))){
           aliases[i, 2] <- replaceformula(aliases[i, 2])

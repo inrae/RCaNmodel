@@ -5,7 +5,7 @@ import fr.cm.dialogs.HelpDialog;
 import fr.cm.xmlFiles.HelpListXML;
 import fr.cm.xmlFiles.HelpXML;
 import fr.cm.xmlFiles.RCommandListXML;
-import fr.cm.xmlFiles.RCommandXML;
+import fr.cm.rCaller.RCaNScript;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Menu;
@@ -19,18 +19,15 @@ import java.util.List;
 public class MenuHelp {
 
     static List<MenuItem> menuItems = null;
-    static final Menu what = new Menu("What");
-    static final Menu how = new Menu("How");
-    static final Menu parameters =  new Menu("Parameters");
-    static final Menu rCommands =  new Menu("R Commands");
+    static final Menu what = new Menu("What"),
+            how = new Menu("How"),
+            parameters =  new Menu("Parameters"),
+            rCommands =  new Menu("R Commands");
 
     static List<Menu> menus = Arrays.asList(what, how, parameters, rCommands);
-
     static BorderPane borderPaneRacine;
-
     List<HelpXML> helpsXML = null;
-    List<RCommandXML> RCommandXMLS = null;
-
+    List<RCaNScript> RCaNScriptXMLS = null;
     public MenuHelp(BorderPane borderPaneRacine) {
         MenuHelp.borderPaneRacine = borderPaneRacine;
         menuItems = new ArrayList<>();
@@ -51,35 +48,30 @@ public class MenuHelp {
             menuItems.add(menuItem);
             menuItem.setOnAction(MenuListener);
         }
-        RCommandXMLS = RCommandListXML.getListOfRCommandXML();
+        RCaNScriptXMLS = RCommandListXML.getListOfRCommandXML();
 
-        for(RCommandXML rCommandXML : RCommandXMLS){
-            MenuItem menuItem = new MenuItem(rCommandXML.getTextMenu());
+        for(RCaNScript rCaNScriptXML : RCaNScriptXMLS){
+            MenuItem menuItem = new MenuItem(rCaNScriptXML.getTextMenu());
             rCommands.getItems().add(menuItem);
             menuItems.add(menuItem);
             menuItem.setOnAction(MenuListenerR);
         }
-
     }
 
     public static List<Menu> getMenus() {
         return menus;
     }
-
     static final EventHandler<ActionEvent> MenuListener = e -> handle(e);
-
     static final EventHandler<ActionEvent> MenuListenerR = e -> handleR(e);
-
     private static void handle(ActionEvent e) {
         MenuItem menuItem = (MenuItem) e.getSource();
         HelpXML helpXML = HelpListXML.getHelpByTextMenu(menuItem.getText());
         new HelpDialog(helpXML);
     }
-
     private static void handleR(ActionEvent e) {
         MenuItem menuItem = (MenuItem) e.getSource();
-        RCommandXML rCommandXML = RCommandListXML.getRCommandByMenu(menuItem.getText());
-        new HelpDialog(rCommandXML);
+        RCaNScript rCaNScriptXML = RCommandListXML.getRCommandByMenu(menuItem.getText());
+        new HelpDialog(rCaNScriptXML);
     }
 
 }

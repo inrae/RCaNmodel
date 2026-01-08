@@ -1,9 +1,8 @@
 package fr.cm.objects;
 
-
 import fr.cm.dialogs.TextAreaDialog;
 import fr.cm.Main.Context;
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import fr.cm.preferences.ColorsAndFormats;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,12 +16,9 @@ import javafx.scene.text.Text;
 
 public class TimeLineTable extends Pane {
     // ---------------------------------
-
     final TableView<TimeLine> table;
     ObservableList<TimeLine> list;
-    double width = Context.getWindowWidth();
-    double height =  Context.getWindowHeight();
-
+    double width = Context.getWindowWidth(), height =  Context.getWindowHeight();
     public TimeLineTable() {
         table = new TableView<>();
         table.setEditable(true);
@@ -40,7 +36,7 @@ public class TimeLineTable extends Pane {
                     new TextAreaDialog("Edit annotation",oComment);
                     String nComment = Context.getTextAreaContent();
                     if(!nComment.equals(oComment)) {
-                        ProjectListsManager.updateAction(row, nComment);
+                        ObjectsManager.updateAction(row, nComment);
                         table.refresh();
                     }
                 }
@@ -84,7 +80,7 @@ public class TimeLineTable extends Pane {
         table.getColumns().add(whichTimeLineCol);
         table.getColumns().add(commentAuthorCol);
 
-        list = FXCollections.observableArrayList(ProjectListsManager.getListOfTimeLines());
+        list = FXCollections.observableArrayList(ObjectsManager.getListOfTimeLines());
         table.setItems(list);
         table.getSelectionModel().selectFirst();
         table.setPrefWidth(0.8*width);
@@ -101,8 +97,8 @@ public class TimeLineTable extends Pane {
             String nComment = Context.getTextAreaContent();
             TimeLine timeLine = new TimeLine("Added by author",nComment);
             timeLine.print();
-            ProjectListsManager.addTimeLine(timeLine,false);
-            list = FXCollections.observableArrayList(ProjectListsManager.getListOfTimeLines());
+            ObjectsManager.addTimeLine(timeLine,false);
+            list = FXCollections.observableArrayList(ObjectsManager.getListOfTimeLines());
             table.setItems(list);
             table.refresh();
         });

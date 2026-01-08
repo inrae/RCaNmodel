@@ -5,7 +5,7 @@
  */
 package fr.cm.objects;
 
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import fr.cm.Main.Context;
 import fr.cm.preferences.ColorsAndFormats;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -26,12 +26,10 @@ import javafx.scene.layout.VBox;
  */
 public class FluxTable extends Pane {
 // ---------------------------------
-
     final TableView<Flux> table;
     ObservableList<Flux> list;
-
-    double width = Context.getWindowWidth();
-    double height =  Context.getWindowHeight();
+    double width = Context.getWindowWidth(),
+            height =  Context.getWindowHeight();
 
     public FluxTable() {
         table = new TableView<>();
@@ -62,7 +60,7 @@ public class FluxTable extends Pane {
         table.getColumns().add(in);
         table.getColumns().add(out);
 
-        list = FXCollections.observableArrayList(ProjectListsManager.getListOfFluxes());
+        list = FXCollections.observableArrayList(ObjectsManager.getListOfFluxes());
         table.setItems(list);
         table.getSelectionModel().selectFirst();
         table.setPrefWidth(0.8*width);
@@ -73,7 +71,7 @@ public class FluxTable extends Pane {
         deleteG.setOnAction((ActionEvent e) -> {
             if (table.getSelectionModel().getSelectedItem() != null) {
                 Flux flux = table.getSelectionModel().getSelectedItem();
-                ProjectListsManager.removeLink(flux);
+                ObjectsManager.removeLink(flux);
                 list.removeAll(flux);
             }
         });
@@ -81,14 +79,14 @@ public class FluxTable extends Pane {
         final Button buttonUp = new Button("Up");
         buttonUp.setOnAction((ActionEvent e) -> {
             Flux flux = table.getSelectionModel().getSelectedItem();
-            ProjectListsManager.upLink(flux);
+            ObjectsManager.upLink(flux);
             updateTable();
         });
 
         final Button buttonDown = new Button("Down");
         buttonDown.setOnAction((ActionEvent e) -> {
             Flux flux = table.getSelectionModel().getSelectedItem();
-            ProjectListsManager.downLink(flux);
+            ObjectsManager.downLink(flux);
             updateTable();
         });
 
@@ -96,8 +94,6 @@ public class FluxTable extends Pane {
         final HBox hBoxButton = new HBox();
         hBoxButton.getChildren().addAll(buttonUp, buttonDown, deleteG, how);
         hBoxButton.setSpacing(80.0);
-        // hbox.setMinSize(500.0, 120.0);
-
 
         final Label title = new Label("System fluxes");
         title.setFont(ColorsAndFormats.titleFont);
@@ -118,7 +114,7 @@ public class FluxTable extends Pane {
     public void updateTable() {
         Flux flux = table.getSelectionModel().getSelectedItem();
         table.getItems().removeAll(list);
-        list = FXCollections.observableArrayList(ProjectListsManager.getListOfFluxes());
+        list = FXCollections.observableArrayList(ObjectsManager.getListOfFluxes());
         table.setItems(list);
         table.getSelectionModel().select(flux);
      }

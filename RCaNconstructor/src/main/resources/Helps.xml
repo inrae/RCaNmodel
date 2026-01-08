@@ -1,0 +1,609 @@
+<helps>
+    <!--  +++++++++++++++++++++++++++++ -->
+    <help>
+        <id>
+            whatRCaN
+        </id>
+        <menu>
+            What is RCaN modeling
+        </menu>
+        <submenu>
+            What
+        </submenu>
+        <text>
+            Rather than attempting to model multiple ecological processes in details, CaN modelling focuses on exploring possible ecological dynamics given a set of constraints.
+            This approach is called: Chance and Necessity (CaN) modelling: chance refer to the indeterminacy in ecological processes while necessity reflects the constraints that delineate what is possible from what isn't.
+            The first constituent of a CaN model is the food-web structure, which is defined as a network. In this network, each vertex/node corresponds to a species, or more generally a trophospecies, i.e. a group or sub-group of species that share common prey and predators. Trophospecies are usually within the model domain and their biomass trajectories are explicitly considered. It is however possible to add species that are outside the model domain, and for which the biomass trajectories are not considered.
+            The library RCaN in the R language (refs...) provides a platform for running chance and necessity modelling for food-webs. RCaN require that the model be specified in a standardised form and provided as a file in xlsx format.
+            The Java application RCaN constructor is designed to help modellers and non-modellers to jointly specify the food-web model structure, parametrisation and input data and to build the associated xlsx file that can then be explored using RCaN.
+            The principles of Chance and Necessity modelling and their application to modelling of marine food-webs can be found in
+            Planque,B. and Mullon, C. 2020 Modelling chance and necessity in natural systems, ICES Journal of Marine Science, Volume 77, Issue 4,
+            Pages 1573-1588, https://doi.org/10.1093/icesjms/fsz173.
+        </text>
+        <image>
+            No
+        </image>
+    </help>
+    <!--  +++++++++++++++++++++++++++++ -->
+    <help>
+        <id>
+            whatComponent
+        </id>
+        <menu>
+            What is a component
+        </menu>
+        <submenu>
+            What
+        </submenu>
+        <text>
+            A component corresponds to a species, or more generally a trophospecies,
+            i.e. a group or sub-group of species that share common prey and predators.
+            Components  may be within the model domain; then their biomass trajectories are explicitly considered.
+            They also may be outside the model domain, then we have not knowledge of their biomass trajectories.
+            An edge/link corresponds to a flux of biomass from/to comp. Most fluxes are trophic: from a prey to a predator. Some fluxes are non-trophic:  they correspond to import/export of biomass from adjacent regions or to removal of biomass through fishing.
+            Inside components
+            Outside components
+        </text>
+        <image>
+            Component.png
+        </image>
+    </help>
+    <!--  +++++++++++++++++++++++++++++ -->
+    <help>
+        <id>
+            whatFlux
+        </id>
+        <menu>
+            What is a flux
+        </menu>
+        <submenu>
+            What
+        </submenu>
+        <text>
+            A flux is a flux of biomass from a component to another component.
+            Most fluxes are trophic: from a prey to a predator.
+            Some fluxes are non-trophic:  they correspond to import/export of biomass from adjacent regions or to removal of biomass through fishing.
+        </text>
+        <image>
+            Flux.png
+        </image>
+    </help>
+    <!--  +++++++++++++++++++++++++++++ -->
+    <help>
+        <id>
+            whatSystem
+        </id>
+        <menu>
+            What is the network
+        </menu>
+        <submenu>
+            What
+        </submenu>
+        <text>
+            In CaN modelling, the food-web is defined as a network.
+            In this network, each vertex/node is called a component.
+            An edge/link corresponds to a flux of biomass from a component to another component.
+        </text>
+        <image>
+            Network.png
+        </image>
+    </help>
+    <!--  +++++++++++++++++++++++++++++ -->
+    <help>
+        <id>
+            whatObservation
+        </id>
+        <menu>
+            What are observations
+        </menu>
+        <submenu>
+            What
+        </submenu>
+        <text>
+            The CaN modelling approach emphasizes the past observa-tions of the dynamics of the food-web.
+            Observations can be: catch or landingsdata, biological samples of specific populations, stomach samples or other sourcesof diet information, survey abundance estimates, outputs from stock assessmentmodels, estimated ranges of biomass, and so on.        </text>
+        <image>
+            ObservationView.png
+        </image>
+    </help>
+    <!--  +++++++++++++++++++++++++++++ -->
+    <help>
+        <id>
+            whatFileWithObservation
+        </id>
+        <menu>
+            What are input files
+        </menu>
+        <submenu>
+            What
+        </submenu>
+        <text>
+            An observation file is a csv (comma separated values) file that contains time series of observations that can be used to constrain the model.
+            The file has a matrix format in which each row is a time step (usually a year) and each column is a variable.
+            The first column contains the time (year) information.
+            In RCaN it is possible to import data series from several observation files.       </text>
+        <image>
+            No
+        </image>
+    </help>
+    <!--  +++++++++++++++++++++++++++++ -->
+    <help>
+        <id>
+            whatMeta
+        </id>
+        <menu>
+            What is meta information
+        </menu>
+        <submenu>
+            What
+        </submenu>
+        <text>
+            The meta-information documents how the model was constructed.
+
+            There is a dedicated template to document the model domain, purpose, structure, parameters, data sources and uncertainties.
+            This templates also documents the model version and date, and provides information about authorship and project funding.
+
+            For each constraint, there is a 'comment' field where one can explicitly describe (in plain words) what the constraint equation represents.
+
+            The meta information supports traceability and transparency of the modelling process. It can be used to document the model in publications. It is valuable to communicate knowledge and information about the model building to other parties, and to keep track of the model development through time.        </text>
+        <image>
+            No
+        </image>
+    </help>
+
+    <help>
+        <id>
+            templates
+        </id>
+        <menu>
+            What is a RCaN-File
+        </menu>
+        <submenu>
+            What
+        </submenu>
+        <text>
+            File formats
+
+            Input Data series are provide in comma sperated valure (CSV) format
+            The first line : names of columns (variables)
+            The first column : years
+
+            The RCaNconstructor saves models into xlsx format files.
+            The xlsx file is structured in several worksheets:
+            - Worksheet "Components  input parameter": includes the following columns:
+            "Component": name of components,
+            "Inside": indicates whether the component is inside (1) or outside (0) the model domain,
+            "AssimilationE": the assimilation efficiency input parameter,
+            "Digestibility": the digestibility input parameter,
+            "OtherLosses": input parameter for the the metabolic and other losses,
+            "Inertia": the inertia parameter,
+            "Satiation": the satiation parameter,
+            "RefugeBiomass": the refuge biomass parameter.
+
+            - Worksheet "Fluxes": includes the following columns:
+            "Flux": name of the flux (usually in the from "prey_predator"),
+            "From": name of the source component,
+            "To": name of the sink component,
+            "Trophic": indicates if the flux is trophic (1) or non-trophic (0)
+
+            - Worksheet "Constraints": includes the following columns:
+            "Id": a unique identifier for each constraints,
+            "Constraint": equation of the equality or inequality constraint,
+            "Time-range": the selection of time steps (years) for which the constraint operate,
+            "Active": a switch to specify if the constraint is active (1) or inactive (0)
+            "Comment": a description of the constraint in plain words
+
+            - Worksheet "Input time-series": includes the following columns:
+            "Year": a discrete time counter (years),
+            All other columns are user-defined and refer to input data series.
+
+            - Worksheet "INFO"
+            This worksheet is optional. It Contains the meta-information about the model.
+            the first column contains the name of the information fields,
+            the second column contains the information provided by the user,
+            the third column contains a description of the information field (i.e. what kind of information is expected to be reported).
+
+            - Worksheet "FileWithObservation"
+            This worksheet is optional. It Contains the meta-information about the input data files.
+
+        </text>
+        <image>
+            No
+        </image>
+    </help>
+    <!--  +++++++++++++++++++++++++++++ -->
+    <help>
+        <id>
+            constraints
+        </id>
+        <menu>
+            What are constraints
+        </menu>
+        <submenu>
+            What
+        </submenu>
+        <text>
+
+            Constraints are at the heart of RCaN modelling. CaN stands for 'Chance and Necessity' and the constraints are used to express necessity. Constraints are the way by which knowledge and data enter RCaN. There are implicit and explicit constraints. These are detailed below:
+
+            1: RCaN implicit constraints:
+            RCaN models always contain few constraints that are implicit. These are:
+            - Biomass must be positive and above the refuge biomass (see parameter in the menu view>components),
+            - Flows between two components are always positive,
+            - Satiation: The sum of flows into a component, from time t to t+1, cannot exceed B(t)*sigma, where B(t) is the biomass at time t and sigma is the satiation parameter (see parameter in the menu view>components),
+            - Inertia: The biomass of a component at time t+1 cannot be greater than B(t)*exp(rho) or lower than B(t)*exp(-rho), where rho is the inertia coefficient (see parameter in the menu view>components).
+
+            2: General principles for writing constraints
+            In addition to the implicit constraints, it is possible to write additional constraints explicitly. These are written in the form of inequalities or equalities. The left side of the (in)equality must contains a reference to one or several components or flows. The right side of the (in)equality can contain fixed values, components, flows, data time series. Below are few examples of syntax for writing constraints:
+            spA and spB are 2 components, spA2spB is a flow between the two species, obsA is an observational time series of species A
+            spA &lt;= 100 # the biomass of species A must be lower or equal to 100
+            spA+spB &lt;= 100 # the combined biomasses of species A an B must be lower or equal to 100
+            spA2spB &lt;= 50 # the flow from species A to species B must be lower or equal to 50
+            spA = obsA # the biomass of species A must equate the observational time series of species A
+            spA &lt;= spB # the biomass of species A must be lower or equal to the biomass of speciesB
+            ...and so on
+
+            2: Constraints using fisheries catch time series
+            The specific case of fisheries catches can be handled in the following way:
+            Consider a species (component inside the model): spA ; a fishery on species A(component outside the model): FA; a flow from the species to the fishery (non-trophic flow): spA2FA; a time series of reported catches of species A by the fishery (data series): CatchA. All are expressed in the same units (e.g. tonnes).
+            If we assume that the reported catches reflect the true catches exactly, we can write the model constraint:
+            spA2FA = CatchA # the flux from species A to the fisheries equates the reported caches
+            If we assume that the reported catches are uncertain by ~10% we can write the 2 model constraints:
+            spA2FA &gt;= CatchA/1.1 # the flux from species A to the fisheries is greater or equal to the reported caches divided by 1.1
+            spA2FA &lt;= CatchA*1.1 # the flux from species A to the fisheries is lesser or equal to the reported caches multiplied by 1.1
+            If we assume that the catches are under-reported and that the true catches are somewhere between what is reported and twice this amount, we can write:
+            spA2FA &gt;= CatchA
+            spA2FA &lt;= CatchA*2
+            and so on...
+
+            3: Constraints using biomass time series, absolute estimates
+            When times-series of absolute biomass estimates are available (e.g. from stock assessments) these can be used to constraint the corresponding modelled biomass.
+            Consider a species (component inside the model): spA; a series of absolute biomass estimate (data series): obsA.
+            If we assume the observation to precisely reflect the true biomass, we can write the model constraint:
+            spA = obsA
+            If we assume that the observed biomass is uncertain by ~10% we can write the 2 model constraints:
+            spA &gt;= obsA/1.1
+            spA &lt;= obsA*1.1
+            If we assume that the observed biomass only represent a fraction of the population and the the true biomass lies somewhere between what is estimated and twice this amount, we can write:
+            spA &gt;= obsA
+            spA &lt;= obsA*2
+            and so on...
+
+            4: Constraints using biomass time series, relative estimates
+            When times-series of relative biomass estimates are available (e.g. from surveys) these can be used to constraint the corresponding modelled biomass.
+            Consider a species (component inside the model): spA; a series of relative biomass estimate (data series): surveyA.
+            If we assume the observation to precisely reflect the relative variations in biomass over time, we can write the model constraint:
+            spA/sum(spA[first_year:last_year]) = obsA/(obsA[first_year:last_year])
+            If we assume that the observed relative changes in biomass are uncertain by ~10% we can write the 2 model constraints:
+            (spA/sum(spA[first_year:last_year])) &gt;= (obsA/(obsA[first_year:last_year]))/1.1
+            (spA/sum(spA[first_year:last_year])) &lt;= (obsA/(obsA[first_year:last_year]))*1.1
+            Changes in biomass in the model and in the data are calculated relative to the reference period indicated in square brackets. Note that this does not necessarily need to run from the first to the last year.
+
+            5: Constraints using consumption time series
+            When times-series of consumption rates are available these can be used to constraint the corresponding trophic flows.
+            Consider a prey species (component inside the model): spA; a predator species (component inside the model): spB; a trophic flow from spA to spB: spA2spB; a time series of estimated consumption of species A by species B: ConsA2B
+            If we assume the observation to precisely reflect the consumption of species A by species B over time, we can write the model constraint:
+            spA2spB = ConsA2B
+            The same logic as above can apply if one want to model uncertainties in the reported consumptions.
+            If the consumption estimates are relative (rather than absolute), it is possible to write the constraint as follows:
+            (spA2spB/sum(spA2spB[firs_year:last_year])) = (ConsA2B/sum(ConsA2B[firs_year:last_year]))
+
+            6: Constraints using timeless absolute bounds
+            Often, there are no data series available to inform on the temporal variations in certain biomass or flows but there is some knowledge about the maximum or minimum values that a component or a flow may take.
+            For example, if the total biomass of species A (spA) is expected to lie between 100 and 1000 tonnes for the whole time series, one can write the following constraints:
+            spA &gt;=100
+            spA &lt;= 1000
+
+            7: Structural constraints (independent of observations)
+            In addition to constraining components/flows based on data or absolute bounds, it is also possible to express structural constraints within the model that are independent of observational time series or absolute bounds.
+            For example, if species C (spC) can feed on species A and B (spA and spB), but we know that species A is always more abundant in the diet of species C, we can write.
+            spA2spC &gt;= spB2spC, which expresses that the flow from spA to spC is always greater than the flow from spB to spC.
+
+            8: applying constraints over limited time span
+            A time period is associated with each constraint. By default this is the period from the first year of observation to the last. However, constrained can be applied to restricted time periods or specific years (or even a single year) when necessary. The selected years are indicated in the fourth column of the constraint table.
+
+            9: Active/inactive constraints
+            For practical reasons, it is possible to de-activate specific constraints. This help in exploring models with similar structure but slightly different sets of constraints, without deleting/rewriting the constraint equations. This is done by ticking/unticking the box in the 'active constraint' column in the menu "View/Constraints".
+        </text>
+        <image>
+            ConstraintView.png
+        </image>
+    </help>
+
+    <!--  +++++++++++++++++++++++++++++ -->
+    <help>
+        <id>
+            howComponent
+        </id>
+        <menu>
+            How to edit components
+        </menu>
+        <submenu>
+            How
+        </submenu>
+        <text>
+            The components view provides a summary of all components in the model. This includes component inside and outside the model domain.
+            The standard parameters for each components can be documented here. These include Assimilation efficiency, Digestibility, Other losses, Inertia, Satiation and Refuge biomass.
+            The values of the parameters can be entered directly in the table.
+            The 'components' table is dynamically linked to the food web structure represented in the network view.
+        </text>
+        <image>
+            No
+        </image>
+    </help>
+    <!--  +++++++++++++++++++++++++++++ -->
+    <help>
+        <id>
+            howConstraint
+        </id>
+        <menu>
+            How to edit constraints
+        </menu>
+        <submenu>
+            How
+        </submenu>
+        <text>
+            Use constraint view
+            - you select a constraint by clicking in corresponding line
+            - clic button new to build a new contraint
+            - you get a dialog which explains how to build a constraint based on tokens;
+            - clic button add to edit a selected constraint
+            ...
+        </text>
+        <image>
+            Constraint.png
+        </image>
+    </help>
+
+    <help>
+        <id>
+            howFile
+        </id>
+        <menu>
+            How to manage input data files
+        </menu>
+        <submenu>
+            How
+        </submenu>
+        <text>
+            Use the data file dialog
+            - you see the list of data files registered
+            - when you select a file in the list, yous see its columns names and the attached meta information
+            - clic button new to register a new data file
+        </text>
+       <image>
+            No
+        </image>
+    </help>
+
+     <help>
+        <id>
+            howLink
+        </id>
+        <menu>
+            How to edit fluxes
+        </menu>
+        <submenu>
+            How
+        </submenu>
+        <text>
+
+            The links view provides a summary of all links between the components of the model. This includes trophic and non-trophic links.
+            It is possible to switch links between tropic and non-trophic by ticking/unticking the 'Trophic link' box (second column of the table).
+            The 'links' table is dynamically linked to the food web structure represented in the network view.
+        </text>
+        <image>
+            No
+        </image>
+    </help>
+
+     <help>
+        <id>
+            howMeta
+        </id>
+        <menu>
+            How to manage meta information
+        </menu>
+        <submenu>
+            How
+        </submenu>
+        <text>
+            Use the meta information view
+            - ...
+        </text>
+       <image>
+            No
+        </image>
+    </help>
+
+     <help>
+        <id>
+            howNetwork
+        </id>
+        <menu>
+            How to edit the trophic network
+        </menu>
+        <submenu>
+            How
+        </submenu>
+        <text>
+            The network view is an interactive graphical representation of the foodweb structure.
+
+            Circles represent components (e.g. trophospecies). The rectangular box indicates the model domain. Components located in/outside the box are in/outside the model domain. To add a component, double-clic on the network map, then enter the component name and specify if the component is inside or outside the model domain. To delete or edit a component, double-clic on the component and choose the relevant option. Components can be moved on the map by clic-and-drag.
+
+            Arrows represent fluxes between components. The arrows point towards the component that receives the flux (typically, the predator). To add a flux, double click on the 'source' component (e.g. the prey), select 'New tropic link' or 'New non trophic link' and then clic on the 'sink' component (e.g. the predator). To delete or edit a flux, double-clic on the corresponding arrow and choose the relevant option. Cannibalistic links can be included by selecting the same component as 'source' and 'sink' for the flux. Cannibalistic links are represented by thick circles around the component.
+
+            The food web structure represented on the network view is dynamically updated in the 'components' and 'links' views.
+        </text>
+        <image>
+            No
+        </image>
+    </help>
+    <!--  +++++++++++++++++++++++++++++ -->
+    <help>
+        <id>
+            howObservation
+        </id>
+        <menu>
+            How to edit observations
+        </menu>
+        <submenu>
+            How
+        </submenu>
+        <text>
+            Use the observation view
+            - clic on observation names to get meta information about it
+            To add and change an observation, use the datafiles view.
+        </text>
+        <image>
+            No
+        </image>
+    </help>
+    <!--  +++++++++++++++++++++++++++++ -->
+    <help>
+        <id>
+            howRunRCaN
+        </id>
+        <menu>
+            How to use RCaN
+        </menu>
+        <submenu>
+            How
+        </submenu>
+        <text>
+            Commands are related to the main steps of the RCaN approach, once the template has been  built,
+            - Building polytope
+            - Sampling polytope
+            - Analysing sample
+            To run a command, clic on the corresponding menu item.
+            In some case, you are asked to define some paramaters.
+            The press the Run button.
+        </text>
+        <image>
+            No
+        </image>
+    </help>
+
+    <help>
+        <id>
+            AssimilationE
+        </id>
+        <submenu>
+            Coefficient
+        </submenu>
+        <menu>
+            Potential assimilation efficiency (gamma)
+        </menu>
+        <text>
+            Potential assimilation efficiency (gamma): the proportion of the biomass ingested by a predator that is effectively assimilated. T
+            he value of the parameter is between zero (no assimilation) and one (complete assimilation).
+            The product of the potential assimilation efficiency by the digestibility correction factor is the absorption efficiency (the proportion of prey biomass digested and absorbed).
+        </text>
+        <image>
+            No
+        </image>
+    </help>
+
+
+    <help>
+        <id>
+            Digestibility
+        </id>
+        <submenu>
+            Coefficient
+        </submenu>
+        <menu>
+            Digestibility correction factor (kappa)
+        </menu>
+        <text>
+            Digestibility correction factor (kappa): a correction factor that accounts for variations in energy content of a prey.
+            The value of the parameter is between zero (no energy content) and one.
+            The product of the potential assimilation efficiency by the digestibility correction factor is the absorption efficiency (the proportion of prey biomass digested and absorbed).
+        </text>
+        <image>
+            No
+        </image>
+    </help>
+
+    <help>
+        <id>
+            Inertia
+        </id>
+        <submenu>
+            Coefficient
+        </submenu>
+        <menu>
+            Inertia (alpha)
+        </menu>
+        <text>
+            Inertia (alpha): a parameter that bounds biomass variations between a maximum growth rate and a maximum mortality rate.
+            The coefficient is strictly positive. The upper bound of biomass variation is given by exp(alpha) and the minimum bound rate is given by exp(-alpha).
+            A value of 0.25 indicates that over 1 time unit (a year) the biomass of a species can reach at most exp(0.25) =  128% and at least exp(-0.25) = 78%  of the original biomass.
+        </text>
+        <image>
+            No
+        </image>
+    </help>
+
+    <help>
+        <id>
+            OtherLosses
+        </id>
+        <submenu>
+            Coefficient
+        </submenu>
+        <menu>
+            Other losses (mu)
+        </menu>
+        <text>
+            Other losses (mu): a mortality coefficient that account for losses, i.e. metabolic losses and other mortality not explicitly accounted for in the model.
+            The losses are expressed in the form exp(-mu). The coefficient is strictly positive.
+            A value of 2 indicates that over 1 time unit (a year) metabolic losses and other mortality losses will represent 1-exp(-2) = 86% of the original biomass (equivalent to 0.55% daily losses).
+        </text>
+        <image>
+            No
+        </image>
+    </help>
+
+    <help>
+        <id>
+            RefugeBiomass
+        </id>
+        <submenu>
+            Coefficient
+        </submenu>
+        <menu>
+            Refuge biomass (beta)
+        </menu>
+        <text>
+            Refuge biomass (beta): the absolute minimum biomass that a species group can reach.
+            This parameter is mostly used for practical calculation and can be set to very low values.
+            Typically 1% of the parameter estimated biomass of a species group, or less.
+        </text>
+        <image>
+            No
+        </image>
+    </help>
+
+    <help>
+        <id>
+            Satiation
+        </id>
+        <submenu>
+            Coefficient
+        </submenu>
+        <menu>
+            Satiation (sigma)
+        </menu>
+        <text>
+            Satiation (sigma): the maximum consumption rate per unit biomass of the predator.
+            The coefficient is strictly positive.
+            A coefficient of 10 indicates that a species group can eat up to 10 times it body weight in the course of \[OpenCurlyQuote] time unit (a year, this is equivalent to a maximum daily consumption rate of 2.7%).
+        </text>
+        <image>
+            No
+        </image>
+    </help>
+
+</helps>
+

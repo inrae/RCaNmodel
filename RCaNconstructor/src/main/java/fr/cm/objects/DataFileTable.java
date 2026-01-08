@@ -1,9 +1,8 @@
 package fr.cm.objects;
 
-import fr.cm.dialogs.HelpDialog;
 import fr.cm.Main.Context;
 import fr.cm.Main.MainApplication;
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import fr.cm.preferences.ColorsAndFormats;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -21,42 +20,19 @@ import static javafx.collections.FXCollections.observableArrayList;
 public class DataFileTable extends Pane {
 // ---------------------------------
 
-    double width = Context.getWindowWidth();
-    double height =  Context.getWindowHeight();
+    double width = Context.getWindowWidth(),
+            height =  Context.getWindowHeight();
     DataFile selectedDataFile;
     // GAUCHE
     Label leftTitle = new Label("Project data files");
     ObservableList<DataFile> listOfFiles;
-    Button buttonNewFile = new Button("Add");
-    Button buttonObservations = new Button("Observations");
-    Button buttonCharacteristics = new Button("Characteristics");
+    Button buttonNewFile = new Button("Add a datafile to above list"),
+            buttonObservations = new Button("Add or remove observations in selected datafile"),
+            buttonCharacteristics = new Button("Edit annotations of selected datafile");
     VBox leftBox = new VBox();
 
     public DataFileTable(){
         TableView<DataFile> tableOfFiles = new TableView<>();
-
-        tableOfFiles.setOnMouseClicked(click -> {
-            if (click.getClickCount() == 2) {
-                @SuppressWarnings("rawtypes")
-                TablePosition pos = tableOfFiles.getSelectionModel().getSelectedCells().get(0);
-                int row = pos.getRow();
-                int col = pos.getColumn();
-                selectedDataFile = ProjectListsManager.getListOfDataFiles().get(row);
-                Context.setTextAreaContent("False");
-                if(col==3){
-                    new DataFileCharacteristicsDialog(selectedDataFile);
-                    tableOfFiles.refresh();
-                }
-                if(col == 2) {
-                    if (selectedDataFile.getNamesColumnInFile().size()==0) {
-                        HelpDialog.warning("No columns in selected data file", "Warning");
-                    } else {
-                        new DataFileObservationsDialog(selectedDataFile);
-                        tableOfFiles.refresh();
-                    }
-                }
-            }
-        });
 
         TableColumn<DataFile, String> idCol = new TableColumn<>("Id");
         idCol.setPrefWidth(0.05 * width);
@@ -68,7 +44,7 @@ public class DataFileTable extends Pane {
         fileNameCol.setCellValueFactory(new PropertyValueFactory<>("shortName"));
         tableOfFiles.getColumns().add(fileNameCol);
 
-        TableColumn<DataFile, String> observationsCol = new TableColumn<>("Observations");
+        TableColumn<DataFile, String> observationsCol = new TableColumn<>("Observations used from this files");
         observationsCol.setPrefWidth(0.2 * width);
         observationsCol.setCellValueFactory(new PropertyValueFactory<>("stringAddedObservations"));
         observationsCol.setCellFactory(tc -> {
@@ -96,15 +72,17 @@ public class DataFileTable extends Pane {
         commentsCol.setEditable(false);
         tableOfFiles.getColumns().add(commentsCol);
 
-
-        listOfFiles = observableArrayList(ProjectListsManager.getListOfDataFiles());
+        listOfFiles = observableArrayList(ObjectsManager.getListOfDataFiles());
         tableOfFiles.setItems(listOfFiles);
         tableOfFiles.getSelectionModel().selectFirst();
         @SuppressWarnings("rawtypes")
         ObservableList<TablePosition> selectedCells = tableOfFiles.getSelectionModel().getSelectedCells();
         selectedCells.addListener((ListChangeListener<TablePosition>) c -> {
-            TablePosition tablePosition = selectedCells.get(0);
-            int nl = tablePosition.getRow();
+            int nl = 0;
+            if(selectedCells.size()>0) {
+                TablePosition tablePosition = selectedCells.get(0);
+                nl = tablePosition.getRow();
+            }
             selectedDataFile = listOfFiles.get(nl);
         });
 
@@ -118,10 +96,10 @@ public class DataFileTable extends Pane {
                     // ADDING A FILE
                     String newFileName = observationFileChooser();
                     DataFile dataFile = new DataFile(newFileName);
-                    ProjectListsManager.addDataFile(dataFile, true);
+                    ObjectsManager.addDataFile(dataFile, true);
                     selectedDataFile = dataFile;
                     tableOfFiles.getSelectionModel().selectLast();
-                    listOfFiles = observableArrayList(ProjectListsManager.getListOfDataFiles());
+                    listOfFiles = observableArrayList(ObjectsManager.getListOfDataFiles());
                     tableOfFiles.setItems(listOfFiles);
                     tableOfFiles.getSelectionModel().selectLast();
                 }
@@ -130,10 +108,11 @@ public class DataFileTable extends Pane {
         buttonCharacteristics.setOnAction(
                 (ActionEvent e) -> {
                     if (selectedDataFile != null) {
-                        new DataFileCharacteristicsDialog(selectedDataFile);
-                        listOfFiles = observableArrayList(ProjectListsManager.getListOfDataFiles());
+                        new DataFileSetCharacteristicsDialog(selectedDataFile);
+                        listOfFiles = observableArrayList(ObjectsManager.getListOfDataFiles());
                         tableOfFiles.setItems(listOfFiles);
                         tableOfFiles.getSelectionModel().selectLast();
+                        tableOfFiles.refresh();
                     }
                 }
         );
@@ -141,18 +120,18 @@ public class DataFileTable extends Pane {
         buttonObservations.setOnAction(
                 (ActionEvent e) -> {
                     if (selectedDataFile != null) {
-                        new DataFileObservationsDialog(selectedDataFile);
-                        listOfFiles = observableArrayList(ProjectListsManager.getListOfDataFiles());
+                        new DataFileAddObservationDialog(selectedDataFile);
+                        listOfFiles = observableArrayList(ObjectsManager.getListOfDataFiles());
                         tableOfFiles.setItems(listOfFiles);
                         tableOfFiles.getSelectionModel().selectLast();
+                        tableOfFiles.refresh();
                     }
                 }
         );
 
-        final Label how = new Label("Include observations or edit annotations with a double clic on cell");
         HBox hBoxButton = new HBox(50);
-        hBoxButton.getChildren().addAll(buttonNewFile, how);
-        hBoxButton.setSpacing(80);
+        hBoxButton.getChildren().addAll(buttonNewFile, buttonObservations, buttonCharacteristics);
+        hBoxButton.setSpacing(20);
         leftBox.getChildren().addAll(leftTitle, tableOfFiles, hBoxButton);
         if(listOfFiles.size()>0){
             selectedDataFile = listOfFiles.get(0);

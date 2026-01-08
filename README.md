@@ -10,6 +10,19 @@ for the intrinsic stochasticity of nature and the existence of physical laws. Th
 facilitates the modelling process (model construction and validation, model exploration, output analysis),
 while the RCaNconstructor GUI provides an interactive/intuitive interface to support 
 a participatory framework.
+
+Since version 2, a new facility was introduced that allow the user to specify the dynamic of the system.
+With such a model, the user specifies of the dynamics of compartments depending on incoming and outputing fluxes and
+the tool then simulates the dynamics of the whole systems accounting for additional constraints. This allow to extend
+the Chance and Necessity approach beyond usual food-web models. A vignette is currently under construction. An example
+of such model is provided with the package:
+
+> system.file("extdata", "CaN_template_mini_generic.xlsx", package = "RCaNmodel")
+
+
+Version 2 also includes a tool called RCaNExplorer that facilitates the interactive
+and fast exploration of the results.
+
  
 
 ## RCaNmodel installation
@@ -17,6 +30,13 @@ For RCaNmodel installation, please look [here](RCaNmodel/README.md)
 
 ## RCaNconstructor installation
 For RCaNconstructor installation, please look [here](https://github.com/inrae/RCaNmodel/releases) (click on "Assets" in the section corresponding to your platform)
+
+## RCaNconstructorShiny
+Besides the former java RCaNconstructor, there is now a Shiny RCaNconstructor to build RCaN file. This avoids the installation of extratools. More info can be found [here](RCaNconstructorShiny/README.md)
+
+## RCaNExplorer installation
+Further information is available [there](https://github.com/TanguyGen/RCaNExplorer)
+
 
 ## Usage
 A vignette is provided with the package to explain how it should be used.

@@ -3,3 +3,5 @@
 .RData
 .Ruserdata
 RCaNmodel.Rproj
+*.DS_Store
+RCaNconstructor/target

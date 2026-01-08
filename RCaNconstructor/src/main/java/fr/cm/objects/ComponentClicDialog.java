@@ -1,7 +1,7 @@
 package fr.cm.objects;
 
 import fr.cm.network.NetworkView;
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 
 import java.util.Optional;
 
@@ -20,9 +20,7 @@ import javafx.stage.Window;
  * @author christianmullon
  */
 public class ComponentClicDialog extends Dialog<ButtonType> {
-
     final Window window;
-
     public ComponentClicDialog(Component component, NetworkView networkView) {
         window = this.getDialogPane().getScene().getWindow();
         window.setOnCloseRequest(event -> window.hide());
@@ -43,7 +41,7 @@ public class ComponentClicDialog extends Dialog<ButtonType> {
                 new ComponentEditDialog(component);
             }
             if (result.get() == buttonTypeDelete) {
-                ProjectListsManager.removeComponent(component);
+                ObjectsManager.removeComponent(component);
             }
             if (result.get() == buttonTypeNewTrophicLink) {
                 networkView.setAddingTrophicLink(true);

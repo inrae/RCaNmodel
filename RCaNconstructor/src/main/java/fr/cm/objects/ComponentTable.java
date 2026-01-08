@@ -5,7 +5,7 @@
  */
 package fr.cm.objects;
 
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import fr.cm.Main.Context;
 import fr.cm.preferences.ColorsAndFormats;
 import fr.cm.preferences.Strings;
@@ -28,13 +28,9 @@ import javafx.scene.layout.Pane;
  */
 public class ComponentTable extends Pane {
 // ---------------------------------
-
-    double width = Context.getWindowWidth();
-    double height =  Context.getWindowHeight();
-
+    double width = Context.getWindowWidth(), height =  Context.getWindowHeight();
     final TableView<Component> table;
     ObservableList<Component> list;
-
     public ComponentTable() {
         super();
         int nbParameters = Strings.getNumberOfParameters();
@@ -91,7 +87,7 @@ public class ComponentTable extends Pane {
             table.getColumns().add(col);
         }
 
-        list = FXCollections.observableArrayList(ProjectListsManager.getListOfComponents());
+        list = FXCollections.observableArrayList(ObjectsManager.getListOfComponents());
         table.setItems(list);
         table.getSelectionModel().selectFirst();
         table.setPrefWidth(0.8*width);
@@ -101,7 +97,7 @@ public class ComponentTable extends Pane {
         deleteG.setOnAction((ActionEvent e) -> {
             if (table.getSelectionModel().getSelectedItem() != null) {
                 Component component = table.getSelectionModel().getSelectedItem();
-                ProjectListsManager.removeComponent(component);
+                ObjectsManager.removeComponent(component);
                 list.removeAll(component);
                 updateTable();
             }
@@ -110,14 +106,14 @@ public class ComponentTable extends Pane {
         final Button buttonUp = new Button("Up");
         buttonUp.setOnAction((ActionEvent e) -> {
             Component component = table.getSelectionModel().getSelectedItem();
-            ProjectListsManager.upComponent(component);
+            ObjectsManager.upComponent(component);
             updateTable();
         });
 
         final Button buttonDown = new Button("Down");
         buttonDown.setOnAction((ActionEvent e) -> {
             Component component = table.getSelectionModel().getSelectedItem();
-            ProjectListsManager.downComponent(component);
+            ObjectsManager.downComponent(component);
             updateTable();
         });
 
@@ -140,7 +136,7 @@ public class ComponentTable extends Pane {
     public void updateTable() {
         Component component = table.getSelectionModel().getSelectedItem();
         table.getItems().removeAll(list);
-        list = FXCollections.observableArrayList(ProjectListsManager.getListOfComponents());
+        list = FXCollections.observableArrayList(ObjectsManager.getListOfComponents());
         table.setItems(list);
         table.getSelectionModel().select(component);
     }

@@ -1,7 +1,6 @@
 package fr.cm.Main;
 
 import fr.cm.project.ProjectCreateNew;
-import fr.cm.project.ProjectListsManager;
 import fr.cm.project.ProjectOpenExisting;
 import fr.cm.project.ProjectSaveAs;
 import javafx.event.ActionEvent;
@@ -14,17 +13,14 @@ import java.util.List;
 
 public class MenuFile {
     // ---------------------------------
-
-    static final MenuItem newItem = new MenuItem("New");
-    static final MenuItem openFileItem = new MenuItem("Open");
-    static final MenuItem saveFileItem = new MenuItem("Save");
-    static final MenuItem saveAsFileItem = new MenuItem("Save as ...");
-    static final MenuItem closeFileItem = new MenuItem("Close");
-    static final MenuItem exitItem = new MenuItem("Exit");
+    static final MenuItem newItem = new MenuItem("New"),
+            openFileItem = new MenuItem("Open"),
+            saveFileItem = new MenuItem("Save"),
+            saveAsFileItem = new MenuItem("Save as ..."),
+            closeFileItem = new MenuItem("Close"),
+            exitItem = new MenuItem("Exit");
     static BorderPane borderPaneRacine;
-
     static List<MenuItem> menuItems = null;
-
     public MenuFile(BorderPane borderPaneRacine) {
         MenuFile.borderPaneRacine = borderPaneRacine;
         menuItems = Arrays.asList(newItem, openFileItem, closeFileItem, saveFileItem, saveAsFileItem, exitItem);
@@ -32,7 +28,6 @@ public class MenuFile {
             menuItem.setOnAction(FileListener);
         }
     }
-
     public static void updateMenus() {
         boolean started = Context.isStarted();
         newItem.setDisable(started);
@@ -42,13 +37,10 @@ public class MenuFile {
         saveAsFileItem.setDisable(! started);
         exitItem.setDisable(false);
     }
-
     public static List<MenuItem> getMenuItems() {
         return menuItems;
     }
-
     static final EventHandler<ActionEvent> FileListener = MenuFile::handle;
-
     private static void handle(ActionEvent e) {
         MenuItem menuItem = (MenuItem) e.getSource();
         int numItem = menuItems.indexOf(menuItem);
@@ -57,26 +49,26 @@ public class MenuFile {
                 new ProjectCreateNew();
                 if (Context.isStarted()) {
                     Context.initRCaN();
-                    ProjectListsManager.init();
-                    ProjectListsManager.makeMetaElementsList();
+                    ObjectsManager.init();
+                    ObjectsManager.makeMetaElementsList();
                     MainApplication.updateMenus();
-                    ProjectListsManager.addTimeLine("Project creation "+ Context.getFileName(),true);
-                    ProjectListsManager.saveExcel();
-                    borderPaneRacine.setCenter(ProjectListsManager.getNetworkView());
+                    ObjectsManager.addTimeLine("Project creation "+ Context.getFileName(),true);
+                    ObjectsManager.saveExcel();
+                    borderPaneRacine.setCenter(ObjectsManager.getNetworkView());
                 }
                 break;
             case 1:
                 new ProjectOpenExisting();
                 if (Context.isStarted()) {
                     Context.initRCaN();
-                    ProjectListsManager.init();
+                    ObjectsManager.init();
                     MainApplication.updateMenus();
-                    ProjectListsManager.getExcel();
-                    borderPaneRacine.setCenter(ProjectListsManager.getNetworkView());
+                    ObjectsManager.getExcel();
+                    borderPaneRacine.setCenter(ObjectsManager.getNetworkView());
                 }
                 break;
             case 2:
-                ProjectListsManager.init();
+                ObjectsManager.init();
                 Context.setStarted(false);
                 MainApplication.updateMenus();
                 MainApplication.setFirstPage();
@@ -86,14 +78,14 @@ public class MenuFile {
                     if(Context.getDirName().length() == 0){
                         new ProjectSaveAs();
                     }
-                    ProjectListsManager.saveExcel();
+                    ObjectsManager.saveExcel();
                 }
                 break;
             case 4:
                 if (Context.isStarted()) {
                     new ProjectSaveAs();
-                    ProjectListsManager.saveExcel();
-                    ProjectListsManager.addTimeLine("Project saved as "+ Context.getFileName(),true);
+                    ObjectsManager.saveExcel();
+                    ObjectsManager.addTimeLine("Project saved as "+ Context.getFileName(),true);
                 }
                 break;
             case 5 :

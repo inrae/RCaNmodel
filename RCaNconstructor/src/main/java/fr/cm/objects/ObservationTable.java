@@ -5,7 +5,7 @@
  */
 package fr.cm.objects;
 
-import fr.cm.project.ProjectListsManager;
+import fr.cm.Main.ObjectsManager;
 import fr.cm.Main.Context;
 import fr.cm.preferences.ColorsAndFormats;
 import javafx.beans.property.SimpleStringProperty;
@@ -24,20 +24,14 @@ import java.util.List;
  */
 public class ObservationTable extends Pane {
 // ---------------------------------
-
     ObservableList<Observation> observableListOfTransposeObservations;
     List<Observation> listOfTransposedObservations;
     Observation selectedObservation = null;
-
     final TableView<Observation> observationTable;
     final VBox vbox = new VBox();
-
-    int no;
-    int ny;
-
-    double width = Context.getWindowWidth();
-    double height = Context.getWindowHeight();
-
+    int no, ny;
+    double width = Context.getWindowWidth(),
+            height = Context.getWindowHeight();
     public ObservationTable() {
         observationTable = new TableView<>();
         observationTable.setEditable(false);
@@ -50,25 +44,21 @@ public class ObservationTable extends Pane {
         vbox.getChildren().addAll(title, observationTable);
         this.getChildren().addAll(vbox);
     }
-
-;
-
     private void transposeListOfObservations() {
         listOfTransposedObservations = new ArrayList<>();
-        no = ProjectListsManager.getListOfObservations().size();
+        no = ObjectsManager.getListOfObservations().size();
         int minYear = Context.getFirstYear();
         ny = Context.getNbYears();
         for (int y = 0; y < ny; y++) {
             String name = "" + (minYear + y);
             double[] values = new double[no];
             for (int o = 0; o < no; o++) {
-                values[o] = ProjectListsManager.getListOfObservations().get(o).getValues(y);
+                values[o] = ObjectsManager.getListOfObservations().get(o).getValues(y);
             }
             Observation transposedObservation = new Observation(name, values);
             listOfTransposedObservations.add(transposedObservation);
         }
     }
-
     private void makeTable() {
         // Premiere colonne avec les annees
         TableColumn<Observation, String> name = new TableColumn<>("Name");
@@ -77,14 +67,14 @@ public class ObservationTable extends Pane {
         observationTable.getColumns().add(name);
         // Autres colones avec les observations
         for (int o = 0; o < no; o++) {
-            String obs = ProjectListsManager.getListOfObservations().get(o).getObsName();
+            String obs = ObjectsManager.getListOfObservations().get(o).getObsName();
             final int oo = o;
             TableColumn<Observation, String> col = new TableColumn<>();
             Label colHeader = new Label(obs);
             colHeader.setOnMouseClicked(event -> {
                 Label labs = (Label) event.getSource();
                 String obsS = labs.getText();
-                selectedObservation = ProjectListsManager.getObservationByName(obsS);
+                selectedObservation = ObjectsManager.getObservationByName(obsS);
             });
             col.setGraphic(colHeader);
             col.setSortable(false);
@@ -101,9 +91,6 @@ public class ObservationTable extends Pane {
             observationTable.getColumns().add(col);
         }
       }
-
-
-    //
     public void buildTable() {
         observationTable.setPrefWidth(0.8*width);
         observationTable.setPrefHeight(0.7*height);

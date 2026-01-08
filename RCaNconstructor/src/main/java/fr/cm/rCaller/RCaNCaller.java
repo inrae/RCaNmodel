@@ -1,12 +1,12 @@
 package fr.cm.rCaller;
 
+import com.github.rcaller.graphics.SkyTheme;
 import com.github.rcaller.rstuff.*;
 import fr.cm.Main.Context;
+import fr.cm.Main.Logg;
 import fr.cm.Main.MainApplication;
-import fr.cm.project.ProjectListsManager;
-import fr.cm.xmlFiles.RCommandXML;
+import fr.cm.Main.ObjectsManager;
 import javafx.application.Platform;
-import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 
 import java.io.*;
@@ -14,36 +14,44 @@ import java.util.List;
 
 public class RCaNCaller {
     static File filePlot;
-    static boolean plot = false,  initialized = false,  runOk = false;
+    static boolean plot = false,  initialized = false,  runOk = false, connected = false;
     static String resultString = "";
-    static RCommandXML rCommandXML = null;
+    static RCaNScript rCaNScript = null;
     static RCaller caller;
     static RCode code;
+    static StringBuilder succ = new StringBuilder("History of connection \n");
 
+    public static void initRCaN(){
+        connected = false;
+        Context.initRCaN();
+        caller = RCaller.create();
+        code = RCode.create();
+        caller.setRCode(code);
+        caller.setGraphicsTheme(new SkyTheme());
+        succ.append("Connected to R  \n");
+        connected = true;
+        Context.setConnectedR(connected);
+        Context.setHowConnected(succ.toString());
+    }
     // ------------------------------------------------------------------------
-    public static void makeRCommand(RCommandXML rCommandXML) {
-        caller = RCaNStartR.getCaller();
-        code = RCaNStartR.getCode();
-        RCaNCaller.rCommandXML = rCommandXML;
+    public static void makeRCommand(RCaNScript rCaNScript) {
+        RCaNCaller.rCaNScript = rCaNScript;
+        rCaNScript.print();
         plot = false;
         filePlot = null;
         resultString = "";
-        List<String> commandsR = rCommandXML.getrCompute();
-        List<String> commandsP = rCommandXML.getrPlots();
+        List<String> commandsR = rCaNScript.getrCompute();
+        List<String> commandsP = rCaNScript.getrPlots();
         try {
             code.clear();
             code.addRCode("resultR <- 'ok'");
             if (commandsR.size() > 0) {
-                for (String commandLine : commandsR) {
-                    code.addRCode(rCommandXML.explicitCommandLine( commandLine));
-                }
+                for (String commandLine : commandsR) code.addRCode(commandLine);
             }
             if (commandsP.size() > 0) {
                 plot = true;
                 filePlot = code.startPlot();
-                for (String commandLine : commandsP) {
-                    code.addRCode(rCommandXML.explicitCommandLine( commandLine));
-                }
+                for (String commandLine : commandsP) code.addRCode(commandLine);
                 code.endPlot();
                 caller.setRCode(code);
             }
@@ -53,8 +61,6 @@ public class RCaNCaller {
     }
     // ------------------------------------------------------------------------
     public static void runCommandR()  {
-        caller = RCaNStartR.getCaller();
-        code = RCaNStartR.getCode();
         runOk = false;
         resultString = "";
         try{
@@ -66,6 +72,7 @@ public class RCaNCaller {
             }
             runOk = true;
         } catch (Exception ex) {
+            Logg.addLog(ex.getMessage());
             ex.printStackTrace();
             runOk = false;
             StringWriter sw = new StringWriter();
@@ -76,13 +83,11 @@ public class RCaNCaller {
             });
         }
         if(runOk) {
-            resultString = RCaNParser.decodeParser( caller,  rCommandXML);
+            resultString = RCaNOutputParser.decodeParser( caller, rCaNScript);
         }
     }
     // ------------------------------------------------------------------------
     public static void stopCommandR(){
-        RCaller caller = RCaNStartR.getCaller();
-        RCode code = RCaNStartR.getCode();
         try {
             System.out.println("Stop R command");
             caller.stopRCallerAsync();
@@ -96,8 +101,6 @@ public class RCaNCaller {
     }
     // ------------------------------------------------------------------------
     static void stopSessionR(){
-        RCaller caller = RCaNStartR.getCaller();
-        RCode code = RCaNStartR.getCode();
         try {
             initialized = false;
             Context.initRCaN();
@@ -112,24 +115,14 @@ public class RCaNCaller {
     // ------------------------------------------------------------------------
     public static HBox getResultsR() {
         if(runOk){
-            if( ! rCommandXML.getName().equals("connect")) {
-                ProjectListsManager.addTimeLine(rCommandXML.getShortStringCommandLine(), true);
-            }
-            rCommandXML.setState(true);
+            if( ! rCaNScript.getName().equals("connect"))
+                ObjectsManager.addTimeLine(rCaNScript.getShortScript(), true);
+            rCaNScript.setState(true);
             MainApplication.updateMenus();
-            if(rCommandXML.isPlot()){
-                try {
-                    FileInputStream inputstream = new FileInputStream(filePlot);
-                    Image imageR = new Image(inputstream);
-                    new RCaNDialogOutput(rCommandXML, imageR);
-                }
-                catch (FileNotFoundException ex){
-                    return(null);
-                }
-            }
-            else if(rCommandXML.isTable()){
-                new RCaNDialogOutput(rCommandXML, resultString);
-            }
+            if(rCaNScript.isPlot())
+                new RCaNDialogOutput(rCaNScript, filePlot);
+            else if(rCaNScript.isTable())
+                new RCaNDialogOutput(rCaNScript, resultString);
         }
         return(null);
     }
