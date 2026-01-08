@@ -103,7 +103,7 @@ IntegerVector order_(const NumericVector & x) {
    
    // Check input arguments
    if (m < (p+1) || b.size()!=m || x0.size()!=p){
-     throw std::range_error("dimensions mismatch");
+     throw std::range_error("dimensions missmatch");
    }
    // Initialisation
    Eigen::MatrixXd X(N,p);

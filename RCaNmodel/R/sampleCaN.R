@@ -87,25 +87,22 @@ sampleCaN <- function(myCaNmod,
   
   writeLines("##Initializing")
   #we removed parameters that are fixed because of A or almost
-  bounds <- getAllBoundsParam(list(A = as.matrix(myCaNmod$A),
-                                   b = myCaNmod$b),
-                              progressBar = TRUE)
-  
-  #if some are fixed, we add them to C
-  fixed <- which(abs(bounds[, 2] - bounds[, 3]) <= 0)
-  if (length(fixed) > 0){
-    myCaNmod$v <- c(myCaNmod$v, rowMeans(bounds[fixed, 2:3, drop = FALSE]))
-    newC <- Matrix(0, length(fixed), ncol(myCaNmod$A))
-    newC[cbind(seq_len(length(fixed)), fixed)] <- 1
-    myCaNmod$C <- rbind(myCaNmod$C, newC)
-  }
-  
+  # bounds <- getAllBoundsParam(list(A = as.matrix(myCaNmod$A),
+  #                                  b = myCaNmod$b),
+  #                             progressBar = TRUE)
+  # 
+  # #if some are fixed, we add them to C
+  # fixed <- which(abs(bounds[, 2] - bounds[, 3]) <= 0)
+  # if (length(fixed) > 0){
+  #   myCaNmod$v <- c(myCaNmod$v, rowMeans(bounds[fixed, 2:3, drop = FALSE]))
+  #   newC <- Matrix(0, length(fixed), ncol(myCaNmod$A))
+  #   newC[cbind(seq_len(length(fixed)), fixed)] <- 1
+  #   myCaNmod$C <- rbind(myCaNmod$C, newC)
+  # }
+  # 
   #now we restrict to the degenerate subspace
-  solequality <- findInitPoint(as.matrix(myCaNmod$A),
-                               myCaNmod$b,
-                               as.matrix(myCaNmod$C),
-                               myCaNmod$v,
-                               progressBar = TRUE)
+  invC <- MASS::ginv(as.matrix(myCaNmod$C))
+  solequality <- invC %*% myCaNmod$v
   if (nrow(myCaNmod$C) > 0){
     subspace <- degenerateSubSpace(as.matrix(myCaNmod$A),
                                    myCaNmod$b,
@@ -168,7 +165,9 @@ sampleCaN <- function(myCaNmod,
   
   res <- foreach(i = 1:nchain) %myinfix% {
     writeLines(paste("###Start chain",i))
-    x0 <- rep(0, ncol(A3))
+    P <- Hpolytope(A = A3, b = b3)
+    
+    x0 <- volesti::inner_ball(P)[-ncol(A3)]
     if (any(is.nan(x0)))
       stop("unable to find any suitable solutions after 100 tries")
     writeLines(paste("###Start cpgs chain",i))
@@ -176,7 +175,6 @@ sampleCaN <- function(myCaNmod,
       res <-
         cpgs(N, A3, b3, x0, thin, method == "gibbs", i, i, covMat)
     } else {
-      P <- Hpolytope(A = A3, b = b3)
       res <- list(X = t(sample_points(P, 
                                       n = N, 
                                       random_walk = list(starting_point = x0, 
