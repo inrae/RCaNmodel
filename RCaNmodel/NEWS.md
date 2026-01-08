@@ -1,4 +1,5 @@
 # RCaNmodel (development version)
+* development of use of volesti
 
 # RCaNmodel 2.1
 * implementation of volesti
