@@ -27,7 +27,7 @@ phase and discarding phases won't be necessary}
 
 \item{thin}{thinning interval}
 
-\item{method}{one of gibbs (default) or hitandrun}
+\item{method}{one of CDHR (default from volesti), RDHR (from volesti), gibbs}
 
 \item{lastF}{should flow for last year be simulated (default = FALSE)}
 
