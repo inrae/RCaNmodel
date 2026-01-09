@@ -30,14 +30,14 @@ Imports:
     Rcpp,
     dqrng,
     RcppEigen,
-    volesti
+    volesti,
+    MASS
 LinkingTo: Rcpp, RcppEigen, dqrng
 Suggests: 
     kableExtra,
     gridExtra,
     knitr,
     rmarkdown,
-    MASS,
     ggraph,
     igraph,
     testthat (>= 3.0.0),
