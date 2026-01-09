@@ -33,14 +33,13 @@ writeCaN2XLS <- function(file,myCaNmod) {
                         "Constraints")
   if (!is.null(myCaNmod$dynamics)){
     list_data <- c(list_data, myCaNmod$dynamics)
-    names(list_data) <- c(list_data,
+    names(list_data) <- c(names(list_data),
                           "Dynamics")
   }
 
   if (!is.null(myCaNmod$aliases)){
-    list_data <- c(list_data, myCaNmod$aliases)
-    names(list_data) <- c(list_data,
-                          "Aliases")
+    list_data <- c(list_data, list(myCaNmod$aliases))
+    names(list_data)[length(list_data)] <- "Aliases"
   }
   write_xlsx(list_data,
              path =  file)
