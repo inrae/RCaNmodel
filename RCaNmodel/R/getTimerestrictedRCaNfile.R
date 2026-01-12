@@ -122,7 +122,7 @@ getTimerestrictedRCaNfile <-
     if (!is.null(aliases)){
       names_aliases <- setdiff(names(aliases),
                                c("Alias", "Formula"))
-      aliases <- aliases |>
+      aliases <- aliases %>%
         dplyr::select(dplyr::all_of(c("Alias", "Formula", names_aliases)))
       if (nrow(aliases > 0)){
         for (i in seq_len(nrow(aliases))){

@@ -170,7 +170,7 @@ sampleCaN <- function(myCaNmod,
     x0 <- volesti::inner_ball(P)[-ncol(A3)]
     if (any(is.nan(x0)))
       stop("unable to find any suitable solutions after 100 tries")
-    writeLines(paste("###Start cpgs chain",i))
+    writeLines(paste("###Start mcmc chain",i))
     if (method %in% c("gibbs", 'hitandrun')){
       res <-
         cpgs(N, A3, b3, x0, thin, method == "gibbs", i, i, covMat)
@@ -191,7 +191,7 @@ sampleCaN <- function(myCaNmod,
                             length(fixed),
                             byrow = TRUE))
       colnames(res$X) <- c(colnames(A3), names(fixed))  
-      res$X <- res$X[, colnames(A2)]
+      res$X <- res$X[, colnames(A2), drop = FALSE]
       
     } else {
       colnames(res$X) <- colnames(A2)  
@@ -205,7 +205,7 @@ sampleCaN <- function(myCaNmod,
     names(res) <- c("F", "covMat")
     res$B <- t(apply(res$F, 1, function(x) as.matrix(myCaNmod$L) %*% x))
     
-    res$F <- res$F[, -seq_len(length(myCaNmod$species))]
+    res$F <- res$F[, -seq_len(length(myCaNmod$species)), drop = FALSE]
     #we remove the first column which corresponds to initial biomasses
     colnames(res$F) <- colnames(myCaNmod$A)[-seq_len(length(myCaNmod$species))]
     
@@ -216,7 +216,7 @@ sampleCaN <- function(myCaNmod,
                                                  "]",
                                                  sep = ""))
       if (length(lastid) > 0)
-        res$F <- res$F[, - lastid]
+        res$F <- res$F[, - lastid, drop = FALSE]
     }
     colnames(res$B) <- rownames(myCaNmod$L)
     writeLines(paste("###End chain",i))
