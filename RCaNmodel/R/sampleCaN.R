@@ -11,6 +11,9 @@
 #' @param lastF should flow for last year be simulated (default = FALSE)
 #' @param keepCovMat save or not the covariance matrix (saving can gain time
 #' if new samples should be run but is very memory consuming - default FALSE)
+#' @param volestiinit volestiinit should the initialisation should be used by
+#' using {\code{\link[volesti]{inner_ball}}}. By default, the function check 
+#' that you have volesti 1.2 before using it (since 1.1 can hang)
 #' @return a sampleCaNmod object which contains three elements
 #' \describe{
 #'  \item{"CaNmod"}{the CaNmod object descring the model}
@@ -52,7 +55,14 @@ sampleCaN <- function(myCaNmod,
                       thin = 1,
                       method = "CDHR",
                       lastF = FALSE,
-                      keepCovMat = FALSE) {
+                      keepCovMat = FALSE,
+                      volestiinit = NULL) {
+  if (is.null(volestiinit)){
+    volesti2 <- compareVersion(as.character(packageVersion('volesti')),
+                               "1.1.2.9") > 0
+  } else {
+    volesti2 <- volestiinit
+  }
   if (inherits(myCaNmod, "sampleCaNmod")){
     covMat <- myCaNmod$covMat
     myCaNmod <- myCaNmod$CaNmod
@@ -86,23 +96,33 @@ sampleCaN <- function(myCaNmod,
   i <- NULL
   
   writeLines("##Initializing")
+
+  
+  if (!volesti2) {
   #we removed parameters that are fixed because of A or almost
-  # bounds <- getAllBoundsParam(list(A = as.matrix(myCaNmod$A),
-  #                                  b = myCaNmod$b),
-  #                             progressBar = TRUE)
-  # 
-  # #if some are fixed, we add them to C
-  # fixed <- which(abs(bounds[, 2] - bounds[, 3]) <= 0)
-  # if (length(fixed) > 0){
-  #   myCaNmod$v <- c(myCaNmod$v, rowMeans(bounds[fixed, 2:3, drop = FALSE]))
-  #   newC <- Matrix(0, length(fixed), ncol(myCaNmod$A))
-  #   newC[cbind(seq_len(length(fixed)), fixed)] <- 1
-  #   myCaNmod$C <- rbind(myCaNmod$C, newC)
-  # }
-  # 
+   bounds <- getAllBoundsParam(list(A = as.matrix(myCaNmod$A),
+                                    b = myCaNmod$b),
+                               progressBar = TRUE)
+   
+   #if some are fixed, we add them to C
+   fixed <- which(abs(bounds[, 2] - bounds[, 3]) <= 0)
+   if (length(fixed) > 0){
+     myCaNmod$v <- c(myCaNmod$v, rowMeans(bounds[fixed, 2:3, drop = FALSE]))
+     newC <- Matrix(0, length(fixed), ncol(myCaNmod$A))
+     newC[cbind(seq_len(length(fixed)), fixed)] <- 1
+     myCaNmod$C <- rbind(myCaNmod$C, newC)
+   }
+   solequality <- findInitPoint(as.matrix(myCaNmod$A),
+                                myCaNmod$b,
+                                as.matrix(myCaNmod$C),
+                                myCaNmod$v,
+                                progressBar = TRUE)
+  } else {
+   
   #now we restrict to the degenerate subspace
   invC <- MASS::ginv(as.matrix(myCaNmod$C))
   solequality <- invC %*% myCaNmod$v
+ }
   if (nrow(myCaNmod$C) > 0){
     subspace <- degenerateSubSpace(as.matrix(myCaNmod$A),
                                    myCaNmod$b,
@@ -157,7 +177,8 @@ sampleCaN <- function(myCaNmod,
   if (ncore > 1) {
     clusterExport(cl, c("A2", "b2", "Nt",
                         "solequality", "A3",
-                        "b3", "fixed", "keepCovMat"),
+                        "b3", "fixed", "keepCovMat",
+                        "volesti2"),
                   envir = environment())
   }
   
@@ -166,8 +187,11 @@ sampleCaN <- function(myCaNmod,
   res <- foreach(i = 1:nchain) %myinfix% {
     writeLines(paste("###Start chain",i))
     P <- Hpolytope(A = A3, b = b3)
-    
-    x0 <- volesti::inner_ball(P)[-ncol(A3)]
+    if (volesti2){
+      x0 <- volesti::inner_ball(P)[-ncol(A3)]
+    } else {
+      x0 <- rep(0, ncol(A3))
+    }
     if (any(is.nan(x0)))
       stop("unable to find any suitable solutions after 100 tries")
     writeLines(paste("###Start mcmc chain",i))

@@ -10,9 +10,10 @@ sampleCaN(
   nchain = 1,
   ncore = 1,
   thin = 1,
-  method = "gibbs",
+  method = "CDHR",
   lastF = FALSE,
-  keepCovMat = FALSE
+  keepCovMat = FALSE,
+  volestiinit = NULL
 )
 }
 \arguments{
@@ -33,6 +34,10 @@ phase and discarding phases won't be necessary}
 
 \item{keepCovMat}{save or not the covariance matrix (saving can gain time
 if new samples should be run but is very memory consuming - default FALSE)}
+
+\item{volestiinit}{volestiinit should the initialisation should be used by
+using {\code{\link[volesti]{inner_ball}}}. By default, the function check 
+that you have volesti 1.2 before using it (since 1.1 can hang)}
 }
 \value{
 a sampleCaNmod object which contains three elements
